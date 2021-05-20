@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Note that values enclosed by ${...} are NOT substituted in by Spring Boot. Instead, they refer to
+         system variables. See https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-logging.html
+         for details on how to configure Spring Boot application.properties to map to system properties that
+         logback can use. -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <!-- Note that log4j.xml had a ConversionPattern of value="%d %-5p [%t] %C{2} (%F:%L) - %m%n" -->
+            <Pattern>
+                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
+            </Pattern>
+        </layout>
+    </appender>
+
+    <appender name="GeneralLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/exlibris/dps/nlnz_tools/dashboard/logs/dashboard.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- Note that brackets are special characters in the pattern and must be escaped -->
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS Z} %-5p [%t] %C{2} \(%F:%L\) - %m%n</Pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 10 MegaBytes -->
+            <fileNamePattern>logs/dashboard-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="Splunk" class="com.splunk.logging.HttpEventCollectorLogbackAppender">
+        <url>http://localhost:8088</url>
+        <token>45cd2f2f-d005-4a63-a2c4-d34dfca4bdf5</token>
+        <disableCertificateValidation>true</disableCertificateValidation>
+        <batch_size_count>1</batch_size_count>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%msg</pattern>
+        </layout>
+    </appender>
+
+
+    <!-- These levels will be overridden by logging.level... properties found in application.properties and
+         application-<run-configuration>.properties -->
+    <root level="ERROR">
+        <appender-ref ref="GeneralLog"/>
+    </root>
+
+    <logger name="nz.govt.natlib.dashboard" level="INFO" additivity="false">
+        <appender-ref ref="GeneralLog"/>
+    </logger>
+
+    <logger name="org.hibernate" level="ERROR" additivity="false">
+        <appender-ref ref="GeneralLog"/>
+    </logger>
+
+    <logger name="org.springframework" level="ERROR" additivity="false">
+        <appender-ref ref="GeneralLog"/>
+    </logger>
+
+    <logger name="org.springframework.security" level="ERROR" additivity="false">
+        <appender-ref ref="GeneralLog"/>
+    </logger>
+
+    <!-- Note that log4j.xml had FATAL level -->
+    <logger name="org.springframework.web.servlet" level="ERROR" additivity="false">
+        <appender-ref ref="GeneralLog"/>
+    </logger>
+
+    <logger name="nz.govt.natlib.dashboard" additivity="false" level="DEBUG">
+        <appender-ref ref="Splunk"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="Splunk"/>
+    </root>
+</configuration>

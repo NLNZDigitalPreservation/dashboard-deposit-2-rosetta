@@ -1,0 +1,8 @@
+Requirement:
+1. port number, default: 8080. DNS name
+2. NFS to storage location: magazine, newspaper, video, audio.
+3. Disk space: 1G for test
+4. The URLs of Rosetta services.
+5. A DIA account for depositing to Rosetta. 
+
+

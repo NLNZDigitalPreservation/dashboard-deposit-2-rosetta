@@ -1,0 +1,91 @@
+<div class="modal fade" id="modal-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modal-settings-static" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header" style="background-image: linear-gradient(to bottom, #919599, #d8d9da);">
+        <h5 class="modal-title" id="modal-settings-static"><i class="bi bi-gear-fill"></i>&nbsp;Settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modal-body-settings">
+          <div class="card-settings" id="global-setting">
+            <nav class="navbar navbar-light">
+              <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <span class="navbar-brand mb-0 h1"><i class="bi bi-globe"></i>&nbsp;Deposit Account</span>
+              </ul>
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <button onclick="saveGlobalSetting();" class="btn btn-primary" type="button">Apply</button>
+                </li>
+              </ul>
+            </nav>
+
+            <div class="alert alert-warning" role="alert" name="audit" style="display: none;"></div>
+
+            <input type="text" name="id" style="display: none;">
+            <div class="input-group mb-3">
+                  <span class="input-group-text">Institute</span>
+                  <input type="text" class="form-control" name="depositUserInstitute">
+            </div>
+            <div class="input-group mb-3">
+                  <span class="input-group-text">User Name</span>
+                  <input type="text" class="form-control" name="depositUserName">
+            </div>
+            <div class="input-group mb-3"> 
+                <span class="input-group-text">Password</span>
+                <input type="password" class="form-control" name="depositUserPassword">
+            </div>
+          </div>
+
+          <div class="card-settings" id="flow-settings">
+            <nav class="navbar navbar-light">
+              <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <span class="navbar-brand mb-0 h1"><i class="bi bi-card-heading"></i>&nbsp;Material Flow Settings</span>
+              </ul>
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <button onclick="newMaterialFlow();" class="btn btn-primary" type="button">New</button>
+                </li>
+              </ul>
+            </nav>
+
+            <!-- <div class="ag-theme-alpine content" id="grid-flow-settings" style="width: 100%; height: 65vh;"></div> -->
+            <div id="table-flow-settings"></div>
+
+          </div>
+
+          <div class="card-settings" id="global-white-list">
+            <nav class="navbar navbar-light">
+              <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <span class="navbar-brand mb-0 h1"><i class="bi bi-people"></i>&nbsp;White List</span>
+              </ul>
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <div class="d-flex justify-content-between bd-highlight mb-3">
+                      <input type="text" name="id" style="display: none;">
+
+                      <div class="p-2 bd-highlight"><span class="input-group-text">User Name</span></div>
+
+                      <div class="p-2 bd-highlight"><input type="text" class="form-control" name="whiteUserName"></div>
+
+                      <div class="p-2 bd-highlight"><span class="input-group-text">Role</span></div>
+
+                      <div class="p-2 bd-highlight">
+                          <select class="form-select" name="whiteUserRole">
+                              <option value="admin">Admin</option>
+                              <option value="normal">Normal</option>
+                          </select>
+                      </div>
+
+                      <div class="p-2 bd-highlight">
+                          <button type="button" class="btn btn-primary" onclick="saveUser2WhiteList();" style="width: 100%;">Add</button>
+                      </div>
+                  </div>
+                </li>
+              </ul>
+            </nav>
+
+            <div id="grid-global-white-list"></div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
