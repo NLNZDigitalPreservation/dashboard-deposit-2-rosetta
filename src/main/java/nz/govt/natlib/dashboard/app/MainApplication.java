@@ -6,8 +6,6 @@ import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.List;
 
-//import nz.govt.natlib.dashboard.domain.repo.RepoStorageLocation;
-//import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +18,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-//import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
@@ -35,11 +32,6 @@ public class MainApplication implements CommandLineRunner {
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_CYAN = "\u001B[36m";
-
-//    @Autowired
-//    private RepoFlowSetting repoFlowSetting;
-//    @Autowired
-//    private RepoStorageLocation repoStorageLocation;
 
     @Autowired
     private ApplicationContext ctx;

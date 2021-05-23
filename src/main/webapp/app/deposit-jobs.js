@@ -7,7 +7,7 @@ const contextMenuItemsDepositJobsActive={
     "pause": {name: "Pause", icon: "bi bi-pause-circle", disabled: disableDepositJobContextMenuItemActive},
     "resume": {name: "Resume", icon: "bi bi-play-circle", disabled: disableDepositJobContextMenuItemActive},
     "sep3": "---------",
-    "terminate": {name: "Terminate", icon: "bi bi-stop-circle", disabled: disableDepositJobContextMenuItemActive},
+    "terminate": {name: "Terminate and Purge", icon: "bi bi-stop-circle", disabled: disableDepositJobContextMenuItemActive},
 };
 
 function disableDepositJobContextMenuItemActive(key, opt){
@@ -25,7 +25,7 @@ function disableDepositJobContextMenuItemActive(key, opt){
         case 'RETRY':
             return !(stage==='DEPOSIT' && state==='FAILED');
         case 'TERMINATE':
-            return (stage==='CANCELED' && state==='CANCELED') || (stage==='FINALIZE' && state==='SUCCEED');
+            return (stage==='DEPOSIT' && (state==='RUNNING' || state==='SUCCEED')) || (stage==='FINALIZE' && state==='SUCCEED');
         case 'CANCEL':
             return !(state==='FAILED');
         default:
@@ -136,6 +136,10 @@ function handleDepositJobActive(action, selectedRow){
         return;
     }
 
+    if(action==='terminate' && !confirm("The job will be forced to terminate and purge. Are you sure you will continue?")){
+        return;
+    }
+
     var reqNodes=[];
     reqNodes.push(selectedRow.data);
 
@@ -152,8 +156,12 @@ function handleDepositJobActive(action, selectedRow){
                 dataset.push(node.data);
             }
         });
-       
-        gridDepositJobs.update(dataset);
+
+        if(action==='terminate'){
+            gridDepositJobs.removeByDataSet(dataset);
+        }else{
+            gridDepositJobs.update(dataset);
+        }
     });
 }
 

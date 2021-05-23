@@ -1,6 +1,7 @@
 package nz.govt.natlib.dashboard.viewer;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.servlet.RequestDispatcher;
@@ -30,6 +31,7 @@ public class TestAudioVideoPlayerViewer {
 //        System.setProperty("https.proxyPort", proxyPort);
     }
 
+    @Disabled
     @Test
     public void testDoGet() throws InterruptedException {
         AudioVideoPlayerViewer viewer = new AudioVideoPlayerViewer();
@@ -47,7 +49,7 @@ public class TestAudioVideoPlayerViewer {
         List<String> results = new ArrayList<>();
         String[] wsdl_urls = {"https://wlguatdpsilb.natlib.govt.nz/dpsws/delivery/DeliveryAccessWS?wsdl",
                 "http://wlguatrosiapp01.natlib.govt.nz:1801/dpsws/delivery/DeliveryAccessWS?wsdl",
-                "http://wlguatrosiapp02.natlib.govt.nz:1801/dpsws/delivery/DeliveryAccessWS?wsdl"};
+                "http://wlguatrosiapp01.natlib.govt.nz:1801/dpsws/delivery/DeliveryAccessWS?wsdl"};
 
 //        ,
 //        "http://wlguatrosiapp01.natlib.govt.nz:1801/dpsws/delivery/DeliveryAccessWS?wsdl",

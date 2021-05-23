@@ -18,8 +18,8 @@ import nz.govt.natlib.ndha.srusearchclient.SruRequest;
 import nz.govt.natlib.ndha.srusearchclient.SruService;
 import nz.govt.natlib.ndha.srusearchclient.impl.SruRequestImpl;
 import nz.govt.natlib.ndha.srusearchclient.impl.SruServiceImpl;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class TestRosettaWebServiceImpl {
 
     private static final String INSTITUTION = "INS00";
     private static final String USERNAME = "leefr";
-    private static final String PASSWORD = "wangyang+115";
+    private static final String PASSWORD = "*****";
 
     @BeforeAll
     static void init() throws Exception {
@@ -61,6 +61,7 @@ public class TestRosettaWebServiceImpl {
         rosettaWebService.init(PDSUrl, ProducerWsdlUrl, DepositWsdlUrl, SipWsdlUrl, DeliveryAccessWsdlUrl);
     }
 
+    @Disabled
     @Test
     public void testGetDepositActivityByUpdateDateByMaterialFlow() throws Exception {
         String pdsHandle = rosettaWebService.login(INSTITUTION, USERNAME, PASSWORD);
@@ -125,6 +126,7 @@ public class TestRosettaWebServiceImpl {
         System.out.println(reply);
     }
 
+    @Disabled
     @Test
     public void testGetProducerDetails() throws Exception {
         String pdsHandle = rosettaWebService.login(INSTITUTION, USERNAME, PASSWORD);
@@ -134,8 +136,8 @@ public class TestRosettaWebServiceImpl {
         System.out.println(reply);
     }
 
-    @Ignore
-//    @Test
+    @Disabled
+    @Test
     public void testDeliveryAccess() throws Exception {
         String pdsHandle = rosettaWebService.getPdsClient().login(INSTITUTION, USERNAME, PASSWORD);
 
@@ -269,8 +271,8 @@ public class TestRosettaWebServiceImpl {
         return (parameterNameValuePair == null ? null : parameterNameValuePair.replace("dps_dvs=", ""));
     }
 
-//    @Test
-    @Ignore
+    @Disabled
+    @Test
     public void testCMS2() throws XmlException, IOException {
         String url = "http://wlgortimuweb01.natlib.govt.nz:8080/sru?";
         boolean isEmu = true;
@@ -310,7 +312,8 @@ public class TestRosettaWebServiceImpl {
     }
 
 //    @Test
-    @Ignore
+    @Disabled
+    @Test
     public void testCms1() throws XmlException, IOException {
         //String url = "http://natlib-primo.hosted.exlibrisgroup.com/primo_library/libweb/action/dlSearch.do?vid=NLNZ&institution=64NLNZ&search_scope=NLNZ&indx=1&bulkSize=10&query=any,exact,";
 //        String url = "https://wlguatdpsilb.natlib.govt.nz/delivery/sru?";

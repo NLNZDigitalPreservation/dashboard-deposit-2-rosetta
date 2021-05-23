@@ -31,12 +31,10 @@ public class ScheduleProcessorImplJobFinalizing extends ScheduleProcessor {
                 return;
             }
 
-            //Finalize success jobs or canceled jobs
+            //Finalize success jobs
             if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
                     (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.INITIALED) ||
-                    (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.RUNNING) ||
-                    job.getStage() == EnumDepositJobStage.CANCELED ||
-                    job.getState() == EnumDepositJobState.CANCELED) {
+                    (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.RUNNING)) {
                 depositJobService.jobFinalizeStart(job);
 
                 //Backup contents

@@ -44,9 +44,7 @@ public class TestScheduleProcessorImplJobFinalizing extends ScheduleProcessorTes
                 assert jobAfterFinalized != null;
                 if ((stage == EnumDepositJobStage.DEPOSIT && state == EnumDepositJobState.SUCCEED)
                         || (stage == EnumDepositJobStage.FINALIZE && state == EnumDepositJobState.INITIALED)
-                        || (stage == EnumDepositJobStage.FINALIZE && state == EnumDepositJobState.RUNNING)
-                        || stage == EnumDepositJobStage.CANCELED
-                        || state == EnumDepositJobState.CANCELED) {
+                        || (stage == EnumDepositJobStage.FINALIZE && state == EnumDepositJobState.RUNNING)) {
                     assert jobAfterFinalized.getStage() == EnumDepositJobStage.FINALIZE;
                     assert jobAfterFinalized.getState() == EnumDepositJobState.SUCCEED;
 

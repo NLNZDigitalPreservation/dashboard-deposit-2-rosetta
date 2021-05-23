@@ -7,8 +7,8 @@ import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityStorageLocation;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import nz.govt.natlib.ndha.common.exlibris.ResultOfDeposit;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,8 @@ public class TestDepositJobService extends BasicTester {
     }
 
     //    @Test
-    @Ignore
+    @Disabled
+    @Test
     public void testDeposit() {
         String institution = "INS00";
         String username = "leefr";
@@ -142,6 +143,7 @@ public class TestDepositJobService extends BasicTester {
         log.info("Sip: {}, Status: {} {} {}", sipId, sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
     }
 
+    @Disabled
     @Test
     public void testManualSubmitDepositJob() {
         EntityFlowSetting flowSetting = repoFlowSetting.getAll().get(0);

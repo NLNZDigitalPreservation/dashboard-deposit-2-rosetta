@@ -3,6 +3,7 @@ package nz.govt.natlib.dashboard.common.injection;
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -48,6 +49,9 @@ public class InjectionTester {
         File targetDir = new File(injectRootPath, subFolderName);
         if (!targetDir.exists()) {
             boolean rstVal = targetDir.mkdirs();
+            if (!rstVal) {
+                System.out.println(targetDir + ": " + ExceptionUtils.getStackTrace(new Exception()));
+            }
             assert rstVal;
         } else {
             try {

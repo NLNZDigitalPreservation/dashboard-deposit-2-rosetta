@@ -191,8 +191,8 @@ class CustomizedAgGrid{
         this.grid.gridOptions.api.redrawRows(true);
 
         var selectedRow=this.getSelectedRow();
-        if (selectedRow) {
-            var selectedNode=gridMaterialFlow.getNodeById(selectedRow.id);
+        if (tableFlowSettings && selectedRow) {
+            var selectedNode=tableFlowSettings.getRowById(selectedRow.id);
             this.selectRow(selectedNode);
         }else{
             this.selectRow();

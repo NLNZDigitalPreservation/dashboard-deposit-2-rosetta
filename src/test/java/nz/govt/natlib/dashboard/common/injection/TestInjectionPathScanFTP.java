@@ -4,7 +4,6 @@ import nz.govt.natlib.dashboard.common.metadata.EnumStorageMode;
 import nz.govt.natlib.dashboard.domain.entity.EntityStorageLocation;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Ignore;
 import org.junit.jupiter.api.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -17,9 +16,9 @@ public class TestInjectionPathScanFTP extends InjectionPathScanTester {
     @BeforeAll
     public static void init() {
         String subFolder = DashboardHelper.getUid();
-        rootPath = String.format("/home/dashboard/deposit/%s", subFolder);
-        injectRootPath = String.format("/home/dashboard/deposit/%s/magazine", subFolder);
-        backupRootPath = String.format("/home/dashboard/deposit/%s/magazine_backup", subFolder);
+        rootPath = String.format("/tmp/dashboard/deposit/%s", subFolder);
+        injectRootPath = String.format("/tmp/dashboard/deposit/%s/magazine", subFolder);
+        backupRootPath = String.format("/tmp/dashboard/deposit/%s/magazine_backup", subFolder);
 
         EntityStorageLocation injectLocationFTP = new EntityStorageLocation();
         injectLocationFTP.setScanMode(EnumStorageMode.FTP.toString());
@@ -37,35 +36,40 @@ public class TestInjectionPathScanFTP extends InjectionPathScanTester {
 
     @AfterAll
     public static void close() {
-        injectPathScanClient.disconnect();
-        backupPathScanClient.disconnect();
+        if (injectPathScanClient != null) {
+            injectPathScanClient.disconnect();
+        }
+        if (backupPathScanClient != null) {
+            backupPathScanClient.disconnect();
+        }
     }
 
-    @Ignore
-//    @Test
+    @Disabled
+    @Test
     public void testRead() throws IOException {
         super.testReadInternal();
     }
 
-    @Ignore
-//    @Test
+    @Disabled
+    @Test
     public void testNFSCopyFiles() throws IOException {
         super.testNFSCopyFilesInternal();
     }
 
-    @Ignore
-//    @Test
+    @Disabled
+    @Test
     public void testDelete() throws IOException {
         super.testDeleteInternal();
     }
 
-    @Ignore
-//    @Test
+    @Disabled
+    @Test
     public void testList() {
         super.testListDir();
     }
 
-//    @Test
+    @Disabled
+    @Test
     public void testChangeDirAndMakeDirs() {
         String subFolder = injectRootPath + PATH_SEPARATOR + DashboardHelper.getUid();
 

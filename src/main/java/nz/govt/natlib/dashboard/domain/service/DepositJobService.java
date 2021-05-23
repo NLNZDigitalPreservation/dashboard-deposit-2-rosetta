@@ -189,22 +189,24 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     }
 
     public EntityDepositJob terminate(EntityDepositJob job) {
-        if ((job.getStage() == EnumDepositJobStage.CANCELED || job.getState() == EnumDepositJobState.CANCELED) ||
+        if ((job.getStage() == EnumDepositJobStage.DEPOSIT && (job.getState() == EnumDepositJobState.RUNNING || job.getState() == EnumDepositJobState.SUCCEED)) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED)) {
             log.warn("{} at stage [{}] and state [{}] could not be terminated", job.getInjectionTitle(), job.getStage(), job.getState());
             return job;
         }
-        long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
-        job.setLatestTime(nowDatetime);
-        job.setStage(EnumDepositJobStage.CANCELED);
-        job.setState(EnumDepositJobState.CANCELED);
-        job.setResultMessage("Terminated");
-        repoJobActive.save(job);
+        repoJobActive.deleteById(job.getId());
+        repoJobHistory.deleteById(job.getId());
+//        long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
+//        job.setLatestTime(nowDatetime);
+//        job.setStage(EnumDepositJobStage.CANCELED);
+//        job.setState(EnumDepositJobState.CANCELED);
+//        job.setResultMessage("Terminated");
+//        repoJobActive.save(job);
         return job;
     }
 
     public EntityDepositJob cancel(EntityDepositJob job) {
-        if (job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() != EnumDepositJobState.RUNNING) {
+        if (job.getStage() != EnumDepositJobStage.DEPOSIT || job.getState() != EnumDepositJobState.FAILED) {
             log.warn("{} at stage [{}] and state [{}] could not be canceled", job.getInjectionTitle(), job.getStage(), job.getState());
             return job;
         }

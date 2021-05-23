@@ -47,6 +47,11 @@ public class TestInjectionUtil extends InjectionTester {
 
     @BeforeEach
     public void initSubFolder() {
-        super.initSubFolder();
+        try {
+            super.initSubFolder();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

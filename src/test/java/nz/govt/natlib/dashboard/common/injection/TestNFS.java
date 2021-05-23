@@ -1,7 +1,7 @@
 package nz.govt.natlib.dashboard.common.injection;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -14,6 +14,7 @@ import java.util.List;
 public class TestNFS {
     private static final String PROMPT = "NFSv41: ";
 
+    @Disabled
     @Test
     public void testNFSList() throws IOException, InterruptedException {
         String filePath = "/media/sf_frank";
@@ -30,6 +31,7 @@ public class TestNFS {
         }
     }
 
+    @Disabled
     @Test
     public void testNFSListWithURL() throws IOException, InterruptedException {
 //        System.setProperty("java.net.useSystemProxies", "true");
@@ -45,8 +47,8 @@ public class TestNFS {
     }
 
     //    Y:\ndha\pre-deposit_prod\frank\magazine
-    @Ignore
-//    @Test
+    @Disabled
+    @Test
     public void testNFSFileListWithURL() throws IOException, InterruptedException {
         URL url = new URL("file://Y:\\\\ndha\\pre-deposit_prod\\frank\\magazine\\");
         URLConnection conn = url.openConnection();
