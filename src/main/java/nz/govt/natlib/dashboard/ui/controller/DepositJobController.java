@@ -35,6 +35,7 @@ public class DepositJobController {
 
     @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_ACTIVE_GET, method = {RequestMethod.POST, RequestMethod.GET})
     public RestResponseCommand retrieveActiveDepositJobs() {
+        log.info("Retrieve all active jobs.");
         RestResponseCommand rsp = new RestResponseCommand();
         List<EntityDepositJob> listActiveJobs = repoDepositJobActive.getAll();
         List<EntityFlowSetting> listFlowSettings = repoFlowSetting.getAll();
@@ -49,6 +50,7 @@ public class DepositJobController {
 
     @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_ALL_GET, method = {RequestMethod.POST, RequestMethod.GET})
     public RestResponseCommand retrieveAllDepositJobs(@RequestParam("scope") String scope) {
+        log.info("Retrieve all jobs from [{}]", scope);
         RestResponseCommand rsp = new RestResponseCommand();
         List<EntityDepositJob> listJobs;
         if (scope.equalsIgnoreCase(RepoDepositJob.DEPOSIT_JOB_DIR_ACTIVE)) {
@@ -63,6 +65,7 @@ public class DepositJobController {
 
     @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_DETAIL, method = {RequestMethod.POST, RequestMethod.GET})
     public RestResponseCommand retrieveDepositJobDetails(@RequestParam("scope") String scope, @RequestParam("jobId") Long jobId) {
+        log.info("Retrieve job details from [{}]: {}", scope, jobId);
         RestResponseCommand rsp = new RestResponseCommand();
         EntityDepositJob dto;
         if (scope.equalsIgnoreCase(RepoDepositJob.DEPOSIT_JOB_DIR_ACTIVE)) {
@@ -82,6 +85,7 @@ public class DepositJobController {
     public RestResponseCommand updateDepositJobs(@RequestParam("action") String action, @RequestBody List<EntityDepositJob> listJobs) {
         List<EntityDepositJob> retVal = new ArrayList<>();
         listJobs.forEach(job -> {
+            log.info("{} {} {}", action, job.getId(), job.getInjectionTitle());
             EntityDepositJob updatedJob = null;
             if (action.equalsIgnoreCase("retry")) {
                 updatedJob = depositJobService.retry(job);

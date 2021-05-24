@@ -33,7 +33,7 @@ public class ScheduleProcessorImplJobDepositing extends ScheduleProcessor {
 
             //
             if (!(job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.INITIALED)) {
-                log.info("Skip unprepared job, {} {} {} {}", flowSetting.getName(), job.getInjectionTitle(), job.getStage(), job.getState());
+                log.debug("Skip deposit job for: {} --> {} at status [{}] [{}]", flowSetting.getName(), job.getInjectionTitle(), job.getStage(), job.getState());
                 continue;
             }
 

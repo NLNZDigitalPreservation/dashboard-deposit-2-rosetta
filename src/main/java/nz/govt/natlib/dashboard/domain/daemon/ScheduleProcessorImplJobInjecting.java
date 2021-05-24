@@ -45,7 +45,7 @@ public class ScheduleProcessorImplJobInjecting extends ScheduleProcessor {
 
             //Ignore the jobs not in the INITIAL stage
             if (job.getStage() != EnumDepositJobStage.INJECT || job.getState() != EnumDepositJobState.RUNNING) {
-                log.info("Deposit job is existing and prepared in DB: {} {} {} {}", flowSetting.getName(), injectionPath.getName(), job.getStage(), job.getState());
+                log.debug("Skip unprepared job for: {} --> {} at status [{}] [{}]", flowSetting.getName(), job.getInjectionTitle(), job.getStage(), job.getState());
                 continue;
             }
 
@@ -53,7 +53,7 @@ public class ScheduleProcessorImplJobInjecting extends ScheduleProcessor {
             job = depositJobService.jobUpdateFilesStat(job, stat.getFileCount(), stat.getFileSize());
 
             File doneFile = new File(injectionPath, flowSetting.getInjectionCompleteFileName());
-            if (!injectionPathScanClient.exists(UnionPath.of(doneFile) )) {
+            if (!injectionPathScanClient.exists(UnionPath.of(doneFile))) {
                 log.debug("{} file does not exist in: {}", flowSetting.getInjectionCompleteFileName(), injectionPath.getAbsolutePath());
                 continue;
             }

@@ -1,6 +1,7 @@
 package nz.govt.natlib.dashboard.ui.controller;
 
 import nz.govt.natlib.dashboard.domain.daemon.TimerScheduledExecutors;
+import nz.govt.natlib.dashboard.domain.repo.RepoAbstract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +20,18 @@ public class SystemManagementController {
     @Autowired
     private TimerScheduledExecutors timerScheduledExecutors;
 
-    @RequestMapping(path = "/shutdown", method = {RequestMethod.GET, RequestMethod.POST})
-    public void shutdown(HttpServletRequest req, HttpServletResponse rsp) throws IOException {
+    @RequestMapping(path = "/release", method = {RequestMethod.GET, RequestMethod.POST})
+    public String release(HttpServletRequest req, HttpServletResponse rsp) throws IOException {
         String reqAddress = req.getRemoteAddr();
         if (!reqAddress.equals("127.0.0.1") && !reqAddress.equals("0:0:0:0:0:0:0:1") && !reqAddress.equals("localhost")) {
             rsp.getWriter().write("You can only shutdown the service from local machine.");
-            return;
+            return "YYou can only shutdown the service from local machine.";
         }
         log.info("Received [shutdown] command {}", req.getParameter("Referer"));
         log.info("Dashboard is going to exit.");
         timerScheduledExecutors.close();
-        System.exit(0);
+        RepoAbstract.getListAllRepos().forEach(RepoAbstract::close);
+        //        System.exit(0);
+        return "The system resources held by Dashboard were released.";
     }
 }

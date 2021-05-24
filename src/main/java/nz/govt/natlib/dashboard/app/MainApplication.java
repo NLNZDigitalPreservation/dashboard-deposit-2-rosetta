@@ -1,12 +1,7 @@
 package nz.govt.natlib.dashboard.app;
 
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Arrays;
-import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,32 +32,12 @@ public class MainApplication implements CommandLineRunner {
     private ApplicationContext ctx;
 
     public static void main(String[] args) {
-//        Arrays.asList(args).forEach(System.out::println);
-        if (args.length >= 2 && args[0].equalsIgnoreCase("stop")) {
-            shutdown(args[1]);
-            return;
-        }
-
         try {
             SpringApplication.run(MainApplication.class, args);
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
-
-    public static void shutdown(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            URLConnection conn = url.openConnection();
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-            List<String> lines = IOUtils.readLines(conn.getInputStream());
-            lines.forEach(System.out::println);
-        } catch (IOException e) {
-//            e.printStackTrace();
-        }
-    }
-
 
     @Override
     public void run(String... args) throws Exception {

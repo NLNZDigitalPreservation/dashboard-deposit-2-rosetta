@@ -7,15 +7,18 @@ import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.StoreConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class RepoAbstract {
     private final static String JE_LOG_FILE_MAX = Long.toString(512 * 1014 * 1014);
+    private final static List<RepoAbstract> listAllRepos = new ArrayList<>();
+
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Value("${system.storage.path}")
@@ -29,6 +32,9 @@ public abstract class RepoAbstract {
         environmentConfig.setAllowCreate(true);
         environmentConfig.setTransactional(true);
         environmentConfig.setConfigParam("je.log.fileMax", JE_LOG_FILE_MAX);
+
+        environmentConfig.setLocking(true);
+
         File file = new File(systemStoragePath, getSubDirectory());
         if (!file.isDirectory()) {
             if (!file.mkdirs()) {
@@ -44,6 +50,8 @@ public abstract class RepoAbstract {
         storeConfig.setTransactional(true);
 
         store = new EntityStore(env, "dashboard", storeConfig);
+
+        listAllRepos.add(this);
     }
 
     @PostConstruct
@@ -52,7 +60,20 @@ public abstract class RepoAbstract {
     abstract public String getSubDirectory();
 
     public void close() {
-        this.store.close();
-        this.store.getEnvironment().close();
+        try {
+            this.store.close();
+
+            if (!this.store.getEnvironment().isClosed()) {
+                this.store.getEnvironment().close();
+            }
+            System.out.println("Closed: " + this.toString());
+        } catch (Exception e) {
+            System.out.println("Failed to close: " + this.toString());
+            e.printStackTrace();
+        }
+    }
+
+    public static List<RepoAbstract> getListAllRepos() {
+        return listAllRepos;
     }
 }
