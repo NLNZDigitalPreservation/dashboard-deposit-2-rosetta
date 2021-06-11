@@ -235,21 +235,6 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
         return String.format("%s%s", baseUrl, targetUrl);
     }
 
-    public String getSSOLogoutUrl(HttpServletRequest req) {
-        String url = getAbsolutePath(req, DashboardConstants.PATH_USER_LOGIN);
-        return String.format("%s?func=logout&url=%s", pdsUrl, url);
-    }
-
-    public String getSSOLoginUrl(HttpServletRequest req) {
-        String url = getAbsolutePath(req, DashboardConstants.PATH_USER_LOGIN);
-        return String.format("%s?func=load-login&url=%s", pdsUrl, url);
-    }
-
-    public String getSSOLoginFromStartUrl(HttpServletRequest req) {
-        String url = getAbsolutePath(req, DashboardConstants.PATH_USER_LOGIN);
-        return String.format("%s?func=logout&url=%s?func=load-login&url=%s", pdsUrl, pdsUrl, url);
-    }
-
     public boolean isValidSession(HttpServletRequest req, HttpServletResponse rsp) {
         StandardSession session = this.getPrivateSessionField(req.getSession());
         if (session == null || !session.isValid()) {

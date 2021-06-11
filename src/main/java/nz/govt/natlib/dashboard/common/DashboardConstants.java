@@ -35,11 +35,13 @@ public class DashboardConstants {
     public static final String PATH_SYSTEM_EVENT_ALL = PATH_SYSTEM_EVENT + "/all/get";
     public static final String PATH_SYSTEM_EVENT_ACTION = PATH_SYSTEM_EVENT + "/selected/action";
 
+
+    //Will bypass the authentication filter
     public static final String PATH_ROOT_AUTH = "/auth";
-    public static final String PATH_USER_LOGIN = PATH_ROOT_AUTH + "/login.html";
-    public static final String PATH_USER_LOGOUT = PATH_ROOT_AUTH + "/logout.html";
-    public static final String PATH_USER_HTML_PASSWORD = PATH_ROOT_AUTH + "password.html";
-    public static final String PATH_USER_CHANGE_PASSWORD = PATH_ROOT_AUTH + "password/save";
+    public static final String PATH_USER_LOGIN_API = PATH_ROOT_AUTH + "/login.json";
+    public static final String PATH_USER_LOGOUT_API = PATH_ROOT_AUTH + "/logout.json";
+    public static final String PATH_USER_LOGIN_HTML = "/login.html";
+    public static final String PATH_USER_INDEX_HTML = "/index.html";
 
     public static final String KEY_PDS_HANDLE = "PDS_HANDLE";
     public static final String KEY_USER_INFO = "USER_INFO";
@@ -51,7 +53,7 @@ public class DashboardConstants {
         for (Field f : fields) {
             if (Modifier.isStatic(f.getModifiers()) && f.getName().startsWith("PATH")) {
                 try {
-                    MAP_ALL_CONSTANTS.put(f.getName(), (String)f.get(DashboardConstants.class));
+                    MAP_ALL_CONSTANTS.put(f.getName(), (String) f.get(DashboardConstants.class));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
