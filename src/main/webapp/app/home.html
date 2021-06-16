@@ -40,7 +40,8 @@
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false">Signed in as ${userName} <br/> <i class="bi bi-person"></i>&nbsp;Admin</a>
         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end bg-danger" aria-labelledby="dropdown01">
-          <li><a class="dropdown-item" href="#" onclick="signOut();"><i class="bi bi-power"></i>&nbsp;Sign out</a></li>
+          <!-- <li><a class="dropdown-item" href="#" onclick="signOut();"><i class="bi bi-power"></i>&nbsp;Sign out</a></li> -->
+          <li><a class="dropdown-item" href="./auth/logout.json"><i class="bi bi-power"></i>&nbsp;Sign out</a></li>
         </ul>
       </li>
     </ul>
@@ -103,7 +104,7 @@ ${templateSettingFlows}
 </#list>
 
 <script>
-  const HTML_IFRAME_LOGIN='<iframe src="${redirectUrl}" scrolling="no" frameborder="0" allowfullscreen> </iframe>';
+  const HTML_IFRAME_LOGIN='<iframe src="login.html" scrolling="no" frameborder="0" allowfullscreen> </iframe>';
   const IS_GLOBAL_SETTING_INITIALED=${initialed};
   const modalGlobalSettingInitial = new bootstrap.Modal(document.getElementById('modal-global-setting-initial'), {keyboard: false});
   const modalSettings = new bootstrap.Modal(document.getElementById('modal-settings'), {keyboard: false});
@@ -146,12 +147,12 @@ ${templateSettingFlows}
   }
 
   function signOut(){
-    window.location.replace(PATH_USER_LOGOUT);
+    window.location.replace('auth/logout.json');
   }
 
   function initialGlobalSetting(){
     fetchHttp(PATH_SETTING_GLOBAL_INITIAL, null, function(rsp){
-      window.location.replace('${PATH_CONTEXT}');
+      window.location.replace('home.html');
     });
   }
 
