@@ -35,6 +35,7 @@ function disableDepositJobContextMenuItemActive(key, opt){
 
 const gridDepositJobsColumnsActive=[
     // {headerName: "#", width:45, checkboxSelection: true, pinned: 'left'},
+    {headerName: "ID", field: "id", width: 90, pinned: 'left'},
     {headerName: "Flow", field: "flowName", pinned: 'left', width: 120, cellRenderer: function(row){
         return row.data.appliedFlowSetting.name;
     }},
@@ -277,6 +278,10 @@ function setValueDepositJobActive(data){
         }else{
             setProgressBarStyle('#progress-stage-name div[name="finalize"]', progress, 'FINALIZE', 'FINISHED');
         }
+    }else{
+        setProgressBarStyle('#progress-stage-name div[name="inject"]', 'bg-finished', 'INJECT', 'FINISHED');
+        setProgressBarStyle('#progress-stage-name div[name="deposit"]', 'bg-finished', 'DEPOSIT', 'FINISHED');
+        setProgressBarStyle('#progress-stage-name div[name="finalize"]', 'bg-finished', 'FINALIZE', state);
     }
 
 

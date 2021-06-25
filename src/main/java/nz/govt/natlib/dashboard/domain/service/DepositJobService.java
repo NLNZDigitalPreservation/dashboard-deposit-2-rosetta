@@ -419,7 +419,6 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
 
 
         List<EntityDepositJob> listJobs = repoJob.getByLatestTime(lStart, lEnd);
-        ;
 
         listJobs = listJobs.stream().filter(e -> {
             return isContains(cmd.getFlowIds(), e.getAppliedFlowSetting().getId().toString());
