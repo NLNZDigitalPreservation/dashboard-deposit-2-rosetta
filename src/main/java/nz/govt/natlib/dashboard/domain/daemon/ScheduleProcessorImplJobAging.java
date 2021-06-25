@@ -4,8 +4,6 @@ import nz.govt.natlib.dashboard.common.injection.InjectionPathScan;
 import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
-import nz.govt.natlib.dashboard.common.metadata.EnumSystemEventLevel;
-import nz.govt.natlib.dashboard.common.metadata.EnumSystemEventModule;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
@@ -17,19 +15,19 @@ import java.util.List;
 public class ScheduleProcessorImplJobAging extends ScheduleProcessor {
     @Override
     public void handle(EntityFlowSetting flowSetting) throws Exception {
-        InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(repoStorageLocation.getById(flowSetting.getInjectionEndPointId()));
+        InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getInjectionEndPoint());
         if (injectionPathScanClient == null) {
             log.error("Failed to initial PathScanClient instance.");
             return;
         }
 
-        InjectionPathScan backupPathScanClient = InjectionUtils.createPathScanClient(repoStorageLocation.getById(flowSetting.getBackupEndPointId()));
+        InjectionPathScan backupPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getBackupEndPoint());
         if (backupPathScanClient == null) {
             log.error("Failed to initial Backup PathScanClient instance.");
             return;
         }
 
-        List<EntityDepositJob> listOfJobs = repoDepositJobActive.getByFlowId(flowSetting.getId());
+        List<EntityDepositJob> listOfJobs = repoDepositJob.getByFlowId(flowSetting.getId());
         for (EntityDepositJob job : listOfJobs) {
             //Only finalized succeed or canceled jobs can be moved to history
             if (!((job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED) || job.getState() == EnumDepositJobState.CANCELED)) {
@@ -49,9 +47,8 @@ public class ScheduleProcessorImplJobAging extends ScheduleProcessor {
                 //Delete existing met contents
                 InjectionUtils.deleteFiles(injectionPathScanClient, new File(injectionPathScanClient.getRootPath(), job.getInjectionTitle()));
 
-                //Move the job entity to the history directory
-                repoDepositJobHistory.save(job);
-                repoDepositJobActive.deleteById(job.getId());
+                job.setStage(EnumDepositJobStage.FINISHED);
+                repoDepositJob.save(job);
             }
         }
     }

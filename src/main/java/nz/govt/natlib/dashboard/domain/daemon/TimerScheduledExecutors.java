@@ -36,12 +36,10 @@ public class TimerScheduledExecutors {
     protected DepositJobService depositJobService;
     @Autowired
     protected RepoFlowSetting repoFlowSetting;
+//    @Autowired
+//    protected RepoStorageLocation repoStorageLocation;
     @Autowired
-    protected RepoStorageLocation repoStorageLocation;
-    @Autowired
-    protected RepoDepositJobActive repoDepositJobActive;
-    @Autowired
-    protected RepoDepositJobHistory repoDepositJobHistory;
+    protected RepoDepositJob repoDepositJob;
     @Autowired
     protected GlobalSettingService globalSettingService;
     @Autowired
@@ -134,10 +132,9 @@ public class TimerScheduledExecutors {
     public void initProcessor(ScheduleProcessor processor) {
         processor.setDepositJobService(depositJobService);
         processor.setGlobalSettingService(globalSettingService);
-        processor.setRepoDepositJobActive(repoDepositJobActive);
-        processor.setRepoDepositJobHistory(repoDepositJobHistory);
+        processor.setRepoDepositJob(repoDepositJob);
         processor.setRepoFlowSetting(repoFlowSetting);
-        processor.setRepoFTPSetting(repoStorageLocation);
+//        processor.setRepoFTPSetting(repoStorageLocation);
         processor.setRosettaWebService(rosettaWebService);
 
         if (processor instanceof ScheduleProcessorImplValidateSettingFlow) {

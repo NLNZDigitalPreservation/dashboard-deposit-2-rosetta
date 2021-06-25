@@ -3,8 +3,6 @@ package nz.govt.natlib.dashboard.domain.daemon;
 import nz.govt.natlib.dashboard.common.injection.*;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
-import nz.govt.natlib.dashboard.common.metadata.EnumSystemEventLevel;
-import nz.govt.natlib.dashboard.common.metadata.EnumSystemEventModule;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import org.springframework.stereotype.Service;
@@ -21,7 +19,7 @@ public class ScheduleProcessorImplJobInjecting extends ScheduleProcessor {
             return;
         }
 
-        InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(repoStorageLocation.getById(flowSetting.getInjectionEndPointId()));
+        InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getInjectionEndPoint());
         if (injectionPathScanClient == null) {
             log.error("Failed to initial PathScanClient instance.");
             return;
@@ -37,7 +35,7 @@ public class ScheduleProcessorImplJobInjecting extends ScheduleProcessor {
             }
 
             File injectionPath = injectionDir.getAbsolutePath();
-            EntityDepositJob job = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), injectionPath.getName());
+            EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), injectionPath.getName());
             //Initial job
             if (job == null) {
                 job = depositJobService.jobInitial(injectionPath.getAbsolutePath(), injectionDir.getName(), flowSetting);

@@ -1,25 +1,10 @@
 package nz.govt.natlib.dashboard.domain.entity;
 
-import com.sleepycat.persist.model.Entity;
-import com.sleepycat.persist.model.PrimaryKey;
-
-@Entity
-public class EntityGlobalSetting {
-    @PrimaryKey
-    private Long id = 0L;
-
+public class EntityGlobalSetting extends EntityCommon{
     private String depositUserInstitute;
     private String depositUserName;
     private String depositUserPassword;
     private String depositUserPasswordConfirm;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getDepositUserInstitute() {
         return depositUserInstitute;

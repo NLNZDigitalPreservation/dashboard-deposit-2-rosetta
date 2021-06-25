@@ -38,10 +38,10 @@ public class TestScheduleProcessorImplJobStatusPolling extends ScheduleProcessor
 
     @Test
     public void testPollingStatusRunning() throws Exception {
-        EntityDepositJob job = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         job.setStage(EnumDepositJobStage.DEPOSIT);
         job.setState(EnumDepositJobState.RUNNING);
-        repoDepositJobActive.save(job);
+        repoDepositJob.save(job);
 
         SipStatusInfo sipStatusInfo = new SipStatusInfo();
         sipStatusInfo.setModule("HUB");
@@ -51,7 +51,7 @@ public class TestScheduleProcessorImplJobStatusPolling extends ScheduleProcessor
 
         testInstance.handle(flowSetting);
 
-        List<EntityDepositJob> jobs = repoDepositJobActive.getAll();
+        List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
         assert jobs.size() == 1;
 
@@ -65,10 +65,10 @@ public class TestScheduleProcessorImplJobStatusPolling extends ScheduleProcessor
 
     @Test
     public void testPollingStatusSuccess() throws Exception {
-        EntityDepositJob job = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         job.setStage(EnumDepositJobStage.DEPOSIT);
         job.setState(EnumDepositJobState.RUNNING);
-        repoDepositJobActive.save(job);
+        repoDepositJob.save(job);
 
         SipStatusInfo sipStatusInfo = new SipStatusInfo();
         sipStatusInfo.setModule("HUB");
@@ -78,7 +78,7 @@ public class TestScheduleProcessorImplJobStatusPolling extends ScheduleProcessor
 
         testInstance.handle(flowSetting);
 
-        List<EntityDepositJob> jobs = repoDepositJobActive.getAll();
+        List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
         assert jobs.size() == 1;
 
@@ -92,10 +92,10 @@ public class TestScheduleProcessorImplJobStatusPolling extends ScheduleProcessor
 
     @Test
     public void testPollingStatusFailed() throws Exception {
-        EntityDepositJob job = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         job.setStage(EnumDepositJobStage.DEPOSIT);
         job.setState(EnumDepositJobState.RUNNING);
-        repoDepositJobActive.save(job);
+        repoDepositJob.save(job);
 
         SipStatusInfo sipStatusInfo = new SipStatusInfo();
         sipStatusInfo.setModule("HUB");
@@ -105,7 +105,7 @@ public class TestScheduleProcessorImplJobStatusPolling extends ScheduleProcessor
 
         testInstance.handle(flowSetting);
 
-        List<EntityDepositJob> jobs = repoDepositJobActive.getAll();
+        List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
         assert jobs.size() == 1;
 

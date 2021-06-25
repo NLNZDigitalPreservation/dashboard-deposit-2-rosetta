@@ -1,6 +1,6 @@
 package nz.govt.natlib.dashboard.common.injection;
 
-import nz.govt.natlib.dashboard.domain.entity.BaseStorageLocation;
+import nz.govt.natlib.dashboard.domain.entity.EntityStorageLocation;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
@@ -23,7 +23,7 @@ public class InjectionPathScanFTP extends InjectionPathScan {
         super(rootPath);
     }
 
-    public void init(BaseStorageLocation ftpEndPoint) throws IOException {
+    public void init(EntityStorageLocation ftpEndPoint) throws IOException {
         if (ftpEndPoint.isFtpProxyEnabled()) {
             this.ftpClient = new FTPHTTPClient(ftpEndPoint.getFtpProxyHost(), ftpEndPoint.getFtpProxyPort());
         } else {

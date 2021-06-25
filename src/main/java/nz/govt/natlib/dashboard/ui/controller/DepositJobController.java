@@ -4,8 +4,6 @@ import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositJob;
-import nz.govt.natlib.dashboard.domain.repo.RepoDepositJobActive;
-import nz.govt.natlib.dashboard.domain.repo.RepoDepositJobHistory;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
 import nz.govt.natlib.dashboard.domain.service.DepositJobService;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
@@ -17,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class DepositJobController {
@@ -29,17 +25,14 @@ public class DepositJobController {
     @Autowired
     private RepoFlowSetting repoFlowSetting;
     @Autowired
-    private RepoDepositJobActive repoDepositJobActive;
-    @Autowired
-    private RepoDepositJobHistory repoDepositJobHistory;
+    private RepoDepositJob repoDepositJob;
 
     @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_ACTIVE_GET, method = {RequestMethod.POST, RequestMethod.GET})
     public RestResponseCommand retrieveActiveDepositJobs() {
         log.info("Retrieve all active jobs.");
         RestResponseCommand rsp = new RestResponseCommand();
-        List<EntityDepositJob> listActiveJobs = repoDepositJobActive.getAll();
+        List<EntityDepositJob> listActiveJobs = repoDepositJob.getAll();
         List<EntityFlowSetting> listFlowSettings = repoFlowSetting.getAll();
-        depositJobService.appendFlowName(listActiveJobs);
 //        Map<String, Object> mapPayload = new HashMap<>();
 //        mapPayload.put("groups", listFlowSettings);
 //        mapPayload.put("activeJobs", listActiveJobs);
@@ -49,34 +42,19 @@ public class DepositJobController {
     }
 
     @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_ALL_GET, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand retrieveAllDepositJobs(@RequestParam("scope") String scope) {
-        log.info("Retrieve all jobs from [{}]", scope);
+    public RestResponseCommand retrieveAllDepositJobs() {
+        log.info("Retrieve all jobs");
         RestResponseCommand rsp = new RestResponseCommand();
-        List<EntityDepositJob> listJobs;
-        if (scope.equalsIgnoreCase(RepoDepositJob.DEPOSIT_JOB_DIR_ACTIVE)) {
-            listJobs = repoDepositJobActive.getAll();
-        } else {
-            listJobs = repoDepositJobHistory.getAll();
-        }
-        depositJobService.appendFlowName(listJobs);
+        List<EntityDepositJob> listJobs = repoDepositJob.getAll();
         rsp.setRspBody(listJobs);
         return rsp;
     }
 
     @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_DETAIL, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand retrieveDepositJobDetails(@RequestParam("scope") String scope, @RequestParam("jobId") Long jobId) {
-        log.info("Retrieve job details from [{}]: {}", scope, jobId);
+    public RestResponseCommand retrieveDepositJobDetails(@RequestParam("jobId") Long jobId) {
+        log.info("Retrieve job details: {}", jobId);
         RestResponseCommand rsp = new RestResponseCommand();
-        EntityDepositJob dto;
-        if (scope.equalsIgnoreCase(RepoDepositJob.DEPOSIT_JOB_DIR_ACTIVE)) {
-            dto = repoDepositJobActive.getById(jobId);
-        } else {
-            dto = repoDepositJobHistory.getById(jobId);
-        }
-        EntityFlowSetting flowSetting = repoFlowSetting.getById(dto.getFlowId());
-        if (flowSetting != null) {
-            dto.setFlowName(flowSetting.getName());
-        }
+        EntityDepositJob dto = repoDepositJob.getById(jobId);
         rsp.setRspBody(dto);
         return rsp;
     }

@@ -16,8 +16,7 @@ public class TestScheduleProcessorImplJobAging extends ScheduleProcessorTester {
 
     @BeforeEach
     public void clearAndInit() throws Exception {
-        repoDepositJobActive.deleteAll();
-        repoDepositJobHistory.deleteAll();
+        repoDepositJob.deleteAll();
 
         initProcessor(testInstance);
 
@@ -32,39 +31,36 @@ public class TestScheduleProcessorImplJobAging extends ScheduleProcessorTester {
 
     @Test
     public void testAgingNotExpired() throws Exception {
-        EntityDepositJob job = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;
 
         for (EnumDepositJobStage stage : EnumDepositJobStage.values()) {
             for (EnumDepositJobState state : EnumDepositJobState.values()) {
                 job.setStage(stage);
                 job.setState(state);
-                repoDepositJobActive.save(job);
+                repoDepositJob.save(job);
 
                 //Aging
                 testInstance.handle(flowSetting);
 
-                EntityDepositJob jobAfterFinalized = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
-                EntityDepositJob jobHistory = repoDepositJobHistory.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+                EntityDepositJob jobAfterFinalized = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
 
                 //Do nothing because it isn't expired
                 assert jobAfterFinalized != null;
                 assert jobAfterFinalized.getStage() == stage;
                 assert jobAfterFinalized.getState() == state;
-
-                assert jobHistory == null;
             }
         }
     }
 
     @Test
     public void testAgingExpired() throws Exception {
-        EntityDepositJob job = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;
 
         for (EnumDepositJobStage stage : EnumDepositJobStage.values()) {
             for (EnumDepositJobState state : EnumDepositJobState.values()) {
-                repoDepositJobHistory.deleteAll();
+                repoDepositJob.deleteAll();
 
                 LocalDateTime oldTime = LocalDateTime.now().minusDays(2 * flowSetting.getMaxActiveDays());
                 long oldMilliSeconds = DashboardHelper.getLocalMilliSeconds(oldTime);
@@ -73,19 +69,17 @@ public class TestScheduleProcessorImplJobAging extends ScheduleProcessorTester {
 
                 job.setStage(stage);
                 job.setState(state);
-                repoDepositJobActive.save(job);
+                repoDepositJob.save(job);
 
                 //Aging
                 testInstance.handle(flowSetting);
 
-                EntityDepositJob jobAfterFinalized = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
-                EntityDepositJob jobHistory = repoDepositJobHistory.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+                EntityDepositJob jobAfterFinalized = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
 
                 if ((stage == EnumDepositJobStage.FINALIZE && state == EnumDepositJobState.SUCCEED)
                         || state == EnumDepositJobState.CANCELED) {
 
-                    assert jobAfterFinalized == null;
-                    assert jobHistory != null;
+                    assert jobAfterFinalized != null;
 
                     File subFolder = new File(job.getInjectionPath());
                     assert !subFolder.exists();
@@ -107,8 +101,6 @@ public class TestScheduleProcessorImplJobAging extends ScheduleProcessorTester {
                     assert jobAfterFinalized != null;
                     assert jobAfterFinalized.getStage() == stage;
                     assert jobAfterFinalized.getState() == state;
-
-                    assert jobHistory == null;
                 }
             }
         }

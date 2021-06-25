@@ -26,6 +26,7 @@ import java.util.Map;
 public class GlobalSettingService {
     private static final Logger log = LoggerFactory.getLogger(GlobalSettingService.class);
     private static final String MASKED_PASSWORD = "******";
+    private static final Long DEFAULT_GLOBAL_ROW_ID=1L;
 
     @Autowired
     private RepoGlobalSetting repoGlobalSetting;
@@ -37,7 +38,7 @@ public class GlobalSettingService {
     private RosettaWebService rosettaWebService;
 
     public EntityGlobalSetting getGlobalSettingInstance() {
-        EntityGlobalSetting globalSetting = repoGlobalSetting.getById(0L);
+        EntityGlobalSetting globalSetting = repoGlobalSetting.getById(DEFAULT_GLOBAL_ROW_ID);
         if (DashboardHelper.isNull(globalSetting)) {
             return new EntityGlobalSetting();
         }
@@ -87,7 +88,6 @@ public class GlobalSettingService {
         }
 
         userInfo = new EntityWhiteList();
-        userInfo.setId(repoWhiteList.nextId());
         userInfo.setUserName(pdsUserInfo.getUserName());
         userInfo.setRole(EnumUserRole.admin);
 
@@ -113,7 +113,7 @@ public class GlobalSettingService {
             return rstVal;
         }
 
-        EntityGlobalSetting oldGlobalSetting = repoGlobalSetting.getById(0L);
+        EntityGlobalSetting oldGlobalSetting = repoGlobalSetting.getById(DEFAULT_GLOBAL_ROW_ID);
         if (oldGlobalSetting != null && StringUtils.equals(globalSetting.getDepositUserPassword(), MASKED_PASSWORD)) {
             globalSetting.setDepositUserPassword(oldGlobalSetting.getDepositUserPassword());
         }
@@ -143,7 +143,7 @@ public class GlobalSettingService {
 
     public RestResponseCommand getGlobalSetting() {
         RestResponseCommand rstVal = new RestResponseCommand();
-        EntityGlobalSetting globalSetting = repoGlobalSetting.getById(0L);
+        EntityGlobalSetting globalSetting = repoGlobalSetting.getById(DEFAULT_GLOBAL_ROW_ID);
         if (DashboardHelper.isNull(globalSetting)) {
             globalSetting = new EntityGlobalSetting();
         }
@@ -186,7 +186,7 @@ public class GlobalSettingService {
             return rstVal;
         }
 
-        EntityGlobalSetting globalSetting = repoGlobalSetting.getById(0L);
+        EntityGlobalSetting globalSetting = repoGlobalSetting.getById(DEFAULT_GLOBAL_ROW_ID);
         if (DashboardHelper.isNull(globalSetting)) {
             rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             rstVal.setRspMsg("Global setting is not initialed");
@@ -196,7 +196,6 @@ public class GlobalSettingService {
         EntityWhiteList whiteUserInfo = getUserFromWhiteList(dtoUserInfo.getUserName());
         if (DashboardHelper.isNull(whiteUserInfo)) {
             whiteUserInfo = new EntityWhiteList();
-            whiteUserInfo.setId(repoWhiteList.nextId());
         }
         whiteUserInfo.setUserName(dtoUserInfo.getUserName());
         whiteUserInfo.setRole(dtoUserInfo.getRole());

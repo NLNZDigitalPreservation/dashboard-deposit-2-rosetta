@@ -4,9 +4,9 @@ import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.exception.InvalidParameterException;
 import nz.govt.natlib.dashboard.common.exception.NullParameterException;
 import nz.govt.natlib.dashboard.common.exception.WebServiceException;
+import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.service.FlowSettingService;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
-import nz.govt.natlib.dashboard.ui.command.FlowSettingCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,11 +31,11 @@ public class FlowSettingController {
     }
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_FLOW_SAVE, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand saveFlowSetting(@RequestBody FlowSettingCommand reqCmd) {
+    public RestResponseCommand saveFlowSetting(@RequestBody EntityFlowSetting reqCmd) {
         RestResponseCommand retVal = new RestResponseCommand();
 
         try {
-            FlowSettingCommand rspCmd = flowSettingService.saveFlowSetting(reqCmd);
+            EntityFlowSetting rspCmd = flowSettingService.saveFlowSetting(reqCmd);
             retVal.setRspBody(rspCmd);
         } catch (NullParameterException | WebServiceException | InvalidParameterException e) {
             retVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);

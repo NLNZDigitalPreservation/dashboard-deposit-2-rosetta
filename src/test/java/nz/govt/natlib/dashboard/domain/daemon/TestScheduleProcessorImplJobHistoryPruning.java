@@ -14,8 +14,7 @@ public class TestScheduleProcessorImplJobHistoryPruning extends ScheduleProcesso
 
     @BeforeEach
     public void clearAndInit() throws Exception {
-        repoDepositJobActive.deleteAll();
-        repoDepositJobHistory.deleteAll();
+        repoDepositJob.deleteAll();
 
         initProcessor(testInstance);
 
@@ -30,24 +29,26 @@ public class TestScheduleProcessorImplJobHistoryPruning extends ScheduleProcesso
 
     @Test
     public void testPruningNotExpired() throws Exception {
-        EntityDepositJob job = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;
 
-        //Added to history
-        repoDepositJobHistory.save(job);
-
         //Pruning
+        LocalDateTime ldt=LocalDateTime.now();
+        ldt=ldt.minusYears(5);
+        job.setLatestTime(DashboardHelper.getLocalMilliSeconds(ldt));
+        repoDepositJob.save(job);
+
         testInstance.handle(flowSetting);
 
-        EntityDepositJob jobHistory = repoDepositJobHistory.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
 
         //Do nothing because it isn't expired
-        assert jobHistory != null;
+        assert job == null;
     }
 
     @Test
     public void testAgingExpired() throws Exception {
-        EntityDepositJob job = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;
 
 
@@ -57,15 +58,14 @@ public class TestScheduleProcessorImplJobHistoryPruning extends ScheduleProcesso
         job.setLatestTime(oldMilliSeconds);
 
         //Added to history
-        repoDepositJobHistory.save(job);
+        repoDepositJob.save(job);
 
         //Pruning
         testInstance.handle(flowSetting);
 
+        job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
 
-        EntityDepositJob jobHistory = repoDepositJobHistory.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
-
-        assert jobHistory == null;
+        assert job == null;
     }
 
     @AfterEach

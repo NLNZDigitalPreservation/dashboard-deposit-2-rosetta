@@ -2,8 +2,6 @@ package nz.govt.natlib.dashboard.domain.daemon;
 
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
-import nz.govt.natlib.dashboard.common.metadata.EnumSystemEventLevel;
-import nz.govt.natlib.dashboard.common.metadata.EnumSystemEventModule;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.ndha.common.exlibris.ResultOfDeposit;
@@ -15,7 +13,7 @@ import java.util.List;
 public class ScheduleProcessorImplJobDepositing extends ScheduleProcessor {
     @Override
     public void handle(EntityFlowSetting flowSetting) throws Exception {
-        List<EntityDepositJob> listOfJobs = repoDepositJobActive.getByFlowId(flowSetting.getId());
+        List<EntityDepositJob> listOfJobs = repoDepositJob.getByFlowId(flowSetting.getId());
         long countRunning = listOfJobs.stream().filter(job -> job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.RUNNING).count();
 
         //Get the current max concurrency limitation of running jobs according to the schedule.

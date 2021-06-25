@@ -43,19 +43,15 @@ public class TestDepositJobService extends BasicTester {
         BasicTester.init();
 
         //Initial flowSetting
-        storageInjection.setId(repoStorageLocation.nextId());
         storageInjection.setScanMode(scanMode);
         storageInjection.setRootPath(scanRootPath);
-        repoStorageLocation.save(storageInjection);
-        flowSetting.setInjectionEndPointId(storageInjection.getId());
+        flowSetting.setInjectionEndPoint(storageInjection);
 
-        storageBackup.setId(repoStorageLocation.nextId());
         storageBackup.setScanMode(backupMode);
         storageBackup.setRootPath(backupRootPath);
-        repoStorageLocation.save(storageBackup);
-        flowSetting.setBackupEndPointId(storageBackup.getId());
+        flowSetting.setBackupEndPoint(storageBackup);
 
-        flowSetting.setId(repoFlowSetting.nextId());
+//        flowSetting.setId(repoFlowSetting.nextId());
         flowSetting.setName(flowName);
         flowSetting.setEnabled(flowEnable);
         flowSetting.setMaterialFlowId(materialFlowId);

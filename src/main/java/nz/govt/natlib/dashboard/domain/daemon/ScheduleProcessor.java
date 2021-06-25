@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 public abstract class ScheduleProcessor {
     protected RosettaWebService rosettaWebService;
     protected RepoFlowSetting repoFlowSetting;
-    protected RepoStorageLocation repoStorageLocation;
-    protected RepoDepositJobActive repoDepositJobActive;
-    protected RepoDepositJobHistory repoDepositJobHistory;
+    protected RepoDepositJob repoDepositJob;
     protected DepositJobService depositJobService;
     protected GlobalSettingService globalSettingService;
 
@@ -37,28 +35,12 @@ public abstract class ScheduleProcessor {
         this.repoFlowSetting = repoFlowSetting;
     }
 
-    public RepoStorageLocation getRepoFTPSetting() {
-        return repoStorageLocation;
+    public RepoDepositJob getRepoDepositJob() {
+        return repoDepositJob;
     }
 
-    public void setRepoFTPSetting(RepoStorageLocation repoStorageLocation) {
-        this.repoStorageLocation = repoStorageLocation;
-    }
-
-    public RepoDepositJobActive getRepoDepositJobActive() {
-        return repoDepositJobActive;
-    }
-
-    public void setRepoDepositJobActive(RepoDepositJobActive repoDepositJobActive) {
-        this.repoDepositJobActive = repoDepositJobActive;
-    }
-
-    public RepoDepositJobHistory getRepoDepositJobHistory() {
-        return repoDepositJobHistory;
-    }
-
-    public void setRepoDepositJobHistory(RepoDepositJobHistory repoDepositJobHistory) {
-        this.repoDepositJobHistory = repoDepositJobHistory;
+    public void setRepoDepositJob(RepoDepositJob repoDepositJob) {
+        this.repoDepositJob = repoDepositJob;
     }
 
     public DepositJobService getDepositJobService() {
@@ -67,14 +49,6 @@ public abstract class ScheduleProcessor {
 
     public void setDepositJobService(DepositJobService depositJobService) {
         this.depositJobService = depositJobService;
-    }
-
-    public RepoStorageLocation getRepoStorageLocation() {
-        return repoStorageLocation;
-    }
-
-    public void setRepoStorageLocation(RepoStorageLocation repoStorageLocation) {
-        this.repoStorageLocation = repoStorageLocation;
     }
 
     public GlobalSettingService getGlobalSettingService() {

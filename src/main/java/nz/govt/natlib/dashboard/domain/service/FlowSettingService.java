@@ -13,10 +13,8 @@ import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityStorageLocation;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
-import nz.govt.natlib.dashboard.domain.repo.RepoDepositJobActive;
-import nz.govt.natlib.dashboard.domain.repo.RepoStorageLocation;
+import nz.govt.natlib.dashboard.domain.repo.RepoDepositJob;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
-import nz.govt.natlib.dashboard.ui.command.FlowSettingCommand;
 import nz.govt.natlib.dashboard.ui.command.RawMaterialFlowCommand;
 import nz.govt.natlib.dashboard.ui.command.RawProducerCommand;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
@@ -41,9 +39,7 @@ public class FlowSettingService {
     @Autowired
     private RepoFlowSetting repoFlowSetting;
     @Autowired
-    private RepoStorageLocation repoStorageLocation;
-    @Autowired
-    private RepoDepositJobActive repoDepositJobActive;
+    private RepoDepositJob repoDepositJob;
     @Autowired
     private TimerScheduledExecutors timerScheduledExecutors;
     @Autowired
@@ -86,7 +82,7 @@ public class FlowSettingService {
     }
 
     public void validateFlowSetting(EntityFlowSetting flowSetting) throws InvalidParameterException, WebServiceException, NullParameterException {
-        validateFlowSetting(flowSetting, repoStorageLocation.getById(flowSetting.getInjectionEndPointId()), repoStorageLocation.getById(flowSetting.getBackupEndPointId()));
+        validateFlowSetting(flowSetting, flowSetting.getInjectionEndPoint(), flowSetting.getBackupEndPoint());
     }
 
     public void validateFlowSetting(EntityFlowSetting flowSetting, EntityStorageLocation storageInjection, EntityStorageLocation storageBackup) throws NullParameterException, WebServiceException, InvalidParameterException {
@@ -249,44 +245,15 @@ public class FlowSettingService {
             return retVal;
         }
 
-        FlowSettingCommand rspCmd = new FlowSettingCommand();
-        rspCmd.setFlowSetting(flowSetting);
-
-        if (!DashboardHelper.isNull(flowSetting.getInjectionEndPointId())) {
-            rspCmd.setInjectionEndPoint(repoStorageLocation.getById(flowSetting.getInjectionEndPointId()));
-        }
-
-        if (!DashboardHelper.isNull(flowSetting.getBackupEndPointId())) {
-            rspCmd.setBackupEndPoint(repoStorageLocation.getById(flowSetting.getBackupEndPointId()));
-        }
-
-        retVal.setRspBody(rspCmd);
+        retVal.setRspBody(flowSetting);
         return retVal;
     }
 
-    public FlowSettingCommand saveFlowSetting(FlowSettingCommand reqCmd) throws InvalidParameterException, WebServiceException, NullParameterException {
+    public EntityFlowSetting saveFlowSetting(EntityFlowSetting flowSetting) throws InvalidParameterException, WebServiceException, NullParameterException {
         //Validating input parameters
-        this.validateFlowSetting(reqCmd.getFlowSetting(), reqCmd.getInjectionEndPoint(), reqCmd.getBackupEndPoint());
-
-        EntityFlowSetting flowSetting = reqCmd.getFlowSetting();
-
-        EntityStorageLocation injectionEndPoint = reqCmd.getInjectionEndPoint();
-        if (DashboardHelper.isNull(injectionEndPoint.getId())) {
-            injectionEndPoint.setId(repoStorageLocation.nextId());
-        }
-        repoStorageLocation.save(injectionEndPoint);
-
-        EntityStorageLocation backupEndPoint = reqCmd.getBackupEndPoint();
-        if (DashboardHelper.isNull(backupEndPoint.getId())) {
-            backupEndPoint.setId(repoStorageLocation.nextId());
-        }
-        repoStorageLocation.save(backupEndPoint);
-
-        if (DashboardHelper.isNull(flowSetting.getId())) {
-            flowSetting.setId(repoFlowSetting.nextId());
-        }
-        flowSetting.setInjectionEndPointId(injectionEndPoint.getId());
-        flowSetting.setBackupEndPointId(backupEndPoint.getId());
+        EntityStorageLocation injectionEndPoint = flowSetting.getInjectionEndPoint();
+        EntityStorageLocation backupEndPoint = flowSetting.getBackupEndPoint();
+        this.validateFlowSetting(flowSetting, injectionEndPoint, backupEndPoint);
 
         flowSetting.setAuditRst(true);
         flowSetting.setAuditMsg("OK");
@@ -295,17 +262,13 @@ public class FlowSettingService {
         //Rescheduling or adding the existing timer
         timerScheduledExecutors.rescheduleDepositJobPreparing(flowSetting);
 
-        FlowSettingCommand rspCmd = new FlowSettingCommand();
-        rspCmd.setFlowSetting(flowSetting);
-        rspCmd.setInjectionEndPoint(injectionEndPoint);
-        rspCmd.setBackupEndPoint(backupEndPoint);
-        return rspCmd;
+        return flowSetting;
     }
 
     public RestResponseCommand deleteFlowSetting(Long id) {
         RestResponseCommand retVal = getFlowSettingDetail(id);
 
-        List<EntityDepositJob> jobs = repoDepositJobActive.getByFlowId(id);
+        List<EntityDepositJob> jobs = repoDepositJob.getByFlowId(id);
         if (jobs.size() > 0) {
             retVal.setRspCode(RestResponseCommand.RSP_USER_OTHER_ERROR);
             retVal.setRspMsg("The flow is referenced by deposit jobs, can not be deleted");
@@ -316,13 +279,6 @@ public class FlowSettingService {
         if (flowSetting != null) {
             //Close the relevant timer
             timerScheduledExecutors.closeDepositJobPreparing(flowSetting);
-
-            if (!DashboardHelper.isNull(flowSetting.getInjectionEndPointId())) {
-                repoStorageLocation.deleteById(flowSetting.getInjectionEndPointId());
-            }
-            if (!DashboardHelper.isNull(flowSetting.getBackupEndPointId())) {
-                repoStorageLocation.deleteById(flowSetting.getBackupEndPointId());
-            }
             repoFlowSetting.deleteById(id);
         }
 

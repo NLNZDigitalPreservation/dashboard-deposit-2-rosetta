@@ -11,7 +11,7 @@ import java.util.List;
 public class ScheduleProcessorImplJobStatusPolling extends ScheduleProcessor {
     @Override
     public void handle(EntityFlowSetting flowSetting) throws Exception {
-        List<EntityDepositJob> listOfRunningJobs = repoDepositJobActive.getAll();
+        List<EntityDepositJob> listOfRunningJobs = repoDepositJob.getAll();
         for (EntityDepositJob job : listOfRunningJobs) {
             if (job.getStage() != EnumDepositJobStage.DEPOSIT || job.getState() != EnumDepositJobState.RUNNING) {
                 continue;
