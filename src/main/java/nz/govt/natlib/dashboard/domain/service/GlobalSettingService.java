@@ -186,12 +186,12 @@ public class GlobalSettingService {
             return rstVal;
         }
 
-        EntityGlobalSetting globalSetting = repoGlobalSetting.getById(DEFAULT_GLOBAL_ROW_ID);
-        if (DashboardHelper.isNull(globalSetting)) {
-            rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
-            rstVal.setRspMsg("Global setting is not initialed");
-            return rstVal;
-        }
+//        EntityGlobalSetting globalSetting = repoGlobalSetting.getById(DEFAULT_GLOBAL_ROW_ID);
+//        if (DashboardHelper.isNull(globalSetting)) {
+//            rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+//            rstVal.setRspMsg("Global setting is not initialed");
+//            return rstVal;
+//        }
 
         EntityWhiteList whiteUserInfo = getUserFromWhiteList(dtoUserInfo.getUserName());
         if (DashboardHelper.isNull(whiteUserInfo)) {

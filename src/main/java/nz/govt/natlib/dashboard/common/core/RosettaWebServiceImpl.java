@@ -49,7 +49,7 @@ public class RosettaWebServiceImpl implements RosettaWebService {
             public void run() {
                 while (true) {
                     try {
-                        TimeUnit.SECONDS.sleep(60); //Postpone 30 seconds to wait for the ready of Rosetta service.
+                        TimeUnit.SECONDS.sleep(30); //Postpone 30 seconds to wait for the ready of Rosetta service.
 
                         pdsClient = CustomizedPdsClient.getInstance();
                         pdsClient.init(pdsUrl, false);
