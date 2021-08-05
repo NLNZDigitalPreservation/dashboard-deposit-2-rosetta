@@ -1,6 +1,6 @@
 package nz.govt.natlib.dashboard.common.injection;
 
-import nz.govt.natlib.dashboard.domain.entity.BaseStorageLocation;
+import nz.govt.natlib.dashboard.domain.entity.EntityStorageLocation;
 import nz.govt.natlib.dashboard.domain.entity.InterfaceFlowSetting;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.slf4j.Logger;
@@ -70,7 +70,7 @@ public class InjectionUtils implements InterfaceFlowSetting {
         return false;
     }
 
-    public static InjectionPathScan createPathScanClient(BaseStorageLocation storage) {
+    public static InjectionPathScan createPathScanClient(EntityStorageLocation storage) {
         if (DashboardHelper.isNull(storage)) {
             return null;
         }

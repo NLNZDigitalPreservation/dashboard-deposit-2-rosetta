@@ -1,81 +1,62 @@
 package nz.govt.natlib.dashboard.domain.repo;
 
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.persist.EntityCursor;
-import com.sleepycat.persist.PrimaryIndex;
-import com.sleepycat.persist.SecondaryIndex;
 import nz.govt.natlib.dashboard.common.metadata.EnumEntityKey;
 import nz.govt.natlib.dashboard.domain.entity.EntityWhiteList;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component("RepoWhiteList")
 public class RepoWhiteList extends RepoAbstract {
-    private static final String STORAGE_FOLDER = "setting-white-list";
-    private PrimaryIndex<Long, EntityWhiteList> primaryIndexById;
-    private SecondaryIndex<String, Long, EntityWhiteList> secondaryIndexByUserName;
-    @Autowired
-    private RepoIdGenerator idGenerator;
+    private static final String SUB_FOLDER = "setting-white-list";
 
-    public Long nextId() {
-        return idGenerator.nextId(EnumEntityKey.WhiteList);
-    }
-
-    @Override
-    public void init() throws DatabaseException, IOException {
-        super.initInternal();
-        primaryIndexById = store.getPrimaryIndex(Long.class, EntityWhiteList.class);
-        secondaryIndexByUserName = store.getSecondaryIndex(primaryIndexById, String.class, "userName");
-    }
-
-    @Override
-    public String getSubDirectory() {
-        return STORAGE_FOLDER;
-    }
-
-    public void save(EntityWhiteList obj) {
-        primaryIndexById.put(obj);
+    @PostConstruct
+    public void init() {
+        this.subStoragePath = this.systemStoragePath + File.separator + SUB_FOLDER;
+        this.entityKey = EnumEntityKey.WhiteList;
     }
 
     public EntityWhiteList getById(Long id) {
-        return primaryIndexById.get(id);
+        return (EntityWhiteList) getById(id, EntityWhiteList.class);
     }
 
     public EntityWhiteList getByUserName(String userName) {
-        EntityCursor<EntityWhiteList> cursor = secondaryIndexByUserName.subIndex(userName).entities();
-        for (EntityWhiteList obj : cursor) {
-            cursor.close();
-            return obj;
+        List<EntityWhiteList> allUsers = getAll();
+        for (EntityWhiteList user : allUsers) {
+            if (user.getUserName().equals(userName)) {
+                return user;
+            }
         }
-        cursor.close();
         return null;
     }
 
     public List<EntityWhiteList> getAll() {
-        return toList(primaryIndexById.entities());
-    }
+        List<EntityWhiteList> retVal = new ArrayList<>();
 
-    public void deleteById(Long id) {
-        primaryIndexById.delete(id);
-    }
-
-    public void deleteAll() {
-        List<EntityWhiteList> list = getAll();
-        for (EntityWhiteList obj : list) {
-            primaryIndexById.delete(obj.getId());
+        File rootDir = new File(this.subStoragePath);
+        if (!rootDir.exists()) {
+            return retVal;
         }
-    }
-
-    private List<EntityWhiteList> toList(EntityCursor<EntityWhiteList> cursor) {
-        List<EntityWhiteList> list = new ArrayList<>();
-        for (EntityWhiteList obj : cursor) {
-            list.add(obj);
+        File[] files = rootDir.listFiles();
+        if (files == null) {
+            return retVal;
         }
-        cursor.close();
-        return list;
+
+        for (File f : files) {
+            String json = read(f);
+            if (StringUtils.isEmpty(json)) {
+                continue;
+            }
+
+            EntityWhiteList obj = (EntityWhiteList) json2Object(json, EntityWhiteList.class);
+            retVal.add(obj);
+        }
+
+        return retVal;
     }
 }

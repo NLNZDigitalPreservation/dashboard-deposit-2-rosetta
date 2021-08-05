@@ -1,79 +1,149 @@
 package nz.govt.natlib.dashboard.domain.repo;
 
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
-import com.sleepycat.persist.EntityStore;
-import com.sleepycat.persist.StoreConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import nz.govt.natlib.dashboard.common.metadata.EnumEntityKey;
+import nz.govt.natlib.dashboard.domain.entity.EntityCommon;
+import nz.govt.natlib.dashboard.util.DashboardHelper;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public abstract class RepoAbstract {
-    private final static String JE_LOG_FILE_MAX = Long.toString(512 * 1014 * 1014);
-    private final static List<RepoAbstract> listAllRepos = new ArrayList<>();
-
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Value("${system.storage.path}")
-    private String systemStoragePath;
+    protected String systemStoragePath;
 
-    protected EntityStore store;
+    @Autowired
+    protected RepoIdGenerator idGenerator;
 
-    public void initInternal() throws DatabaseException, IOException {
-        EnvironmentConfig environmentConfig = new EnvironmentConfig();
-        environmentConfig.setCacheSize(1024 * 1024);
-        environmentConfig.setAllowCreate(true);
-        environmentConfig.setTransactional(true);
-        environmentConfig.setConfigParam("je.log.fileMax", JE_LOG_FILE_MAX);
+    protected String subStoragePath;
+    protected EnumEntityKey entityKey;
 
-        environmentConfig.setLocking(true);
-
-        File file = new File(systemStoragePath, getSubDirectory());
-        if (!file.isDirectory()) {
-            if (!file.mkdirs()) {
-                log.error("Failed mkdirs( {} )", file.getAbsolutePath());
-                throw new IOException("Failed to mkdirs: " + file.getAbsolutePath());
-            }
-        }
-        Environment env = new Environment(file, environmentConfig);
-
-        StoreConfig storeConfig = new StoreConfig();
-        storeConfig.setAllowCreate(true);
-        storeConfig.setAllowCreateVoid(true);
-        storeConfig.setTransactional(true);
-
-        store = new EntityStore(env, "dashboard", storeConfig);
-
-        listAllRepos.add(this);
-    }
-
-    @PostConstruct
-    abstract public void init() throws DatabaseException, IOException;
-
-    abstract public String getSubDirectory();
-
-    public void close() {
+    public String obj2Json(Object obj) {
+        String json = "{}";
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            this.store.close();
-
-            if (!this.store.getEnvironment().isClosed()) {
-                this.store.getEnvironment().close();
-            }
-            System.out.println("Closed: " + this.toString());
-        } catch (Exception e) {
-            System.out.println("Failed to close: " + this.toString());
+            json = objectMapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
+
+        return json;
     }
 
-    public static List<RepoAbstract> getListAllRepos() {
-        return listAllRepos;
+    public Object json2Object(String json, Class<?> clazz) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(json, clazz);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String read(String dir, String fileName) {
+        return read(new File(dir, fileName));
+    }
+
+    public String read(File fullPath) {
+        if (fullPath == null || !fullPath.isFile() || !fullPath.exists()) {
+            log.error("Invalid input parameter, fullPath: {}", fullPath.getAbsolutePath());
+            return null;
+        }
+        try {
+            return FileUtils.readFileToString(fullPath);
+        } catch (IOException e) {
+            log.error("Failed to read: {}", fullPath.getAbsolutePath(), e);
+            return null;
+        }
+    }
+
+    public boolean save(String dir, String fileName, Object obj) {
+        return save(new File(dir, fileName), obj);
+    }
+
+    public boolean save(File fullPath, Object obj) {
+        if (fullPath == null || obj == null) {
+            log.error("Invalie input parameter");
+            return false;
+        }
+
+        if (!fullPath.getParentFile().exists() && !fullPath.getParentFile().mkdirs()) {
+            log.error("Failed to make directory: {}", fullPath.getParent());
+            return false;
+        }
+
+        String json = obj2Json(obj);
+        try {
+            FileUtils.write(fullPath, json);
+            return true;
+        } catch (IOException e) {
+            log.error("Failed to save obj: {}", fullPath.getAbsolutePath(), e);
+            return false;
+        }
+    }
+
+    public boolean delete(String dir, String fileName) {
+        return delete(new File(dir, fileName));
+    }
+
+    public boolean delete(File fullPath) {
+        if (fullPath == null || !fullPath.exists()) {
+            log.error("Invalid input parameter");
+            return false;
+        }
+        try {
+            Files.delete(fullPath.toPath());
+            return true;
+        } catch (IOException e) {
+            log.error("Failed to delete file: {}", fullPath.getAbsolutePath(), e);
+            return false;
+        }
+    }
+
+
+    public void save(EntityCommon obj) {
+        if (DashboardHelper.isNull(obj.getId())) {
+            obj.setId(nextId());
+        }
+
+        String fileName = String.format("%d.json", obj.getId());
+        save(this.subStoragePath, fileName, obj);
+    }
+
+    public Object getById(Long id, Class<?> clazz) {
+        String fileName = String.format("%d.json", id);
+        String json = read(this.subStoragePath, fileName);
+        if (!StringUtils.isEmpty(json)) {
+            return json2Object(json, clazz);
+        }
+        return null;
+    }
+
+    public void deleteById(Long id) {
+        String fileName = String.format("%d.json", id);
+        delete(this.subStoragePath, fileName);
+    }
+
+    public void deleteAll() {
+        try {
+            Files.delete(Path.of(this.subStoragePath));
+        } catch (IOException e) {
+            log.error("Failed to delete directory: {}", this.subStoragePath);
+        }
+    }
+
+    private Long nextId() {
+        return idGenerator.nextId(entityKey);
     }
 }

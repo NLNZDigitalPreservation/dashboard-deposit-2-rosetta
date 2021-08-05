@@ -4,5 +4,5 @@ public enum EnumDepositJobStage {
     INJECT,
     DEPOSIT,
     FINALIZE,
-    CANCELED
+    FINISHED
 }

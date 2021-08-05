@@ -35,7 +35,10 @@ function disableDepositJobContextMenuItemActive(key, opt){
 
 const gridDepositJobsColumnsActive=[
     // {headerName: "#", width:45, checkboxSelection: true, pinned: 'left'},
-    {headerName: "Flow", field: "flowName", pinned: 'left', width: 120},
+    {headerName: "ID", field: "id", width: 90, pinned: 'left'},
+    {headerName: "Flow", field: "flowName", pinned: 'left', width: 120, cellRenderer: function(row){
+        return row.data.appliedFlowSetting.name;
+    }},
     {headerName: "JobTitle", field: "injectionTitle", width: 485, pinned: 'left'},
 
     {headerName: "Status", field: "state", width: 180, pinned: 'left', cellRenderer: function(row){
@@ -231,7 +234,7 @@ function setValueDepositJobActive(data){
 
     $('#deposit-job-title').val(data['injectionTitle']);
     $('#deposit-job-path').val(data['injectionPath']);
-    $('#deposit-job-flow-name').val(data['flowName']);
+    $('#deposit-job-flow-name').val(data['appliedFlowSetting']['name']);
     $('#deposit-job-stage').val(data['stage']);
     $('#deposit-job-state').val(data['state']);
     // $('#deposit-job-percent').val(calcPercentActive(data['stage'], data['state'])+'%');
@@ -275,16 +278,15 @@ function setValueDepositJobActive(data){
         }else{
             setProgressBarStyle('#progress-stage-name div[name="finalize"]', progress, 'FINALIZE', 'FINISHED');
         }
+    }else{
+        setProgressBarStyle('#progress-stage-name div[name="inject"]', 'bg-finished', 'INJECT', 'FINISHED');
+        setProgressBarStyle('#progress-stage-name div[name="deposit"]', 'bg-finished', 'DEPOSIT', 'FINISHED');
+        setProgressBarStyle('#progress-stage-name div[name="finalize"]', 'bg-finished', 'FINALIZE', state);
     }
 
 
     //Value appliedFlowSetting
-    var appliedFlow={
-        flowSetting: data.appliedFlowSetting,
-        injectionEndPoint: data.appliedInjectionStorageLocation,
-        backupEndPoint: data.appliedBackupStorageLocation,
-    }
-    setValueMaterialFlow(appliedFlow, '#ul-flow-setting-job-applied');
+    setValueMaterialFlow(data.appliedFlowSetting, '#ul-flow-setting-job-applied');
 
     return true;
 }

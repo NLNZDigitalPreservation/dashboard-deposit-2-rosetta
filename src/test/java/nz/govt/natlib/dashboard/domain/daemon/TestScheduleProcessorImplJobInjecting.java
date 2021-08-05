@@ -24,7 +24,7 @@ public class TestScheduleProcessorImplJobInjecting extends ScheduleProcessorTest
     public void testPreparingJobsInjectionNotReady() throws Exception {
         testInstance.handle(flowSetting);
 
-        List<EntityDepositJob> jobs = repoDepositJobActive.getAll();
+        List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
         assert jobs.size() == 1;
 
@@ -41,7 +41,7 @@ public class TestScheduleProcessorImplJobInjecting extends ScheduleProcessorTest
 
         testInstance.handle(flowSetting);
 
-        EntityDepositJob job = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;
         assert job.getStage() == EnumDepositJobStage.DEPOSIT;
         assert job.getState() == EnumDepositJobState.INITIALED;

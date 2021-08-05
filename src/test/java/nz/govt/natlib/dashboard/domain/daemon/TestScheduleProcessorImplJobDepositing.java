@@ -20,7 +20,7 @@ public class TestScheduleProcessorImplJobDepositing extends ScheduleProcessorTes
     @BeforeEach
     public void clearAndInit() throws Exception {
         initProcessor(testInstance);
-        repoDepositJobActive.deleteAll();
+        repoDepositJob.deleteAll();
         initSubFolder();
 
         ScheduleProcessor injectionProcessor = new ScheduleProcessorImplJobInjecting();
@@ -37,7 +37,7 @@ public class TestScheduleProcessorImplJobDepositing extends ScheduleProcessorTes
 
         testInstance.handle(flowSetting);
 
-        List<EntityDepositJob> jobs = repoDepositJobActive.getAll();
+        List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
         assert jobs.size() == 1;
 
@@ -54,13 +54,23 @@ public class TestScheduleProcessorImplJobDepositing extends ScheduleProcessorTes
     public void testDepositingJobsInjectionFailed() throws Exception {
         when(rosettaWebService.deposit(any(), any(), any(), any(), any(), any())).thenReturn(new ResultOfDeposit(false, "Failed", "xyz"));
 
-        testInstance.handle(flowSetting);
-
-        List<EntityDepositJob> jobs = repoDepositJobActive.getAll();
+        List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
         assert jobs.size() == 1;
 
         EntityDepositJob job = jobs.get(0);
+        job.setSipID(null);
+        job.setStage(EnumDepositJobStage.DEPOSIT);
+        job.setState(EnumDepositJobState.INITIALED);
+        repoDepositJob.save(job);
+
+        testInstance.handle(flowSetting);
+
+        jobs = repoDepositJob.getAll();
+        assert jobs != null;
+        assert jobs.size() == 1;
+
+         job = jobs.get(0);
         assert job.getStage() == EnumDepositJobStage.DEPOSIT;
         assert job.getState() == EnumDepositJobState.FAILED;
         assert job.getFileCount() == 2;

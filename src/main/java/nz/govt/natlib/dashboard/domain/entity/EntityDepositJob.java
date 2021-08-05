@@ -1,25 +1,16 @@
 package nz.govt.natlib.dashboard.domain.entity;
 
-import com.sleepycat.persist.model.Entity;
-import com.sleepycat.persist.model.PrimaryKey;
-import com.sleepycat.persist.model.Relationship;
-import com.sleepycat.persist.model.SecondaryKey;
+
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
 
-@Entity
-public class EntityDepositJob {
-    @PrimaryKey
-    private Long id;
-    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
+public class EntityDepositJob extends EntityCommon{
     private Long initialTime;
-    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private Long latestTime;
     private Long depositStartTime;
     private Long depositEndTime;
 
     private String injectionPath;
-    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
     private String injectionTitle;
 
     private long fileCount;
@@ -35,24 +26,10 @@ public class EntityDepositJob {
     private EnumDepositJobStage stage;
     private EnumDepositJobState state;
 
-    @SecondaryKey(relate = Relationship.MANY_TO_ONE)
-    private Long flowId;
-    private String flowName;
-
     private String depositSetId;
     private String resultMessage;
 
-    private DTOFlowSetting appliedFlowSetting;
-    private DTOStorageLocation appliedInjectionStorageLocation;
-    private DTOStorageLocation appliedBackupStorageLocation;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private EntityFlowSetting appliedFlowSetting;
 
     public Long getInitialTime() {
         return initialTime;
@@ -174,22 +151,6 @@ public class EntityDepositJob {
         this.state = state;
     }
 
-    public Long getFlowId() {
-        return flowId;
-    }
-
-    public void setFlowId(Long flowId) {
-        this.flowId = flowId;
-    }
-
-    public String getFlowName() {
-        return flowName;
-    }
-
-    public void setFlowName(String flowName) {
-        this.flowName = flowName;
-    }
-
     public String getDepositSetId() {
         return depositSetId;
     }
@@ -206,27 +167,11 @@ public class EntityDepositJob {
         this.resultMessage = resultMessage;
     }
 
-    public BaseFlowSetting getAppliedFlowSetting() {
+    public EntityFlowSetting getAppliedFlowSetting() {
         return appliedFlowSetting;
     }
 
-    public void setAppliedFlowSetting(DTOFlowSetting appliedFlowSetting) {
+    public void setAppliedFlowSetting(EntityFlowSetting appliedFlowSetting) {
         this.appliedFlowSetting = appliedFlowSetting;
-    }
-
-    public DTOStorageLocation getAppliedInjectionStorageLocation() {
-        return appliedInjectionStorageLocation;
-    }
-
-    public void setAppliedInjectionStorageLocation(DTOStorageLocation appliedInjectionStorageLocation) {
-        this.appliedInjectionStorageLocation = appliedInjectionStorageLocation;
-    }
-
-    public DTOStorageLocation getAppliedBackupStorageLocation() {
-        return appliedBackupStorageLocation;
-    }
-
-    public void setAppliedBackupStorageLocation(DTOStorageLocation appliedBackupStorageLocation) {
-        this.appliedBackupStorageLocation = appliedBackupStorageLocation;
     }
 }

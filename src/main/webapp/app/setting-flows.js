@@ -47,7 +47,7 @@ function saveMaterialFlow(){
     weeklyMaxThreads.push($('#modal-flow-setting-pop #flow-setting input[name="sun"]').val());
     reqBasic['weeklyMaxConcurrency']=weeklyMaxThreads;
 
-    reqInjectionStorage['id']=$('#modal-flow-setting-pop #injection-location input[name="id"]').val();
+//    reqInjectionStorage['id']=$('#modal-flow-setting-pop #injection-location input[name="id"]').val();
     reqInjectionStorage['scanMode']=$('#modal-flow-setting-pop #injection-location select[name="scanMode"] option:selected').attr('value');
     reqInjectionStorage['rootPath']=$('#modal-flow-setting-pop #injection-location input[name="rootPath"]').val();
     reqInjectionStorage['ftpServer']=$('#modal-flow-setting-pop #injection-location input[name="ftpServer"]').val();
@@ -55,7 +55,7 @@ function saveMaterialFlow(){
     reqInjectionStorage['ftpUsername']=$('#modal-flow-setting-pop #injection-location input[name="ftpUsername"]').val();
     reqInjectionStorage['ftpPassword']=$('#modal-flow-setting-pop #injection-location input[name="ftpPassword"]').val();
 
-    reqBackupStorage['id']=$('#modal-flow-setting-pop #backup-location input[name="id"]').val();
+//    reqBackupStorage['id']=$('#modal-flow-setting-pop #backup-location input[name="id"]').val();
     reqBackupStorage['scanMode']=$('#modal-flow-setting-pop #backup-location select[name="scanMode"] option:selected').attr('value');
     reqBackupStorage['rootPath']=$('#modal-flow-setting-pop #backup-location input[name="rootPath"]').val();
     reqBackupStorage['ftpServer']=$('#modal-flow-setting-pop #backup-location input[name="ftpServer"]').val();
@@ -63,19 +63,16 @@ function saveMaterialFlow(){
     reqBackupStorage['ftpUsername']=$('#modal-flow-setting-pop #backup-location input[name="ftpUsername"]').val();
     reqBackupStorage['ftpPassword']=$('#modal-flow-setting-pop #backup-location input[name="ftpPassword"]').val();
 
-    var req={
-        flowSetting: reqBasic,
-        injectionEndPoint: reqInjectionStorage,
-        backupEndPoint: reqBackupStorage
-    };
+    reqBasic['injectionEndPoint']=reqInjectionStorage;
+    reqBasic['backupEndPoint']=reqBackupStorage;
 
-    console.log(req);
+    console.log(reqBasic);
 
-    fetchHttp(PATH_SETTING_FLOW_SAVE, req, function(rsp){
-        tableFlowSettings.update(rsp.flowSetting);
+    fetchHttp(PATH_SETTING_FLOW_SAVE, reqBasic, function(rsp){
+        tableFlowSettings.update(rsp);
         applyUpdatedSettingFlowToDepositJobHtmls();
         modalFlowSettingPop.hide();
-        toastr.success("Successfully save the material flow: " + rsp.flowSetting.name);
+        toastr.success("Successfully save the material flow: " + rsp.name);
     });
 }
 
@@ -105,7 +102,7 @@ function detailMaterialFlow(id, module){
 }
 
 function newMaterialFlow(){
-    var reqBasic={
+    var flowSetting={
         id: null,
         name: '',
         enabled: true,
@@ -138,20 +135,18 @@ function newMaterialFlow(){
     }
 
     var reqBackupStorage=Object.assign({},reqInjectionStorage);
-    var data={
-       flowSetting: reqBasic,
-       injectionEndPoint: reqInjectionStorage,
-       backupEndPoint: reqBackupStorage
-    }
 
-    setValueMaterialFlow(data, '#modal-flow-setting-pop');
+    flowSetting['injectionEndPoint']=reqInjectionStorage;
+    flowSetting['backupEndPoint']=reqBackupStorage;
+
+    setValueMaterialFlow(flowSetting, '#modal-flow-setting-pop');
 
     $('#modal-flow-setting-pop button[name="delete"]').hide();
     modalFlowSettingPop.show();
 }
 
 function setValueMaterialFlow(data, module){
-    var reqBasic=data.flowSetting, reqInjectionStorage=data.injectionEndPoint, reqBackupStorage=data.backupEndPoint;
+    var reqBasic=data, reqInjectionStorage=data.injectionEndPoint, reqBackupStorage=data.backupEndPoint;
     $(module+' #flow-setting input[name="id"]').val(reqBasic['id']);
     $(module+' #flow-setting input[name="enabled"]').prop('checked', reqBasic['enabled']);
     $(module+' #flow-setting input[name="name"]').val(reqBasic['name']);
@@ -174,7 +169,7 @@ function setValueMaterialFlow(data, module){
     $(module+' #flow-setting input[name="sat"]').val(weeklyMaxThreads[5]);
     $(module+' #flow-setting input[name="sun"]').val(weeklyMaxThreads[6]);    
 
-    $(module+' #injection-location input[name="id"]').val(reqInjectionStorage['id']);
+//    $(module+' #injection-location input[name="id"]').val(reqInjectionStorage['id']);
     $(module+' #injection-location select[name="scanMode"]').val(reqInjectionStorage['scanMode']);
     $(module+' #injection-location input[name="rootPath"]').val(reqInjectionStorage['rootPath']);
     $(module+' #injection-location input[name="ftpServer"]').val(reqInjectionStorage['ftpServer']);
@@ -182,7 +177,7 @@ function setValueMaterialFlow(data, module){
     $(module+' #injection-location input[name="ftpUsername"]').val(reqInjectionStorage['ftpUsername']);
     $(module+' #injection-location input[name="ftpPassword"]').val(reqInjectionStorage['ftpPassword']);
 
-    $(module+' #backup-location input[name="id"]').val(reqBackupStorage['id']);
+//    $(module+' #backup-location input[name="id"]').val(reqBackupStorage['id']);
     $(module+' #backup-location select[name="scanMode"]').val(reqBackupStorage['scanMode']);
     $(module+' #backup-location input[name="rootPath"]').val(reqBackupStorage['rootPath']);
     $(module+' #backup-location input[name="ftpServer"]').val(reqBackupStorage['ftpServer']);

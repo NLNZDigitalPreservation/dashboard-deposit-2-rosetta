@@ -34,41 +34,24 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     @Autowired
     private RosettaWebService rosettaWebService;
     @Autowired
-    private RepoDepositJobActive repoJobActive;
-    @Autowired
-    private RepoDepositJobHistory repoJobHistory;
+    private RepoDepositJob repoJob;
     @Autowired
     private RepoFlowSetting repoFlowSetting;
-    @Autowired
-    private RepoStorageLocation repoStorageLocation;
 
     public EntityDepositJob jobInitial(String injectionPath, String injectionTitle, EntityFlowSetting flowSetting) {
         EntityDepositJob job = new EntityDepositJob();
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
-        job.setId(repoJobActive.nextId());
         job.setInjectionPath(injectionPath);
         job.setInjectionTitle(injectionTitle);
         job.setInitialTime(nowDatetime);
         job.setLatestTime(nowDatetime);
-        job.setFlowId(flowSetting.getId());
         job.setDepositSetId("1");
         job.setStage(EnumDepositJobStage.INJECT);
         job.setState(EnumDepositJobState.RUNNING);
 
-        String jsonFlowSetting = obj2Json(flowSetting);
-        DTOFlowSetting dtoFlowSetting = (DTOFlowSetting) json2Object(jsonFlowSetting, DTOFlowSetting.class);
-        job.setAppliedFlowSetting(dtoFlowSetting);
+        job.setAppliedFlowSetting(flowSetting);
 
-        String jsonInjectionStorageLocation = obj2Json(repoStorageLocation.getById(flowSetting.getInjectionEndPointId()));
-        DTOStorageLocation dtoInjectionStorageLocation = (DTOStorageLocation) json2Object(jsonInjectionStorageLocation, DTOStorageLocation.class);
-        job.setAppliedInjectionStorageLocation(dtoInjectionStorageLocation);
-
-        String jsonBackupStorageLocation = obj2Json(repoStorageLocation.getById(flowSetting.getBackupEndPointId()));
-        DTOStorageLocation dtoBackupStorageLocation = (DTOStorageLocation) json2Object(jsonBackupStorageLocation, DTOStorageLocation.class);
-        job.setAppliedBackupStorageLocation(dtoBackupStorageLocation);
-
-        repoJobActive.save(job);
-
+        repoJob.save(job);
         return job;
     }
 
@@ -77,7 +60,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         job.setLatestTime(nowDatetime);
         job.setFileCount(fileCount);
         job.setFileSize(fileSize);
-        repoJobActive.save(job);
+        repoJob.save(job);
         return job;
     }
 
@@ -86,11 +69,11 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         job.setLatestTime(nowDatetime);
         job.setStage(EnumDepositJobStage.DEPOSIT);
         job.setState(EnumDepositJobState.INITIALED);
-        repoJobActive.save(job);
+        repoJob.save(job);
         return job;
     }
 
-    public EntityDepositJob jobDepositAccept(EntityDepositJob job, String sipId, EntityFlowSetting flowSetting) {
+    public void jobDepositAccept(EntityDepositJob job, String sipId, EntityFlowSetting flowSetting) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
         job.setDepositStartTime(nowDatetime);
@@ -98,19 +81,17 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         job.setSuccessful(true);
         job.setStage(EnumDepositJobStage.DEPOSIT);
         job.setState(EnumDepositJobState.RUNNING);
-        repoJobActive.save(job);
-        return job;
+        repoJob.save(job);
     }
 
-    public EntityDepositJob jobDepositReject(EntityDepositJob job, String error) {
+    public void jobDepositReject(EntityDepositJob job, String error) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
         job.setDepositStartTime(nowDatetime);
         job.setResultMessage(error);
         job.setStage(EnumDepositJobStage.DEPOSIT);
         job.setState(EnumDepositJobState.FAILED);
-        repoJobActive.save(job);
-        return job;
+        repoJob.save(job);
     }
 
     public EntityDepositJob jobUpdateStatus(EntityDepositJob job, SipStatusInfo sipStatusInfo) {
@@ -124,7 +105,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
 //            job.setStage(EnumDepositJobStage.FINALIZE); //Going to next step
 //            job.setState(EnumDepositJobState.INITIALED);
 //        }
-        repoJobActive.save(job);
+        repoJob.save(job);
         return job;
     }
 
@@ -138,7 +119,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             job.setState(state);
         }
         job.setResultMessage("");
-        repoJobActive.save(job);
+        repoJob.save(job);
         return job;
     }
 
@@ -149,7 +130,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             job.setState(state);
         }
         job.setResultMessage("");
-        repoJobActive.save(job);
+        repoJob.save(job);
         return job;
     }
 
@@ -184,7 +165,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         }
 
         job.setResultMessage("");
-        repoJobActive.save(job);
+        repoJob.save(job);
         return job;
     }
 
@@ -194,14 +175,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             log.warn("{} at stage [{}] and state [{}] could not be terminated", job.getInjectionTitle(), job.getStage(), job.getState());
             return job;
         }
-        repoJobActive.deleteById(job.getId());
-        repoJobHistory.deleteById(job.getId());
-//        long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
-//        job.setLatestTime(nowDatetime);
-//        job.setStage(EnumDepositJobStage.CANCELED);
-//        job.setState(EnumDepositJobState.CANCELED);
-//        job.setResultMessage("Terminated");
-//        repoJobActive.save(job);
+        repoJob.deleteById(job.getId());
         return job;
     }
 
@@ -212,41 +186,34 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         }
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
-        job.setStage(EnumDepositJobStage.CANCELED);
+        job.setStage(EnumDepositJobStage.FINISHED);
         job.setState(EnumDepositJobState.CANCELED);
         job.setResultMessage("");
-        repoJobActive.save(job);
+        repoJob.save(job);
         return job;
     }
 
-    public EntityDepositJob jobDepositFinished(EntityDepositJob job) {
+    public void jobDepositFinished(EntityDepositJob job) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
         job.setDepositEndTime(nowDatetime);
-        repoJobActive.save(job);
-        return job;
+        repoJob.save(job);
     }
 
-    public EntityDepositJob jobFinalizeStart(EntityDepositJob job) {
+    public void jobFinalizeStart(EntityDepositJob job) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
         job.setStage(EnumDepositJobStage.FINALIZE);
         job.setState(EnumDepositJobState.RUNNING);
-        repoJobActive.save(job);
-        return job;
+        repoJob.save(job);
     }
 
-    public EntityDepositJob jobFinalizeEnd(EntityDepositJob job, EnumDepositJobState state) {
+    public void jobFinalizeEnd(EntityDepositJob job, EnumDepositJobState state) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
-        if (job.getStage() != EnumDepositJobStage.CANCELED) {
-            job.setStage(EnumDepositJobStage.FINALIZE);
-        }
-        if (job.getState() != EnumDepositJobState.CANCELED) {
-            job.setState(state);
-        }
-        repoJobActive.save(job);
-        return job;
+        job.setStage(EnumDepositJobStage.FINISHED);
+        job.setState(state);
+        repoJob.save(job);
     }
 
 
@@ -358,8 +325,8 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         }
 
         //Checking is sourceNfsDirectory valid and is ready
-        EntityStorageLocation storageInjection = repoStorageLocation.getById(flowSetting.getInjectionEndPointId());
-        InjectionPathScan targetInjectionPathScanClient = InjectionUtils.createPathScanClient(storageInjection);
+        EntityStorageLocation storageInjection = flowSetting.getInjectionEndPoint();
+        InjectionPathScan targetInjectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getInjectionEndPoint());
 
         if (targetInjectionPathScanClient == null) {
             String msg = String.format("%s flow setting does not exist", flowId);
@@ -370,12 +337,11 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         }
 
         //
-        EntityDepositJob jobActive = repoJobActive.getByFlowIdAndInjectionTitle(flowId, fSubFolder.getName());
-        EntityDepositJob jobHistory = repoJobHistory.getByFlowIdAndInjectionTitle(flowId, fSubFolder.getName());
+        EntityDepositJob job = repoJob.getByFlowIdAndInjectionTitle(flowId, fSubFolder.getName());
 
         File targetSubFolder = new File(storageInjection.getRootPath(), fSubFolder.getName());
 
-        boolean isExisting = targetInjectionPathScanClient.exists(targetSubFolder.getAbsolutePath()) || jobActive != null || jobHistory != null;
+        boolean isExisting = targetInjectionPathScanClient.exists(targetSubFolder.getAbsolutePath()) || job != null;
         if (isExisting && !isForceReplaceExistingJob) {
             String msg = String.format("%s folder does exist in: %s, and can not be replaced", fSubFolder.getName(), storageInjection.getRootPath());
             log.error(msg);
@@ -387,11 +353,8 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         //If existing and allow replaced
         if (isExisting) {
             InjectionUtils.deleteFiles(targetInjectionPathScanClient, targetSubFolder);
-            if (jobActive != null) {
-                repoJobActive.deleteById(jobActive.getId());
-            }
-            if (jobHistory != null) {
-                repoJobHistory.deleteById(jobHistory.getId());
+            if (job != null) {
+                repoJob.deleteById(job.getId());
             }
         }
 
@@ -454,35 +417,18 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         long lStart = DashboardHelper.getLocalMilliSeconds(ldtStart);
         long lEnd = DashboardHelper.getLocalMilliSeconds(ldtEnd);
 
-        List<EntityDepositJob> listJobsActive = repoJobActive.getByLatestTime(lStart, lEnd);
-        List<EntityDepositJob> listJobsHistory = repoJobHistory.getByLatestTime(lStart, lEnd);
-        List<EntityDepositJob> listJobs = listJobsActive;
-        listJobs.addAll(listJobsHistory);
+
+        List<EntityDepositJob> listJobs = repoJob.getByLatestTime(lStart, lEnd);
 
         listJobs = listJobs.stream().filter(e -> {
-            return isContains(cmd.getFlowIds(), e.getFlowId().toString());
+            return isContains(cmd.getFlowIds(), e.getAppliedFlowSetting().getId().toString());
         }).filter(e -> {
             return isContains(cmd.getStages(), e.getStage().name());
         }).filter(e -> {
             return isContains(cmd.getStates(), e.getState().name());
         }).collect(Collectors.toList());
 
-        appendFlowName(listJobs);
-
         return listJobs;
-    }
-
-    public void appendFlowName(List<EntityDepositJob> list) {
-        if (list == null) {
-            return;
-        }
-
-        for (EntityDepositJob job : list) {
-            EntityFlowSetting flowSetting = repoFlowSetting.getById(job.getFlowId());
-            if (flowSetting != null) {
-                job.setFlowName(flowSetting.getName());
-            }
-        }
     }
 
     private static boolean isContains(String[] conditions, String item) {

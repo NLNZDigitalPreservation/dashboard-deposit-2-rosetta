@@ -4,8 +4,6 @@ import nz.govt.natlib.dashboard.common.injection.InjectionPathScan;
 import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
-import nz.govt.natlib.dashboard.common.metadata.EnumSystemEventLevel;
-import nz.govt.natlib.dashboard.common.metadata.EnumSystemEventModule;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 
@@ -15,17 +13,17 @@ import java.util.List;
 public class ScheduleProcessorImplJobFinalizing extends ScheduleProcessor {
     @Override
     public void handle(EntityFlowSetting flowSetting) throws Exception {
-        List<EntityDepositJob> listOfJobs = repoDepositJobActive.getByFlowId(flowSetting.getId());
+        List<EntityDepositJob> listOfJobs = repoDepositJob.getByFlowId(flowSetting.getId());
         for (EntityDepositJob job : listOfJobs) {
             //Using the applied Injection Storage Location
-            InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(job.getAppliedInjectionStorageLocation());
+            InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(job.getAppliedFlowSetting().getInjectionEndPoint());
             if (injectionPathScanClient == null) {
                 log.error("Failed to initial PathScanClient instance.");
                 return;
             }
 
             //Backup to the current Backup Storage Location
-            InjectionPathScan backupPathScanClient = InjectionUtils.createPathScanClient(repoStorageLocation.getById(flowSetting.getBackupEndPointId()));
+            InjectionPathScan backupPathScanClient = InjectionUtils.createPathScanClient(job.getAppliedFlowSetting().getBackupEndPoint());
             if (backupPathScanClient == null) {
                 log.error("Failed to initial Backup PathScanClient instance.");
                 return;

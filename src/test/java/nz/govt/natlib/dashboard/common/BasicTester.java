@@ -41,9 +41,7 @@ public class BasicTester {
 
     protected static RepoIdGenerator repoIdGenerator;
     protected static RepoFlowSetting repoFlowSetting;
-    protected static RepoStorageLocation repoStorageLocation;
-    protected static RepoDepositJobActive repoDepositJobActive;
-    protected static RepoDepositJobHistory repoDepositJobHistory;
+    protected static RepoDepositJob repoDepositJob;
     protected static RepoGlobalSetting repoGlobalSetting;
     protected static RepoWhiteList repoWhiteList;
 
@@ -62,22 +60,14 @@ public class BasicTester {
         ReflectionTestUtils.setField(repoFlowSetting, "idGenerator", repoIdGenerator);
         repoFlowSetting.init();
 
-        repoStorageLocation = new RepoStorageLocation();
-        ReflectionTestUtils.setField(repoStorageLocation, "systemStoragePath", storagePath);
-        ReflectionTestUtils.setField(repoStorageLocation, "idGenerator", repoIdGenerator);
-        repoStorageLocation.init();
-
-        repoDepositJobActive = new RepoDepositJobActive();
-        ReflectionTestUtils.setField(repoDepositJobActive, "systemStoragePath", storagePath);
-        ReflectionTestUtils.setField(repoDepositJobActive, "idGenerator", repoIdGenerator);
-        repoDepositJobActive.init();
-
-        repoDepositJobHistory = new RepoDepositJobHistory();
-        ReflectionTestUtils.setField(repoDepositJobHistory, "systemStoragePath", storagePath);
-        repoDepositJobHistory.init();
+        repoDepositJob = new RepoDepositJob();
+        ReflectionTestUtils.setField(repoDepositJob, "systemStoragePath", storagePath);
+        ReflectionTestUtils.setField(repoDepositJob, "idGenerator", repoIdGenerator);
+        repoDepositJob.init();
 
         repoGlobalSetting = new RepoGlobalSetting();
         ReflectionTestUtils.setField(repoGlobalSetting, "systemStoragePath", storagePath);
+        ReflectionTestUtils.setField(repoGlobalSetting, "idGenerator", repoIdGenerator);
         repoGlobalSetting.init();
 
         repoWhiteList = new RepoWhiteList();
@@ -96,11 +86,8 @@ public class BasicTester {
         depositJobService = new DepositJobService();
         ReflectionTestUtils.setField(depositJobService, "rosettaWebService", rosettaWebService);
 //        ReflectionTestUtils.setField(depositJobService, "globalSettingService", globalSettingService);
-        ReflectionTestUtils.setField(depositJobService, "repoJobActive", repoDepositJobActive);
-        ReflectionTestUtils.setField(depositJobService, "repoJobHistory", repoDepositJobHistory);
+        ReflectionTestUtils.setField(depositJobService, "repoJob", repoDepositJob);
         ReflectionTestUtils.setField(depositJobService, "repoFlowSetting", repoFlowSetting);
-        ReflectionTestUtils.setField(depositJobService, "repoStorageLocation", repoStorageLocation);
-//        ReflectionTestUtils.setField(depositJobService, "depositJobActiveTimeSlotDays", 1L);
 
         globalSettingService = new GlobalSettingService();
         ReflectionTestUtils.setField(globalSettingService, "repoGlobalSetting", repoGlobalSetting);
@@ -110,13 +97,6 @@ public class BasicTester {
 
     @AfterAll
     public static void clearTempFiles() {
-        repoIdGenerator.close();
-        repoFlowSetting.close();
-        repoStorageLocation.close();
-        repoDepositJobActive.close();
-        repoDepositJobHistory.close();
-        repoGlobalSetting.close();
-        repoWhiteList.close();
         try {
             FileUtils.cleanDirectory(testDir);
             testDir.deleteOnExit();

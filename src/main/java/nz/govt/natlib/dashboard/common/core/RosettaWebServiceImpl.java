@@ -27,6 +27,7 @@ import java.lang.Exception;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class RosettaWebServiceImpl implements RosettaWebService {
     private static final Logger log = LoggerFactory.getLogger(UserAccessService.class);
@@ -42,14 +43,33 @@ public class RosettaWebServiceImpl implements RosettaWebService {
     private String dcProxyUsername = "leefr";
     private String dcProxyPassword = "******";
 
-    public void init(String pdsUrl, String wsdlUrlProducer, String wsdlUrlDeposit, String wsdlUrlSip, String wsdlUrlDeliveryAccess) throws Exception {
-        pdsClient = CustomizedPdsClient.getInstance();
-        pdsClient.init(pdsUrl, false);
+    public void init(String pdsUrl, String wsdlUrlProducer, String wsdlUrlDeposit, String wsdlUrlSip, String wsdlUrlDeliveryAccess) {
+        Runnable postponeInitializer = new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        TimeUnit.SECONDS.sleep(30); //Postpone 30 seconds to wait for the ready of Rosetta service.
 
-        producerWebServices = (new ProducerWebServices_Service(new URL(wsdlUrlProducer), new QName("http://dps.exlibris.com/", "ProducerWebServices"))).getProducerWebServicesPort();
-        depositWebServices = (new DepositWebServices_Service(new URL(wsdlUrlDeposit), new QName("http://dps.exlibris.com/", "DepositWebServices"))).getDepositWebServicesPort();
-        sipWebServices = (new SipWebServices_Service(new URL(wsdlUrlSip), new QName("http://dps.exlibris.com/", "SipWebServices"))).getSipWebServicesPort();
-        deliveryAccessWS = new DeliveryAccessWS_Service(new URL(wsdlUrlDeliveryAccess), new QName("http://dps.exlibris.com/", "DeliveryAccessWS")).getDeliveryAccessWSPort();
+                        pdsClient = CustomizedPdsClient.getInstance();
+                        pdsClient.init(pdsUrl, false);
+
+                        producerWebServices = (new ProducerWebServices_Service(new URL(wsdlUrlProducer), new QName("http://dps.exlibris.com/", "ProducerWebServices"))).getProducerWebServicesPort();
+                        depositWebServices = (new DepositWebServices_Service(new URL(wsdlUrlDeposit), new QName("http://dps.exlibris.com/", "DepositWebServices"))).getDepositWebServicesPort();
+                        sipWebServices = (new SipWebServices_Service(new URL(wsdlUrlSip), new QName("http://dps.exlibris.com/", "SipWebServices"))).getSipWebServicesPort();
+                        deliveryAccessWS = new DeliveryAccessWS_Service(new URL(wsdlUrlDeliveryAccess), new QName("http://dps.exlibris.com/", "DeliveryAccessWS")).getDeliveryAccessWSPort();
+
+                        log.info("Succeed to connect to Rosetta services, and ended retrying.");
+                        return;
+                    } catch (Exception e) {
+                        log.warn("Failed to connect to Rosetta services, will retry.", e);
+                    }
+                }
+            }
+        };
+
+        Thread processor = new Thread(postponeInitializer);
+        processor.start();
     }
 
     public String getDpsSruCmsUrl() {

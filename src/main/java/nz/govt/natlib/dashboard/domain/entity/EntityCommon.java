@@ -1,9 +1,6 @@
 package nz.govt.natlib.dashboard.domain.entity;
 
-import com.sleepycat.persist.model.Persistent;
-
-@Persistent
-public class DTOFlowSetting extends BaseFlowSetting  {
+public class EntityCommon {
     private Long id;
 
     public Long getId() {
@@ -13,5 +10,4 @@ public class DTOFlowSetting extends BaseFlowSetting  {
     public void setId(Long id) {
         this.id = id;
     }
-
 }

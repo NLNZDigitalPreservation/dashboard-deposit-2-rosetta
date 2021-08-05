@@ -8,7 +8,6 @@ import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
 import nz.govt.natlib.dashboard.domain.daemon.TimerScheduledExecutors;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityStorageLocation;
-import nz.govt.natlib.dashboard.ui.command.FlowSettingCommand;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,7 +33,6 @@ public class TestFlowSettingService extends BasicTester {
         ReflectionTestUtils.setField(testInstance, "rosettaWebService", rosettaWebService);
         ReflectionTestUtils.setField(testInstance, "globalSettingService", globalSettingService);
         ReflectionTestUtils.setField(testInstance, "repoFlowSetting", repoFlowSetting);
-        ReflectionTestUtils.setField(testInstance, "repoStorageLocation", repoStorageLocation);
 
         TimerScheduledExecutors timerScheduledExecutors = mock(TimerScheduledExecutors.class);
 
@@ -185,21 +183,19 @@ public class TestFlowSettingService extends BasicTester {
         EntityStorageLocation backupEndLocation = new EntityStorageLocation();
         setValues(backupEndLocation);
 
-        FlowSettingCommand cmd = new FlowSettingCommand();
-        cmd.setFlowSetting(flowSetting);
-        cmd.setInjectionEndPoint(injectionEndLocation);
-        cmd.setBackupEndPoint(backupEndLocation);
+        flowSetting.setInjectionEndPoint(injectionEndLocation);
+        flowSetting.setBackupEndPoint(backupEndLocation);
 
-        FlowSettingCommand rst = null;
+        EntityFlowSetting rst = null;
         try {
             when(rosettaWebService.login(anyString(), anyString(), anyString())).thenReturn(UUID.randomUUID().toString());
             when(rosettaWebService.isValidProducer(anyString(), anyString())).thenReturn(true);
             when(rosettaWebService.isValidMaterialFlow(anyString(), anyString())).thenReturn(true);
-            rst = testInstance.saveFlowSetting(cmd);
+            rst = testInstance.saveFlowSetting(flowSetting);
             assert rst != null;
-            assert !DashboardHelper.isNull(rst.getFlowSetting().getId());
-            assert !DashboardHelper.isNull(rst.getInjectionEndPoint().getId());
-            assert !DashboardHelper.isNull(rst.getBackupEndPoint().getId());
+            assert !DashboardHelper.isNull(rst.getId());
+            assert !DashboardHelper.isNull(rst.getInjectionEndPoint());
+            assert !DashboardHelper.isNull(rst.getBackupEndPoint());
         } catch (Exception e) {
             e.printStackTrace();
             assert false;
@@ -216,21 +212,19 @@ public class TestFlowSettingService extends BasicTester {
         EntityStorageLocation backupEndLocation = new EntityStorageLocation();
         setValues(backupEndLocation);
 
-        FlowSettingCommand cmd = new FlowSettingCommand();
-        cmd.setFlowSetting(flowSetting);
-        cmd.setInjectionEndPoint(injectionEndLocation);
-        cmd.setBackupEndPoint(backupEndLocation);
+        flowSetting.setInjectionEndPoint(injectionEndLocation);
+        flowSetting.setBackupEndPoint(backupEndLocation);
 
-        FlowSettingCommand rst = null;
+        EntityFlowSetting rst = null;
         try {
             when(rosettaWebService.login(anyString(), anyString(), anyString())).thenReturn(UUID.randomUUID().toString());
             when(rosettaWebService.isValidProducer(anyString(), anyString())).thenReturn(true);
             when(rosettaWebService.isValidMaterialFlow(anyString(), anyString())).thenReturn(true);
-            rst = testInstance.saveFlowSetting(cmd);
+            rst = testInstance.saveFlowSetting(flowSetting);
             assert rst != null;
-            assert !DashboardHelper.isNull(rst.getFlowSetting().getId());
-            assert !DashboardHelper.isNull(rst.getInjectionEndPoint().getId());
-            assert !DashboardHelper.isNull(rst.getBackupEndPoint().getId());
+            assert !DashboardHelper.isNull(rst.getId());
+            assert !DashboardHelper.isNull(rst.getInjectionEndPoint());
+            assert !DashboardHelper.isNull(rst.getBackupEndPoint());
         } catch (Exception e) {
             e.printStackTrace();
             assert false;
@@ -244,22 +238,25 @@ public class TestFlowSettingService extends BasicTester {
         String updatedBackupRootPath = FileUtils.getTempDirectoryPath();
         backupEndLocation.setRootPath(updatedBackupRootPath);
 
+        flowSetting.setInjectionEndPoint(injectionEndLocation);
+        flowSetting.setBackupEndPoint(backupEndLocation);
+
         try {
-            rst = testInstance.saveFlowSetting(cmd);
+            rst = testInstance.saveFlowSetting(flowSetting);
             assert rst != null;
         } catch (InvalidParameterException | WebServiceException | NullParameterException e) {
             e.printStackTrace();
             assert false;
         }
 
-        EntityFlowSetting flowSettingAfterEdit = repoFlowSetting.getById(rst.getFlowSetting().getId());
+        EntityFlowSetting flowSettingAfterEdit = repoFlowSetting.getById(rst.getId());
         assert flowSettingAfterEdit != null;
         assert flowSettingAfterEdit.getDelays()==500;
         assert flowSettingAfterEdit.getDelayUnit().equals("D");
-        EntityStorageLocation injectionEndLocationAfterEdit = repoStorageLocation.getById(rst.getInjectionEndPoint().getId());
+        EntityStorageLocation injectionEndLocationAfterEdit = rst.getInjectionEndPoint();
         assert injectionEndLocationAfterEdit != null;
         assert injectionEndLocationAfterEdit.getRootPath().equals(updatedInjectRootPath);
-        EntityStorageLocation backupEndLocationAfterEdit = repoStorageLocation.getById(rst.getBackupEndPoint().getId());
+        EntityStorageLocation backupEndLocationAfterEdit =rst.getBackupEndPoint();
         assert backupEndLocationAfterEdit != null;
         assert backupEndLocationAfterEdit.getRootPath().equals(updatedBackupRootPath);
     }

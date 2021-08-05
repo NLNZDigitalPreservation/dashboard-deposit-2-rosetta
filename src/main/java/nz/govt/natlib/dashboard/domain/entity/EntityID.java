@@ -1,11 +1,6 @@
 package nz.govt.natlib.dashboard.domain.entity;
 
-import com.sleepycat.persist.model.Entity;
-import com.sleepycat.persist.model.PrimaryKey;
-
-@Entity
 public class EntityID {
-    @PrimaryKey
     private String key;
     private Long number;
 

@@ -28,24 +28,24 @@ public class TestScheduleProcessorImplJobFinalizing extends ScheduleProcessorTes
 
     @Test
     public void testFinalizeSuccess() throws Exception {
-        EntityDepositJob job = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;
 
         for (EnumDepositJobStage stage : EnumDepositJobStage.values()) {
             for (EnumDepositJobState state : EnumDepositJobState.values()) {
                 job.setStage(stage);
                 job.setState(state);
-                repoDepositJobActive.save(job);
+                repoDepositJob.save(job);
 
                 //Finalizing
                 testInstance.handle(flowSetting);
 
-                EntityDepositJob jobAfterFinalized = repoDepositJobActive.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+                EntityDepositJob jobAfterFinalized = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
                 assert jobAfterFinalized != null;
                 if ((stage == EnumDepositJobStage.DEPOSIT && state == EnumDepositJobState.SUCCEED)
                         || (stage == EnumDepositJobStage.FINALIZE && state == EnumDepositJobState.INITIALED)
                         || (stage == EnumDepositJobStage.FINALIZE && state == EnumDepositJobState.RUNNING)) {
-                    assert jobAfterFinalized.getStage() == EnumDepositJobStage.FINALIZE;
+                    assert jobAfterFinalized.getStage() == EnumDepositJobStage.FINISHED;
                     assert jobAfterFinalized.getState() == EnumDepositJobState.SUCCEED;
 
                     File subFolder = new File(job.getInjectionPath());

@@ -1,7 +1,6 @@
 package nz.govt.natlib.dashboard.ui.controller;
 
 import nz.govt.natlib.dashboard.domain.daemon.TimerScheduledExecutors;
-import nz.govt.natlib.dashboard.domain.repo.RepoAbstract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +29,6 @@ public class SystemManagementController {
         log.info("Received [shutdown] command {}", req.getParameter("Referer"));
         log.info("Dashboard is going to exit.");
         timerScheduledExecutors.close();
-        RepoAbstract.getListAllRepos().forEach(RepoAbstract::close);
-        //        System.exit(0);
         return "The system resources held by Dashboard were released.";
     }
 }

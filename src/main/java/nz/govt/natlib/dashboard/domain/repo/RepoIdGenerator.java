@@ -1,40 +1,39 @@
 package nz.govt.natlib.dashboard.domain.repo;
 
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.persist.PrimaryIndex;
+
 import nz.govt.natlib.dashboard.common.metadata.EnumEntityKey;
 import nz.govt.natlib.dashboard.domain.entity.EntityID;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import javax.annotation.PostConstruct;
+import java.io.File;
 
 @Component("RepoIdGenerator")
 public class RepoIdGenerator extends RepoAbstract {
-    private static final String STORAGE_FOLDER = "id-generator";
-    private PrimaryIndex<String, EntityID> primaryIndexById;
+    private static final String SUB_FOLDER = "id-generator";
 
-    @Override
-    public void init() throws DatabaseException, IOException {
-        super.initInternal();
-        primaryIndexById = store.getPrimaryIndex(String.class, EntityID.class);
-    }
-
-    @Override
-    public String getSubDirectory() {
-        return STORAGE_FOLDER;
+    @PostConstruct
+    public void init() {
+        this.subStoragePath = this.systemStoragePath + File.separator + SUB_FOLDER;
     }
 
     synchronized public Long nextId(EnumEntityKey key) {
-        EntityID obj = primaryIndexById.get(key.name());
-        if (obj == null) {
-            obj = new EntityID();
+        String fileName = String.format("%s.json", key.name());
+        String json = read(this.subStoragePath, fileName);
+
+        EntityID obj;
+
+        if (StringUtils.isEmpty(json)){
+            obj=new EntityID();
             obj.setKey(key.name());
             obj.setNumber(1L);
-        } else {
+        }else{
+            obj=(EntityID) json2Object(json,EntityID.class);
             obj.setNumber(obj.getNumber() + 1);
         }
 
-        primaryIndexById.put(obj);
+        save(this.subStoragePath, fileName, obj);
         return obj.getNumber();
     }
 }
