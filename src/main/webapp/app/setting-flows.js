@@ -209,11 +209,12 @@ function initFlowSettings(){
     fetchHttp(PATH_RAW_MATERIAL_FLOW, null, function(rsp){
         var html=combineProducers(rsp);
         $('#flow-setting select[name="producer"]').html(html);
-        var selectedId=$('#flow-setting select[name="producer"] option:selected').val();
-        $('#flow-setting select[name="materialFlow"]').html(mapMaterialFlows[selectedId]);
+        //var selectedId=$('#flow-setting select[name="producer"] option:selected').val();
+        //$('#flow-setting select[name="materialFlow"]').html(mapMaterialFlows[selectedId]);
 
         $('#flow-setting select[name="producer"]').change(function() {
-            var selectedId=$('#flow-setting select[name="producer"] option:selected').val();
+            var selectedId=$(this).val();
+            //var selectedId=$('#flow-setting select[name="producer"] option:selected').val();
             var flows=mapMaterialFlows[selectedId];
 
             console.log(flows);
