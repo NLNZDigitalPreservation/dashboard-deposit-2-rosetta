@@ -281,26 +281,26 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         return true;
     }
 
-    public boolean isDepositDone(InjectionPathScan injectionPathScanClient, String injectionPath) {
-        List<UnionFile> progressFiles = injectionPathScanClient.listFile(injectionPath);
-        for (UnionFile f : progressFiles) {
-            if (f.getName().equalsIgnoreCase("done")) {
-                return true;
-            }
-        }
-
-        InputStream inputStream = injectionPathScanClient.readFile(injectionPath + File.separator + "content", "mets.xml");
-        if (inputStream == null) {
-            return false;
-        }
-        MetsXmlProperties prop = MetsHandler.parse(inputStream);
-        if (prop == null) {
-            return false;
-        }
-
-        int num = rosettaWebService.getNumberOfRecords(prop);
-        return num == 1;
-    }
+//    public boolean isDepositDone(InjectionPathScan injectionPathScanClient, String injectionPath) {
+//        List<UnionFile> progressFiles = injectionPathScanClient.listFile(injectionPath);
+//        for (UnionFile f : progressFiles) {
+//            if (f.getName().equalsIgnoreCase("done")) {
+//                return true;
+//            }
+//        }
+//
+//        InputStream inputStream = injectionPathScanClient.readFile(injectionPath + File.separator + "content", "mets.xml");
+//        if (inputStream == null) {
+//            return false;
+//        }
+//        MetsXmlProperties prop = MetsHandler.parse(inputStream);
+//        if (prop == null) {
+//            return false;
+//        }
+//
+//        int num = rosettaWebService.getNumberOfRecords(prop);
+//        return num == 1;
+//    }
 
     public RestResponseCommand manuallySubmitDepositJob(Long flowId, String sourceNfsDirectory, boolean isForceReplaceExistingJob) {
         RestResponseCommand retVal = new RestResponseCommand();

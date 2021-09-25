@@ -7,18 +7,9 @@ import com.exlibris.digitool.repository.ifc.Collection;
 import com.exlibris.dps.*;
 import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.util.CustomizedPdsClient;
-import nz.govt.natlib.ndha.common.exlibris.*;
-import nz.govt.natlib.ndha.common.ilsquery.criteria.Criteria;
-import nz.govt.natlib.ndha.common.ilsquery.criteria.SearchAttribute;
-import nz.govt.natlib.ndha.common.ilsquery.criteria.SingleCriteria;
-import nz.govt.natlib.ndha.common.ilsquery.criteria.SruQueryBuilderVisitorImpl;
-import nz.govt.natlib.dashboard.common.metadata.MetsXmlProperties;
 import nz.govt.natlib.dashboard.domain.service.UserAccessService;
-import nz.govt.natlib.dashboard.util.DashboardHelper;
-import nz.govt.natlib.ndha.srusearchclient.SruRequest;
-import nz.govt.natlib.ndha.srusearchclient.SruService;
-import nz.govt.natlib.ndha.srusearchclient.impl.SruRequestImpl;
-import nz.govt.natlib.ndha.srusearchclient.impl.SruServiceImpl;
+
+import nz.govt.natlib.ndha.common.exlibris.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,12 +22,10 @@ import java.util.concurrent.TimeUnit;
 
 public class RosettaWebServiceImpl implements RosettaWebService {
     private static final Logger log = LoggerFactory.getLogger(UserAccessService.class);
-    private final SruService sruService = new SruServiceImpl();
     private CustomizedPdsClient pdsClient;
     private ProducerWebServices producerWebServices;
     private DepositWebServices depositWebServices;
     private SipWebServices sipWebServices;
-    private DeliveryAccessWS deliveryAccessWS;
 
     private String dpsSruCmsUrl = "http://wlgortimuweb01.natlib.govt.nz:8080/sru?";
     private String dcSruCmsUrl = "https://ap01-psb.alma.exlibrisgroup.com/view/sru/64NLNZ_MAIN?";
@@ -57,7 +46,6 @@ public class RosettaWebServiceImpl implements RosettaWebService {
                         producerWebServices = (new ProducerWebServices_Service(new URL(wsdlUrlProducer), new QName("http://dps.exlibris.com/", "ProducerWebServices"))).getProducerWebServicesPort();
                         depositWebServices = (new DepositWebServices_Service(new URL(wsdlUrlDeposit), new QName("http://dps.exlibris.com/", "DepositWebServices"))).getDepositWebServicesPort();
                         sipWebServices = (new SipWebServices_Service(new URL(wsdlUrlSip), new QName("http://dps.exlibris.com/", "SipWebServices"))).getSipWebServicesPort();
-                        deliveryAccessWS = new DeliveryAccessWS_Service(new URL(wsdlUrlDeliveryAccess), new QName("http://dps.exlibris.com/", "DeliveryAccessWS")).getDeliveryAccessWSPort();
 
                         log.info("Succeed to connect to Rosetta services, and ended retrying.");
                         return;
@@ -86,14 +74,6 @@ public class RosettaWebServiceImpl implements RosettaWebService {
 
     public void setDcSruCmsUrl(String dcSruCmsUrl) {
         this.dcSruCmsUrl = dcSruCmsUrl;
-    }
-
-    public DeliveryAccessWS getDeliveryAccessWS() {
-        return deliveryAccessWS;
-    }
-
-    public void setDeliveryAccessWS(DeliveryAccessWS deliveryAccessWS) {
-        this.deliveryAccessWS = deliveryAccessWS;
     }
 
     public String getDcProxyUsername() {
@@ -255,7 +235,7 @@ public class RosettaWebServiceImpl implements RosettaWebService {
     @Override
     public SipStatusInfo getSIPStatusInfo(String sipId) throws Exception {
         try {
-            return sipWebServices.getSIPStatusInfo(sipId);
+            return sipWebServices.getSIPStatusInfo(sipId, false);
         } catch (Exception_Exception e) {
             log.error("Failed to get SIP StatusInfo: {}", sipId, e);
             throw e;
@@ -294,50 +274,5 @@ public class RosettaWebServiceImpl implements RosettaWebService {
 
     public SipWebServices getSipWebServices() {
         return sipWebServices;
-    }
-
-    @Override
-    public int getNumberOfRecords(MetsXmlProperties prop) {
-        SruQueryBuilderVisitorImpl queryBuilder = new SruQueryBuilderVisitorImpl();
-        SruRequest sruRequest = new SruRequestImpl();
-        sruRequest.setStartRecord(1);
-        sruRequest.setMaximumRecords(10);
-        sruRequest.setQuery(queryBuilder);
-
-        if (!DashboardHelper.isNull(prop.getObjectIdentifierValue())) {
-            //ALMA
-            sruRequest.setUrl(dcSruCmsUrl);
-            sruRequest.setSchema("dc");
-            Criteria criteria = new SingleCriteria(SearchAttribute.AlmaRecID, "alma_mms_id", prop.getObjectIdentifierValue());
-            criteria.accept(queryBuilder);
-            sruRequest.setIsInternal(true);
-        } else if (!DashboardHelper.isNull(prop.getCmdId())) {
-            sruRequest.setUrl(dpsSruCmsUrl);
-            sruRequest.setSchema("dps");
-            Criteria criteria = new SingleCriteria(SearchAttribute.IRN, "IRN", prop.getCmdId());
-            criteria.accept(queryBuilder);
-            sruRequest.setIsInternal(false);
-            sruRequest.setUser(dcProxyUsername);
-            sruRequest.setPassword(dcProxyPassword);
-        } else {
-            return -1;
-        }
-
-        String xmlResult = new String(sruService.executeReturnAsByteArray(sruRequest, 1000));
-
-        return getNumberOfRecords(xmlResult);
-    }
-
-    private int getNumberOfRecords(String xmlResult) {
-        if (DashboardHelper.isNull(xmlResult)) {
-            return -1;
-        }
-        String key = "numberOfRecords>";
-        int idxStart = xmlResult.indexOf(key);
-        idxStart += key.length();
-        int idxEnd = xmlResult.indexOf("<", idxStart);
-
-        String sNumberOfRecords = xmlResult.substring(idxStart, idxEnd);
-        return Integer.parseInt(sNumberOfRecords);
     }
 }
