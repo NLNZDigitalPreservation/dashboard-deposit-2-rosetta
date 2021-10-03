@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class TestRosettaWebServiceImpl {
     private static String PDSUrl = "https://slbpdstest.natlib.govt.nz/pds?";
@@ -43,7 +44,7 @@ public class TestRosettaWebServiceImpl {
 //        System.setProperty("http.proxyPort", proxyPort);
 //        System.setProperty("https.proxyHost", proxyHost);
 //        System.setProperty("https.proxyPort", proxyPort);
-        rosettaWebService.init(PDSUrl, ProducerWsdlUrl, DepositWsdlUrl, SipWsdlUrl, DeliveryAccessWsdlUrl);
+        rosettaWebService._init(PDSUrl, ProducerWsdlUrl, DepositWsdlUrl, SipWsdlUrl, DeliveryAccessWsdlUrl);
     }
 
     @Disabled
@@ -90,7 +91,7 @@ public class TestRosettaWebServiceImpl {
 
     @Test
     public void testGetSipStatus() {
-        String sipId = "742449";
+        String sipId = "747793";
         SipWebServices sipApi = rosettaWebService.getSipWebServices();
         String reply = sipApi.getSipStatus(sipId);
         System.out.println(reply);

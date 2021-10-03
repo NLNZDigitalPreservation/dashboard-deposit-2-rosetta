@@ -29,7 +29,7 @@ dependencies {
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
 
     // This dependency is used by the application.
-    //implementation 'com.google.guava:guava:28.2-jre'
+    implementation 'com.google.guava:guava:28.2-jre'
     implementation 'com.sun.xml.bind:jaxb-impl:2.3.2'
     implementation 'com.sun.xml.bind:jaxb-core:2.3.0'
     implementation 'com.sun.xml.ws:jaxws-ri:2.3.2'

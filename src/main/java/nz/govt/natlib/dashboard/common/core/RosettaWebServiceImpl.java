@@ -38,14 +38,9 @@ public class RosettaWebServiceImpl implements RosettaWebService {
             public void run() {
                 while (true) {
                     try {
-                        TimeUnit.SECONDS.sleep(30); //Postpone 30 seconds to wait for the ready of Rosetta service.
+                        TimeUnit.SECONDS.sleep(30); //Postpone 30 seconds to wait for the preparation of Rosetta service.
 
-                        pdsClient = CustomizedPdsClient.getInstance();
-                        pdsClient.init(pdsUrl, false);
-
-                        producerWebServices = (new ProducerWebServices_Service(new URL(wsdlUrlProducer), new QName("http://dps.exlibris.com/", "ProducerWebServices"))).getProducerWebServicesPort();
-                        depositWebServices = (new DepositWebServices_Service(new URL(wsdlUrlDeposit), new QName("http://dps.exlibris.com/", "DepositWebServices"))).getDepositWebServicesPort();
-                        sipWebServices = (new SipWebServices_Service(new URL(wsdlUrlSip), new QName("http://dps.exlibris.com/", "SipWebServices"))).getSipWebServicesPort();
+                        _init(pdsUrl, wsdlUrlProducer, wsdlUrlDeposit, wsdlUrlSip, wsdlUrlDeliveryAccess);
 
                         log.info("Succeed to connect to Rosetta services, and ended retrying.");
                         return;
@@ -58,6 +53,15 @@ public class RosettaWebServiceImpl implements RosettaWebService {
 
         Thread processor = new Thread(postponeInitializer);
         processor.start();
+    }
+
+    public void _init(String pdsUrl, String wsdlUrlProducer, String wsdlUrlDeposit, String wsdlUrlSip, String wsdlUrlDeliveryAccess) throws Exception {
+        pdsClient = CustomizedPdsClient.getInstance();
+        pdsClient.init(pdsUrl, false);
+
+        producerWebServices = (new ProducerWebServices_Service(new URL(wsdlUrlProducer), new QName("http://dps.exlibris.com/", "ProducerWebServices"))).getProducerWebServicesPort();
+        depositWebServices = (new DepositWebServices_Service(new URL(wsdlUrlDeposit), new QName("http://dps.exlibris.com/", "DepositWebServices"))).getDepositWebServicesPort();
+        sipWebServices = (new SipWebServices_Service(new URL(wsdlUrlSip), new QName("http://dps.exlibris.com/", "SipWebServices"))).getSipWebServicesPort();
     }
 
     public String getDpsSruCmsUrl() {
