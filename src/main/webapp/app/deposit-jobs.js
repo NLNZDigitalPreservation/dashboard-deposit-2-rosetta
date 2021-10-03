@@ -25,7 +25,7 @@ function disableDepositJobContextMenuItemActive(key, opt){
         case 'RETRY':
             return !(stage==='DEPOSIT' && state==='FAILED');
         case 'TERMINATE':
-            return (stage==='DEPOSIT' && (state==='RUNNING' || state==='SUCCEED')) || (stage==='FINALIZE' && state==='SUCCEED');
+            return (stage==='DEPOSIT' && state==='SUCCEED') || (stage==='FINALIZE' && state==='SUCCEED');
         case 'CANCEL':
             return !(state==='FAILED');
         default:

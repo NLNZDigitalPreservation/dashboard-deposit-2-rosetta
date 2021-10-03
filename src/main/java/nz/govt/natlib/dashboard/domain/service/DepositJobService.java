@@ -170,7 +170,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     }
 
     public EntityDepositJob terminate(EntityDepositJob job) {
-        if ((job.getStage() == EnumDepositJobStage.DEPOSIT && (job.getState() == EnumDepositJobState.RUNNING || job.getState() == EnumDepositJobState.SUCCEED)) ||
+        if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED)) {
             log.warn("{} at stage [{}] and state [{}] could not be terminated", job.getInjectionTitle(), job.getStage(), job.getState());
             return job;
