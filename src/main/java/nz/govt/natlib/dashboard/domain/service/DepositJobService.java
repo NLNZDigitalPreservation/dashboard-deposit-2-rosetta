@@ -170,7 +170,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     }
 
     public EntityDepositJob terminate(EntityDepositJob job) {
-        if ((job.getStage() == EnumDepositJobStage.DEPOSIT && (job.getState() == EnumDepositJobState.RUNNING || job.getState() == EnumDepositJobState.SUCCEED)) ||
+        if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED)) {
             log.warn("{} at stage [{}] and state [{}] could not be terminated", job.getInjectionTitle(), job.getStage(), job.getState());
             return job;
@@ -281,26 +281,26 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         return true;
     }
 
-    public boolean isDepositDone(InjectionPathScan injectionPathScanClient, String injectionPath) {
-        List<UnionFile> progressFiles = injectionPathScanClient.listFile(injectionPath);
-        for (UnionFile f : progressFiles) {
-            if (f.getName().equalsIgnoreCase("done")) {
-                return true;
-            }
-        }
-
-        InputStream inputStream = injectionPathScanClient.readFile(injectionPath + File.separator + "content", "mets.xml");
-        if (inputStream == null) {
-            return false;
-        }
-        MetsXmlProperties prop = MetsHandler.parse(inputStream);
-        if (prop == null) {
-            return false;
-        }
-
-        int num = rosettaWebService.getNumberOfRecords(prop);
-        return num == 1;
-    }
+//    public boolean isDepositDone(InjectionPathScan injectionPathScanClient, String injectionPath) {
+//        List<UnionFile> progressFiles = injectionPathScanClient.listFile(injectionPath);
+//        for (UnionFile f : progressFiles) {
+//            if (f.getName().equalsIgnoreCase("done")) {
+//                return true;
+//            }
+//        }
+//
+//        InputStream inputStream = injectionPathScanClient.readFile(injectionPath + File.separator + "content", "mets.xml");
+//        if (inputStream == null) {
+//            return false;
+//        }
+//        MetsXmlProperties prop = MetsHandler.parse(inputStream);
+//        if (prop == null) {
+//            return false;
+//        }
+//
+//        int num = rosettaWebService.getNumberOfRecords(prop);
+//        return num == 1;
+//    }
 
     public RestResponseCommand manuallySubmitDepositJob(Long flowId, String sourceNfsDirectory, boolean isForceReplaceExistingJob) {
         RestResponseCommand retVal = new RestResponseCommand();

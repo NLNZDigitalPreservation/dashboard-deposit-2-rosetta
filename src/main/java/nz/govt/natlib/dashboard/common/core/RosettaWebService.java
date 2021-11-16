@@ -34,6 +34,4 @@ public interface RosettaWebService {
     Collection getCollectionByName(String pdsHandle, String path);
 
     String getDepositActivityBySubmitDateByMaterialFlow(String pdsHandle, String depositActivityStatus, String materialFlowId, String producerID, String producerAgentID, String updateDateFrom, String updateDateTo, String startRecord, String endRecord);
-
-     int getNumberOfRecords(MetsXmlProperties prop);
 }

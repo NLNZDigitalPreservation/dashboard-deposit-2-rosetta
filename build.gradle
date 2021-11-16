@@ -11,15 +11,12 @@ repositories {
     maven {
         url = 'https://repo1.maven.org/maven2'
     }
-
     maven {
         url = 'https://repo.maven.apache.org/maven2'
     }
-
     maven {
         url = 'https://splunk.jfrog.io/splunk/ext-releases-local'
     }
-//    jcenter()
 }
 
 dependencies {
@@ -29,26 +26,18 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-tomcat'
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:28.2-jre'
     implementation 'com.sun.xml.bind:jaxb-impl:2.3.2'
     implementation 'com.sun.xml.bind:jaxb-core:2.3.0'
     implementation 'com.sun.xml.ws:jaxws-ri:2.3.2'
-//    implementation 'com.sun.xml.bind:jaxb-impl:3.0.0'
-//    implementation 'com.sun.xml.bind:jaxb-core:3.0.0'
-//    implementation 'com.sun.xml.ws:jaxws-ri:3.0.0'
 
-    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
-    implementation group: 'com.exlibris', name: 'commons', version: '3.2'
-    implementation group: 'com.exlibris', name: 'dps-sdk', version: '6.3.0'
-    implementation group: 'com.exlibris', name: 'metswriter', version: '3.2'
-    implementation group: 'com.exlibris', name: 'deposit', version: '5.0'
-    implementation group: 'com.exlibris', name: 'srusearchclient', version: '1.16'
-    implementation group: 'com.exlibris', name: 'producerws', version: '5.0'
-    implementation group: 'com.exlibris', name: 'sipws', version: '5.0'
-    implementation group: 'com.exlibris', name: 'deliveryaccessws', version: '5.3'
-    implementation group: 'com.exlibris', name: 'RosettaIEMetaDataParser', version: '1.7'
+    implementation group: 'com.exlibris', name: 'dps-sdk', version: '7.1.0'
+    implementation group: 'com.exlibris', name: 'dps-sdk-deposit-api', version: '7.1.0'
+    implementation group: 'nz.govt.natlib.ndha', name: 'commons', version: '3.2'
+
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     implementation group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '3.1.0'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.12'
