@@ -2,11 +2,13 @@ package nz.govt.natlib.dashboard.common;
 
 import com.exlibris.dps.*;
 import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.util.CustomizedPdsClient;
 import nz.govt.natlib.ndha.common.exlibris.MaterialFlow;
 import nz.govt.natlib.ndha.common.exlibris.Producer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.lang.Exception;
@@ -19,7 +21,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestRosettaWebServiceImpl {
     private static String PDSUrl = "https://slbpdstest.natlib.govt.nz/pds?";
@@ -30,9 +34,14 @@ public class TestRosettaWebServiceImpl {
     private static String DeliveryAccessWsdlUrl = "https://wlguatdpsilb.natlib.govt.nz/dpsws/delivery/DeliveryAccessWS?wsdl";
     private static RosettaWebServiceImpl rosettaWebService = new RosettaWebServiceImpl();
 
+    private static final String _PRODUCER_AGENT_ID = "NLNZ";
     private static final String INSTITUTION = "INS00";
-    private static final String USERNAME = "leefr";
-    private static final String PASSWORD = "*****";
+    private static final String USERNAME = "test";
+    private static final String PASSWORD = "test";
+
+    private static final ProducerWebServices producerWebServices = mock(ProducerWebServices.class);
+    private static final DepositWebServices depositWebServices = mock(DepositWebServices.class);
+    private static final SipWebServices sipWebServices = mock(SipWebServices.class);
 
     @BeforeAll
     static void init() throws Exception {
@@ -44,7 +53,15 @@ public class TestRosettaWebServiceImpl {
 //        System.setProperty("http.proxyPort", proxyPort);
 //        System.setProperty("https.proxyHost", proxyHost);
 //        System.setProperty("https.proxyPort", proxyPort);
-        rosettaWebService._init(PDSUrl, ProducerWsdlUrl, DepositWsdlUrl, SipWsdlUrl, DeliveryAccessWsdlUrl);
+//        rosettaWebService._init(PDSUrl, ProducerWsdlUrl, DepositWsdlUrl, SipWsdlUrl, DeliveryAccessWsdlUrl);
+        CustomizedPdsClient pdsClient = CustomizedPdsClient.getInstance();
+        pdsClient.init("http://localhost/", true);
+
+
+        ReflectionTestUtils.setField(rosettaWebService, "pdsClient", pdsClient);
+        ReflectionTestUtils.setField(rosettaWebService, "producerWebServices", producerWebServices);
+        ReflectionTestUtils.setField(rosettaWebService, "depositWebServices", depositWebServices);
+        ReflectionTestUtils.setField(rosettaWebService, "sipWebServices", sipWebServices);
     }
 
     @Disabled
@@ -52,14 +69,24 @@ public class TestRosettaWebServiceImpl {
     public void testGetDepositActivityByUpdateDateByMaterialFlow() throws Exception {
         String pdsHandle = rosettaWebService.login(INSTITUTION, USERNAME, PASSWORD);
 //        PdsUserInfo pdsUserInfo = rosettaWebService.getPdsUserByPdsHandle(pdsHandle);
-        String producerAgentID = rosettaWebService.getInternalUserIdByExternalId("leefr");
+
+        when(producerWebServices.getInternalUserIdByExternalId(USERNAME)).thenReturn(_PRODUCER_AGENT_ID);
+        String producerAgentID = rosettaWebService.getInternalUserIdByExternalId(USERNAME);
+        assert producerAgentID.equals(_PRODUCER_AGENT_ID);
+
         String depositActivityStatus = "all";
         String updateDateFrom = "01/01/2020";
         String updateDateTo = "18/09/2020";
         String startRecord = "1";
         String endRecord = "20";
 
-        List<Producer> producers = rosettaWebService.getProducers("leefr");
+//        String xml= MockProducerWebServices.getProducerXml();
+//        when(producerWebServices.getInternalUserIdByExternalId(USERNAME)).thenReturn(_PRODUCER_AGENT_ID);
+//        when(producerWebServices.getProducersOfProducerAgent(_PRODUCER_AGENT_ID)).thenReturn(xml);
+
+//        producerWebServices.getProducersOfProducerAgent
+
+        List<Producer> producers = rosettaWebService.getProducers(USERNAME);
         for (Producer producer : producers) {
             List<MaterialFlow> materialFlows = rosettaWebService.getMaterialFlows(producer.getID());
             for (MaterialFlow materialFlow : materialFlows) {
