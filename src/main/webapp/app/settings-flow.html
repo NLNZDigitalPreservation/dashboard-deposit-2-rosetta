@@ -7,7 +7,7 @@
     <!-- <meta name="theme-color" content="#7952b3"> -->
 
     <link rel="icon" type="image/x-icon" href="favicon.ico"/>
-    <link rel="stylesheet" href="../dist/bootstrap.css">
+    <!-- <link rel="stylesheet" href="../dist/bootstrap.css"> -->
     <!-- <link rel="stylesheet" href="./dist/font/fontawesome-free.min.css"> -->
     <link rel="stylesheet" href="../dist/bootstrap-icons.css">
     <link rel="stylesheet" href="../dist/icheck-bootstrap.min.css">
@@ -15,74 +15,24 @@
     <link rel="stylesheet" href="../dist/jquery/menu/jquery.contextMenu.css">
     <link rel="stylesheet" href="../dist/daterangepicker.css">
     <link rel="stylesheet" href="../dist/toastr.min.css">
-
-    <link rel="stylesheet" href="../app/dashboard.css">
-
-    <style>
-    a{
-        display: inline-block;
-        padding: 0 2px;
-    }
-
-
-
-
-
-
-
-    </style>
+    <link rel="stylesheet" href="../dist/fancytree/skin-win8/ui.fancytree.min.css">
+    <link rel="stylesheet" href="../dist/adminlte.css">
+    <link rel="stylesheet" href="../dist/toastr.min.css">
+    <link rel="stylesheet" href="dashboard.css">
 
     <script src="../dist/jquery-3.5.1.min.js"></script>
-    <script src="../dist/ag-grid-community.min.js"></script>
+    <script src="../dist/adminlte.min.js"></script>
 
 </head>
-<body>
+<body style="overflow: hidden;">
 <div class="row">
     <div class="col-5">
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Producer Name</th>
-                <th scope="col">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Otto</td>
-                <td>
-                    <div class="btn-group" role="group" aria-label="Basic outlined example">
-                        <a href="#"><span class="badge bg-primary">View</span></a>
-                        <a href="#"><span class="badge bg-primary">Edit</span></a>
-                        <a href="#"><span class="badge bg-primary">Delete</span></a>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>
-                    <div class="btn-group" role="group" aria-label="Basic outlined example">
-                        <a href="#"><span class="badge bg-primary">View</span></a>
-                        <a href="#"><span class="badge bg-primary">Edit</span></a>
-                        <a href="#"><span class="badge bg-primary">Delete</span></a>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">3</th>
-                <td>Larry</td>
-                <td>
-                    <div class="btn-group" role="group" aria-label="Basic outlined example">
-                        <a href="#"><span class="badge bg-primary">View</span></a>
-                        <a href="#"><span class="badge bg-primary">Edit</span></a>
-                        <a href="#"><span class="badge bg-primary">Delete</span></a>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="card-body card-main hidden" id="tree-harvest-struct" style="width: 100%; height:100%; overflow-x: hidden; overflow-y: scroll;">
+            <table id="grid-flow-settings" class="hierachy-tree" style="width: 100%; outline: none;">
+              <colgroup><col width="50px"><col width="*"><col width="80px"><col width="80px"><col width="80px"><col width="80px"><col width="80px"><col width="80px"><col width="80px"></colgroup>
+              <thead><tr><th>Action</th><th>URL</th><th>Type</th><th>Status</th><th>Size</th><th>URLs</th><th>Success</th><th>Failed</th><th>TotSize</th></tr></thead>
+            </table>
+        </div>
     </div>
 
     <div class="col-7">
@@ -116,8 +66,14 @@
                 <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
             </div>
             <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Email address</label>
-                <select class="form-select" name="producer"></select>
+                <label class="form-label">Email address</label>
+                <select class="form-control">
+                    <option>option 1</option>
+                    <option>option 2</option>
+                    <option>option 3</option>
+                    <option>option 4</option>
+                    <option>option 5</option>
+                </select>
             </div>
         </form>
 
@@ -137,11 +93,11 @@
 
                 <div class="input-group mb-3">
                     <span class="input-group-text">Producer</span>
-                    <select class="form-select" name="producer"></select>
+                    <select class="form-control" name="producer"></select>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">Material Flow</span>
-                    <select class="form-select" name="materialFlow"></select>
+                    <select class="form-control" name="materialFlow"></select>
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text">Root Location</span>
@@ -257,5 +213,40 @@
         </ul>
     </div>
 </div>
+<script src="../dist/fancytree/jquery.fancytree-all-deps.js"></script>
+<script src="../dist/fancytree/modules/jquery.fancytree.table.js"></script>
+<script src="../dist/fancytree/modules/jquery.fancytree.wide.js"></script>
+<script src="../dist/fancytree/modules/jquery.fancytree.logger.js"></script>
+<script src="../dist/toastr.min.js"></script>
+<script src="dashboard.js"></script>
+<script src="setting-flows.js"></script>
+<script type="text/javascript">
+// const tableFlowSettings=new DashboardTable('grid-flow-settings', defHeadersFlowSettings);
+$(function(){
+    const gridFlowSettings=new TreeGrid('grid-flow-settings', optionFlowSetting);
+
+    fetchHttp('/dashboard/restful/setting/flow/all/get', null, function(rsp){
+        var html=combineProducers(rsp);
+        $('#flow-setting select[name="producer"]').html(html);
+        
+        $('#flow-setting select[name="producer"]').change(function() {
+            var selectedId=$(this).val();
+            //var selectedId=$('#flow-setting select[name="producer"] option:selected').val();
+            var flows=mapMaterialFlows[selectedId];
+
+            console.log(flows);
+
+            $('#flow-setting select[name="materialFlow"]').html(flows);
+        });
+    });
+
+    var template=$('#template-flow-setting').html();
+    $('#ul-flow-setting-read').html(template);
+    $('#ul-flow-setting-edit').html(template);
+
+    $('#ul-flow-setting-read input').prop('disabled', true);
+    $('#ul-flow-setting-read select').prop('disabled', true);
+});
+</script>
 </body>
 </html>

@@ -21,7 +21,7 @@ public class FlowSettingController {
     }
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_FLOW_ALL_GET, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand getAllMaterialFlow() {
+    public RestResponseCommand getAllFlowSettings() {
         return flowSettingService.getAllFlowSettings();
     }
 

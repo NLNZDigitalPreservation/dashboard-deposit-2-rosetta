@@ -39,10 +39,10 @@ public class HttpAccessManagementFilter implements Filter {
             log.debug("Before doFilter {}", securityConfig.getCurrentSessionMessage(req, rsp));
         }
 
-        if (!securityConfig.isValidSession(req, rsp)) {
-            responseError(req, rsp);
-            return;
-        }
+//        if (!securityConfig.isValidSession(req, rsp)) {
+//            responseError(req, rsp);
+//            return;
+//        }
 
         chain.doFilter(request, response);
 

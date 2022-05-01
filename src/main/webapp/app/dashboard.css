@@ -1,3 +1,10 @@
+html {
+  font-family: sans-serif;
+  line-height: 1.15;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
 nav{
 	padding: 0 0 0 5px;
 	/*background-image: linear-gradient(to right, #212529, #212529, #212529, #343a40, #212529, #212529);*/

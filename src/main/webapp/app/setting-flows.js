@@ -193,7 +193,7 @@ function setValueMaterialFlow(data, module){
     }
 }
 
-const modalFlowSettingPop = new bootstrap.Modal(document.getElementById('modal-flow-setting-pop'), {keyboard: false});
+// const modalFlowSettingPop = new bootstrap.Modal(document.getElementById('modal-flow-setting-pop'), {keyboard: false});
 
 const defHeadersFlowSettings=[
     {headerName: "ID", field: "id"},
@@ -205,30 +205,55 @@ const defHeadersFlowSettings=[
 ];
 
 
-function initFlowSettings(){
-    fetchHttp(PATH_RAW_MATERIAL_FLOW, null, function(rsp){
-        var html=combineProducers(rsp);
-        $('#flow-setting select[name="producer"]').html(html);
-        //var selectedId=$('#flow-setting select[name="producer"] option:selected').val();
-        //$('#flow-setting select[name="materialFlow"]').html(mapMaterialFlows[selectedId]);
+const optionFlowSetting={
+    extensions: ["table", "wide", "filter"],
+    quicksearch: true,
+    checkbox: true,
+    table: {checkboxColumnIdx: 0, nodeColumnIdx: 1},
+    source: [],
+    selectMode: 3,
+    renderColumns: function(event, treeNode) {
+        var nodeData=treeNode.node.data;
 
-        $('#flow-setting select[name="producer"]').change(function() {
-            var selectedId=$(this).val();
-            //var selectedId=$('#flow-setting select[name="producer"] option:selected').val();
-            var flows=mapMaterialFlows[selectedId];
+        var $tdList = $(treeNode.node.tr).find(">td");
 
-            console.log(flows);
+        if (nodeData.contentType && nodeData.contentType!=='unknown') {
+            $tdList.eq(2).text(nodeData.contentType);
+        }
 
-            $('#flow-setting select[name="materialFlow"]').html(flows);
-        });
-    });
+        if (nodeData.statusCode > 0) {
+            $tdList.eq(3).text(nodeData.statusCode);
+        }
+        
+        if (nodeData.contentLength > 0){
+            $tdList.eq(4).text(formatContentLength(nodeData.contentLength));
+        }
 
-    var template=$('#template-flow-setting').html();
-    $('#ul-flow-setting-read').html(template);
-    $('#ul-flow-setting-edit').html(template);
+        $tdList.eq(5).text(nodeData.totUrls);
+        $tdList.eq(6).text(nodeData.totSuccess);
+        $tdList.eq(7).text(nodeData.totFailed);
+        $tdList.eq(8).text(formatContentLength(nodeData.totSize));
 
-    $('#ul-flow-setting-read input').prop('disabled', true);
-    $('#ul-flow-setting-read select').prop('disabled', true);
-}
+        $(treeNode.node.tr).attr("key", ""+treeNode.node.key);
 
-const tableFlowSettings=new DashboardTable('table-flow-settings', defHeadersFlowSettings);
+        // $(treeNode.node.tr).attr("data", JSON.stringify(nodeData));
+        if (nodeData.id > 0) {
+            $(treeNode.node.tr).attr("idx", ""+nodeData.id);
+
+            var toBeModifiedNode=gPopupModifyHarvest.gridToBeModified.getNodeByDataId(nodeData.id);
+            if (toBeModifiedNode) {
+                var classOfTreeRow=gPopupModifyHarvest.getTreeNodeStyle(toBeModifiedNode.option);
+                $(treeNode.node.tr.children).addClass(classOfTreeRow);
+            }
+        }
+
+        // if (nodeData.viewType && nodeData.viewType===2 && nodeData.id===-1){
+        //  $(treeNode.node.tr).attr("menu", "folder");
+        // }else{
+        //  $(treeNode.node.tr).attr("menu", "url");
+        // }
+    },
+    icon: function(event, data){
+        return "bi bi-box-seam";
+    },
+};
