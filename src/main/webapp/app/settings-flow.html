@@ -4,79 +4,71 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <!-- <meta name="theme-color" content="#7952b3"> -->
-
     <link rel="icon" type="image/x-icon" href="favicon.ico"/>
     <link rel="stylesheet" href="../dist/bootstrap.css">
-    <!-- <link rel="stylesheet" href="./dist/font/fontawesome-free.min.css"> -->
-    <link rel="stylesheet" href="../dist/bootstrap-icons.css">
+    <!-- <link rel="stylesheet" href="../dist/bootstrap-icons.css"> -->
     <link rel="stylesheet" href="../dist/icheck-bootstrap.min.css">
-    <!-- <link rel="stylesheet" href="../dist/ag-theme-alpine.css"> -->
-    <link rel="stylesheet" href="../dist/jquery/menu/jquery.contextMenu.css">
-    <link rel="stylesheet" href="../dist/daterangepicker.css">
-    <link rel="stylesheet" href="../dist/toastr.min.css">
-    <link rel="stylesheet" href="../dist/fancytree/skin-win8/ui.fancytree.min.css">
-    <!-- <link rel="stylesheet" href="../dist/adminlte.css"> -->
+    <link rel="stylesheet" href="../dist/bootstrap-dashboard.css">
     <link rel="stylesheet" href="../dist/toastr.min.css">
     <link rel="stylesheet" href="dashboard.css">
-
-    <script src="../dist/bootstrap.bundle.js"></script>
-    <script src="../dist/jquery-3.5.1.min.js"></script>
-    <!-- <script src="../dist/adminlte.min.js"></script> -->
 </head>
-<!-- <body class="hold-transition" style="overflow: hidden;"> -->
-<body class="hold-transition">
+<!-- <body class="hold-transition" style="overflow-x: hidden;"> -->
+<body style="overflow:hidden;">
 
-<div class="wrapper">
-    <div class="row">
-        <div class="col-4">
-            <nav class="navbar navbar-expand navbar-dark bg-secondary">
-                <a href="#" class="navbar-brand">Flow Setting List</a>
-                <ul class="navbar-nav me-auto mb-2 mb-md-0"></ul>
-                <button type="button" class="btn btn-block btn-primary btn-sm"><i class="bi bi-plus-lg"></i>New</button>                
-            </nav>
-        </div>
-        <div class="col-8">
-            <nav class="navbar navbar-expand navbar-light bg-dark">
-                <a href="#" class="navbar-brand">Flow Setting Details</a>
-                <ul class="navbar-nav me-auto mb-2 mb-md-0"></ul>
-                <button type="button" class="btn btn-block btn-primary btn-sm">Save</button>
-            </nav>
-        </div>
-    </div>
 
+<div class="container-fluid">
     <div class="row">
-        <div class="col-4">
-            <!-- <div class="card-body card-main hidden" id="tree-harvest-struct" style="width: 100%; height:calc(100vh - 4em); overflow-x: hidden; overflow-y: scroll;">
-                <table id="grid-flow-settings" class="hierachy-tree" style="width: 100%; outline: none;">
-                  <colgroup><col width="50px"><col width="*"><col width="80px"><col width="80px"></colgroup>
-                  <thead><tr><th>ID</th><th>Flow Name</th><th>Status</th><th>Action</th></tr></thead>
-                </table>
+        <div class="col-md-3 sidepad bg-light" style="overflow-y: auto;">
+            <!-- <div class="d-grid gap-2" style="padding:5px;">
+              <button class="btn btn-primary" type="button">New</button>
             </div> -->
+            <!-- <br/> -->
             <ol class="list-group list-group-numbered">
               <li class="list-group-item d-flex justify-content-between align-items-start">
                 <a href="#">Content for list item</a>
                 <span class="badge bg-danger rounded-pill"><a href="#" class="text-white">Delete</a></span>
               </li>
-              <li class="list-group-item d-flex justify-content-between align-items-start">
-                <div class="ms-2 me-auto">
-                  <div class="fw-bold">Subheading</div>
-                  Content for list item
-                </div>
-                <span class="badge bg-primary rounded-pill">14</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-start">
-                <div class="ms-2 me-auto">
-                  <div class="fw-bold">Subheading</div>
-                  Content for list item
-                </div>
-                <span class="badge bg-primary rounded-pill">14</span>
-              </li>
-            </ol>
 
+
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <a href="#">Content for list item</a>
+                <span class="badge bg-danger rounded-pill"><a href="#" class="text-white">Delete</a></span>
+              </li>
+
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <a href="#">Content for list item</a>
+                <span class="badge bg-danger rounded-pill"><a href="#" class="text-white">Delete</a></span>
+              </li>
+
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <a href="#">Content for list item</a>
+                <span class="badge bg-danger rounded-pill"><a href="#" class="text-white">Delete</a></span>
+              </li>
+
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <a href="#">Content for list item</a>
+                <span class="badge bg-danger rounded-pill"><a href="#" class="text-white">Delete</a></span>
+              </li>
+
+              
+
+
+
+            </ol>
         </div>
 
-        <div class="col-8">
+        <main class="col-md-9 ms-sm-auto px-md-4">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <!-- <h4 class="h4">Flow Setting</h4> -->
+            <button class="btn btn-sm btn-danger" type="button">New</button>
+            <div class="btn-toolbar mb-2 mb-md-0">
+              <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-primary">Save</button>
+              </div>
+            </div>
+          </div>
+
+        <!-- <div class="col-8"> -->
             <div class="alert alert-warning" role="alert" name="audit" style="display: none;"></div>
             <div class="card bg-white mb-3">
               <div class="card-header">Basic Settings</div>
@@ -116,22 +108,10 @@
                     </div>
 
                     <div class="input-group mb-3">
-                        <span class="input-group-text">Scan Interval (Seconds)</span>
-                        <div class="input-group-text" style="display:none;">
-                            <select class="form-select mt-0" name="delayUnit">
-                                <option value="S">Seconds</option>
-                                <option value="M">Minutes</option>
-                                <option value="H">Hours</option>
-                                <option value="D">Days</option>
-                            </select>
-                        </div>
+                        <span class="input-group-text">Scan Interval (Seconds)</span>                        
                         <input type="text" class="form-control" placeholder="1" , name="delays">
-                    <!-- </div>
-                    <div class="input-group mb-3"> -->
                         <span class="input-group-text">Max Active Days</span>
                         <input type="text" class="form-control" placeholder="14" , name="maxActiveDays">
-                    <!-- </div>
-                    <div class="input-group mb-3"> -->
                         <span class="input-group-text">Max Storage Days</span>
                         <input type="text" class="form-control" placeholder="365" , name="maxSaveDays">
                     </div>
@@ -158,12 +138,10 @@
         </div>
     </div> <!--End of row-->
 
-</div> <!--End of warpper-->
+</div> <!--End of container-fluid-->
 
-<script src="../dist/fancytree/jquery.fancytree-all-deps.js"></script>
-<script src="../dist/fancytree/modules/jquery.fancytree.table.js"></script>
-<script src="../dist/fancytree/modules/jquery.fancytree.wide.js"></script>
-<script src="../dist/fancytree/modules/jquery.fancytree.logger.js"></script>
+<script src="../dist/jquery-3.5.1.min.js"></script>
+<script src="../dist/bootstrap.bundle.js"></script>
 <script src="../dist/toastr.min.js"></script>
 <script src="dashboard.js"></script>
 <script src="setting-flows.js"></script>
