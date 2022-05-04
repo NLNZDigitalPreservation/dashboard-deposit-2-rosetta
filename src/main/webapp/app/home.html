@@ -7,7 +7,7 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <!-- <meta name="theme-color" content="#7952b3"> -->
 
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/x-icon" href="../favicon.ico" />
   <link rel="stylesheet" href="../dist/bootstrap.css">
   <!-- <link rel="stylesheet" href="./dist/font/fontawesome-free.min.css"> -->
   <link rel="stylesheet" href="../dist/bootstrap-icons.css">
@@ -23,10 +23,8 @@
 </head>
 
 <body style="overflow: hidden;">
-  <!-- style="background-image: linear-gradient(to right, #212529, #212529, #212529, #343a40, #212529, #212529);" -->
-   <!-- background-image: linear-gradient(to right, #212529, #495057, #495057); -->
   <nav class="navbar navbar-expand-lg navbar-dark" style="padding: 0 0 0 5px; background: linear-gradient(to right, #212529, #212529, #198754, #212529);">
-    <a href="#" class="navbar-brand"><img src="img/natlib-logo-orange.png" width="35" height="35">&nbsp;Deposit&nbsp;Dashboard</a>
+    <a href="#" class="navbar-brand"><img src="../img/natlib-logo-orange.png" width="35" height="35">&nbsp;Deposit&nbsp;Dashboard</a>
     <form class="d-flex">
       <input id="filter-deposit-job" class="form-control me-2" type="search" placeholder="Filter" aria-label="Search">
     </form>
@@ -42,40 +40,177 @@
         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="dropdown01">
           <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal-producer-settings">Producer Settings</a></li>
           <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal-flow-settings">Materialflow Settings</a></li>
-          <li><a class="dropdown-item" href="#">User White List</a></li>
+          <li><a class="dropdown-item" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">User White List</a></li>
           <li><hr class="dropdown-divider"></li>
           <!-- <li><a class="dropdown-item" href="#" onclick="signOut();"><i class="bi bi-power"></i> Sign out</a></li> -->
           <li><a class="dropdown-item" href="./auth/logout.json" style="color:red;"><i class="bi bi-power"></i>Sign out: ${userName}</a></li>
         </ul>
       </li>
     </ul>
-</nav>
+  </nav>
 
+  
 
+  <main style="display: none;">
+        <div class="ag-theme-alpine-dark" id="grid-deposit-jobs"></div>
+  </main>
 
-<main style="display: none;">
-  <div class="ag-theme-alpine-dark" id="grid-deposit-jobs"></div>
-</main>
-
-<div id="modal-sso-login" style="display: none;"></div>
-
-<div class="modal fade" id="modal-global-setting-initial" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Congrats! Login succeed!</h5>
+  <div class="side-panel bg-light" id="panel-settings-flow">
+    <div class="card">
+      <div class="card-header d-flex bd-highlight mb-3">
+        <div class="p-1 bd-highlight">
+          <h5>Flow Settings</h5>            
+        </div>        
+        <!-- <div class="p-3 bd-highlight">Flex item</div> -->
+        <div class="ms-auto p-1 bd-highlight">
+          <button type="button" class="btn btn-close" aria-label="Close" onclick="javascript: $('#panel-settings-flow').hide();"></button>
+        </div>
       </div>
-      <div class="modal-body">
-        <h4>This is the first time to use the dashboard. You MUST initial the dashboard before using it. If you agree, the current user <span class="text-primary">[${userName}]</span> will be add to the white list as an admin user.</h4>
+      <div class="card-body">
+        <ol class="list-group list-group-numbered" id="flow-settings-list"> <h5>Add the first material flow here.</h5> </ol>        
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" onclick="initialGlobalSetting();">Initial</button>
-        <button type="button" class="btn btn-secondary" onclick="signOut();">Sign out</button>
+
+      <div class="card-footer">
+        <div class="d-grid gap-2" style="padding: 2px 5px;">
+          <button type="button" class="btn btn-danger btm-sm" data-bs-toggle="modal" data-bs-target="#modal-flow-settings">New</button>
+        </div>
+      </div>
+    </div>    
+  </div>
+
+  <div id="modal-sso-login" style="display: none;"></div>
+
+  <div class="modal fade" id="modal-global-setting-initial" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Congrats! Login succeed!</h5>
+        </div>
+        <div class="modal-body">
+          <h4>This is the first time to use the dashboard. You MUST initial the dashboard before using it. If you agree, the current user <span class="text-primary">[${userName}]</span> will be add to the white list as an admin user.</h4>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" onclick="initialGlobalSetting();">Initial</button>
+          <button type="button" class="btn btn-secondary" onclick="signOut();">Sign out</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
+
+<!-- Modal: Flow settings -->
+<div class="modal modal-fullscreen-lg-down fade" id="modal-flow-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Flow Settings</h5>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- <iframe id="inlineFrameExample"
+            title="Inline Frame Example"
+            width="100%"
+            height="550"
+            src="/app/settings-producer.html">
+        </iframe> -->
+        <div class="row">
+        <div class="col-md-3 sidepad bg-light" style="overflow-y: auto;">            
+            <ol class="list-group list-group-numbered" id="flow-settings-list"> <h5>Add the first material flow here.</h5> </ol>
+        </div>
+
+        <main class="col-md-9 ms-sm-auto px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <!-- <h4 class="h4">Flow Setting</h4> -->
+                <button class="btn btn-danger" type="button">New</button>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                  <div class="btn-group me-2">
+                    <button type="button" class="btn btn-primary">Save</button>
+                  </div>
+                </div>
+            </div>        
+            
+            <div class="card bg-white mb-3" id="flow-settings">
+                <div class="card-header"><h5>Basic Settings</h5></div>
+                <div class="card-body">
+                    <input type="text" name="id" style="display: none;">       
+
+                    <div class="nput-group mb-3 form-check form-switch">
+                      <input class="form-check-input" type="checkbox" role="switch" id="flow-setting-enabled" name="enabled" checked>
+                      <label class="form-check-label" for="flow-setting-enabled">If enable depositing for this material flow.</label>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Flow Name</span>
+                        <input type="text" class="form-control" name="name">
+                        <span class="input-group-text">Root Location</span>
+                        <input type="input" class="form-control" name="rootPath" aria-describedby="desc-root-path">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Producer</span>
+                        <select class="form-control form-select mt-0" name="producer"></select>
+                        <span class="input-group-text">Material Flow</span>
+                        <select class="form-control form-select mt-0" name="materiaFlow"></select>
+                    </div>
+                </div>
+
+                <div class="card-header"><h5>Advanced Settings</h5></div>
+                <div class="card-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Stream Path</span>
+                        <input type="text" class="form-control" placeholder="content/streams" , name="streamLocation">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Injection Completed File Name</span>
+                        <input type="text" class="form-control" placeholder="ready-for-ingestion-FOLDER-COMPLETED" ,
+                               name="injectionCompleteFileName">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Scan Interval (Seconds)</span>                        
+                        <input type="text" class="form-control" placeholder="1" , name="delays">
+                        <span class="input-group-text">Max Active Days</span>
+                        <input type="text" class="form-control" placeholder="14" , name="maxActiveDays">
+                        <span class="input-group-text">Max Storage Days</span>
+                        <input type="text" class="form-control" placeholder="365" , name="maxSaveDays">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Max Threads:</span>
+                        <span class="input-group-text">Mon</span>
+                        <input type="text" class="form-control" name="mon">
+                        <span class="input-group-text">Tue</span>
+                        <input type="text" class="form-control" name="tue">
+                        <span class="input-group-text">Wed</span>
+                        <input type="text" class="form-control" name="wed">
+                        <span class="input-group-text">Thu</span>
+                        <input type="text" class="form-control" name="thu">
+                        <span class="input-group-text">Fri</span>
+                        <input type="text" class="form-control" name="fri">
+                        <span class="input-group-text">Sat</span>
+                        <input type="text" class="form-control" name="sat">
+                        <span class="input-group-text">Sun</span>
+                        <input type="text" class="form-control" name="sun">
+                    </div>
+                </div>
+
+                <div class="card-header"><h5>Health Audit</h5></div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert" name="audit"></div>
+                </div>
+            </div> <!--End of card-->       
+        </div>
+    </div> <!--End of row-->
+
+
+    
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div> -->
+    </div>
+  </div>
+</div>
 
 <!-- Modal: Material flow settings -->
 <div class="modal modal-fullscreen-lg-down fade" id="modal-flow-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">

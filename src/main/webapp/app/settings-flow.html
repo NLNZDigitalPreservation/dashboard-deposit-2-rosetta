@@ -18,71 +18,34 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3 sidepad bg-light" style="overflow-y: auto;">
-            <!-- <div class="d-grid gap-2" style="padding:5px;">
-              <button class="btn btn-primary" type="button">New</button>
-            </div> -->
-            <!-- <br/> -->
-            <ol class="list-group list-group-numbered">
-              <li class="list-group-item d-flex justify-content-between align-items-start">
-                <a href="#">Content for list item</a>
-                <span class="badge bg-danger rounded-pill"><a href="#" class="text-white">Delete</a></span>
-              </li>
-
-
-              <li class="list-group-item d-flex justify-content-between align-items-start">
-                <a href="#">Content for list item</a>
-                <span class="badge bg-danger rounded-pill"><a href="#" class="text-white">Delete</a></span>
-              </li>
-
-              <li class="list-group-item d-flex justify-content-between align-items-start">
-                <a href="#">Content for list item</a>
-                <span class="badge bg-danger rounded-pill"><a href="#" class="text-white">Delete</a></span>
-              </li>
-
-              <li class="list-group-item d-flex justify-content-between align-items-start">
-                <a href="#">Content for list item</a>
-                <span class="badge bg-danger rounded-pill"><a href="#" class="text-white">Delete</a></span>
-              </li>
-
-              <li class="list-group-item d-flex justify-content-between align-items-start">
-                <a href="#">Content for list item</a>
-                <span class="badge bg-danger rounded-pill"><a href="#" class="text-white">Delete</a></span>
-              </li>
-
-              
-
-
-
-            </ol>
+        <div class="col-md-3 sidepad bg-light" style="overflow-y: auto;">            
+            <ol class="list-group list-group-numbered" id="flow-settings-list"> <h5>Add the first material flow here.</h5> </ol>
         </div>
 
         <main class="col-md-9 ms-sm-auto px-md-4">
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <!-- <h4 class="h4">Flow Setting</h4> -->
-            <button class="btn btn-sm btn-danger" type="button">New</button>
-            <div class="btn-toolbar mb-2 mb-md-0">
-              <div class="btn-group me-2">
-                <button type="button" class="btn btn-sm btn-primary">Save</button>
-              </div>
-            </div>
-          </div>
-
-        <!-- <div class="col-8"> -->
-            <div class="alert alert-warning" role="alert" name="audit" style="display: none;"></div>
-            <div class="card bg-white mb-3">
-              <div class="card-header">Basic Settings</div>
-              <div class="card-body">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <!-- <h4 class="h4">Flow Setting</h4> -->
+                <button class="btn btn-danger" type="button">New</button>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                  <div class="btn-group me-2">
+                    <button type="button" class="btn btn-primary">Save</button>
+                  </div>
+                </div>
+            </div>        
+            
+            <div class="card bg-white mb-3" id="flow-settings">
+                <div class="card-header"><h5>Basic Settings</h5></div>
+                <div class="card-body">
                     <input type="text" name="id" style="display: none;">       
-          
+
                     <div class="nput-group mb-3 form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="flow-setting-enabled" name="flowSettingEnabled" checked>
+                      <input class="form-check-input" type="checkbox" role="switch" id="flow-setting-enabled" name="enabled" checked>
                       <label class="form-check-label" for="flow-setting-enabled">If enable depositing for this material flow.</label>
                     </div>
 
                     <div class="input-group mb-3">
                         <span class="input-group-text">Flow Name</span>
-                        <input type="text" class="form-control" name="flowName">
+                        <input type="text" class="form-control" name="name">
                         <span class="input-group-text">Root Location</span>
                         <input type="input" class="form-control" name="rootPath" aria-describedby="desc-root-path">
                     </div>
@@ -93,10 +56,10 @@
                         <span class="input-group-text">Material Flow</span>
                         <select class="form-control form-select mt-0" name="materiaFlow"></select>
                     </div>
-              </div>
+                </div>
 
-              <div class="card-header">Advanced Settings</div>
-              <div class="card-body">
+                <div class="card-header"><h5>Advanced Settings</h5></div>
+                <div class="card-body">
                     <div class="input-group mb-3">
                         <span class="input-group-text">Stream Path</span>
                         <input type="text" class="form-control" placeholder="content/streams" , name="streamLocation">
@@ -133,7 +96,12 @@
                         <span class="input-group-text">Sun</span>
                         <input type="text" class="form-control" name="sun">
                     </div>
-              </div>
+                </div>
+
+                <div class="card-header"><h5>Health Audit</h5></div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert" name="audit"></div>
+                </div>
             </div> <!--End of card-->       
         </div>
     </div> <!--End of row-->
@@ -148,29 +116,20 @@
 <script type="text/javascript">
 // const tableFlowSettings=new DashboardTable('grid-flow-settings', defHeadersFlowSettings);
 $(function(){
-    const gridFlowSettings=new TreeGrid('grid-flow-settings', optionFlowSetting);
+    fetchHttp('/restful/setting/flow/all/get', null, initFlowSettingsList);
+    fetchHttp('/restful/setting/flow/all/get', null, initFlowSettingsList); 
 
-    fetchHttp('/dashboard/restful/setting/flow/all/get', null, function(rsp){
-        var html=combineProducers(rsp);
-        $('#flow-setting select[name="producer"]').html(html);
-        
-        $('#flow-setting select[name="producer"]').change(function() {
-            var selectedId=$(this).val();
-            //var selectedId=$('#flow-setting select[name="producer"] option:selected').val();
-            var flows=mapMaterialFlows[selectedId];
-
-            console.log(flows);
-
-            $('#flow-setting select[name="materialFlow"]').html(flows);
-        });
+    $('.producer-name').click(function () {
+        var id=$(this).prop('data-id');
+        if (!id) {return;}
+        detailMaterialFlow(id, '#flow-settings');
     });
 
-    var template=$('#template-flow-setting').html();
-    $('#ul-flow-setting-read').html(template);
-    $('#ul-flow-setting-edit').html(template);
-
-    $('#ul-flow-setting-read input').prop('disabled', true);
-    $('#ul-flow-setting-read select').prop('disabled', true);
+    $('.producer-action-delete').click(function () {
+        var id=$(this).prop('data-id');
+        if (!id) {return;}
+        deleteMaterialFlow(id, '#flow-settings');
+    });
 });
 </script>
 </body>

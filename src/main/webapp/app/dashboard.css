@@ -26,20 +26,20 @@ a:active {
 	text-decoration: none; 
 }
 
-.sidepad {
-  position: fixed;
-  top: 0;
-  /* rtl:raw:
-  right: 0;
-  */
+.side-panel{
+	display: block;
+	position: absolute;
   bottom: 0;
-  /* rtl:remove */
-  left: 0;
-  z-index: 100; /* Behind the navbar */
-  padding: 8px 0 0 0; /* Height of navbar */
-  box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+  right: 0;
+  height: calc(100vh - 45px);
+  width: 420px;
+  margin: 0 1px;
+  /*z-index: 2100;*/
 }
 
+.side-panel .card-body{
+	height: calc(100vh - 180px);
+}
 
 nav{
 	padding: 0 0 0 5px;
