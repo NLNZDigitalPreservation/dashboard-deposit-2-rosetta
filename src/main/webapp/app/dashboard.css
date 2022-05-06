@@ -27,7 +27,7 @@ a:active {
 }
 
 .side-panel{
-	display: block;
+	display: none;
 	position: absolute;
   bottom: 0;
   right: 0;
@@ -37,7 +37,8 @@ a:active {
   /*z-index: 2100;*/
 }
 
-.side-panel .card-body{
+.side-panel .customized-card-body{
+	margin-top: -15px;
 	height: calc(100vh - 180px);
 }
 

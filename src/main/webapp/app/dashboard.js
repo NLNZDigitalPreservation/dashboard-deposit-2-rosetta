@@ -1,3 +1,40 @@
+const PATH_ROOT = "/restful";
+
+const PATH_RAW_PRODUCER= PATH_ROOT + "/raw/producer";
+const PATH_RAW_MATERIAL_FLOW = PATH_ROOT + "/raw/material-flows";
+
+const PATH_SETTING_PRODUCER = PATH_ROOT + "/setting/producer";
+const PATH_SETTING_PRODUCER_ALL_GET = PATH_SETTING_PRODUCER + "/all/get";
+const PATH_SETTING_PRODUCER_DETAIL = PATH_SETTING_PRODUCER + "/detail";
+const PATH_SETTING_PRODUCER_SAVE = PATH_SETTING_PRODUCER + "/save";
+const PATH_SETTING_PRODUCER_DELETE = PATH_SETTING_PRODUCER + "/delete";
+
+const PATH_SETTING_FLOW = PATH_ROOT + "/setting/flow";
+const PATH_SETTING_FLOW_ALL_GET = PATH_SETTING_FLOW + "/all/get";
+const PATH_SETTING_FLOW_DETAIL = PATH_SETTING_FLOW + "/detail";
+const PATH_SETTING_FLOW_SAVE = PATH_SETTING_FLOW + "/save";
+const PATH_SETTING_FLOW_DELETE = PATH_SETTING_FLOW + "/delete";
+
+const PATH_SETTING_GLOBAL = PATH_ROOT + "/setting/global";
+const PATH_SETTING_GLOBAL_INITIAL = PATH_SETTING_GLOBAL + "/initial";
+const PATH_SETTING_GLOBAL_SAVE = PATH_SETTING_GLOBAL + "/save";
+const PATH_SETTING_GLOBAL_GET = PATH_SETTING_GLOBAL + "/get";
+const PATH_SETTING_GLOBAL_WHITE_USER_SAVE = PATH_SETTING_GLOBAL + "/white/user/save";
+const PATH_SETTING_GLOBAL_WHITE_USER_DELETE = PATH_SETTING_GLOBAL + "/white/user/delete";
+
+const PATH_DEPOSIT_JOBS = PATH_ROOT + "/deposit-jobs";
+const PATH_DEPOSIT_JOBS_ACTIVE_GET = PATH_DEPOSIT_JOBS + "/active/get";
+const PATH_DEPOSIT_JOBS_ALL_GET = PATH_DEPOSIT_JOBS + "/all/get";
+const PATH_DEPOSIT_JOBS_DETAIL = PATH_DEPOSIT_JOBS + "/details";
+const PATH_DEPOSIT_JOBS_UPDATE = PATH_DEPOSIT_JOBS + "/update";
+const PATH_DEPOSIT_JOBS_NEW = PATH_DEPOSIT_JOBS + "/new";
+const PATH_DEPOSIT_JOBS_SEARCH = PATH_DEPOSIT_JOBS + "/search";
+
+const PATH_SYSTEM_EVENT = PATH_ROOT + "/system-events";
+const PATH_SYSTEM_EVENT_ALL = PATH_SYSTEM_EVENT + "/all/get";
+const PATH_SYSTEM_EVENT_ACTION = PATH_SYSTEM_EVENT + "/selected/action";
+
+
 function getUrlVars() {
     var vars = {};
     var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {

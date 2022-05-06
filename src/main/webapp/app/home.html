@@ -38,9 +38,9 @@
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-gear"></i>Settings</a>
         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="dropdown01">
-          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal-producer-settings">Producer Settings</a></li>
-          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal-flow-settings">Materialflow Settings</a></li>
-          <li><a class="dropdown-item" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">User White List</a></li>
+          <li><a class="dropdown-item" href="#" onclick="showPanelProducer();">Producer Settings</a></li>
+          <li><a class="dropdown-item" href="#" onclick="showPanelFlow();">Materialflow Settings</a></li>
+          <li><a class="dropdown-item" href="#" onclick="showPanelWhitelist();">User White List</a></li>
           <li><hr class="dropdown-divider"></li>
           <!-- <li><a class="dropdown-item" href="#" onclick="signOut();"><i class="bi bi-power"></i> Sign out</a></li> -->
           <li><a class="dropdown-item" href="./auth/logout.json" style="color:red;"><i class="bi bi-power"></i>Sign out: ${userName}</a></li>
@@ -55,31 +55,9 @@
         <div class="ag-theme-alpine-dark" id="grid-deposit-jobs"></div>
   </main>
 
-  <div class="side-panel bg-light" id="panel-settings-flow">
-    <div class="card">
-      <div class="card-header d-flex bd-highlight mb-3">
-        <div class="p-1 bd-highlight">
-          <h5>Flow Settings</h5>            
-        </div>        
-        <!-- <div class="p-3 bd-highlight">Flex item</div> -->
-        <div class="ms-auto p-1 bd-highlight">
-          <button type="button" class="btn btn-close" aria-label="Close" onclick="javascript: $('#panel-settings-flow').hide();"></button>
-        </div>
-      </div>
-      <div class="card-body">
-        <ol class="list-group list-group-numbered" id="flow-settings-list"> <h5>Add the first material flow here.</h5> </ol>        
-      </div>
-
-      <div class="card-footer">
-        <div class="d-grid gap-2" style="padding: 2px 5px;">
-          <button type="button" class="btn btn-danger btm-sm" data-bs-toggle="modal" data-bs-target="#modal-flow-settings">New</button>
-        </div>
-      </div>
-    </div>    
-  </div>
-
   <div id="modal-sso-login" style="display: none;"></div>
 
+  <!-- Global settings: initial the system -->
   <div class="modal fade" id="modal-global-setting-initial" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -97,235 +75,362 @@
     </div>
   </div>
 
-
-<!-- Modal: Flow settings -->
-<div class="modal modal-fullscreen-lg-down fade" id="modal-flow-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Flow Settings</h5>
-        <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <!-- Panel: Producer settings  -->
+  <div class="side-panel bg-light" id="panel-settings-producer">
+    <div class="card">
+      <div class="card-header d-flex bd-highlight mb-3">
+        <div class="p-1 bd-highlight">
+          <h5>Producer Settings</h5>            
+        </div>        
+        <!-- <div class="p-3 bd-highlight">Flex item</div> -->
+        <div class="ms-auto p-1 bd-highlight">
+          <button type="button" class="btn btn-close" aria-label="Close" onclick="$('#panel-settings-producer').hide();"></button>
+        </div>
       </div>
-      <div class="modal-body">
-        <!-- <iframe id="inlineFrameExample"
-            title="Inline Frame Example"
-            width="100%"
-            height="550"
-            src="/app/settings-producer.html">
-        </iframe> -->
-        <div class="row">
-        <div class="col-md-3 sidepad bg-light" style="overflow-y: auto;">            
-            <ol class="list-group list-group-numbered" id="flow-settings-list"> <h5>Add the first material flow here.</h5> </ol>
-        </div>
+      <div class="customized-card-body">
+        <!-- <ol class="list-group list-group-numbered" id="producer-settings-list"> <h5>Add the first producer here.</h5> </ol> -->
+        <ul class="list-group">
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <a href="#">
+            <div class="ms-2 me-auto">
+              <div class="fw-bold">Subheading</div>
+              Content for list item
+            </div>
+            </a>
+            <a href="#" class="actions text-white"><span class="badge bg-danger rounded-pill">Delete</span></a>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+              <div class="fw-bold">Subheading</div>
+              Content for list item
+            </div>
+            <span class="badge bg-primary rounded-pill">14</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+              <div class="fw-bold">Subheading</div>
+              Content for list item
+            </div>
+            <span class="badge bg-primary rounded-pill">14</span>
+          </li>
+        </ul>
 
-        <main class="col-md-9 ms-sm-auto px-md-4">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <!-- <h4 class="h4">Flow Setting</h4> -->
-                <button class="btn btn-danger" type="button">New</button>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                  <div class="btn-group me-2">
-                    <button type="button" class="btn btn-primary">Save</button>
+      </div>
+
+      <div class="card-footer">
+        <div class="d-grid gap-2" style="padding: 2px 5px;">
+          <button type="button" class="btn btn-danger btm-sm" onclick="newProducer();">New</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Producer settings -->
+  <div class="modal modal-fullscreen-lg-down fade" id="modal-producer-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Producer Settings</h5>
+          <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="card bg-white mb-1" id="producer-settings">
+            <div class="card-header"><h5>Settings</h5></div>
+            <div class="card-body">
+                <input type="text" name="id" style="display: none;">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Producer</span>
+                    <select class="form-control form-select mt-0" name="producer"></select>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Institute</span>
+                    <input type="text" class="form-control" name="depositUserInstitute">
+                    <span class="input-group-text">User Name</span>
+                    <input type="text" class="form-control" name="depositUserName">
+                    <span class="input-group-text">Password</span>
+                    <input type="password" class="form-control" name="depositUserPassword">
+                </div>
+            </div>
+            <div class="card-header"><h5>Health Audit</h5></div>
+            <div class="card-body">
+                <div class="alert alert-warning" role="alert" name="audit"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel: Flow settings  -->
+  <div class="side-panel bg-light" id="panel-settings-flow">
+    <div class="card">
+      <div class="card-header d-flex bd-highlight mb-3">
+        <div class="p-1 bd-highlight">
+          <h5>Flow Settings</h5>            
+        </div>        
+        <!-- <div class="p-3 bd-highlight">Flex item</div> -->
+        <div class="ms-auto p-1 bd-highlight">
+          <button type="button" class="btn btn-close" aria-label="Close" onclick="$('#panel-settings-flow').hide();"></button>
+        </div>
+      </div>
+      <div class="customized-card-body">
+        <ul class="list-group list-group-numbered" id="flow-settings-list"> <h5>Add the first material flow here.</h5> </ul>        
+      </div>
+
+      <div class="card-footer">
+        <div class="d-grid gap-2" style="padding: 2px 5px;">
+          <button type="button" class="btn btn-danger btm-sm" data-bs-toggle="modal" data-bs-target="#modal-flow-settings">New</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Modal: Flow settings -->
+  <div class="modal modal-fullscreen-lg-down fade" id="modal-flow-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Flow Settings</h5>
+          <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">        
+              <div class="card bg-white mb-1" id="flow-settings">
+                  <div class="card-header"><h5>Basic Settings</h5></div>
+                  <div class="card-body">
+                      <input type="text" name="id" style="display: none;">       
+
+                      <div class="nput-group mb-3 form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="flow-setting-enabled" name="enabled" checked>
+                        <label class="form-check-label" for="flow-setting-enabled">If enable depositing for this material flow.</label>
+                      </div>
+
+                      <div class="input-group mb-3">
+                          <span class="input-group-text">Flow Name</span>
+                          <input type="text" class="form-control" name="name">
+                          <span class="input-group-text">Root Location</span>
+                          <input type="input" class="form-control" name="rootPath" aria-describedby="desc-root-path">
+                      </div>
+
+                      <div class="input-group mb-3">
+                          <span class="input-group-text">Producer</span>
+                          <select class="form-control form-select mt-0" name="producer"></select>
+                          <span class="input-group-text">Material Flow</span>
+                          <select class="form-control form-select mt-0" name="materiaFlow"></select>
+                      </div>
                   </div>
-                </div>
-            </div>        
-            
-            <div class="card bg-white mb-3" id="flow-settings">
-                <div class="card-header"><h5>Basic Settings</h5></div>
-                <div class="card-body">
-                    <input type="text" name="id" style="display: none;">       
 
-                    <div class="nput-group mb-3 form-check form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="flow-setting-enabled" name="enabled" checked>
-                      <label class="form-check-label" for="flow-setting-enabled">If enable depositing for this material flow.</label>
-                    </div>
+                  <div class="card-header"><h5>Advanced Settings</h5></div>
+                  <div class="card-body">
+                      <div class="input-group mb-3">
+                          <span class="input-group-text">Stream Path</span>
+                          <input type="text" class="form-control" placeholder="content/streams" , name="streamLocation">
+                      </div>
+                      <div class="input-group mb-3">
+                          <span class="input-group-text">Injection Completed File Name</span>
+                          <input type="text" class="form-control" placeholder="ready-for-ingestion-FOLDER-COMPLETED" ,
+                                 name="injectionCompleteFileName">
+                      </div>
 
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Flow Name</span>
-                        <input type="text" class="form-control" name="name">
-                        <span class="input-group-text">Root Location</span>
-                        <input type="input" class="form-control" name="rootPath" aria-describedby="desc-root-path">
-                    </div>
+                      <div class="input-group mb-3">
+                          <span class="input-group-text">Scan Interval (Seconds)</span>                        
+                          <input type="text" class="form-control" placeholder="1" , name="delays">
+                          <span class="input-group-text">Max Active Days</span>
+                          <input type="text" class="form-control" placeholder="14" , name="maxActiveDays">
+                          <span class="input-group-text">Max Storage Days</span>
+                          <input type="text" class="form-control" placeholder="365" , name="maxSaveDays">
+                      </div>
 
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Producer</span>
-                        <select class="form-control form-select mt-0" name="producer"></select>
-                        <span class="input-group-text">Material Flow</span>
-                        <select class="form-control form-select mt-0" name="materiaFlow"></select>
-                    </div>
-                </div>
+                      <div class="input-group mb-3">
+                          <span class="input-group-text">Max Threads:</span>
+                          <span class="input-group-text">Mon</span>
+                          <input type="text" class="form-control" name="mon">
+                          <span class="input-group-text">Tue</span>
+                          <input type="text" class="form-control" name="tue">
+                          <span class="input-group-text">Wed</span>
+                          <input type="text" class="form-control" name="wed">
+                          <span class="input-group-text">Thu</span>
+                          <input type="text" class="form-control" name="thu">
+                          <span class="input-group-text">Fri</span>
+                          <input type="text" class="form-control" name="fri">
+                          <span class="input-group-text">Sat</span>
+                          <input type="text" class="form-control" name="sat">
+                          <span class="input-group-text">Sun</span>
+                          <input type="text" class="form-control" name="sun">
+                      </div>
+                  </div>
 
-                <div class="card-header"><h5>Advanced Settings</h5></div>
-                <div class="card-body">
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Stream Path</span>
-                        <input type="text" class="form-control" placeholder="content/streams" , name="streamLocation">
-                    </div>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Injection Completed File Name</span>
-                        <input type="text" class="form-control" placeholder="ready-for-ingestion-FOLDER-COMPLETED" ,
-                               name="injectionCompleteFileName">
-                    </div>
-
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Scan Interval (Seconds)</span>                        
-                        <input type="text" class="form-control" placeholder="1" , name="delays">
-                        <span class="input-group-text">Max Active Days</span>
-                        <input type="text" class="form-control" placeholder="14" , name="maxActiveDays">
-                        <span class="input-group-text">Max Storage Days</span>
-                        <input type="text" class="form-control" placeholder="365" , name="maxSaveDays">
-                    </div>
-
-                    <div class="input-group mb-3">
-                        <span class="input-group-text">Max Threads:</span>
-                        <span class="input-group-text">Mon</span>
-                        <input type="text" class="form-control" name="mon">
-                        <span class="input-group-text">Tue</span>
-                        <input type="text" class="form-control" name="tue">
-                        <span class="input-group-text">Wed</span>
-                        <input type="text" class="form-control" name="wed">
-                        <span class="input-group-text">Thu</span>
-                        <input type="text" class="form-control" name="thu">
-                        <span class="input-group-text">Fri</span>
-                        <input type="text" class="form-control" name="fri">
-                        <span class="input-group-text">Sat</span>
-                        <input type="text" class="form-control" name="sat">
-                        <span class="input-group-text">Sun</span>
-                        <input type="text" class="form-control" name="sun">
-                    </div>
-                </div>
-
-                <div class="card-header"><h5>Health Audit</h5></div>
-                <div class="card-body">
-                    <div class="alert alert-warning" role="alert" name="audit"></div>
-                </div>
-            </div> <!--End of card-->       
+                  <div class="card-header"><h5>Health Audit</h5></div>
+                  <div class="card-body">
+                      <div class="alert alert-warning" role="alert" name="audit"></div>
+                  </div>
+              </div> <!--End of card-->
         </div>
-    </div> <!--End of row-->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
+
+  <!-- Panel: White list settings  -->
+  <div class="side-panel bg-light" id="panel-settings-whitelist">
+    <div class="card">
+      <div class="card-header d-flex bd-highlight mb-3">
+        <div class="p-1 bd-highlight">
+          <h5>User Settings</h5>            
+        </div>        
+        <!-- <div class="p-3 bd-highlight">Flex item</div> -->
+        <div class="ms-auto p-1 bd-highlight">
+          <button type="button" class="btn btn-close" aria-label="Close" onclick="$('#panel-settings-whitelist').hide();"></button>
+        </div>
+      </div>
+      <div class="customized-card-body">
+        <ul class="list-group list-group-numbered" id="whitelist-settings-list"> </ul>        
+      </div>
+
+      <div class="card-footer">
+        <div class="d-grid gap-2" style="padding: 2px 5px;">
+          <button type="button" class="btn btn-danger btm-sm" data-bs-toggle="modal" data-bs-target="#modal-whitelist-settings">New</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: White list settings -->
+  <div class="modal modal-fullscreen-lg-down fade" id="modal-whitelist-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">User Settings</h5>
+          <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="card bg-white mb-1" id="whitelist-settings">
+            <div class="card-header"><h5>Settings</h5></div>
+            <div class="card-body">
+                <input type="text" name="id" style="display: none;">
+                <div class="input-group mb-3">
+                      <span class="input-group-text">Institute</span>
+                      <input type="text" class="form-control" name="depositUserInstitute">
+                </div>
+                <div class="input-group mb-3">
+                      <span class="input-group-text">User Name</span>
+                      <input type="text" class="form-control" name="depositUserName">
+                </div>
+                <div class="input-group mb-3"> 
+                    <span class="input-group-text">Password</span>
+                    <input type="password" class="form-control" name="depositUserPassword">
+                </div>
+            </div>
+            <div class="card-header"><h5>Health Audit</h5></div>
+            <div class="card-body">
+                <div class="alert alert-warning" role="alert" name="audit"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="../dist/bootstrap.bundle.js"></script>
+  <script src="../dist/ag-grid-community.min.js"></script>
+  <script src="../dist/jquery/menu/jquery.contextMenu.js"></script>
+  <script src="../dist/jquery/menu/jquery.ui.position.js"></script>
+  <script src="../dist/plugins/moment-with-locales.min.js"></script>
+  <script src="../dist/daterangepicker.js"></script>
+  <script src="../dist/toastr.min.js"></script>
+
+  <script src="dashboard.js"></script>
+  <script src="deposit-jobs.js"></script>
+  <script src="setting-producer.js"></script>
+  <script src="setting-flows.js"></script>
+  <script src="setting-global.js"></script>
+
+
+  <script>
+    const HTML_IFRAME_LOGIN='<iframe src="login.html" scrolling="no" frameborder="0" allowfullscreen> </iframe>';
+    const IS_GLOBAL_SETTING_INITIALED=true;
+    const modalGlobalSettingInitial = new bootstrap.Modal(document.getElementById('modal-global-setting-initial'), {keyboard: false});
+    // const modalSettings = new bootstrap.Modal(document.getElementById('modal-settings'), {keyboard: false});
+
+
+    // function openModalSettings(){
+    //   fetchHttp(PATH_SETTING_GLOBAL_GET, null, function(rsp){
+    //       var globalSetting=rsp['globalSetting'];
+    //       $('#global-setting input[name="depositUserInstitute"]').val(globalSetting['depositUserInstitute']);
+    //       $('#global-setting input[name="depositUserName"]').val(globalSetting['depositUserName']);
+    //       $('#global-setting input[name="depositUserPassword"]').val(globalSetting['depositUserPassword']);
+
+    //       if (globalSetting.auditRst) {
+    //           $('#modal-global-setting-pop div[name="audit"]').hide();
+    //       }else{
+    //           $('#modal-global-setting-pop div[name="audit"]').show();
+    //           $('#modal-global-setting-pop div[name="audit"]').html('<i class="bi bi-exclamation-triangle-fill text-danger">&nbsp;</i>' + globalSetting.auditMsg);
+    //       }
+
+    //       tableWhiteList.setRowData(rsp['whiteList']);
+    //       tableFlowSettings.setRowData(rsp['flowSettings']);
+
+    //       modalSettings.show();
+    //   });
+    // }
+
+    function loginCallback(){
+      $('#modal-sso-login').hide();
+      $('#modal-sso-login').html('');
+      fetchHttp(retryUrl, retryReq, retryCallback);
+    }
+
+    function isParentAvailable(){
+      return true;
+    }
+
+    function popupSSOLoginWindow(){    
+      $('#modal-sso-login').html(HTML_IFRAME_LOGIN);
+      $('#modal-sso-login').show();
+    }
+
+    function signOut(){
+      window.location.replace('auth/logout.json');
+    }
+
+    function initialGlobalSetting(){
+      fetchHttp(PATH_SETTING_GLOBAL_INITIAL, null, function(rsp){
+        window.location.replace('home.html');
+      });
+    }
 
     
-      </div>
-      <!-- <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div> -->
-    </div>
-  </div>
-</div>
+    $(function(){
+        toastr.options=Object.assign(toastr.options,{
+          "positionClass": "toast-top-center",
+          "closeButton": true,
+          "showDuration": "300",
+          "hideDuration": "1000",
+          "timeOut": "5000",
+          "extendedTimeOut": "1000",
+        });
 
-<!-- Modal: Material flow settings -->
-<div class="modal modal-fullscreen-lg-down fade" id="modal-flow-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Flow Settings</h5>
-        <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <iframe id="inlineFrameExample"
-            title="Inline Frame Example"
-            width="100%"
-            height="550"
-            src="/app/settings-flow.html">
-        </iframe>
-      </div>
-      <!-- <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div> -->
-    </div>
-  </div>
-</div>
-
-
-<script src="../dist/bootstrap.bundle.js"></script>
-<script src="../dist/ag-grid-community.min.js"></script>
-<script src="../dist/jquery/menu/jquery.contextMenu.js"></script>
-<script src="../dist/jquery/menu/jquery.ui.position.js"></script>
-<script src="../dist/plugins/moment-with-locales.min.js"></script>
-<script src="../dist/daterangepicker.js"></script>
-<script src="../dist/toastr.min.js"></script>
-
-<script src="dashboard.js"></script>
-<script src="deposit-jobs.js"></script>
-<script src="setting-flows.js"></script>
-<script src="setting-global.js"></script>
-
-<#list map_path_constants as key, value>
-<script>
-  const ${key}='${PATH_CONTEXT}' + '${value}';
-</script>
-</#list>
-
-<script>
-  const HTML_IFRAME_LOGIN='<iframe src="login.html" scrolling="no" frameborder="0" allowfullscreen> </iframe>';
-  const IS_GLOBAL_SETTING_INITIALED=${initialed};
-  const modalGlobalSettingInitial = new bootstrap.Modal(document.getElementById('modal-global-setting-initial'), {keyboard: false});
-  const modalSettings = new bootstrap.Modal(document.getElementById('modal-settings'), {keyboard: false});
-
-
-  function openModalSettings(){
-    fetchHttp(PATH_SETTING_GLOBAL_GET, null, function(rsp){
-        var globalSetting=rsp['globalSetting'];
-        $('#global-setting input[name="depositUserInstitute"]').val(globalSetting['depositUserInstitute']);
-        $('#global-setting input[name="depositUserName"]').val(globalSetting['depositUserName']);
-        $('#global-setting input[name="depositUserPassword"]').val(globalSetting['depositUserPassword']);
-
-        if (globalSetting.auditRst) {
-            $('#modal-global-setting-pop div[name="audit"]').hide();
+        if (IS_GLOBAL_SETTING_INITIALED) {
+          $('main').show();
+          initDepositJob();
+          // initFlowSettings();
         }else{
-            $('#modal-global-setting-pop div[name="audit"]').show();
-            $('#modal-global-setting-pop div[name="audit"]').html('<i class="bi bi-exclamation-triangle-fill text-danger">&nbsp;</i>' + globalSetting.auditMsg);
+          modalGlobalSettingInitial.show();
         }
-
-        tableWhiteList.setRowData(rsp['whiteList']);
-        tableFlowSettings.setRowData(rsp['flowSettings']);
-
-        modalSettings.show();
     });
-  }
-
-  function loginCallback(){
-    $('#modal-sso-login').hide();
-    $('#modal-sso-login').html('');
-    fetchHttp(retryUrl, retryReq, retryCallback);
-  }
-
-  function isParentAvailable(){
-    return true;
-  }
-
-  function popupSSOLoginWindow(){    
-    $('#modal-sso-login').html(HTML_IFRAME_LOGIN);
-    $('#modal-sso-login').show();
-  }
-
-  function signOut(){
-    window.location.replace('auth/logout.json');
-  }
-
-  function initialGlobalSetting(){
-    fetchHttp(PATH_SETTING_GLOBAL_INITIAL, null, function(rsp){
-      window.location.replace('home.html');
-    });
-  }
-
-  $(function(){
-      toastr.options=Object.assign(toastr.options,{
-        "positionClass": "toast-top-center",
-        "closeButton": true,
-        "showDuration": "300",
-        "hideDuration": "1000",
-        "timeOut": "5000",
-        "extendedTimeOut": "1000",
-      });
-
-      if (IS_GLOBAL_SETTING_INITIALED) {
-        $('main').show();
-        initDepositJob();
-        initFlowSettings();
-      }else{
-        modalGlobalSettingInitial.show();
-      }
-  });
-</script>
+  </script>
 </body>
 </html>
