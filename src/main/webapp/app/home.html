@@ -38,9 +38,9 @@
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-gear"></i>Settings</a>
         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="dropdown01">
-          <li><a class="dropdown-item" href="#" onclick="showPanelProducer();">Producer Settings</a></li>
-          <li><a class="dropdown-item" href="#" onclick="showPanelFlow();">Materialflow Settings</a></li>
-          <li><a class="dropdown-item" href="#" onclick="showPanelWhitelist();">User White List</a></li>
+          <li><a class="dropdown-item" href="#" onclick="settingProducer.popupPanel();">Producer Settings</a></li>
+          <li><a class="dropdown-item" href="#" onclick="settingFlow.popupPanel();">Materialflow Settings</a></li>
+          <li><a class="dropdown-item" href="#" onclick="settingWhitelist.popupPanel();">User White List</a></li>
           <li><hr class="dropdown-divider"></li>
           <!-- <li><a class="dropdown-item" href="#" onclick="signOut();"><i class="bi bi-power"></i> Sign out</a></li> -->
           <li><a class="dropdown-item" href="./auth/logout.json" style="color:red;"><i class="bi bi-power"></i>Sign out: ${userName}</a></li>
@@ -48,8 +48,6 @@
       </li>
     </ul>
   </nav>
-
-  
 
   <main style="display: none;">
         <div class="ag-theme-alpine-dark" id="grid-deposit-jobs"></div>
@@ -80,46 +78,20 @@
     <div class="card">
       <div class="card-header d-flex bd-highlight mb-3">
         <div class="p-1 bd-highlight">
-          <h5>Producer Settings</h5>            
+          <h5>Producer Settings</h5>
         </div>        
         <!-- <div class="p-3 bd-highlight">Flex item</div> -->
         <div class="ms-auto p-1 bd-highlight">
-          <button type="button" class="btn btn-close" aria-label="Close" onclick="$('#panel-settings-producer').hide();"></button>
+          <button type="button" class="btn btn-close" aria-label="Close" onclick="settingProducer.closePanel();"></button>
         </div>
       </div>
       <div class="customized-card-body">
-        <!-- <ol class="list-group list-group-numbered" id="producer-settings-list"> <h5>Add the first producer here.</h5> </ol> -->
-        <ul class="list-group">
-          <li class="list-group-item d-flex justify-content-between align-items-start">
-            <a href="#">
-            <div class="ms-2 me-auto">
-              <div class="fw-bold">Subheading</div>
-              Content for list item
-            </div>
-            </a>
-            <a href="#" class="actions text-white"><span class="badge bg-danger rounded-pill">Delete</span></a>
-          </li>
-          <li class="list-group-item d-flex justify-content-between align-items-start">
-            <div class="ms-2 me-auto">
-              <div class="fw-bold">Subheading</div>
-              Content for list item
-            </div>
-            <span class="badge bg-primary rounded-pill">14</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between align-items-start">
-            <div class="ms-2 me-auto">
-              <div class="fw-bold">Subheading</div>
-              Content for list item
-            </div>
-            <span class="badge bg-primary rounded-pill">14</span>
-          </li>
-        </ul>
-
+        <ul class="list-group list-group-numbered" id="producer-settings-list">  </ul>       
       </div>
 
       <div class="card-footer">
         <div class="d-grid gap-2" style="padding: 2px 5px;">
-          <button type="button" class="btn btn-danger btm-sm" onclick="newProducer();">New</button>
+          <button type="button" class="btn btn-danger btm-sm" onclick="settingProducer.newSettingItem();">New</button>
         </div>
       </div>
     </div>
@@ -158,7 +130,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+          <button type="button" class="btn btn-primary" onclick="settingProducer.saveSettingItem();">Save</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
@@ -174,16 +146,16 @@
         </div>        
         <!-- <div class="p-3 bd-highlight">Flex item</div> -->
         <div class="ms-auto p-1 bd-highlight">
-          <button type="button" class="btn btn-close" aria-label="Close" onclick="$('#panel-settings-flow').hide();"></button>
+          <button type="button" class="btn btn-close" aria-label="Close" onclick="settingFlow.closePanel();"></button>
         </div>
       </div>
       <div class="customized-card-body">
-        <ul class="list-group list-group-numbered" id="flow-settings-list"> <h5>Add the first material flow here.</h5> </ul>        
+        <ul class="list-group list-group-numbered" id="flow-settings-list"></ul>        
       </div>
 
       <div class="card-footer">
         <div class="d-grid gap-2" style="padding: 2px 5px;">
-          <button type="button" class="btn btn-danger btm-sm" data-bs-toggle="modal" data-bs-target="#modal-flow-settings">New</button>
+          <button type="button" class="btn btn-danger btm-sm" onclick="settingFlow.newSettingItem();">New</button>
         </div>
       </div>
     </div>
@@ -271,7 +243,7 @@
               </div> <!--End of card-->
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+          <button type="button" class="btn btn-primary" onclick="settingFlow.saveSettingItem();">Save</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
@@ -288,7 +260,7 @@
         </div>        
         <!-- <div class="p-3 bd-highlight">Flex item</div> -->
         <div class="ms-auto p-1 bd-highlight">
-          <button type="button" class="btn btn-close" aria-label="Close" onclick="$('#panel-settings-whitelist').hide();"></button>
+          <button type="button" class="btn btn-close" aria-label="Close" onclick="settingWhitelist.closePanel();"></button>
         </div>
       </div>
       <div class="customized-card-body">
@@ -297,7 +269,7 @@
 
       <div class="card-footer">
         <div class="d-grid gap-2" style="padding: 2px 5px;">
-          <button type="button" class="btn btn-danger btm-sm" data-bs-toggle="modal" data-bs-target="#modal-whitelist-settings">New</button>
+          <button type="button" class="btn btn-danger btm-sm" onclick="settingWhitelist.newSettingItem();">New</button>
         </div>
       </div>
     </div>
@@ -317,31 +289,128 @@
             <div class="card-body">
                 <input type="text" name="id" style="display: none;">
                 <div class="input-group mb-3">
-                      <span class="input-group-text">Institute</span>
-                      <input type="text" class="form-control" name="depositUserInstitute">
-                </div>
-                <div class="input-group mb-3">
                       <span class="input-group-text">User Name</span>
-                      <input type="text" class="form-control" name="depositUserName">
+                      <input type="text" class="form-control" name="whiteUserName">
                 </div>
+                
                 <div class="input-group mb-3"> 
-                    <span class="input-group-text">Password</span>
-                    <input type="password" class="form-control" name="depositUserPassword">
+                    <span class="input-group-text">Role</span>
+                    <select class="form-select" name="whiteUserRole">
+                        <option value="admin">Admin</option>
+                        <option value="normal">Normal</option>
+                    </select>
                 </div>
-            </div>
-            <div class="card-header"><h5>Health Audit</h5></div>
-            <div class="card-body">
-                <div class="alert alert-warning" role="alert" name="audit"></div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+          <button type="button" class="btn btn-primary" onclick="settingWhitelist.saveSettingItem();">Save</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Deposit job details -->
+  <div class="modal fade" id="deposit-job-details" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+              <h3 class="modal-title">Deposit Job</h3>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <!-- /.card-tools -->
+          </div>
+          <!-- /.card-header -->
+          
+          <div class="modal-body">
+              <ul class="list-group">
+                  <div class="alert alert-warning" role="alert" id="deposit-job-health" style="display: none;"></div>
+
+                  <li class="list-group-item section-title">Basic Properties</li>
+                  <li class="list-group-item">
+                    <div class="input-group mb-3">
+                      <span class="input-group-text">Job Title</span>
+                      <input type="text" class="form-control" id="deposit-job-title">
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <span class="input-group-text">Original Path</span>
+                      <input type="text" class="form-control" id="deposit-job-path">
+                    </div>
+               
+                    <div class="input-group mb-3">
+                      <span class="input-group-text">Material Flow</span>
+                      <input type="text" class="form-control" id="deposit-job-flow-name">
+                    </div>
+          
+                    
+                    
+                    <div class="input-group mb-3">
+                      <span class="input-group-text">Initial Time</span>
+                      <input type="text" class="form-control" id="deposit-job-initial-time">
+                      <span class="input-group-text">Latest Update Time</span>
+                      <input type="text" class="form-control" id="deposit-job-latest-time">
+                    </div>
+
+                    <div class="input-group mb-3">
+                      <span class="input-group-text">File Count</span>
+                      <input type="text" class="form-control" id="deposit-job-file-count">
+                      <span class="input-group-text">File Size</span>
+                      <input type="text" class="form-control" id="deposit-job-file-size">
+                    </div>
+              
+                    <div class="input-group mb-3">
+                      <span class="input-group-text">Current Stage</span>
+                      <input type="text" class="form-control" id="deposit-job-stage">
+                      <span class="input-group-text">Current State</span>
+                      <input type="text" class="form-control" id="deposit-job-state">
+                    </div>
+
+                    <div class="progress" id="progress-stage-name">
+                      <div class="progress-bar bg-running" role="progressbar" name="inject">Inject</div>
+                      <div class="progress-bar" role="progressbar" name="deposit" style="border-left: none; border-right: none;">Deposit</div>
+                      <div class="progress-bar" role="progressbar" name="finalize">Finalize</div>
+                    </div>
+                  </li>
+
+                  <li class="list-group-item section-title">SIP Properties</li>
+                  <li class="list-group-item">
+                      <div class="input-group mb-3">
+                        <span class="input-group-text">Deposit Start Time</span>
+                        <input type="text" class="form-control" id="deposit-job-deposit-start">
+                        <span class="input-group-text">Deposit End Time</span>
+                        <input type="text" class="form-control" id="deposit-job-deposit-end">
+                      </div>
+
+                      <div class="input-group mb-3">
+                        <span class="input-group-text">SIP ID</span>
+                        <input type="text" class="form-control" id="deposit-job-sip-id">
+                        <span class="input-group-text">SIP Result</span>
+                        <input type="text" class="form-control" id="deposit-job-sip-msg">
+                      </div>
+
+                      <div class="input-group mb-3">
+                        <span class="input-group-text">SIP Module</span>
+                        <input type="text" class="form-control" id="deposit-job-sip-module">
+                        <span class="input-group-text">SIP Stage</span>
+                        <input type="text" class="form-control" id="deposit-job-sip-stage">
+                        <span class="input-group-text">SIP Status</span>
+                        <input type="text" class="form-control" id="deposit-job-sip-status">
+                      </div>
+                  </li>
+              </ul>
+         
+              <ul class="list-group" id="ul-flow-setting-job-applied">
+          </div> <!-- End of card body -->
+
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+          </div>
+      </div>
+    </div>
+    <!-- modal-dialog -->
+</div>     <!-- modal -->
 
 
   <script src="../dist/bootstrap.bundle.js"></script>
@@ -352,40 +421,24 @@
   <script src="../dist/daterangepicker.js"></script>
   <script src="../dist/toastr.min.js"></script>
 
+  <script src="dashboard-constants.js"></script>
   <script src="dashboard.js"></script>
+  <script src="settings.js"></script>
+  <script src="settings-producer.js"></script>
+  <script src="settings-flow.js"></script>
+  <script src="settings-whitelist.js"></script>
   <script src="deposit-jobs.js"></script>
-  <script src="setting-producer.js"></script>
-  <script src="setting-flows.js"></script>
-  <script src="setting-global.js"></script>
+
 
 
   <script>
     const HTML_IFRAME_LOGIN='<iframe src="login.html" scrolling="no" frameborder="0" allowfullscreen> </iframe>';
     const IS_GLOBAL_SETTING_INITIALED=true;
     const modalGlobalSettingInitial = new bootstrap.Modal(document.getElementById('modal-global-setting-initial'), {keyboard: false});
-    // const modalSettings = new bootstrap.Modal(document.getElementById('modal-settings'), {keyboard: false});
-
-
-    // function openModalSettings(){
-    //   fetchHttp(PATH_SETTING_GLOBAL_GET, null, function(rsp){
-    //       var globalSetting=rsp['globalSetting'];
-    //       $('#global-setting input[name="depositUserInstitute"]').val(globalSetting['depositUserInstitute']);
-    //       $('#global-setting input[name="depositUserName"]').val(globalSetting['depositUserName']);
-    //       $('#global-setting input[name="depositUserPassword"]').val(globalSetting['depositUserPassword']);
-
-    //       if (globalSetting.auditRst) {
-    //           $('#modal-global-setting-pop div[name="audit"]').hide();
-    //       }else{
-    //           $('#modal-global-setting-pop div[name="audit"]').show();
-    //           $('#modal-global-setting-pop div[name="audit"]').html('<i class="bi bi-exclamation-triangle-fill text-danger">&nbsp;</i>' + globalSetting.auditMsg);
-    //       }
-
-    //       tableWhiteList.setRowData(rsp['whiteList']);
-    //       tableFlowSettings.setRowData(rsp['flowSettings']);
-
-    //       modalSettings.show();
-    //   });
-    // }
+    
+    const settingProducer=new ProducerSetting();
+    const settingFlow=new FlowSetting();
+    const settingWhitelist=new Whitelist();
 
     function loginCallback(){
       $('#modal-sso-login').hide();
@@ -430,6 +483,8 @@
         }else{
           modalGlobalSettingInitial.show();
         }
+
+
     });
   </script>
 </body>

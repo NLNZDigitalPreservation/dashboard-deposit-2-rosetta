@@ -292,8 +292,8 @@ function setValueDepositJobActive(data){
 }
 
 const modalDepositJobDetails = new bootstrap.Modal(document.getElementById('deposit-job-details'), {keyboard: false});
-const modalDepositJobSearch = new bootstrap.Modal(document.getElementById('search-deposit-job'), {keyboard: false});
-const modalDepositJobManualNew = new bootstrap.Modal(document.getElementById('new-manual-deposit-job'), {keyboard: false});
+const modalDepositJobSearch = new bootstrap.Modal(document.getElementById('deposit-job-details'), {keyboard: false});
+const modalDepositJobManualNew = new bootstrap.Modal(document.getElementById('deposit-job-details'), {keyboard: false});
 
 const gridDepositJobs=new CustomizedAgGrid($('#grid-deposit-jobs')[0], Object.assign({columnDefs: gridDepositJobsColumnsActive}), null);
 
