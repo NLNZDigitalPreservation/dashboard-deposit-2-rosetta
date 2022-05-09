@@ -3,7 +3,7 @@ package nz.govt.natlib.dashboard.ui.controller;
 import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.domain.entity.EntityWhiteList;
+import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
 import nz.govt.natlib.dashboard.domain.service.GlobalSettingService;
 import org.slf4j.Logger;
@@ -43,14 +43,14 @@ public class GlobalSettingController {
 
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_GLOBAL_WHITE_USER_SAVE, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand saveWhiteListUser(@RequestBody EntityWhiteList userInfo, HttpServletRequest req, HttpServletResponse rsp) {
+    public RestResponseCommand saveWhiteListUser(@RequestBody EntityWhitelistSetting userInfo, HttpServletRequest req, HttpServletResponse rsp) {
         PdsUserInfo pdsUserInfo = (PdsUserInfo) req.getSession().getAttribute(DashboardConstants.KEY_USER_INFO);
 
         return globalSettingService.saveUser2WhiteList(userInfo, pdsUserInfo);
     }
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_GLOBAL_WHITE_USER_DELETE, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand deleteWhiteListUser(@RequestBody EntityWhiteList userInfo, HttpServletRequest req, HttpServletResponse rsp) {
+    public RestResponseCommand deleteWhiteListUser(@RequestBody EntityWhitelistSetting userInfo, HttpServletRequest req, HttpServletResponse rsp) {
         PdsUserInfo pdsUserInfo = (PdsUserInfo) req.getSession().getAttribute(DashboardConstants.KEY_USER_INFO);
 
         return globalSettingService.deleteUserFromWhiteList(userInfo, pdsUserInfo);

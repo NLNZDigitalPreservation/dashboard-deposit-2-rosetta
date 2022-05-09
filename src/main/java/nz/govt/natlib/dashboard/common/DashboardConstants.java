@@ -8,13 +8,26 @@ import java.util.Map;
 public class DashboardConstants {
     public static final String PATH_ROOT = "/restful";
 
-    public static final String PATH_RAW_MATERIAL_FLOW = PATH_ROOT + "/producer/material-flows";
+    public static final String PATH_RAW_PRODUCER_MATERIAL_FLOW  = PATH_ROOT + "/raw/producer-material-flows";
+
+    public static final String PATH_SETTING_DEPOSIT_ACCOUNT = PATH_ROOT + "/setting/deposit-account";
+    public static final String PATH_SETTING_DEPOSIT_ACCOUNT_ALL_GET = PATH_SETTING_DEPOSIT_ACCOUNT + "/all/get";
+    public static final String PATH_SETTING_DEPOSIT_ACCOUNT_DETAIL = PATH_SETTING_DEPOSIT_ACCOUNT + "/detail";
+    public static final String PATH_SETTING_DEPOSIT_ACCOUNT_SAVE = PATH_SETTING_DEPOSIT_ACCOUNT + "/save";
+    public static final String PATH_SETTING_DEPOSIT_ACCOUNT_DELETE = PATH_SETTING_DEPOSIT_ACCOUNT + "/delete";
 
     public static final String PATH_SETTING_FLOW = PATH_ROOT + "/setting/flow";
     public static final String PATH_SETTING_FLOW_ALL_GET = PATH_SETTING_FLOW + "/all/get";
     public static final String PATH_SETTING_FLOW_DETAIL = PATH_SETTING_FLOW + "/detail";
     public static final String PATH_SETTING_FLOW_SAVE = PATH_SETTING_FLOW + "/save";
     public static final String PATH_SETTING_FLOW_DELETE = PATH_SETTING_FLOW + "/delete";
+
+    public static final String PATH_SETTING_WHITELIST = PATH_ROOT + "/setting/whitelist";
+    public static final String PATH_SETTING_WHITELIST_ALL_GET = PATH_SETTING_WHITELIST + "/all/get";
+    public static final String PATH_SETTING_WHITELIST_DETAIL = PATH_SETTING_WHITELIST + "/detail";
+    public static final String PATH_SETTING_WHITELIST_SAVE = PATH_SETTING_WHITELIST + "/save";
+    public static final String PATH_SETTING_WHITELIST_DELETE = PATH_SETTING_WHITELIST + "/delete";
+
 
     public static final String PATH_SETTING_GLOBAL = PATH_ROOT + "/setting/global";
     public static final String PATH_SETTING_GLOBAL_INITIAL = PATH_SETTING_GLOBAL + "/initial";

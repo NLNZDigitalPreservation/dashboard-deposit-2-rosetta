@@ -2,7 +2,7 @@ package nz.govt.natlib.dashboard.domain.entity;
 
 import nz.govt.natlib.dashboard.common.metadata.EnumUserRole;
 
-public class EntityWhiteList extends EntityCommon{
+public class EntityWhitelistSetting extends EntityCommon{
     private String userName;
     private EnumUserRole role;
 

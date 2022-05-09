@@ -1,7 +1,7 @@
 package nz.govt.natlib.dashboard.domain.repo;
 
 import nz.govt.natlib.dashboard.common.metadata.EnumEntityKey;
-import nz.govt.natlib.dashboard.domain.entity.EntityProducer;
+import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -11,21 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component("RepoProducer")
-public class RepoProducer extends RepoAbstract {
-    public static final String SUB_FOLDER = "setting-producer";
+public class RepoDepositAccount extends RepoAbstract {
+    public static final String SUB_FOLDER = "setting-deposit-account";
 
     @PostConstruct
     public void init() {
         this.subStoragePath = this.systemStoragePath + File.separator + SUB_FOLDER;
-        this.entityKey = EnumEntityKey.ProducerSetting;
+        this.entityKey = EnumEntityKey.DepositAccountSetting;
     }
 
-    public EntityProducer getById(Long id) {
-        return (EntityProducer) getById(id, EntityProducer.class);
+    public EntityDepositAccountSetting getById(Long id) {
+        return (EntityDepositAccountSetting) getById(id, EntityDepositAccountSetting.class);
     }
 
-    public List<EntityProducer> getAll() {
-        List<EntityProducer> retVal = new ArrayList<>();
+    public List<EntityDepositAccountSetting> getAll() {
+        List<EntityDepositAccountSetting> retVal = new ArrayList<>();
 
         File rootDir = new File(this.subStoragePath);
         if (!rootDir.exists()) {
@@ -42,7 +42,7 @@ public class RepoProducer extends RepoAbstract {
                 continue;
             }
 
-            EntityProducer obj = (EntityProducer) json2Object(json, EntityProducer.class);
+            EntityDepositAccountSetting obj = (EntityDepositAccountSetting) json2Object(json, EntityDepositAccountSetting.class);
             retVal.add(obj);
         }
 

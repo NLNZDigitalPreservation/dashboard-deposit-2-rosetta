@@ -154,36 +154,36 @@ public class FlowSettingService {
 
     public RestResponseCommand getAllMaterialFlowDigests() {
         RestResponseCommand rstVal = new RestResponseCommand();
-        EntityGlobalSetting globalSetting = globalSettingService.getGlobalSettingInstance();
-        if (DashboardHelper.isNull(globalSetting)) {
-            rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
-            rstVal.setRspMsg("Please initial deposit dashboard before using it");
-            return rstVal;
-        }
-
-        try {
-            final List<RawProducerCommand> allFlows = new ArrayList<>();
-            List<Producer> producers = this.rosettaWebService.getProducers(globalSetting.getDepositUserName());
-            for (Producer producer : producers) {
-                RawProducerCommand producerCommand = new RawProducerCommand();
-                producerCommand.setId(producer.getID());
-                producerCommand.setName(producer.getDescription());
-                List<MaterialFlow> materialFlows = this.rosettaWebService.getMaterialFlows(producer.getID());
-                materialFlows.forEach(materialFlow -> {
-                    RawMaterialFlowCommand materialFlowCommand = new RawMaterialFlowCommand();
-                    materialFlowCommand.setId(materialFlow.getID());
-                    materialFlowCommand.setName(materialFlow.getDescription());
-                    materialFlowCommand.setProducerId(producer.getID());
-                    producerCommand.getMaterialFlows().add(materialFlowCommand);
-                });
-                allFlows.add(producerCommand);
-            }
-            rstVal.setRspBody(allFlows);
-        } catch (Exception e) {
-            log.error("Failed to get MaterialFlows", e);
-            rstVal.setRspCode(RestResponseCommand.RSP_DEPOSIT_QUERY_ERROR);
-            rstVal.setRspMsg(e.getMessage());
-        }
+//        EntityGlobalSetting globalSetting = globalSettingService.getGlobalSettingInstance();
+//        if (DashboardHelper.isNull(globalSetting)) {
+//            rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+//            rstVal.setRspMsg("Please initial deposit dashboard before using it");
+//            return rstVal;
+//        }
+//
+//        try {
+//            final List<RawProducerCommand> allFlows = new ArrayList<>();
+//            List<Producer> producers = this.rosettaWebService.getProducers(globalSetting.getDepositUserName());
+//            for (Producer producer : producers) {
+//                RawProducerCommand producerCommand = new RawProducerCommand();
+//                producerCommand.setProducerId(producer.getID());
+//                producerCommand.setProducerName(producer.getDescription());
+//                List<MaterialFlow> materialFlows = this.rosettaWebService.getMaterialFlows(producer.getID());
+//                materialFlows.forEach(materialFlow -> {
+//                    RawMaterialFlowCommand materialFlowCommand = new RawMaterialFlowCommand();
+//                    materialFlowCommand.setId(materialFlow.getID());
+//                    materialFlowCommand.setName(materialFlow.getDescription());
+//                    materialFlowCommand.setProducerId(producer.getID());
+//                    producerCommand.getMaterialFlows().add(materialFlowCommand);
+//                });
+//                allFlows.add(producerCommand);
+//            }
+//            rstVal.setRspBody(allFlows);
+//        } catch (Exception e) {
+//            log.error("Failed to get MaterialFlows", e);
+//            rstVal.setRspCode(RestResponseCommand.RSP_DEPOSIT_QUERY_ERROR);
+//            rstVal.setRspMsg(e.getMessage());
+//        }
         return rstVal;
     }
 

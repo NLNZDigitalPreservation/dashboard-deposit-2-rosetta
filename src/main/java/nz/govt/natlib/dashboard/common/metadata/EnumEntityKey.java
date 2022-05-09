@@ -2,10 +2,10 @@ package nz.govt.natlib.dashboard.common.metadata;
 
 public enum EnumEntityKey {
     GlobalSetting,
-    ProducerSetting,
+    DepositAccountSetting,
     FlowSetting,
     StorageLocation,
     DepositJob,
     SystemEvent,
-    WhiteList
+    WhiteListSetting
 }

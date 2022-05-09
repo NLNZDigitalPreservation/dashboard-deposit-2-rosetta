@@ -6,7 +6,7 @@ import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.exception.WebServiceException;
 import nz.govt.natlib.dashboard.common.metadata.EnumUserRole;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
-import nz.govt.natlib.dashboard.domain.entity.EntityWhiteList;
+import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoGlobalSetting;
@@ -62,32 +62,32 @@ public class GlobalSettingService {
     }
 
     public boolean isInWhiteList(PdsUserInfo pdsUserInfo) {
-        EntityWhiteList user = getUserFromWhiteList(pdsUserInfo);
+        EntityWhitelistSetting user = getUserFromWhiteList(pdsUserInfo);
         return !DashboardHelper.isNull(user);
     }
 
-    private EntityWhiteList getUserFromWhiteList(PdsUserInfo pdsUserInfo) {
+    private EntityWhitelistSetting getUserFromWhiteList(PdsUserInfo pdsUserInfo) {
         if (DashboardHelper.isNull(pdsUserInfo)) {
             return null;
         }
         return getUserFromWhiteList(pdsUserInfo.getUserName());
     }
 
-    private EntityWhiteList getUserFromWhiteList(String userName) {
+    private EntityWhitelistSetting getUserFromWhiteList(String userName) {
         return repoWhiteList.getByUserName(userName);
     }
 
     public RestResponseCommand initialGlobalSetting(PdsUserInfo pdsUserInfo) {
         RestResponseCommand rstVal = new RestResponseCommand();
 
-        EntityWhiteList userInfo = getUserFromWhiteList(pdsUserInfo);
+        EntityWhitelistSetting userInfo = getUserFromWhiteList(pdsUserInfo);
         if (!DashboardHelper.isNull(userInfo)) {
             rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             rstVal.setRspMsg("The dashboard could not be duplicated initialed.");
             return rstVal;
         }
 
-        userInfo = new EntityWhiteList();
+        userInfo = new EntityWhitelistSetting();
         userInfo.setUserName(pdsUserInfo.getUserName());
         userInfo.setRole(EnumUserRole.admin);
 
@@ -101,7 +101,7 @@ public class GlobalSettingService {
     public RestResponseCommand saveGlobalSettingWithoutWhiteList(EntityGlobalSetting globalSetting, PdsUserInfo pdsUserInfo) {
         RestResponseCommand rstVal = new RestResponseCommand();
 
-        EntityWhiteList whiteUserInfo = getUserFromWhiteList(pdsUserInfo);
+        EntityWhitelistSetting whiteUserInfo = getUserFromWhiteList(pdsUserInfo);
         if (DashboardHelper.isNull(whiteUserInfo)) {
             rstVal.setRspCode(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
             return rstVal;
@@ -149,7 +149,7 @@ public class GlobalSettingService {
         }
         globalSetting.setDepositUserPassword(MASKED_PASSWORD);
 
-        List<EntityWhiteList> whiteList = repoWhiteList.getAll();
+        List<EntityWhitelistSetting> whiteList = repoWhiteList.getAll();
         List<EntityFlowSetting> flowSettings = repoFlowSetting.getAll();
 
         Map<String, Object> rspBody = new HashMap<>();
@@ -165,10 +165,10 @@ public class GlobalSettingService {
         return rstVal;
     }
 
-    public RestResponseCommand saveUser2WhiteList(EntityWhiteList dtoUserInfo, PdsUserInfo pdsUserInfo) {
+    public RestResponseCommand saveUser2WhiteList(EntityWhitelistSetting dtoUserInfo, PdsUserInfo pdsUserInfo) {
         RestResponseCommand rstVal = new RestResponseCommand();
 
-        EntityWhiteList whiteUserInfoMe = getUserFromWhiteList(pdsUserInfo);
+        EntityWhitelistSetting whiteUserInfoMe = getUserFromWhiteList(pdsUserInfo);
         if (DashboardHelper.isNull(whiteUserInfoMe) || whiteUserInfoMe.getRole() != EnumUserRole.admin) {
             rstVal.setRspCode(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
             return rstVal;
@@ -193,9 +193,9 @@ public class GlobalSettingService {
 //            return rstVal;
 //        }
 
-        EntityWhiteList whiteUserInfo = getUserFromWhiteList(dtoUserInfo.getUserName());
+        EntityWhitelistSetting whiteUserInfo = getUserFromWhiteList(dtoUserInfo.getUserName());
         if (DashboardHelper.isNull(whiteUserInfo)) {
-            whiteUserInfo = new EntityWhiteList();
+            whiteUserInfo = new EntityWhitelistSetting();
         }
         whiteUserInfo.setUserName(dtoUserInfo.getUserName());
         whiteUserInfo.setRole(dtoUserInfo.getRole());
@@ -207,10 +207,10 @@ public class GlobalSettingService {
         return rstVal;
     }
 
-    public RestResponseCommand deleteUserFromWhiteList(EntityWhiteList dtoUserInfo, PdsUserInfo pdsUserInfo) {
+    public RestResponseCommand deleteUserFromWhiteList(EntityWhitelistSetting dtoUserInfo, PdsUserInfo pdsUserInfo) {
         RestResponseCommand rstVal = new RestResponseCommand();
 
-        EntityWhiteList whiteUserInfoMe = getUserFromWhiteList(pdsUserInfo);
+        EntityWhitelistSetting whiteUserInfoMe = getUserFromWhiteList(pdsUserInfo);
         if (DashboardHelper.isNull(whiteUserInfoMe) || whiteUserInfoMe.getRole() != EnumUserRole.admin) {
             rstVal.setRspCode(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
             return rstVal;
