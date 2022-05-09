@@ -57,7 +57,7 @@ public abstract class RepoAbstract {
 
     public String read(File fullPath) {
         if (fullPath == null || !fullPath.isFile() || !fullPath.exists()) {
-            log.error("Invalid input parameter, fullPath: {}", fullPath.getAbsolutePath());
+            log.error("Invalid input parameter, fullPath: {}", fullPath);
             return null;
         }
         try {

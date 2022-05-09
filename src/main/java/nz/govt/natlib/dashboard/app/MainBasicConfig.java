@@ -52,7 +52,7 @@ public class MainBasicConfig {
     public RosettaWebService rosettaWebService() throws Exception {
         log.info("Start to initial Rosetta Web Service");
         RosettaWebServiceImpl bean = new RosettaWebServiceImpl();
-//        bean.init(pdsUrl, wsdlUrlProducer, wsdlUrlDeposit, wsdlUrlSip, wsdlUrlDeliveryAccess);
+        bean.init(pdsUrl, wsdlUrlProducer, wsdlUrlDeposit, wsdlUrlSip, wsdlUrlDeliveryAccess);
         log.info("End to initial Rosetta Web Service");
         return bean;
     }
