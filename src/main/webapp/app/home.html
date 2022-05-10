@@ -177,23 +177,26 @@
                   <div class="card-body">
                       <input type="text" name="id" style="display: none;">       
 
-                      <div class="nput-group mb-3 form-check form-switch">
+                      <div class="form-check form-switch mb-3">
                         <input class="form-check-input" type="checkbox" role="switch" id="flow-setting-enabled" name="enabled" checked>
                         <label class="form-check-label" for="flow-setting-enabled">If enable depositing for this material flow.</label>
                       </div>
 
                       <div class="input-group mb-3">
-                          <span class="input-group-text">Flow Name</span>
-                          <input type="text" class="form-control" name="name">
-                          <span class="input-group-text">Root Location</span>
-                          <input type="input" class="form-control" name="rootPath" aria-describedby="desc-root-path">
+                          <span class="input-group-text">Deposit Account</span>
+                          <select class="form-control form-select mt-0" name="depositAccount"></select>
                       </div>
 
                       <div class="input-group mb-3">
                           <span class="input-group-text">Producer</span>
                           <select class="form-control form-select mt-0" name="producer"></select>
                           <span class="input-group-text">Material Flow</span>
-                          <select class="form-control form-select mt-0" name="materiaFlow"></select>
+                          <select class="form-control form-select mt-0" name="materialFlow"></select>
+                      </div>
+
+                      <div class="input-group mb-3">
+                          <span class="input-group-text">Root Location</span>
+                          <input type="text" class="form-control" name="rootPath" aria-describedby="desc-root-path">
                       </div>
                   </div>
 
@@ -436,9 +439,7 @@
     const HTML_IFRAME_LOGIN='<iframe src="login.html" scrolling="no" frameborder="0" allowfullscreen> </iframe>';
     const IS_GLOBAL_SETTING_INITIALED=true;
     const modalGlobalSettingInitial = new bootstrap.Modal(document.getElementById('modal-global-setting-initial'), {keyboard: false});
-    
-    const settingDepositAccount=new DepositAccountSetting();
-    const settingFlow=new FlowSetting();
+
     const settingWhitelist=new Whitelist();
 
     function loginCallback(){

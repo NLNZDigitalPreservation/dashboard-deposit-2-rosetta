@@ -1,7 +1,6 @@
 const PATH_ROOT = "/restful";
 
-const PATH_RAW_PRODUCER= PATH_ROOT + "/raw/producer";
-const PATH_RAW_MATERIAL_FLOW = PATH_ROOT + "/raw/material-flows";
+const PATH_RAW_PRODUCER_MATERIAL_FLOW = PATH_ROOT + "/raw/producer-material-flows";
 
 const PATH_SETTING_DEPOSIT_ACCOUNT = PATH_ROOT + "/setting/deposit-account";
 const PATH_SETTING_DEPOSIT_ACCOUNT_ALL_GET = PATH_SETTING_DEPOSIT_ACCOUNT + "/all/get";
