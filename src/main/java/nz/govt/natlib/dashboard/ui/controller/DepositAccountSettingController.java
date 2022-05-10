@@ -14,19 +14,19 @@ public class DepositAccountSettingController {
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_ALL_GET, method = {RequestMethod.POST, RequestMethod.GET})
     public RestResponseCommand getAllProducerSettings() {
-        return depositAccountSettingService.getAllProducerSettings();
+        return depositAccountSettingService.getAllDepositAccountSettings();
     }
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_DETAIL, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand getProducerSettingDetail(@RequestParam("id") Long id) {
-        return depositAccountSettingService.getProducerDetail(id);
+    public RestResponseCommand getProducerSettingDetail(@RequestParam("id") Long id) throws Exception {
+        return depositAccountSettingService.getDepositAccountDetail(id);
     }
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_SAVE, method = {RequestMethod.POST, RequestMethod.GET})
     public RestResponseCommand saveProducerSetting(@RequestBody EntityDepositAccountSetting reqCmd) {
         RestResponseCommand retVal = new RestResponseCommand();
         try {
-            retVal = depositAccountSettingService.saveProducerSetting(reqCmd);
+            retVal = depositAccountSettingService.saveDepositAccountSetting(reqCmd);
         } catch (Exception e) {
             retVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             retVal.setRspMsg(e.getMessage());
@@ -36,6 +36,6 @@ public class DepositAccountSettingController {
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_DELETE, method = {RequestMethod.POST, RequestMethod.GET})
     public RestResponseCommand deleteProducerSetting(@RequestParam("id") Long id) {
-        return depositAccountSettingService.deleteProducerSetting(id);
+        return depositAccountSettingService.deleteDepositAccountSetting(id);
     }
 }

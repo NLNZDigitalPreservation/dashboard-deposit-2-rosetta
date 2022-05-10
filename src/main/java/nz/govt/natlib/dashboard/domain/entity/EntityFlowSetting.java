@@ -168,23 +168,4 @@ public class EntityFlowSetting extends EntityCommon{
             return null;
         }
     }
-
-    private Boolean auditRst = true;
-    private String auditMsg = "OK";
-
-    public Boolean getAuditRst() {
-        return auditRst;
-    }
-
-    public void setAuditRst(Boolean auditRst) {
-        this.auditRst = auditRst;
-    }
-
-    public String getAuditMsg() {
-        return auditMsg;
-    }
-
-    public void setAuditMsg(String auditMsg) {
-        this.auditMsg = auditMsg;
-    }
 }

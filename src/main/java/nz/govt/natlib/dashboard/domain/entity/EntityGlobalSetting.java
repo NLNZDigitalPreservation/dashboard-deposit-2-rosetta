@@ -37,23 +37,4 @@ public class EntityGlobalSetting extends EntityCommon{
     public void setDepositUserPasswordConfirm(String depositUserPasswordConfirm) {
         this.depositUserPasswordConfirm = depositUserPasswordConfirm;
     }
-
-    private Boolean auditRst;
-    private String auditMsg;
-
-    public Boolean getAuditRst() {
-        return auditRst;
-    }
-
-    public void setAuditRst(Boolean auditRst) {
-        this.auditRst = auditRst;
-    }
-
-    public String getAuditMsg() {
-        return auditMsg;
-    }
-
-    public void setAuditMsg(String auditMsg) {
-        this.auditMsg = auditMsg;
-    }
 }

@@ -19,8 +19,10 @@ BasicSettings.prototype.popupPanel=function(){
 }
 
 BasicSettings.prototype.updatePanelList=function(items){
+    var that=this;
+
     if(items.length==0){
-        $(this.idContentList).html('<h5>Please add the first item here.</h5>');
+        $(that.idContentList).html('<h5>Please add the first item here.</h5>');
         return;
     }
 
@@ -30,31 +32,28 @@ BasicSettings.prototype.updatePanelList=function(items){
         html+='<li class="list-group-item d-flex justify-content-between align-items-start">';
         html+='<a href="#" class="titles" data-id="'+item.id+'">';
         html+='<div class="ms-2 me-auto">';
-        html+='<div class="fw-bold">'+item[this.keyObjId]+'</div>';
-        html+=item[this.keyObjName];
+        html+='<div class="fw-bold">'+item[that.keyObjId]+'</div>';
+        html+=item[that.keyObjName];
         html+='</div>';
         html+=' </a>';
         html+='<a href="#" class="actions text-white" data-id="'+item.id+'"><span class="badge bg-danger rounded-pill">Delete</span></a>';
         html+='</li>';
     }
-    $(this.idContentList).html(html);
+    $(that.idContentList).html(html);
 
-    var currentInstance=this;
-    $(this.idContentList + ' .titles').click(function(){
+    $(that.idContentList + ' .titles').click(function(){
         var id=$(this).attr('data-id');
-        fetchHttp(currentInstance.urlGetDetail + '?id='+id, null, function(rsp){
-          currentInstance.setValue(rsp);
+        fetchHttp(that.urlGetDetail + '?id='+id, null, function(rsp){
+          that.setValue(rsp);
+          that.modal.show();
         });
     });
 
-    var valObjName=item[this.keyObjName];
-    $(this.idContentList + ' .actions').click(function(){
-        var id=$(this).attr('data-id');
-
-       fetchHttp(currentInstance.urlDelete + '?id='+id, null, function(rsp){
-              var name=rsp.name;
-              toastr.success("Succeed to delete the row:" + name);
-              fetchHttp(currentInstance.urlGetList, null, currentInstance.updatePanelList);
+    $(that.idContentList + ' .actions').click(function(){
+       var id=$(this).attr('data-id');
+       fetchHttp(that.urlDelete + '?id='+id, null, function(rsp){
+              toastr.success("Succeed to delete the row");
+              fetchHttp(that.urlGetList, null, that.updatePanelList);
         });
     });
 }
@@ -76,11 +75,11 @@ BasicSettings.prototype.setValue=function(data){}
 
 BasicSettings.prototype.saveSettingItem=function(){
 	var data=this.getInputValue();
-	var currentInstance=this;
+	var that=this;
 	fetchHttp(this.urlSave, data, function(rsp){
-      toastr.success("Successfully save the row: " + data['name']);
-      modalFlow.hide();
-      fetchHttp(currentInstance.urlGetList, null, currentInstance.updatePanelList);
+      toastr.success("Successfully save the data");
+      that.modal.hide();
+      fetchHttp(that.urlGetList, null, that.updatePanelList);
   });
 }
 
