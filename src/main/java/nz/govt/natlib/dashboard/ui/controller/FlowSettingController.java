@@ -15,11 +15,6 @@ public class FlowSettingController {
     @Autowired
     private FlowSettingService flowSettingService;
 
-    @RequestMapping(path = DashboardConstants.PATH_RAW_MATERIAL_FLOW, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand getAllMaterialFlowDigest() {
-        return flowSettingService.getAllMaterialFlowDigests();
-    }
-
     @RequestMapping(path = DashboardConstants.PATH_SETTING_FLOW_ALL_GET, method = {RequestMethod.POST, RequestMethod.GET})
     public RestResponseCommand getAllFlowSettings() {
         return flowSettingService.getAllFlowSettings();

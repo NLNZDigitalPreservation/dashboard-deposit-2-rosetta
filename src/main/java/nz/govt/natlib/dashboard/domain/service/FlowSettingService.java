@@ -10,16 +10,12 @@ import nz.govt.natlib.dashboard.common.injection.InjectionPathScanFTP;
 import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
 import nz.govt.natlib.dashboard.domain.daemon.TimerScheduledExecutors;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
-import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityStorageLocation;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositJob;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
-import nz.govt.natlib.dashboard.ui.command.RawMaterialFlowCommand;
-import nz.govt.natlib.dashboard.ui.command.RawProducerCommand;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import nz.govt.natlib.ndha.common.exlibris.MaterialFlow;
-import nz.govt.natlib.ndha.common.exlibris.Producer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -152,54 +147,6 @@ public class FlowSettingService {
         }
     }
 
-    public RestResponseCommand getAllMaterialFlowDigests() {
-        RestResponseCommand rstVal = new RestResponseCommand();
-//        EntityGlobalSetting globalSetting = globalSettingService.getGlobalSettingInstance();
-//        if (DashboardHelper.isNull(globalSetting)) {
-//            rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
-//            rstVal.setRspMsg("Please initial deposit dashboard before using it");
-//            return rstVal;
-//        }
-//
-//        try {
-//            final List<RawProducerCommand> allFlows = new ArrayList<>();
-//            List<Producer> producers = this.rosettaWebService.getProducers(globalSetting.getDepositUserName());
-//            for (Producer producer : producers) {
-//                RawProducerCommand producerCommand = new RawProducerCommand();
-//                producerCommand.setProducerId(producer.getID());
-//                producerCommand.setProducerName(producer.getDescription());
-//                List<MaterialFlow> materialFlows = this.rosettaWebService.getMaterialFlows(producer.getID());
-//                materialFlows.forEach(materialFlow -> {
-//                    RawMaterialFlowCommand materialFlowCommand = new RawMaterialFlowCommand();
-//                    materialFlowCommand.setId(materialFlow.getID());
-//                    materialFlowCommand.setName(materialFlow.getDescription());
-//                    materialFlowCommand.setProducerId(producer.getID());
-//                    producerCommand.getMaterialFlows().add(materialFlowCommand);
-//                });
-//                allFlows.add(producerCommand);
-//            }
-//            rstVal.setRspBody(allFlows);
-//        } catch (Exception e) {
-//            log.error("Failed to get MaterialFlows", e);
-//            rstVal.setRspCode(RestResponseCommand.RSP_DEPOSIT_QUERY_ERROR);
-//            rstVal.setRspMsg(e.getMessage());
-//        }
-        return rstVal;
-    }
-
-    public RestResponseCommand getProducers(String userName) throws Exception {
-        RestResponseCommand restResponseCommand = new RestResponseCommand();
-        try {
-            List<Producer> producers = this.rosettaWebService.getProducers(userName);
-            restResponseCommand.setRspBody(producers);
-        } catch (Exception e) {
-            log.error("Failed to get producers", e);
-            restResponseCommand.setRspCode(RestResponseCommand.RSP_DEPOSIT_QUERY_ERROR);
-            restResponseCommand.setRspMsg(e.getMessage());
-        }
-        return restResponseCommand;
-    }
-
     public RestResponseCommand getMaterialFlows(String producerID) throws Exception {
         RestResponseCommand restResponseCommand = new RestResponseCommand();
         try {
@@ -215,22 +162,6 @@ public class FlowSettingService {
 
     public RestResponseCommand getAllFlowSettings() {
         RestResponseCommand retVal = new RestResponseCommand();
-
-//        List<FlowSettingCommand> rspFlowSettings = repoFlowSetting.getAll().stream().map(flowSetting -> {
-//            FlowSettingCommand rspCmd = new FlowSettingCommand();
-//            rspCmd.setFlowSetting(flowSetting);
-//
-//            if (!DashboardHelper.isNull(flowSetting.getInjectionEndPointId())) {
-//                rspCmd.setInjectionEndPoint(repoStorageLocation.getById(flowSetting.getInjectionEndPointId()));
-//            }
-//
-//            if (!DashboardHelper.isNull(flowSetting.getBackupEndPointId())) {
-//                rspCmd.setBackupEndPoint(repoStorageLocation.getById(flowSetting.getBackupEndPointId()));
-//            }
-//
-//            return rspCmd;
-//        }).collect(Collectors.toList());
-
         retVal.setRspBody(repoFlowSetting.getAll());
         return retVal;
     }

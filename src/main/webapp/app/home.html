@@ -38,7 +38,7 @@
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-gear"></i>Settings</a>
         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="dropdown01">
-          <li><a class="dropdown-item" href="#" onclick="settingProducer.popupPanel();">Producer Settings</a></li>
+          <li><a class="dropdown-item" href="#" onclick="settingDepositAccount.popupPanel();">Producer Settings</a></li>
           <li><a class="dropdown-item" href="#" onclick="settingFlow.popupPanel();">Materialflow Settings</a></li>
           <li><a class="dropdown-item" href="#" onclick="settingWhitelist.popupPanel();">User White List</a></li>
           <li><hr class="dropdown-divider"></li>
@@ -73,52 +73,52 @@
     </div>
   </div>
 
-  <!-- Panel: Producer settings  -->
-  <div class="side-panel bg-light" id="panel-settings-producer">
+  <!-- Panel: Deposit Account settings  -->
+  <div class="side-panel bg-light" id="panel-settings-deposit-account">
     <div class="card">
       <div class="card-header d-flex bd-highlight mb-3">
         <div class="p-1 bd-highlight">
-          <h5>Producer Settings</h5>
+          <h5>Deposit Account Settings</h5>
         </div>        
         <!-- <div class="p-3 bd-highlight">Flex item</div> -->
         <div class="ms-auto p-1 bd-highlight">
-          <button type="button" class="btn btn-close" aria-label="Close" onclick="settingProducer.closePanel();"></button>
+          <button type="button" class="btn btn-close" aria-label="Close" onclick="settingDepositAccount.closePanel();"></button>
         </div>
       </div>
       <div class="customized-card-body">
-        <ul class="list-group list-group-numbered" id="producer-settings-list">  </ul>       
+        <ul class="list-group list-group-numbered" id="deposit-account-settings-list">  </ul>       
       </div>
 
       <div class="card-footer">
         <div class="d-grid gap-2" style="padding: 2px 5px;">
-          <button type="button" class="btn btn-danger btm-sm" onclick="settingProducer.newSettingItem();">New</button>
+          <button type="button" class="btn btn-danger btm-sm" onclick="settingDepositAccount.newSettingItem();">New</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal: Producer settings -->
-  <div class="modal modal-fullscreen-lg-down fade" id="modal-producer-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <!-- Modal: Deposit Account settings -->
+  <div class="modal modal-fullscreen-lg-down fade" id="modal-deposit-account-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Producer Settings</h5>
+          <h5 class="modal-title" id="staticBackdropLabel">Deposit Account Settings</h5>
           <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="card bg-white mb-1" id="producer-settings">
+          <div class="card bg-white mb-1" id="deposit-account-settings">
             <div class="card-header"><h5>Settings</h5></div>
             <div class="card-body">
                 <input type="text" name="id" style="display: none;">
                 <div class="input-group mb-3">
-                    <span class="input-group-text">Producer</span>
-                    <select class="form-control form-select mt-0" name="producer"></select>
-                </div>
-                <div class="input-group mb-3">
                     <span class="input-group-text">Institute</span>
                     <input type="text" class="form-control" name="depositUserInstitute">
+                </div>
+                <div class="input-group mb-3">
                     <span class="input-group-text">User Name</span>
                     <input type="text" class="form-control" name="depositUserName">
+                </div>
+                <div class="input-group mb-3">
                     <span class="input-group-text">Password</span>
                     <input type="password" class="form-control" name="depositUserPassword">
                 </div>
@@ -130,7 +130,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" onclick="settingProducer.saveSettingItem();">Save</button>
+          <button type="button" class="btn btn-primary" onclick="settingDepositAccount.saveSettingItem();">Save</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
@@ -436,7 +436,7 @@
     const IS_GLOBAL_SETTING_INITIALED=true;
     const modalGlobalSettingInitial = new bootstrap.Modal(document.getElementById('modal-global-setting-initial'), {keyboard: false});
     
-    const settingProducer=new ProducerSetting();
+    const settingDepositAccount=new DepositAccountSetting();
     const settingFlow=new FlowSetting();
     const settingWhitelist=new Whitelist();
 
