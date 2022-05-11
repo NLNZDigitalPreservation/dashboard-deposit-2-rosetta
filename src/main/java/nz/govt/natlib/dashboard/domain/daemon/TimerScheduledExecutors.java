@@ -1,11 +1,10 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.*;
 import nz.govt.natlib.dashboard.domain.service.DepositJobService;
 import nz.govt.natlib.dashboard.domain.service.FlowSettingService;
-import nz.govt.natlib.dashboard.domain.service.GlobalSettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,17 +30,15 @@ public class TimerScheduledExecutors {
 
     private static final long initialDelay = 0;
     @Autowired
-    protected RosettaWebService rosettaWebService;
+    protected RosettaWebServiceImpl rosettaWebService;
     @Autowired
     protected DepositJobService depositJobService;
     @Autowired
     protected RepoFlowSetting repoFlowSetting;
-//    @Autowired
-//    protected RepoStorageLocation repoStorageLocation;
+    @Autowired
+    protected RepoDepositAccount repoDepositAccount;
     @Autowired
     protected RepoDepositJob repoDepositJob;
-    @Autowired
-    protected GlobalSettingService globalSettingService;
     @Autowired
     protected FlowSettingService flowSettingService;
 
@@ -63,28 +60,7 @@ public class TimerScheduledExecutors {
         scheduleProcessorCommon(new ScheduleProcessorImplJobDepositing());
         scheduleProcessorCommon(new ScheduleProcessorImplJobStatusPolling());
         scheduleProcessorCommon(new ScheduleProcessorImplJobFinalizing());
-        scheduleProcessorCommon(new ScheduleProcessorImplJobAging());
         scheduleProcessorCommon(new ScheduleProcessorImplJobHistoryPruning());
-        scheduleProcessorCommon(new ScheduleProcessorImplValidateSettingFlow());
-
-        scheduleProcessorGlobalSetting(new ScheduleProcessorImplValidateSettingGlobal());
-    }
-
-    public void scheduleProcessorGlobalSetting(ScheduleProcessorImplValidateSettingGlobal processor) {
-        processor.setGlobalSettingService(globalSettingService);
-        Runnable handler = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    processor.handle();
-                } catch (Throwable e) {
-                    log.error("Failed to execute processor", e);
-                }
-            }
-        };
-
-        ScheduledFuture<?> future = _schedule_executor.scheduleWithFixedDelay(handler, initialDelay, depositJobScanInterval, TimeUnit.SECONDS);
-        listProcessorCommons.add(future);
     }
 
     public void scheduleProcessorCommon(ScheduleProcessor processor) {
@@ -131,15 +107,11 @@ public class TimerScheduledExecutors {
 
     public void initProcessor(ScheduleProcessor processor) {
         processor.setDepositJobService(depositJobService);
-        processor.setGlobalSettingService(globalSettingService);
+        processor.setRepoDepositAccount(repoDepositAccount);
         processor.setRepoDepositJob(repoDepositJob);
         processor.setRepoFlowSetting(repoFlowSetting);
 //        processor.setRepoFTPSetting(repoStorageLocation);
         processor.setRosettaWebService(rosettaWebService);
-
-        if (processor instanceof ScheduleProcessorImplValidateSettingFlow) {
-            ((ScheduleProcessorImplValidateSettingFlow) processor).setFlowSettingService(flowSettingService);
-        }
     }
 
     public void close() {

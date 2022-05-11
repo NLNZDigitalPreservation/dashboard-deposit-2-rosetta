@@ -15,15 +15,11 @@ public class ScheduleProcessorImplJobInjecting extends ScheduleProcessor {
     @Override
     public void handle(EntityFlowSetting flowSetting) throws Exception {
         if (!flowSetting.isEnabled()) {
-            log.warn("Disabled Material Flow: {} {}", flowSetting.getName(), flowSetting.getMaterialFlowId());
+            log.warn("Disabled Material Flow: {} {}", flowSetting.getId(), flowSetting.getMaterialFlowId());
             return;
         }
 
-        InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getInjectionEndPoint());
-        if (injectionPathScanClient == null) {
-            log.error("Failed to initial PathScanClient instance.");
-            return;
-        }
+        InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
 
         //Summarize the number and size of files
         InjectionFileStat stat = new InjectionFileStat();
@@ -43,7 +39,7 @@ public class ScheduleProcessorImplJobInjecting extends ScheduleProcessor {
 
             //Ignore the jobs not in the INITIAL stage
             if (job.getStage() != EnumDepositJobStage.INJECT || job.getState() != EnumDepositJobState.RUNNING) {
-                log.debug("Skip unprepared job for: {} --> {} at status [{}] [{}]", flowSetting.getName(), job.getInjectionTitle(), job.getStage(), job.getState());
+                log.debug("Skip unprepared job for: {} --> {} at status [{}] [{}]", flowSetting.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
                 continue;
             }
 

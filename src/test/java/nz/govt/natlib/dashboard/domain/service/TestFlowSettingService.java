@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -29,9 +28,10 @@ public class TestFlowSettingService extends BasicTester {
     @BeforeAll
     public static void init() throws IOException {
         BasicTester.init();
+        BasicTester.initSubFolder();
 
         ReflectionTestUtils.setField(testInstance, "rosettaWebService", rosettaWebService);
-        ReflectionTestUtils.setField(testInstance, "globalSettingService", globalSettingService);
+        ReflectionTestUtils.setField(testInstance, "repoDepositAccount", repoDepositAccount);
         ReflectionTestUtils.setField(testInstance, "repoFlowSetting", repoFlowSetting);
 
         TimerScheduledExecutors timerScheduledExecutors = mock(TimerScheduledExecutors.class);
@@ -39,49 +39,11 @@ public class TestFlowSettingService extends BasicTester {
         ReflectionTestUtils.setField(testInstance, "timerScheduledExecutors", timerScheduledExecutors);
     }
 
-    @Test
-    public void testValidateStorage() {
-        //Valid Storage Location: NFS
-        {
-            EntityStorageLocation storage = new EntityStorageLocation();
-            storage.setScanMode(InjectionUtils.SCAN_MODE_NFS);
-            storage.setRootPath(scanRootPath);
-
-            try {
-                FileUtils.forceMkdir(new File(scanRootPath));
-                testInstance.validateStorage(storage);
-                assert true;
-            } catch (NullParameterException | InvalidParameterException | WebServiceException | IOException e) {
-                e.printStackTrace();
-                assert false;
-            }
-        }
-
-        //Invalid Storage Location: NFS
-        {
-            EntityStorageLocation storage = new EntityStorageLocation();
-            storage.setScanMode(InjectionUtils.SCAN_MODE_NFS);
-            storage.setRootPath(scanRootPath);
-
-            try {
-                FileUtils.forceDelete(new File(scanRootPath));
-                testInstance.validateStorage(storage);
-                assert false;
-            } catch (NullParameterException | InvalidParameterException | WebServiceException | IOException e) {
-                assert true;
-            }
-        }
-    }
 
     @Test
     public void testValidateFlowSetting() {
         //Valid flow setting
         {
-            EntityStorageLocation injectionEndLocation = new EntityStorageLocation();
-            setValues(injectionEndLocation);
-
-            EntityStorageLocation backupEndLocation = new EntityStorageLocation();
-            setValues(backupEndLocation);
 
             EntityFlowSetting flowSetting = new EntityFlowSetting();
             setValues(flowSetting);
@@ -90,10 +52,10 @@ public class TestFlowSettingService extends BasicTester {
             try {
                 //Set mock data
                 when(rosettaWebService.login(any(), any(), any())).thenReturn(pdsHandle);
-                when(rosettaWebService.isValidProducer(globalSettingService.getDepositUserName(), flowSetting.getProducerId())).thenReturn(true);
+                when(rosettaWebService.isValidProducer("serverside", flowSetting.getProducerId())).thenReturn(true);
                 when(rosettaWebService.isValidMaterialFlow(flowSetting.getProducerId(), flowSetting.getMaterialFlowId())).thenReturn(true);
 
-                testInstance.validateFlowSetting(flowSetting, injectionEndLocation, backupEndLocation);
+                testInstance.validateFlowSetting(flowSetting);
                 assert true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -103,11 +65,6 @@ public class TestFlowSettingService extends BasicTester {
 
         //Invalid flow setting: invalid user name
         {
-            EntityStorageLocation injectionEndLocation = new EntityStorageLocation();
-            setValues(injectionEndLocation);
-            EntityStorageLocation backupEndLocation = new EntityStorageLocation();
-            setValues(backupEndLocation);
-
             EntityFlowSetting flowSetting = new EntityFlowSetting();
             setValues(flowSetting);
 
@@ -115,7 +72,7 @@ public class TestFlowSettingService extends BasicTester {
                 //Set mock data
                 when(rosettaWebService.login(any(), any(), any())).thenReturn(null);
 
-                testInstance.validateFlowSetting(flowSetting, injectionEndLocation, backupEndLocation);
+                testInstance.validateFlowSetting(flowSetting);
 
                 Exception e = new InvalidParameterException("Validate user name");
                 e.printStackTrace();
@@ -127,19 +84,14 @@ public class TestFlowSettingService extends BasicTester {
 
         //Invalid flow setting: invalid producer Id
         {
-            EntityStorageLocation injectionEndLocation = new EntityStorageLocation();
-            setValues(injectionEndLocation);
-            EntityStorageLocation backupEndLocation = new EntityStorageLocation();
-            setValues(backupEndLocation);
-
             EntityFlowSetting flowSetting = new EntityFlowSetting();
             setValues(flowSetting);
 
             try {
                 //Set mock data
-                when(rosettaWebService.isValidProducer(globalSettingService.getDepositUserName(), flowSetting.getProducerId())).thenReturn(false);
+                when(rosettaWebService.isValidProducer("serverside", flowSetting.getProducerId())).thenReturn(false);
 
-                testInstance.validateFlowSetting(flowSetting, injectionEndLocation, backupEndLocation);
+                testInstance.validateFlowSetting(flowSetting);
 
                 Exception e = new InvalidParameterException("Validate producer Id");
                 e.printStackTrace();
@@ -151,11 +103,6 @@ public class TestFlowSettingService extends BasicTester {
 
         //Invalid flow setting: invalid material flow id
         {
-            EntityStorageLocation injectionEndLocation = new EntityStorageLocation();
-            setValues(injectionEndLocation);
-            EntityStorageLocation backupEndLocation = new EntityStorageLocation();
-            setValues(backupEndLocation);
-
             EntityFlowSetting flowSetting = new EntityFlowSetting();
             setValues(flowSetting);
 
@@ -163,7 +110,7 @@ public class TestFlowSettingService extends BasicTester {
                 //Set mock data
                 when(rosettaWebService.isValidMaterialFlow(flowSetting.getProducerId(), flowSetting.getMaterialFlowId())).thenReturn(true);
 
-                testInstance.validateFlowSetting(flowSetting, injectionEndLocation, backupEndLocation);
+                testInstance.validateFlowSetting(flowSetting);
 
                 Exception e = new InvalidParameterException("Validate material flow Id");
                 e.printStackTrace();
@@ -178,13 +125,6 @@ public class TestFlowSettingService extends BasicTester {
     public void testSaveNewFlowSetting() {
         EntityFlowSetting flowSetting = new EntityFlowSetting();
         setValues(flowSetting);
-        EntityStorageLocation injectionEndLocation = new EntityStorageLocation();
-        setValues(injectionEndLocation);
-        EntityStorageLocation backupEndLocation = new EntityStorageLocation();
-        setValues(backupEndLocation);
-
-        flowSetting.setInjectionEndPoint(injectionEndLocation);
-        flowSetting.setBackupEndPoint(backupEndLocation);
 
         EntityFlowSetting rst = null;
         try {
@@ -194,8 +134,6 @@ public class TestFlowSettingService extends BasicTester {
             rst = testInstance.saveFlowSetting(flowSetting);
             assert rst != null;
             assert !DashboardHelper.isNull(rst.getId());
-            assert !DashboardHelper.isNull(rst.getInjectionEndPoint());
-            assert !DashboardHelper.isNull(rst.getBackupEndPoint());
         } catch (Exception e) {
             e.printStackTrace();
             assert false;
@@ -207,13 +145,6 @@ public class TestFlowSettingService extends BasicTester {
         EntityFlowSetting flowSetting = new EntityFlowSetting();
         setValues(flowSetting);
         flowSetting.setId(1L);
-        EntityStorageLocation injectionEndLocation = new EntityStorageLocation();
-        setValues(injectionEndLocation);
-        EntityStorageLocation backupEndLocation = new EntityStorageLocation();
-        setValues(backupEndLocation);
-
-        flowSetting.setInjectionEndPoint(injectionEndLocation);
-        flowSetting.setBackupEndPoint(backupEndLocation);
 
         EntityFlowSetting rst = null;
         try {
@@ -223,8 +154,6 @@ public class TestFlowSettingService extends BasicTester {
             rst = testInstance.saveFlowSetting(flowSetting);
             assert rst != null;
             assert !DashboardHelper.isNull(rst.getId());
-            assert !DashboardHelper.isNull(rst.getInjectionEndPoint());
-            assert !DashboardHelper.isNull(rst.getBackupEndPoint());
         } catch (Exception e) {
             e.printStackTrace();
             assert false;
@@ -232,14 +161,7 @@ public class TestFlowSettingService extends BasicTester {
 
         flowSetting.setDelays(500L);
         flowSetting.setDelayUnit("D");
-
-        String updatedInjectRootPath = FileUtils.getTempDirectoryPath();
-        injectionEndLocation.setRootPath(updatedInjectRootPath);
-        String updatedBackupRootPath = FileUtils.getTempDirectoryPath();
-        backupEndLocation.setRootPath(updatedBackupRootPath);
-
-        flowSetting.setInjectionEndPoint(injectionEndLocation);
-        flowSetting.setBackupEndPoint(backupEndLocation);
+        flowSetting.setRootPath(FileUtils.getTempDirectoryPath());
 
         try {
             rst = testInstance.saveFlowSetting(flowSetting);
@@ -251,21 +173,16 @@ public class TestFlowSettingService extends BasicTester {
 
         EntityFlowSetting flowSettingAfterEdit = repoFlowSetting.getById(rst.getId());
         assert flowSettingAfterEdit != null;
-        assert flowSettingAfterEdit.getDelays()==500;
+        assert flowSettingAfterEdit.getDelays() == 500;
         assert flowSettingAfterEdit.getDelayUnit().equals("D");
-        EntityStorageLocation injectionEndLocationAfterEdit = rst.getInjectionEndPoint();
-        assert injectionEndLocationAfterEdit != null;
-        assert injectionEndLocationAfterEdit.getRootPath().equals(updatedInjectRootPath);
-        EntityStorageLocation backupEndLocationAfterEdit =rst.getBackupEndPoint();
-        assert backupEndLocationAfterEdit != null;
-        assert backupEndLocationAfterEdit.getRootPath().equals(updatedBackupRootPath);
     }
 
 
     private void setValues(EntityFlowSetting flowSetting) {
         flowSetting.setEnabled(true);
-        flowSetting.setName("Magazine");
+        flowSetting.setDepositAccountId(Long.parseLong("0"));
         flowSetting.setStreamLocation("content/streams");
+        flowSetting.setRootPath(scanRootPath);
         flowSetting.setInjectionCompleteFileName("empty.done");
         flowSetting.setProducerId("0001");
         flowSetting.setProducerName("Producer-Test");
@@ -276,8 +193,6 @@ public class TestFlowSettingService extends BasicTester {
         flowSetting.setDelayUnit("S");
         flowSetting.setMaxActiveDays(14L);
         flowSetting.setMaxSaveDays(365L);
-
-        flowSetting.setBackupEnabled(false);
     }
 
     private void setValues(EntityStorageLocation storage) {

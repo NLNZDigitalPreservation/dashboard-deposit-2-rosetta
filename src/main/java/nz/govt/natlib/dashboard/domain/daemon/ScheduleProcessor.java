@@ -1,29 +1,28 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.*;
 import nz.govt.natlib.dashboard.domain.service.DepositJobService;
-import nz.govt.natlib.dashboard.domain.service.GlobalSettingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class ScheduleProcessor {
-    protected RosettaWebService rosettaWebService;
+    protected RosettaWebServiceImpl rosettaWebService;
     protected RepoFlowSetting repoFlowSetting;
     protected RepoDepositJob repoDepositJob;
     protected DepositJobService depositJobService;
-    protected GlobalSettingService globalSettingService;
+    protected RepoDepositAccount repoDepositAccount;
 
     protected static final Logger log = LoggerFactory.getLogger(ScheduleProcessor.class);
 
     abstract public void handle(EntityFlowSetting flowSetting) throws Exception;
 
-    public RosettaWebService getRosettaWebService() {
+    public RosettaWebServiceImpl getRosettaWebService() {
         return rosettaWebService;
     }
 
-    public void setRosettaWebService(RosettaWebService rosettaWebService) {
+    public void setRosettaWebService(RosettaWebServiceImpl rosettaWebService) {
         this.rosettaWebService = rosettaWebService;
     }
 
@@ -51,11 +50,11 @@ public abstract class ScheduleProcessor {
         this.depositJobService = depositJobService;
     }
 
-    public GlobalSettingService getGlobalSettingService() {
-        return globalSettingService;
+    public RepoDepositAccount getRepoDepositAccount() {
+        return repoDepositAccount;
     }
 
-    public void setGlobalSettingService(GlobalSettingService globalSettingService) {
-        this.globalSettingService = globalSettingService;
+    public void setRepoDepositAccount(RepoDepositAccount repoDepositAccount) {
+        this.repoDepositAccount = repoDepositAccount;
     }
 }

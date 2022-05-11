@@ -1,7 +1,7 @@
 package nz.govt.natlib.dashboard.domain.service;
 
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositAccount;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
@@ -17,7 +17,7 @@ import java.util.List;
 public class DepositAccountSettingService {
     private static final Logger log = LoggerFactory.getLogger(DepositAccountSettingService.class);
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private RosettaWebServiceImpl rosettaWebService;
     @Autowired
     private RepoDepositAccount repoDepositAccount;
 

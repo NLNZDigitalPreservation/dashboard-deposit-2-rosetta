@@ -2,8 +2,8 @@ package nz.govt.natlib.dashboard.app;
 
 import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.auth.HttpAccessManagementFilter;
+import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.catalina.session.StandardSession;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +45,7 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
     private String baseUrl;
 
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private RosettaWebServiceImpl rosettaWebService;
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {

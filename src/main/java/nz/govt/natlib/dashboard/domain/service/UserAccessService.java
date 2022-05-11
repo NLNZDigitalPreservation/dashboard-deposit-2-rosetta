@@ -2,7 +2,7 @@ package nz.govt.natlib.dashboard.domain.service;
 
 import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 import nz.govt.natlib.dashboard.ui.command.UserAccessRspCommand;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ public class UserAccessService {
     private static final Logger log = LoggerFactory.getLogger(UserAccessService.class);
 
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private RosettaWebServiceImpl rosettaWebService;
 
     @Value("${User.Institution}")
     private String userInstitution;

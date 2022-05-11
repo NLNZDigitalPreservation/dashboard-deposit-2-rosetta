@@ -1,11 +1,10 @@
 package nz.govt.natlib.dashboard.common;
 
 import com.google.common.io.Files;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
-import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
+import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.repo.*;
 import nz.govt.natlib.dashboard.domain.service.DepositJobService;
-import nz.govt.natlib.dashboard.domain.service.GlobalSettingService;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -42,12 +41,11 @@ public class BasicTester {
     protected static RepoIdGenerator repoIdGenerator;
     protected static RepoFlowSetting repoFlowSetting;
     protected static RepoDepositJob repoDepositJob;
-    protected static RepoGlobalSetting repoGlobalSetting;
+    protected static RepoDepositAccount repoDepositAccount;
     protected static RepoWhiteList repoWhiteList;
 
-    protected static RosettaWebService rosettaWebService;
+    protected static RosettaWebServiceImpl rosettaWebService;
     protected static DepositJobService depositJobService;
-    protected static GlobalSettingService globalSettingService;
 
     public static void init() throws IOException {
         //Initial services
@@ -65,23 +63,17 @@ public class BasicTester {
         ReflectionTestUtils.setField(repoDepositJob, "idGenerator", repoIdGenerator);
         repoDepositJob.init();
 
-        repoGlobalSetting = new RepoGlobalSetting();
-        ReflectionTestUtils.setField(repoGlobalSetting, "systemStoragePath", storagePath);
-        ReflectionTestUtils.setField(repoGlobalSetting, "idGenerator", repoIdGenerator);
-        repoGlobalSetting.init();
+        repoDepositAccount = new RepoDepositAccount();
+        ReflectionTestUtils.setField(repoDepositAccount, "systemStoragePath", storagePath);
+        ReflectionTestUtils.setField(repoDepositAccount, "idGenerator", repoIdGenerator);
+        repoDepositAccount.init();
 
         repoWhiteList = new RepoWhiteList();
         ReflectionTestUtils.setField(repoWhiteList, "systemStoragePath", storagePath);
         ReflectionTestUtils.setField(repoWhiteList, "idGenerator", repoIdGenerator);
         repoWhiteList.init();
 
-        EntityGlobalSetting entityGlobalSetting = new EntityGlobalSetting();
-        entityGlobalSetting.setDepositUserInstitute("INS01");
-        entityGlobalSetting.setDepositUserName("annoy");
-        entityGlobalSetting.setDepositUserPassword("***");
-        repoGlobalSetting.save(entityGlobalSetting);
-
-        rosettaWebService = mock(RosettaWebService.class);
+        rosettaWebService = mock(RosettaWebServiceImpl.class);
 
         depositJobService = new DepositJobService();
         ReflectionTestUtils.setField(depositJobService, "rosettaWebService", rosettaWebService);
@@ -89,10 +81,12 @@ public class BasicTester {
         ReflectionTestUtils.setField(depositJobService, "repoJob", repoDepositJob);
         ReflectionTestUtils.setField(depositJobService, "repoFlowSetting", repoFlowSetting);
 
-        globalSettingService = new GlobalSettingService();
-        ReflectionTestUtils.setField(globalSettingService, "repoGlobalSetting", repoGlobalSetting);
-        ReflectionTestUtils.setField(globalSettingService, "repoWhiteList", repoWhiteList);
-        ReflectionTestUtils.setField(globalSettingService, "rosettaWebService", rosettaWebService);
+        EntityDepositAccountSetting depositAccount = new EntityDepositAccountSetting();
+        depositAccount.setId(Long.parseLong("0"));
+        depositAccount.setDepositUserInstitute("INS00");
+        depositAccount.setDepositUserName("test");
+        depositAccount.setDepositUserPassword("unknown");
+        repoDepositAccount.save(depositAccount);
     }
 
     @AfterAll
@@ -106,7 +100,7 @@ public class BasicTester {
         }
     }
 
-    public void clearSubFolders() {
+    public static void clearSubFolders() {
         File fRootPath = new File(scanRootPath);
         if (!fRootPath.exists()) {
             return;
@@ -120,7 +114,7 @@ public class BasicTester {
         }
     }
 
-    public void initSubFolder() {
+    public static void initSubFolder() {
         clearSubFolders();
 
         File targetDir = new File(scanRootPath, subFolderName);

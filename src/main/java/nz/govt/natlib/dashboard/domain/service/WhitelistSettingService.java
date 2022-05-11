@@ -1,6 +1,8 @@
 package nz.govt.natlib.dashboard.domain.service;
 
+import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
+import nz.govt.natlib.dashboard.common.metadata.EnumUserRole;
 import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoWhiteList;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
@@ -17,6 +19,11 @@ public class WhitelistSettingService {
     @Autowired
     private RepoWhiteList repoWhiteList;
 
+    public boolean isEmptyWhiteList() {
+        List<EntityWhitelistSetting> data = repoWhiteList.getAll();
+        return data.isEmpty();
+    }
+
     public RestResponseCommand getAllWhitelistSettings() {
         RestResponseCommand rstVal = new RestResponseCommand();
         List<EntityWhitelistSetting> data = repoWhiteList.getAll();
@@ -28,7 +35,7 @@ public class WhitelistSettingService {
         //Validate the producer
         DashboardHelper.assertNotNull("Whitelist", whitelist);
         DashboardHelper.assertNotNull("WhitelistUsername", whitelist.getUserName());
-        DashboardHelper.assertNotNull("WhitelistRole",whitelist.getRole());
+        DashboardHelper.assertNotNull("WhitelistRole", whitelist.getRole());
 
         RestResponseCommand rstVal = new RestResponseCommand();
         repoWhiteList.save(whitelist);
@@ -44,6 +51,43 @@ public class WhitelistSettingService {
     public RestResponseCommand getWhitelistDetail(Long id) {
         RestResponseCommand rstVal = new RestResponseCommand();
         rstVal.setRspBody(repoWhiteList.getById(id));
+        return rstVal;
+    }
+
+    public boolean isInWhiteList(PdsUserInfo pdsUserInfo) {
+        EntityWhitelistSetting user = getUserFromWhiteList(pdsUserInfo);
+        return !DashboardHelper.isNull(user);
+    }
+
+    private EntityWhitelistSetting getUserFromWhiteList(PdsUserInfo pdsUserInfo) {
+        if (DashboardHelper.isNull(pdsUserInfo)) {
+            return null;
+        }
+        return getUserFromWhiteList(pdsUserInfo.getUserName());
+    }
+
+    private EntityWhitelistSetting getUserFromWhiteList(String userName) {
+        return repoWhiteList.getByUserName(userName);
+    }
+
+    public RestResponseCommand initialWhiteListSetting(PdsUserInfo pdsUserInfo) {
+        RestResponseCommand rstVal = new RestResponseCommand();
+
+        EntityWhitelistSetting userInfo = getUserFromWhiteList(pdsUserInfo);
+        if (!DashboardHelper.isNull(userInfo)) {
+            rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+            rstVal.setRspMsg("The dashboard could not be duplicated initialed.");
+            return rstVal;
+        }
+
+        userInfo = new EntityWhitelistSetting();
+        userInfo.setUserName(pdsUserInfo.getUserName());
+        userInfo.setRole(EnumUserRole.admin);
+
+        repoWhiteList.save(userInfo);
+
+        rstVal.setRspBody(userInfo);
+
         return rstVal;
     }
 }

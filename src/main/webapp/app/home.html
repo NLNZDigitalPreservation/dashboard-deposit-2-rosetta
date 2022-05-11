@@ -346,8 +346,6 @@
                       <span class="input-group-text">Material Flow</span>
                       <input type="text" class="form-control" id="deposit-job-flow-name">
                     </div>
-          
-                    
                     
                     <div class="input-group mb-3">
                       <span class="input-group-text">Initial Time</span>
@@ -414,7 +412,10 @@
       </div>
     </div>
     <!-- modal-dialog -->
-</div>     <!-- modal -->
+    </div>     <!-- modal -->
+
+
+  ${templateDepositJobs}
 
 
   <script src="../dist/bootstrap.bundle.js"></script>
@@ -425,7 +426,7 @@
   <script src="../dist/daterangepicker.js"></script>
   <script src="../dist/toastr.min.js"></script>
 
-  <script src="dashboard-constants.js"></script>
+<!--  <script src="dashboard-constants.js"></script>-->
   <script src="dashboard.js"></script>
   <script src="settings.js"></script>
   <script src="settings-deposit-account.js"></script>
@@ -433,7 +434,11 @@
   <script src="settings-whitelist.js"></script>
   <script src="deposit-jobs.js"></script>
 
-
+  <#list map_path_constants as key, value>
+  <script>
+  const ${key}='${PATH_CONTEXT}' + '${value}';
+  </script>
+  </#list>
 
   <script>
     const HTML_IFRAME_LOGIN='<iframe src="login.html" scrolling="no" frameborder="0" allowfullscreen> </iframe>';

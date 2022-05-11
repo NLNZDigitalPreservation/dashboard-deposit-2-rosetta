@@ -3,10 +3,10 @@ package nz.govt.natlib.dashboard.ui.controller;
 import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.app.MainSecurityConfig;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
+import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
-import nz.govt.natlib.dashboard.domain.service.GlobalSettingService;
+import nz.govt.natlib.dashboard.domain.service.WhitelistSettingService;
 import nz.govt.natlib.dashboard.ui.command.UserAccessReqCommand;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.slf4j.Logger;
@@ -31,9 +31,9 @@ public class UserAccessController {
     @Autowired
     private RepoFlowSetting repoFlowSetting;
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private RosettaWebServiceImpl rosettaWebService;
     @Autowired
-    private GlobalSettingService globalSettingService;
+    private WhitelistSettingService whitelistService;
 
     @RequestMapping(path = DashboardConstants.PATH_USER_LOGIN_API, method = {RequestMethod.GET, RequestMethod.POST})
     public RestResponseCommand login(@RequestBody UserAccessReqCommand cmd, HttpServletRequest req, HttpServletResponse rsp) throws IOException {
@@ -57,7 +57,7 @@ public class UserAccessController {
             return rstVal;
         }
 
-        if (DashboardHelper.isNull(pdsUserInfo.getUserName()) || (globalSettingService.isInitialed() && !globalSettingService.isInWhiteList(pdsUserInfo))) {
+        if (DashboardHelper.isNull(pdsUserInfo.getUserName()) || (!whitelistService.isInWhiteList(pdsUserInfo))) {
             rstVal.setRspCode(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
             return rstVal;
         }

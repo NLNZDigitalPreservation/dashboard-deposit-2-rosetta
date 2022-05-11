@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class RosettaWebServiceImpl implements RosettaWebService {
+public class RosettaWebServiceImpl {
     private static final Logger log = LoggerFactory.getLogger(UserAccessService.class);
     private CustomizedPdsClient pdsClient;
     private ProducerWebServices producerWebServices;
@@ -96,7 +96,6 @@ public class RosettaWebServiceImpl implements RosettaWebService {
         this.dcProxyPassword = dcProxyPassword;
     }
 
-    @Override
     public String login(String institution, String username, String password) throws Exception {
         try {
             return pdsClient.login(institution, username, password);
@@ -106,7 +105,6 @@ public class RosettaWebServiceImpl implements RosettaWebService {
         }
     }
 
-    @Override
     public String logout(String pdsHandle) throws Exception {
         try {
             return pdsClient.logout(pdsHandle);
@@ -116,7 +114,6 @@ public class RosettaWebServiceImpl implements RosettaWebService {
         }
     }
 
-    @Override
     public PdsUserInfo getPdsUserByPdsHandle(String pdsHandle) throws Exception {
         try {
             return pdsClient.getPdsUserByPdsHandle(pdsHandle);
@@ -126,12 +123,10 @@ public class RosettaWebServiceImpl implements RosettaWebService {
         }
     }
 
-    @Override
     public String getInternalUserIdByExternalId(String userName) {
         return this.producerWebServices.getInternalUserIdByExternalId(userName);
     }
 
-    @Override
     public List<Producer> getProducers(String depositUserName) throws Exception {
         try {
             String producerAgentId = this.producerWebServices.getInternalUserIdByExternalId(depositUserName);
@@ -152,7 +147,6 @@ public class RosettaWebServiceImpl implements RosettaWebService {
         }
     }
 
-    @Override
     public boolean isValidProducer(String depositUserName, String producerId) throws Exception {
         List<Producer> producers = getProducers(depositUserName);
         for (Producer producer : producers) {
@@ -163,7 +157,6 @@ public class RosettaWebServiceImpl implements RosettaWebService {
         return false;
     }
 
-    @Override
     public List<MaterialFlow> getMaterialFlows(String producerID) throws Exception {
         try {
             String xmlReply = this.producerWebServices.getMaterialFlowsOfProducer(producerID);
@@ -183,7 +176,6 @@ public class RosettaWebServiceImpl implements RosettaWebService {
         }
     }
 
-    @Override
     public boolean isValidMaterialFlow(String producerId, String materialFlowId) throws Exception {
         List<MaterialFlow> materialFlows = getMaterialFlows(producerId);
         for (MaterialFlow materialFlow : materialFlows) {
@@ -194,7 +186,6 @@ public class RosettaWebServiceImpl implements RosettaWebService {
         return false;
     }
 
-    @Override
     public ResultOfDeposit deposit(String injectionRootDirectory, String pdsHandle, String depositUserInstitution, String depositUserProducerId, String materialFlowID, String depositSetID) throws Exception {
         StringBuilder paramsBuf = new StringBuilder(System.lineSeparator());
         paramsBuf.append("ingestRootDirectory: ").append(injectionRootDirectory).append(System.lineSeparator());
@@ -236,7 +227,6 @@ public class RosettaWebServiceImpl implements RosettaWebService {
         }
     }
 
-    @Override
     public SipStatusInfo getSIPStatusInfo(String sipId) throws Exception {
         try {
             return sipWebServices.getSIPStatusInfo(sipId, false);
@@ -246,12 +236,10 @@ public class RosettaWebServiceImpl implements RosettaWebService {
         }
     }
 
-    @Override
     public Collection getCollectionByName(String pdsHandle, String path) {
         return null;
     }
 
-    @Override
     public String getDepositActivityBySubmitDateByMaterialFlow(String pdsHandle,
                                                                String depositActivityStatus,
                                                                String materialFlowId,

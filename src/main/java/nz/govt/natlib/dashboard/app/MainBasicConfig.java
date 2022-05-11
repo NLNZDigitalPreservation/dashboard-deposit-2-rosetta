@@ -1,6 +1,5 @@
 package nz.govt.natlib.dashboard.app;
 
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +48,7 @@ public class MainBasicConfig {
     }
 
     @Bean(BeanDefinition.SCOPE_SINGLETON)
-    public RosettaWebService rosettaWebService() throws Exception {
+    public RosettaWebServiceImpl rosettaWebService() throws Exception {
         log.info("Start to initial Rosetta Web Service");
         RosettaWebServiceImpl bean = new RosettaWebServiceImpl();
         bean.init(pdsUrl, wsdlUrlProducer, wsdlUrlDeposit, wsdlUrlSip, wsdlUrlDeliveryAccess);
