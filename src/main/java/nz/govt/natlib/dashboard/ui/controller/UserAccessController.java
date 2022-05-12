@@ -5,6 +5,8 @@ import nz.govt.natlib.dashboard.app.MainSecurityConfig;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
 import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.common.metadata.EnumUserRole;
+import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
 import nz.govt.natlib.dashboard.domain.service.WhitelistSettingService;
 import nz.govt.natlib.dashboard.ui.command.UserAccessReqCommand;
@@ -18,7 +20,6 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @RestController
 public class UserAccessController {
@@ -36,7 +37,7 @@ public class UserAccessController {
     private WhitelistSettingService whitelistService;
 
     @RequestMapping(path = DashboardConstants.PATH_USER_LOGIN_API, method = {RequestMethod.GET, RequestMethod.POST})
-    public RestResponseCommand login(@RequestBody UserAccessReqCommand cmd, HttpServletRequest req, HttpServletResponse rsp) throws IOException {
+    public RestResponseCommand login(@RequestBody UserAccessReqCommand cmd, HttpServletRequest req, HttpServletResponse rsp) throws Exception {
         RestResponseCommand rstVal = new RestResponseCommand();
 
         String pdsHandle = null;
@@ -57,7 +58,15 @@ public class UserAccessController {
             return rstVal;
         }
 
-        if (DashboardHelper.isNull(pdsUserInfo.getUserName()) || (!whitelistService.isInWhiteList(pdsUserInfo))) {
+        if (!DashboardHelper.isNull(pdsUserInfo.getUserName())) {
+            //To initial the system: save the current user as the first admin user.
+            if (whitelistService.isEmptyWhiteList()) {
+                EntityWhitelistSetting whitelist = new EntityWhitelistSetting();
+                whitelist.setUserName(pdsUserInfo.getUserName());
+                whitelist.setRole(EnumUserRole.admin);
+                whitelistService.saveWhitelistSetting(whitelist);
+            }
+        } else if (!whitelistService.isInWhiteList(pdsUserInfo)) {
             rstVal.setRspCode(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
             return rstVal;
         }

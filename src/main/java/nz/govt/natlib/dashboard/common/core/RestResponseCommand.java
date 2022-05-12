@@ -11,6 +11,7 @@ public class RestResponseCommand {
     public static final int RSP_LOGIN_ERROR = 1001;
     public static final int RSP_LOGOUT_ERROR = 1002;
     public static final int RSP_AUTH_NO_PRIVILEGE = 1003;
+    public static final int RSP_AUTH_NEED_INITIAL = 1004;
     public static final int RSP_PROCESS_SET_DUPLICATED = 3000;
     public static final int RSP_PROCESS_SET_NOT_EXIST = 3001;
     public static final int RSP_USER_CONFIDENTIAL_REQUIRED = 4000;
