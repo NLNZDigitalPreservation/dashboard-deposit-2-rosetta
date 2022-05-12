@@ -109,7 +109,7 @@ class FlowSetting extends BasicSettings{
         data['streamLocation']=$('#flow-settings input[name="streamLocation"]').val();
         data['injectionCompleteFileName']=$('#flow-settings input[name="injectionCompleteFileName"]').val();
         data['delays']=$('#flow-settings input[name="delays"]').val();
-        data['delayUnit']='seconds';
+        data['delayUnit']='S';
         data['maxActiveDays']=$('#flow-settings input[name="maxActiveDays"]').val();
         data['maxSaveDays']=$('#flow-settings input[name="maxSaveDays"]').val();
 
@@ -159,4 +159,4 @@ class FlowSetting extends BasicSettings{
     }
 }
 
-const settingFlow=new FlowSetting('panel-settings-flow','modal-flow-settings', 'flow-settings-list', PATH_SETTING_FLOW_ALL_GET, PATH_SETTING_FLOW_SAVE, PATH_SETTING_FLOW_DETAIL, PATH_SETTING_FLOW_DELETE, 'flowId', 'flowName');
+const settingFlow=new FlowSetting('panel-settings-flow','modal-flow-settings', 'flow-settings-list', PATH_SETTING_FLOW_ALL_GET, PATH_SETTING_FLOW_SAVE, PATH_SETTING_FLOW_DETAIL, PATH_SETTING_FLOW_DELETE);

@@ -62,8 +62,8 @@ public class UserAccessController {
             //To initial the system: save the current user as the first admin user.
             if (whitelistService.isEmptyWhiteList()) {
                 EntityWhitelistSetting whitelist = new EntityWhitelistSetting();
-                whitelist.setUserName(pdsUserInfo.getUserName());
-                whitelist.setRole(EnumUserRole.admin);
+                whitelist.setWhiteUserName(pdsUserInfo.getUserName());
+                whitelist.setWhiteUserRole(EnumUserRole.admin.name());
                 whitelistService.saveWhitelistSetting(whitelist);
             }
         } else if (!whitelistService.isInWhiteList(pdsUserInfo)) {

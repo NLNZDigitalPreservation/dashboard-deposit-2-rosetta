@@ -18,8 +18,8 @@
                 <div id="search-select-material-flow">
                   <#list flowSettings as flow>
                   <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="check-stage-${flow.getName()}" flowId="${flow.getId()}" checked>
-                    <label class="form-check-label" for="check-stage-${flow.getName()}">${flow.getName()}</label>
+                    <input class="form-check-input" type="checkbox" id="check-stage-${flow.getMaterialFlowName()}" flowId="${flow.getId()}" checked>
+                    <label class="form-check-label" for="check-stage-${flow.getMaterialFlowName()}">${flow.getMaterialFlowName()}</label>
                   </div>
                   </#list>
                 </div>
@@ -73,7 +73,7 @@
                   <div class="col-md-10">
                     <select class="form-select" placeholder="Material Flow" style="width: 100%;" id="new-job-select-material-flow">
                       <#list flowSettings as flow>
-                        <option value="${flow.getId()}">${flow.getName()}</option>
+                        <option value="${flow.getId()}">${flow.getMaterialFlowName()}</option>
                       </#list>
                     </select>
                   </div>

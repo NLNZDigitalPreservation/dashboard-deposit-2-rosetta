@@ -34,8 +34,8 @@ public class WhitelistSettingService {
     public RestResponseCommand saveWhitelistSetting(EntityWhitelistSetting whitelist) throws Exception {
         //Validate the producer
         DashboardHelper.assertNotNull("Whitelist", whitelist);
-        DashboardHelper.assertNotNull("WhitelistUsername", whitelist.getUserName());
-        DashboardHelper.assertNotNull("WhitelistRole", whitelist.getRole());
+        DashboardHelper.assertNotNull("WhitelistUsername", whitelist.getWhiteUserName());
+        DashboardHelper.assertNotNull("WhitelistRole", whitelist.getWhiteUserRole());
 
         RestResponseCommand rstVal = new RestResponseCommand();
         repoWhiteList.save(whitelist);
@@ -81,8 +81,8 @@ public class WhitelistSettingService {
         }
 
         userInfo = new EntityWhitelistSetting();
-        userInfo.setUserName(pdsUserInfo.getUserName());
-        userInfo.setRole(EnumUserRole.admin);
+        userInfo.setWhiteUserName(pdsUserInfo.getUserName());
+        userInfo.setWhiteUserRole(EnumUserRole.admin.name());
 
         repoWhiteList.save(userInfo);
 

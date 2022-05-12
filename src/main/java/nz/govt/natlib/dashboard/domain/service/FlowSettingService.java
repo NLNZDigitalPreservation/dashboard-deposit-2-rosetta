@@ -123,9 +123,6 @@ public class FlowSettingService {
     public EntityFlowSetting saveFlowSetting(EntityFlowSetting flowSetting) throws InvalidParameterException, WebServiceException, NullParameterException {
         //Validating input parameters
         this.validateFlowSetting(flowSetting);
-
-        flowSetting.setAuditRst(true);
-        flowSetting.setAuditMsg("OK");
         repoFlowSetting.save(flowSetting);
 
         //Rescheduling or adding the existing timer

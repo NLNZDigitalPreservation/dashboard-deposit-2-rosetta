@@ -3,7 +3,7 @@ class BasicSettings{
         this.idPanel='#'+idPanel;
         this.idModal='#'+idModal;
         this.idContentList='#'+idContentList;
-        this.modal=new bootstrap.Modal(document.getElementById(idModal), {keyboard: false});
+        this.modal=new bootstrap.Modal(document.getElementById(idModal), {backdrop: "static", keyboard: false, focus: true});
         this.urlGetList=urlGetList;
         this.urlSave=urlSave;
         this.urlGetDetail=urlGetDetail;
@@ -77,15 +77,7 @@ class BasicSettings{
       });
     }
 
-//    combineSelector(items){
-//        var html='';
-//        for(var i=0; i<items.length; i++){
-//            var item=items[i];
-//            html+='<option value="' + item.id + '">' + item.id + '-' + item.name + '</option>';
-//        }
-//        return html;
-//    }
-
+    getInputValue(){}
     getPanelTitle(item){}
     getPanelDescription(item){}
     popupPanelPost(){}

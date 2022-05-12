@@ -196,12 +196,13 @@ class CustomizedAgGrid{
         this.grid.gridOptions.api.redrawRows(true);
 
         var selectedRow=this.getSelectedRow();
-        if (tableFlowSettings && selectedRow) {
-            var selectedNode=tableFlowSettings.getRowById(selectedRow.id);
-            this.selectRow(selectedNode);
-        }else{
-            this.selectRow();
-        }
+//        if (tableFlowSettings && selectedRow) {
+//            var selectedNode=tableFlowSettings.getRowById(selectedRow.id);
+//            this.selectRow(selectedNode);
+//        }else{
+//            this.selectRow();
+//        }
+        this.selectRow();
     }
 
     selectRow(selectedNode){

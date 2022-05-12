@@ -29,7 +29,7 @@
 
     <ul class="navbar-nav me-auto mb-2 mb-md-0">
       <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#search-deposit-job"><i class="bi bi-search"></i>&nbsp;Search</button>
-      <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#new-manual-deposit-job"><i class="bi bi-plus-circle"></i>&nbsp;New Deposit</button>
+<!--      <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#new-manual-deposit-job"><i class="bi bi-plus-circle"></i>&nbsp;New Deposit</button>-->
     </ul>
 
     <ul class="navbar-nav" id="control-right">
@@ -98,7 +98,7 @@
   <!-- Modal: Deposit Account settings -->
 <!--  modal-fullscreen-lg-down-->
   <div class="modal fade" id="modal-deposit-account-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="staticBackdropLabel">Deposit Account Settings</h5>
@@ -279,7 +279,7 @@
 
   <!-- Modal: White list settings -->
   <div class="modal modal-fullscreen-lg-down fade" id="modal-whitelist-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="staticBackdropLabel">User Settings</h5>
@@ -313,106 +313,6 @@
     </div>
   </div>
 
-  <!-- Deposit job details -->
-  <div class="modal fade" id="deposit-job-details" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-              <h3 class="modal-title">Deposit Job</h3>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              <!-- /.card-tools -->
-          </div>
-          <!-- /.card-header -->
-          
-          <div class="modal-body">
-              <ul class="list-group">
-                  <div class="alert alert-warning" role="alert" id="deposit-job-health" style="display: none;"></div>
-
-                  <li class="list-group-item section-title">Basic Properties</li>
-                  <li class="list-group-item">
-                    <div class="input-group mb-3">
-                      <span class="input-group-text">Job Title</span>
-                      <input type="text" class="form-control" id="deposit-job-title">
-                    </div>
-
-                    <div class="input-group mb-3">
-                      <span class="input-group-text">Original Path</span>
-                      <input type="text" class="form-control" id="deposit-job-path">
-                    </div>
-               
-                    <div class="input-group mb-3">
-                      <span class="input-group-text">Material Flow</span>
-                      <input type="text" class="form-control" id="deposit-job-flow-name">
-                    </div>
-                    
-                    <div class="input-group mb-3">
-                      <span class="input-group-text">Initial Time</span>
-                      <input type="text" class="form-control" id="deposit-job-initial-time">
-                      <span class="input-group-text">Latest Update Time</span>
-                      <input type="text" class="form-control" id="deposit-job-latest-time">
-                    </div>
-
-                    <div class="input-group mb-3">
-                      <span class="input-group-text">File Count</span>
-                      <input type="text" class="form-control" id="deposit-job-file-count">
-                      <span class="input-group-text">File Size</span>
-                      <input type="text" class="form-control" id="deposit-job-file-size">
-                    </div>
-              
-                    <div class="input-group mb-3">
-                      <span class="input-group-text">Current Stage</span>
-                      <input type="text" class="form-control" id="deposit-job-stage">
-                      <span class="input-group-text">Current State</span>
-                      <input type="text" class="form-control" id="deposit-job-state">
-                    </div>
-
-                    <div class="progress" id="progress-stage-name">
-                      <div class="progress-bar bg-running" role="progressbar" name="inject">Inject</div>
-                      <div class="progress-bar" role="progressbar" name="deposit" style="border-left: none; border-right: none;">Deposit</div>
-                      <div class="progress-bar" role="progressbar" name="finalize">Finalize</div>
-                    </div>
-                  </li>
-
-                  <li class="list-group-item section-title">SIP Properties</li>
-                  <li class="list-group-item">
-                      <div class="input-group mb-3">
-                        <span class="input-group-text">Deposit Start Time</span>
-                        <input type="text" class="form-control" id="deposit-job-deposit-start">
-                        <span class="input-group-text">Deposit End Time</span>
-                        <input type="text" class="form-control" id="deposit-job-deposit-end">
-                      </div>
-
-                      <div class="input-group mb-3">
-                        <span class="input-group-text">SIP ID</span>
-                        <input type="text" class="form-control" id="deposit-job-sip-id">
-                        <span class="input-group-text">SIP Result</span>
-                        <input type="text" class="form-control" id="deposit-job-sip-msg">
-                      </div>
-
-                      <div class="input-group mb-3">
-                        <span class="input-group-text">SIP Module</span>
-                        <input type="text" class="form-control" id="deposit-job-sip-module">
-                        <span class="input-group-text">SIP Stage</span>
-                        <input type="text" class="form-control" id="deposit-job-sip-stage">
-                        <span class="input-group-text">SIP Status</span>
-                        <input type="text" class="form-control" id="deposit-job-sip-status">
-                      </div>
-                  </li>
-              </ul>
-         
-              <ul class="list-group" id="ul-flow-setting-job-applied">
-          </div> <!-- End of card body -->
-
-          <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-          </div>
-      </div>
-    </div>
-    <!-- modal-dialog -->
-    </div>     <!-- modal -->
-
-
   ${templateDepositJobs}
 
   <script>
@@ -443,8 +343,6 @@
     const HTML_IFRAME_LOGIN='<iframe src="login.html" scrolling="no" frameborder="0" allowfullscreen> </iframe>';
     const IS_GLOBAL_SETTING_INITIALED=true;
     const modalGlobalSettingInitial = new bootstrap.Modal(document.getElementById('modal-global-setting-initial'), {keyboard: false});
-
-    const settingWhitelist=new Whitelist();
 
     function loginCallback(){
       $('#modal-sso-login').hide();

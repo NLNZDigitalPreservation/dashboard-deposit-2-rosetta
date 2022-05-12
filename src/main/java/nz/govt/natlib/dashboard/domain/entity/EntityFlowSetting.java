@@ -149,7 +149,7 @@ public class EntityFlowSetting extends EntityCommon{
         } else if (this.delayUnit.equalsIgnoreCase("D")) {
             return TimeUnit.DAYS;
         } else {
-            return null;
+            return TimeUnit.SECONDS;
         }
     }
 }

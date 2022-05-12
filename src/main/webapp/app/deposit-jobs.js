@@ -234,7 +234,7 @@ function setValueDepositJobActive(data){
 
     $('#deposit-job-title').val(data['injectionTitle']);
     $('#deposit-job-path').val(data['injectionPath']);
-    $('#deposit-job-flow-name').val(data['appliedFlowSetting']['name']);
+    $('#deposit-job-flow-name').val(data['appliedFlowSetting']['materialFlowName']);
     $('#deposit-job-stage').val(data['stage']);
     $('#deposit-job-state').val(data['state']);
     // $('#deposit-job-percent').val(calcPercentActive(data['stage'], data['state'])+'%');
@@ -286,7 +286,7 @@ function setValueDepositJobActive(data){
 
 
     //Value appliedFlowSetting
-    setValueMaterialFlow(data.appliedFlowSetting, '#ul-flow-setting-job-applied');
+//    setValueMaterialFlow(data.appliedFlowSetting, '#ul-flow-setting-job-applied');
 
     return true;
 }
@@ -342,19 +342,19 @@ function initDepositJob(){
     });
 }
 
-function applyUpdatedSettingFlowToDepositJobHtmls(){
-    var flows=tableFlowSettings.dataset;
-
-    var htmlSearchFlowList='', htmlNewJob='';
-    for(var i=0;i<flows.length;i++){
-        var flow=flows[i];
-        htmlSearchFlowList+='<div class="form-check form-check-inline">';
-        htmlSearchFlowList+='<input class="form-check-input" type="checkbox" id="check-stage-'+flow.name+'" flowId="'+flow.id+'" checked>';
-        htmlSearchFlowList+='<label class="form-check-label" for="check-stage-'+flow.name+'">'+flow.name+'</label>';
-        htmlSearchFlowList+='</div>';
-
-        htmlNewJob+='<option value="${flow.getId()}">'+flow.name+'</option>';
-    }
-    $('#search-select-material-flow').html(htmlSearchFlowList);
-    $('#new-job-select-material-flow').html(htmlNewJob);
-}
+//function applyUpdatedSettingFlowToDepositJobHtmls(){
+//    var flows=tableFlowSettings.dataset;
+//
+//    var htmlSearchFlowList='', htmlNewJob='';
+//    for(var i=0;i<flows.length;i++){
+//        var flow=flows[i];
+//        htmlSearchFlowList+='<div class="form-check form-check-inline">';
+//        htmlSearchFlowList+='<input class="form-check-input" type="checkbox" id="check-stage-'+flow.name+'" flowId="'+flow.id+'" checked>';
+//        htmlSearchFlowList+='<label class="form-check-label" for="check-stage-'+flow.name+'">'+flow.name+'</label>';
+//        htmlSearchFlowList+='</div>';
+//
+//        htmlNewJob+='<option value="${flow.getId()}">'+flow.name+'</option>';
+//    }
+//    $('#search-select-material-flow').html(htmlSearchFlowList);
+//    $('#new-job-select-material-flow').html(htmlNewJob);
+//}

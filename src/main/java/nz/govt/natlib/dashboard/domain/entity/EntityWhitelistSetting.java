@@ -2,23 +2,23 @@ package nz.govt.natlib.dashboard.domain.entity;
 
 import nz.govt.natlib.dashboard.common.metadata.EnumUserRole;
 
-public class EntityWhitelistSetting extends EntityCommon{
-    private String userName;
-    private EnumUserRole role;
+public class EntityWhitelistSetting extends EntityCommon {
+    private String whiteUserName;
+    private EnumUserRole whiteUserRole;
 
-    public String getUserName() {
-        return userName;
+    public String getWhiteUserName() {
+        return whiteUserName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setWhiteUserName(String whiteUserName) {
+        this.whiteUserName = whiteUserName;
     }
 
-    public EnumUserRole getRole() {
-        return role;
+    public String getWhiteUserRole() {
+        return whiteUserRole.name();
     }
 
-    public void setRole(EnumUserRole role) {
-        this.role = role;
+    public void setWhiteUserRole(String whiteUserRole) {
+        this.whiteUserRole = EnumUserRole.valueOf(whiteUserRole);
     }
 }

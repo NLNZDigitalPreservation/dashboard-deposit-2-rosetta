@@ -27,7 +27,7 @@ public class RepoWhiteList extends RepoAbstract {
     public EntityWhitelistSetting getByUserName(String userName) {
         List<EntityWhitelistSetting> allUsers = getAll();
         for (EntityWhitelistSetting user : allUsers) {
-            if (user.getUserName().equals(userName)) {
+            if (user.getWhiteUserName().equals(userName)) {
                 return user;
             }
         }
