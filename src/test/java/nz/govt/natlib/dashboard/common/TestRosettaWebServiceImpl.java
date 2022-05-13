@@ -1,13 +1,10 @@
 package nz.govt.natlib.dashboard.common;
 
-import com.exlibris.digitool.deposit.service.xmlbeans.DepData;
-import com.exlibris.digitool.deposit.service.xmlbeans.DepositDataDocument;
 import com.exlibris.dps.*;
 import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 import nz.govt.natlib.dashboard.util.CustomizedPdsClient;
 import nz.govt.natlib.ndha.common.exlibris.MaterialFlow;
 import nz.govt.natlib.ndha.common.exlibris.Producer;
-import org.apache.xmlbeans.XmlException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
