@@ -8,11 +8,6 @@ function getUrlVars() {
 
 var retryUrl, retryReq, retryCallback;
 function fetchHttp(reqUrl, req, callback){
-//  if(reqUrl.startsWith('/')){
-//    reqUrl='/dashboard'+reqUrl;
-//  }
-  
-
   $('#popup-window-loading').show();
   var reqBodyPayload="{}";
   if(req !== null){

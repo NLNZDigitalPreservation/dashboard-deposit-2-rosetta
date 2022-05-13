@@ -16,6 +16,7 @@ import java.io.IOException;
 public class HttpAccessManagementFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(HttpAccessManagementFilter.class);
     private MainSecurityConfig securityConfig;
+    private PrivilegeManagementHandler privilegeManagementHandler;
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -28,8 +29,9 @@ public class HttpAccessManagementFilter implements Filter {
         String contextUri = req.getContextPath(), reqUri = req.getRequestURI();
         String url = req.getRequestURI().substring(contextUri.length());
 
-//        log.debug("contextUri: {}, url: {}", contextUri, url);
+        log.debug("contextUri: {}, url: {}", contextUri, url);
 
+        //Only allowed the authentication for restful APIs
         if (!url.startsWith(DashboardConstants.PATH_ROOT)) {
             chain.doFilter(request, response);
             return;
@@ -39,10 +41,15 @@ public class HttpAccessManagementFilter implements Filter {
             log.debug("Before doFilter {}", securityConfig.getCurrentSessionMessage(req, rsp));
         }
 
-//        if (!securityConfig.isValidSession(req, rsp)) {
-//            responseError(req, rsp);
-//            return;
-//        }
+        if (!securityConfig.isValidSession(req, rsp)) {
+            responseError(req, rsp, RestResponseCommand.RSP_LOGIN_ERROR);
+            return;
+        }
+
+        if (!privilegeManagementHandler.isActionPermit(req, rsp)) {
+            responseError(req, rsp, RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
+            return;
+        }
 
         chain.doFilter(request, response);
 
@@ -54,11 +61,11 @@ public class HttpAccessManagementFilter implements Filter {
         }
     }
 
-    private void responseError(HttpServletRequest req, HttpServletResponse rsp) throws IOException {
+    private void responseError(HttpServletRequest req, HttpServletResponse rsp, int response_code) throws IOException {
         rsp.setContentType("application/json");
 
         RestResponseCommand rst = new RestResponseCommand();
-        rst.setRspCode(RestResponseCommand.RSP_LOGIN_ERROR);
+        rst.setRspCode(response_code);
 
         String json = "{}";
         ObjectMapper objectMapper = new ObjectMapper();
@@ -81,5 +88,13 @@ public class HttpAccessManagementFilter implements Filter {
 
     public void setSecurityConfig(MainSecurityConfig securityConfig) {
         this.securityConfig = securityConfig;
+    }
+
+    public PrivilegeManagementHandler getPrivilegeManagementHandler() {
+        return privilegeManagementHandler;
+    }
+
+    public void setPrivilegeManagementHandler(PrivilegeManagementHandler privilegeManagementHandler) {
+        this.privilegeManagementHandler = privilegeManagementHandler;
     }
 }

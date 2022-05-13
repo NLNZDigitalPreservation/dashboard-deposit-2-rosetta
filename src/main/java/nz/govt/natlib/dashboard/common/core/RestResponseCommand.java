@@ -18,11 +18,13 @@ public class RestResponseCommand {
     public static final int RSP_USER_NAME_PASSWORD_ERROR = 4001;
     public static final int RSP_USER_QUERY_ERROR = 4002;
     public static final int RSP_USER_PDS_HANDLE_REQUIRED = 4003;
+    public static final int RSP_WHITELIST_CHANGE_ERROR = 4004;
     public static final int RSP_USER_OTHER_ERROR = 4009;
     public static final int RSP_DEPOSIT_QUERY_ERROR = 4010;
     public static final int RSP_NETWORK_EXCEPTION = 5000;
     public static final int RSP_INVALID_INPUT_PARAMETERS = 5001;
     public static final int RSP_SYSTEM_ERROR = 9999;
+
 
 
     public static final Map<Integer, String> map = new HashMap<>();

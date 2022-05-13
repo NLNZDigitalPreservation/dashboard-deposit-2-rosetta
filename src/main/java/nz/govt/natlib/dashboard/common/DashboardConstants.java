@@ -28,7 +28,6 @@ public class DashboardConstants {
     public static final String PATH_SETTING_WHITELIST_SAVE = PATH_SETTING_WHITELIST + "/save";
     public static final String PATH_SETTING_WHITELIST_DELETE = PATH_SETTING_WHITELIST + "/delete";
 
-
     public static final String PATH_SETTING_GLOBAL = PATH_ROOT + "/setting/global";
     public static final String PATH_SETTING_GLOBAL_INITIAL = PATH_SETTING_GLOBAL + "/initial";
     public static final String PATH_SETTING_GLOBAL_SAVE = PATH_SETTING_GLOBAL + "/save";

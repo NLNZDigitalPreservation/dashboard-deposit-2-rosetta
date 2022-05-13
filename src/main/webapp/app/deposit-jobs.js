@@ -36,8 +36,8 @@ function disableDepositJobContextMenuItemActive(key, opt){
 const gridDepositJobsColumnsActive=[
     // {headerName: "#", width:45, checkboxSelection: true, pinned: 'left'},
     {headerName: "ID", field: "id", width: 90, pinned: 'left'},
-    {headerName: "Flow", field: "flowName", pinned: 'left', width: 120, cellRenderer: function(row){
-        return row.data.appliedFlowSetting.name;
+    {headerName: "Flow", field: "materialName", pinned: 'left', width: 350, cellRenderer: function(row){
+        return row.data.appliedFlowSetting.materialFlowName;
     }},
     {headerName: "JobTitle", field: "injectionTitle", width: 485, pinned: 'left'},
 

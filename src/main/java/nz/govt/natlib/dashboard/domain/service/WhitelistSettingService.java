@@ -31,6 +31,19 @@ public class WhitelistSettingService {
         return rstVal;
     }
 
+    public RestResponseCommand saveWhitelistSetting(EntityWhitelistSetting whitelist, PdsUserInfo loginUserInfo) throws Exception {
+        RestResponseCommand rstVal = new RestResponseCommand();
+        if (whitelist.getId() != null) {
+            EntityWhitelistSetting toBeModifiedUser = repoWhiteList.getById(whitelist.getId());
+            if (toBeModifiedUser != null && toBeModifiedUser.getWhiteUserName().equalsIgnoreCase(loginUserInfo.getUserName())) {
+                rstVal.setRspCode(RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
+                rstVal.setRspMsg("You could not change yourself.");
+                return rstVal;
+            }
+        }
+        return saveWhitelistSetting(whitelist);
+    }
+
     public RestResponseCommand saveWhitelistSetting(EntityWhitelistSetting whitelist) throws Exception {
         //Validate the producer
         DashboardHelper.assertNotNull("Whitelist", whitelist);
@@ -38,12 +51,26 @@ public class WhitelistSettingService {
         DashboardHelper.assertNotNull("WhitelistRole", whitelist.getWhiteUserRole());
 
         RestResponseCommand rstVal = new RestResponseCommand();
+
+        EntityWhitelistSetting existingUser = repoWhiteList.getByUserName(whitelist.getWhiteUserName());
+        if (existingUser != null && !existingUser.getId().equals(whitelist.getId())) {
+            rstVal.setRspCode(RestResponseCommand.RSP_PROCESS_SET_DUPLICATED);
+            rstVal.setRspMsg("The User exists in the white list.");
+            return rstVal;
+        }
+
         repoWhiteList.save(whitelist);
         return rstVal;
     }
 
-    public RestResponseCommand deleteWhitelistSetting(Long id) {
+    public RestResponseCommand deleteWhitelistSetting(Long id, PdsUserInfo loginUserInfo) {
         RestResponseCommand rstVal = new RestResponseCommand();
+        EntityWhitelistSetting toBeDeletedUser = repoWhiteList.getById(id);
+        if (toBeDeletedUser != null && toBeDeletedUser.getWhiteUserName().equalsIgnoreCase(loginUserInfo.getUserName())) {
+            rstVal.setRspCode(RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
+            rstVal.setRspMsg("You could not delete yourself.");
+            return rstVal;
+        }
         repoWhiteList.deleteById(id);
         return rstVal;
     }
