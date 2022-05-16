@@ -38,11 +38,9 @@ public class RosettaWebServiceImpl {
             public void run() {
                 while (true) {
                     try {
-                        TimeUnit.SECONDS.sleep(30); //Postpone 30 seconds to wait for the preparation of Rosetta service.
-
                         _init(pdsUrl, wsdlUrlProducer, wsdlUrlDeposit, wsdlUrlSip, wsdlUrlDeliveryAccess);
-
                         log.info("Succeed to connect to Rosetta services, and ended retrying.");
+                        TimeUnit.SECONDS.sleep(3); //Postpone 3 seconds to wait for the preparation of Rosetta service.
                         return;
                     } catch (Exception e) {
                         log.warn("Failed to connect to Rosetta services, will retry.", e);

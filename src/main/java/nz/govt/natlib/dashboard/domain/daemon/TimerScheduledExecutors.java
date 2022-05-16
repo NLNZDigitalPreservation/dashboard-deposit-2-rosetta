@@ -48,7 +48,8 @@ public class TimerScheduledExecutors {
     private long depositJobScanInterval;
 
     @PostConstruct
-    public void init() {
+    public void init() throws InterruptedException {
+        TimeUnit.SECONDS.sleep(5); //Postpone 3 seconds to wait for the preparation of Rosetta service.
         List<EntityFlowSetting> listFlows = repoFlowSetting.getAll();
         for (EntityFlowSetting flowSetting : listFlows) {
             if (!flowSetting.isEnabled()) {

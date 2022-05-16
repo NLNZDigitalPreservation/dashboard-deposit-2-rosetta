@@ -11,6 +11,11 @@ import java.util.List;
 public class ScheduleProcessorImplJobStatusPolling extends ScheduleProcessor {
     @Override
     public void handle(EntityFlowSetting flowSetting) throws Exception {
+        if (rosettaWebService == null) {
+            log.info("RosettaWebService is initialing.");
+            return;
+        }
+
         List<EntityDepositJob> listOfRunningJobs = repoDepositJob.getAll();
         for (EntityDepositJob job : listOfRunningJobs) {
             if (job.getStage() != EnumDepositJobStage.DEPOSIT || job.getState() != EnumDepositJobState.RUNNING) {

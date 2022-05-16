@@ -30,12 +30,19 @@ public class ScheduleProcessorImplJobInjecting extends ScheduleProcessor {
                 continue;
             }
 
+            File depositDoneFile = new File(injectionDir.getAbsolutePath(), "done");
+            if (injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
+                log.debug("The job {} had been deposited", injectionDir.getAbsolutePath());
+                continue;
+            }
+
             File injectionPath = injectionDir.getAbsolutePath();
             EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), injectionPath.getName());
             //Initial job
             if (job == null) {
                 job = depositJobService.jobInitial(injectionPath.getAbsolutePath(), injectionDir.getName(), flowSetting);
             }
+
 
             //Ignore the jobs not in the INITIAL stage
             if (job.getStage() != EnumDepositJobStage.INJECT || job.getState() != EnumDepositJobState.RUNNING) {
