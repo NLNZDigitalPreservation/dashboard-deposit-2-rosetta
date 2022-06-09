@@ -2,8 +2,10 @@ package nz.govt.natlib.dashboard.app;
 
 import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.auth.HttpAccessManagementFilter;
+import nz.govt.natlib.dashboard.common.auth.PrivilegeManagementHandler;
+import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.domain.repo.RepoWhiteList;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.catalina.session.StandardSession;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +47,10 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
     private String baseUrl;
 
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private RosettaWebServiceImpl rosettaWebService;
+
+    @Autowired
+    private RepoWhiteList repoWhiteList;
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
@@ -67,9 +72,17 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    public PrivilegeManagementHandler privilegeManagementHandler() {
+        PrivilegeManagementHandler bean = new PrivilegeManagementHandler();
+        bean.setRepoWhiteList(repoWhiteList);
+        return bean;
+    }
+
+    @Bean
     public HttpAccessManagementFilter httpAccessManagementFilter() {
         HttpAccessManagementFilter bean = new HttpAccessManagementFilter();
         bean.setSecurityConfig(this);
+        bean.setPrivilegeManagementHandler(privilegeManagementHandler());
         return bean;
     }
 

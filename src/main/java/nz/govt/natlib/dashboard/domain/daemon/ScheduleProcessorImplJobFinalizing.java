@@ -16,18 +16,7 @@ public class ScheduleProcessorImplJobFinalizing extends ScheduleProcessor {
         List<EntityDepositJob> listOfJobs = repoDepositJob.getByFlowId(flowSetting.getId());
         for (EntityDepositJob job : listOfJobs) {
             //Using the applied Injection Storage Location
-            InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(job.getAppliedFlowSetting().getInjectionEndPoint());
-            if (injectionPathScanClient == null) {
-                log.error("Failed to initial PathScanClient instance.");
-                return;
-            }
-
-            //Backup to the current Backup Storage Location
-            InjectionPathScan backupPathScanClient = InjectionUtils.createPathScanClient(job.getAppliedFlowSetting().getBackupEndPoint());
-            if (backupPathScanClient == null) {
-                log.error("Failed to initial Backup PathScanClient instance.");
-                return;
-            }
+            InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(job.getAppliedFlowSetting().getRootPath());
 
             //Finalize success jobs
             if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
@@ -35,14 +24,13 @@ public class ScheduleProcessorImplJobFinalizing extends ScheduleProcessor {
                     (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.RUNNING)) {
                 depositJobService.jobFinalizeStart(job);
 
-                //Backup contents
-                if (flowSetting.isBackupEnabled()) {
-                    InjectionUtils.copyFiles(injectionPathScanClient, backupPathScanClient, new File(injectionPathScanClient.getRootPath(), job.getInjectionTitle()));
+                File depositDoneFile = new File(job.getInjectionPath(), "done");
+                if (!injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
+                    if (!depositDoneFile.createNewFile()) {
+                        log.error("Failed to create file: {}", depositDoneFile.getAbsolutePath());
+                        continue;
+                    }
                 }
-
-                //Delete existing met contents
-                InjectionUtils.deleteFiles(injectionPathScanClient, new File(injectionPathScanClient.getRootPath(), job.getInjectionTitle()));
-
                 depositJobService.jobFinalizeEnd(job, EnumDepositJobState.SUCCEED);
             }
         }

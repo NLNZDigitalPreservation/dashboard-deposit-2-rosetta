@@ -36,8 +36,8 @@ function disableDepositJobContextMenuItemActive(key, opt){
 const gridDepositJobsColumnsActive=[
     // {headerName: "#", width:45, checkboxSelection: true, pinned: 'left'},
     {headerName: "ID", field: "id", width: 90, pinned: 'left'},
-    {headerName: "Flow", field: "flowName", pinned: 'left', width: 120, cellRenderer: function(row){
-        return row.data.appliedFlowSetting.name;
+    {headerName: "Flow", field: "materialName", pinned: 'left', width: 350, cellRenderer: function(row){
+        return row.data.appliedFlowSetting.materialFlowName;
     }},
     {headerName: "JobTitle", field: "injectionTitle", width: 485, pinned: 'left'},
 
@@ -234,7 +234,7 @@ function setValueDepositJobActive(data){
 
     $('#deposit-job-title').val(data['injectionTitle']);
     $('#deposit-job-path').val(data['injectionPath']);
-    $('#deposit-job-flow-name').val(data['appliedFlowSetting']['name']);
+    $('#deposit-job-flow-name').val(data['appliedFlowSetting']['materialFlowName']);
     $('#deposit-job-stage').val(data['stage']);
     $('#deposit-job-state').val(data['state']);
     // $('#deposit-job-percent').val(calcPercentActive(data['stage'], data['state'])+'%');
@@ -286,14 +286,14 @@ function setValueDepositJobActive(data){
 
 
     //Value appliedFlowSetting
-    setValueMaterialFlow(data.appliedFlowSetting, '#ul-flow-setting-job-applied');
+//    setValueMaterialFlow(data.appliedFlowSetting, '#ul-flow-setting-job-applied');
 
     return true;
 }
 
 const modalDepositJobDetails = new bootstrap.Modal(document.getElementById('deposit-job-details'), {keyboard: false});
-const modalDepositJobSearch = new bootstrap.Modal(document.getElementById('search-deposit-job'), {keyboard: false});
-const modalDepositJobManualNew = new bootstrap.Modal(document.getElementById('new-manual-deposit-job'), {keyboard: false});
+const modalDepositJobSearch = new bootstrap.Modal(document.getElementById('deposit-job-details'), {keyboard: false});
+const modalDepositJobManualNew = new bootstrap.Modal(document.getElementById('deposit-job-details'), {keyboard: false});
 
 const gridDepositJobs=new CustomizedAgGrid($('#grid-deposit-jobs')[0], Object.assign({columnDefs: gridDepositJobsColumnsActive}), null);
 
@@ -342,19 +342,19 @@ function initDepositJob(){
     });
 }
 
-function applyUpdatedSettingFlowToDepositJobHtmls(){
-    var flows=tableFlowSettings.dataset;
-
-    var htmlSearchFlowList='', htmlNewJob='';
-    for(var i=0;i<flows.length;i++){
-        var flow=flows[i];
-        htmlSearchFlowList+='<div class="form-check form-check-inline">';
-        htmlSearchFlowList+='<input class="form-check-input" type="checkbox" id="check-stage-'+flow.name+'" flowId="'+flow.id+'" checked>';
-        htmlSearchFlowList+='<label class="form-check-label" for="check-stage-'+flow.name+'">'+flow.name+'</label>';
-        htmlSearchFlowList+='</div>';
-
-        htmlNewJob+='<option value="${flow.getId()}">'+flow.name+'</option>';
-    }
-    $('#search-select-material-flow').html(htmlSearchFlowList);
-    $('#new-job-select-material-flow').html(htmlNewJob);
-}
+//function applyUpdatedSettingFlowToDepositJobHtmls(){
+//    var flows=tableFlowSettings.dataset;
+//
+//    var htmlSearchFlowList='', htmlNewJob='';
+//    for(var i=0;i<flows.length;i++){
+//        var flow=flows[i];
+//        htmlSearchFlowList+='<div class="form-check form-check-inline">';
+//        htmlSearchFlowList+='<input class="form-check-input" type="checkbox" id="check-stage-'+flow.name+'" flowId="'+flow.id+'" checked>';
+//        htmlSearchFlowList+='<label class="form-check-label" for="check-stage-'+flow.name+'">'+flow.name+'</label>';
+//        htmlSearchFlowList+='</div>';
+//
+//        htmlNewJob+='<option value="${flow.getId()}">'+flow.name+'</option>';
+//    }
+//    $('#search-select-material-flow').html(htmlSearchFlowList);
+//    $('#new-job-select-material-flow').html(htmlNewJob);
+//}

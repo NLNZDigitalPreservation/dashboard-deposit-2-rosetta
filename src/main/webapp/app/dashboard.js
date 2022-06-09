@@ -191,12 +191,13 @@ class CustomizedAgGrid{
         this.grid.gridOptions.api.redrawRows(true);
 
         var selectedRow=this.getSelectedRow();
-        if (tableFlowSettings && selectedRow) {
-            var selectedNode=tableFlowSettings.getRowById(selectedRow.id);
-            this.selectRow(selectedNode);
-        }else{
-            this.selectRow();
-        }
+//        if (tableFlowSettings && selectedRow) {
+//            var selectedNode=tableFlowSettings.getRowById(selectedRow.id);
+//            this.selectRow(selectedNode);
+//        }else{
+//            this.selectRow();
+//        }
+        this.selectRow();
     }
 
     selectRow(selectedNode){
@@ -350,4 +351,156 @@ class DashboardTable{
         html='';
     }
 
+}
+
+
+class TreeGrid{
+    constructor(container, options, contextMenuItems){
+        var hierarchyTreeInstance=this;
+        this.isTree=true;
+        this.dataset=[];
+        this.container=container;
+        this.options=options;
+        if(contextMenuItems!=null){
+            $.contextMenu({
+                selector: this.container + ' tr', 
+                trigger: 'right',
+                reposition: true,
+                callback: function(key, options) {
+                    var treeNodeKey=$(this).attr('key');
+                    var treeNode=$.ui.fancytree.getTree(hierarchyTreeInstance.container).getNodeByKey(treeNodeKey);
+                    var nodeData=hierarchyTreeInstance._getDataFromNode(treeNode);
+                    contextMenuCallback(key, nodeData, hierarchyTreeInstance, gPopupModifyHarvest);
+                },
+                items: contextMenuItems
+            });
+        }
+        // popupModifyViews[container]=this;
+    }
+
+    _getDataFromNode(treeNode){
+        var nodeData=treeNode.data;
+        nodeData.url=treeNode.title;
+        nodeData.folder=treeNode.folder;
+        return nodeData;
+    }
+
+    draw(dataset){
+        dataset=formatLazyloadData(dataset);
+        if($.ui.fancytree.getTree(this.container)){
+            $.ui.fancytree.getTree(this.container).destroy();
+        }
+
+        this.options.source=dataset;
+        $(this.container).fancytree(this.options);
+    }
+
+    drawWithDomain(dataset){
+        if($.ui.fancytree.getTree(this.container)){
+            $.ui.fancytree.getTree(this.container).destroy();
+        }
+
+        this.options.source=dataset;
+        $(this.container).fancytree(this.options);
+    }
+
+    //Sort the domain names
+    sortDomainByNames(dataset){
+        for(var i=0; i<dataset.length; i++){
+            for(var j=i+1; j<dataset.length; j++){
+                if(dataset[i].title.localeCompare(dataset[j].title) > 0){
+                    var c=dataset[i];
+                    dataset[i]=dataset[j];
+                    dataset[j]=c;
+                }
+            }
+        }
+    }
+
+    setRowData(dataset){
+        if($.ui.fancytree.getTree(this.container)){
+            $.ui.fancytree.getTree(this.container).destroy();
+        }
+        this.formatDataForTreeGrid(dataset);
+        this.options.source=dataset;
+        $(this.container).fancytree(this.options);
+    }
+
+    formatDataForTreeGrid(dataset){
+      if (!dataset) {return;}
+      for(var i=0;i<dataset.length;i++){
+        var e=dataset[i];
+        e.title=e.url;
+        delete e['lazy'];
+        delete e['outlinks'];
+        this.formatDataForTreeGrid(e.children);
+      }
+    }
+
+    getSelectedNodes(){
+        var selData=[];
+        var selNodes = $.ui.fancytree.getTree(this.container).getSelectedNodes();
+        for(var i=0; i<selNodes.length; i++){
+            var treeNode=selNodes[i];
+            var nodeData=this._getDataFromNode(treeNode);
+            if ((this.container==='#hierachy-tree-url-names' && treeNode.folder!=null && treeNode.folder===false)
+            || (this.container==='#hierachy-tree-harvest-struct' && (!treeNode.folder || treeNode.folder===false))) {
+                selData.push(nodeData);
+            }
+            // selData.push(selNodes[i].data);
+            // $.ui.fancytree.getTree(this.container).applyCommand('indent', selNodes[i]);
+        }
+
+        // console.log(selData);
+        return selData;
+    }
+
+    getAllNodes(){
+        var dataset=[];
+        var rootNode= $.ui.fancytree.getTree(this.container).getRootNode();
+        this._walkAllNodes(dataset, rootNode);
+        return dataset;
+    }
+
+    _walkAllNodes(dataset, treeNode){
+        var nodeData=this._getDataFromNode(treeNode);
+
+        if ((this.container==='#hierachy-tree-url-names' && treeNode.folder!=null && treeNode.folder===false)
+            || (this.container==='#hierachy-tree-harvest-struct' && treeNode.folder!==null)) {
+            dataset.push(nodeData);
+        }
+
+        var childrenNodes=treeNode.children;
+        if (!childrenNodes) {
+            return;
+        }
+        for(var i=0; i<childrenNodes.length; i++){
+            this._walkAllNodes(dataset, childrenNodes[i]);
+        }
+    }
+
+    clearAll(){
+        if($.ui.fancytree.getTree(this.container)){
+            $.ui.fancytree.getTree(this.container).destroy();
+        }
+    }
+
+    filter(match){
+        var tree=$.ui.fancytree.getTree(this.container);
+        var filterFunc = tree.filterNodes; //tree.filterBranches
+        var option={
+                autoApply: false,   // Re-apply last filter if lazy data is loaded
+                autoExpand: true, // Expand all branches that contain matches while filtered
+                counter: true,     // Show a badge with number of matching child nodes near parent icons
+                fuzzy: false,      // Match single characters in order, e.g. 'fb' will match 'FooBar'
+                hideExpandedCounter: true,  // Hide counter badge if parent is expanded
+                hideExpanders: false,       // Hide expanders if all child nodes are hidden by filter
+                highlight: true,   // Highlight matches by wrapping inside <mark> tags
+                leavesOnly: false, // Match end nodes only
+                nodata: true,      // Display a 'no data' status node if result is empty
+                mode: "hide"       //dimm or hide Grayout unmatched nodes (pass "hide" to remove unmatched node instead)
+        }
+        var n = filterFunc.call(tree, match, option);
+        console.log("filter out: "+n);
+    }
 }

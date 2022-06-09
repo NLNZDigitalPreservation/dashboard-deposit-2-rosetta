@@ -2,7 +2,7 @@ package nz.govt.natlib.dashboard.domain.service;
 
 import com.exlibris.dps.SipStatusInfo;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 import nz.govt.natlib.dashboard.common.injection.*;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
@@ -32,7 +32,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     private static final Logger log = LoggerFactory.getLogger(DepositJobService.class);
     private static final Map<Long, Semaphore> DB_JOB_TOKENS = new HashMap<>();
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private RosettaWebServiceImpl rosettaWebService;
     @Autowired
     private RepoDepositJob repoJob;
     @Autowired
@@ -325,25 +325,16 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         }
 
         //Checking is sourceNfsDirectory valid and is ready
-        EntityStorageLocation storageInjection = flowSetting.getInjectionEndPoint();
-        InjectionPathScan targetInjectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getInjectionEndPoint());
-
-        if (targetInjectionPathScanClient == null) {
-            String msg = String.format("%s flow setting does not exist", flowId);
-            log.warn(msg);
-            retVal.setRspMsg(msg);
-            retVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
-            return retVal;
-        }
+        InjectionPathScan targetInjectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
 
         //
         EntityDepositJob job = repoJob.getByFlowIdAndInjectionTitle(flowId, fSubFolder.getName());
 
-        File targetSubFolder = new File(storageInjection.getRootPath(), fSubFolder.getName());
+        File targetSubFolder = new File(flowSetting.getRootPath(), fSubFolder.getName());
 
         boolean isExisting = targetInjectionPathScanClient.exists(targetSubFolder.getAbsolutePath()) || job != null;
         if (isExisting && !isForceReplaceExistingJob) {
-            String msg = String.format("%s folder does exist in: %s, and can not be replaced", fSubFolder.getName(), storageInjection.getRootPath());
+            String msg = String.format("%s folder does exist in: %s, and can not be replaced", fSubFolder.getName(), flowSetting.getRootPath());
             log.error(msg);
             retVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             retVal.setRspMsg(msg);
@@ -359,7 +350,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         }
 
         //The upload job in the flow root location
-        if (!fSubFolder.getParent().equalsIgnoreCase(storageInjection.getRootPath())) {
+        if (!fSubFolder.getParent().equalsIgnoreCase(flowSetting.getRootPath())) {
             //Copying the input sourceNfsDirectory to root location of the Flow
             cascadeCopyFiles(fSubFolder.getParentFile(), targetInjectionPathScanClient, fSubFolder, flowSetting);
 //            FileUtils.copyDirectory(sourceDirectory, destinationDirectory);

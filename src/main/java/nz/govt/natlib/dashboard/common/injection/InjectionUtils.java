@@ -91,4 +91,8 @@ public class InjectionUtils implements InterfaceFlowSetting {
         }
         return injectionPathScanClient;
     }
+
+    public static InjectionPathScan createPathScanClient(String rootPath) {
+        return new InjectionPathScanNFS(rootPath);
+    }
 }

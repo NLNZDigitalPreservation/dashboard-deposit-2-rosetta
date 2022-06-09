@@ -4,7 +4,6 @@ import com.exlibris.dps.SipStatusInfo;
 import nz.govt.natlib.dashboard.common.BasicTester;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
-import nz.govt.natlib.dashboard.domain.entity.EntityStorageLocation;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import nz.govt.natlib.ndha.common.exlibris.ResultOfDeposit;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,29 +34,17 @@ public class TestDepositJobService extends BasicTester {
     protected static final Long maxSaveDays = 180L;
 
     protected static final EntityFlowSetting flowSetting = new EntityFlowSetting();
-    protected static final EntityStorageLocation storageInjection = new EntityStorageLocation();
-    protected static final EntityStorageLocation storageBackup = new EntityStorageLocation();
 
     @BeforeAll
     public static void init() throws IOException {
         BasicTester.init();
 
-        //Initial flowSetting
-        storageInjection.setScanMode(scanMode);
-        storageInjection.setRootPath(scanRootPath);
-        flowSetting.setInjectionEndPoint(storageInjection);
-
-        storageBackup.setScanMode(backupMode);
-        storageBackup.setRootPath(backupRootPath);
-        flowSetting.setBackupEndPoint(storageBackup);
-
 //        flowSetting.setId(repoFlowSetting.nextId());
-        flowSetting.setName(flowName);
+        flowSetting.setDepositAccountId(Long.parseLong("0"));
         flowSetting.setEnabled(flowEnable);
         flowSetting.setMaterialFlowId(materialFlowId);
         flowSetting.setStreamLocation(streamPath);
         flowSetting.setInjectionCompleteFileName(completedFileName);
-        flowSetting.setBackupEnabled(backupEnable);
         flowSetting.setMaxActiveDays(maxActiveDays);
         flowSetting.setMaxSaveDays(maxSaveDays);
 

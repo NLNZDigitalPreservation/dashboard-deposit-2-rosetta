@@ -1,3 +1,53 @@
+html {
+  font-family: sans-serif;
+  line-height: 1.15;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus,
+.btn.focus,
+.btn:active.focus,
+.btn.active.focus 
+.form-control,
+.form-control:focus{
+	border: 1;
+	border-color: #adb5bd;
+	webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+a:link,
+a:visited,
+a:hover,
+a:active { 
+	text-decoration: none; 
+}
+
+.side-panel{
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    border-bottom: 5px solid;
+    border-right: 5px solid;
+    border-left: calc(100vw - 450px) solid;
+    border-top: 45px solid;
+    z-index: 2;
+    border-color: rgba(111,111,111,0.5);
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+}
+
+.side-panel .customized-card-body{
+	margin-top: -15px;
+	height: calc(100vh - 180px);
+}
+
 nav{
 	padding: 0 0 0 5px;
 	/*background-image: linear-gradient(to right, #212529, #212529, #212529, #343a40, #212529, #212529);*/
@@ -86,7 +136,7 @@ nav a{
 
 #grid-deposit-jobs{
 	width: 100%;
-	height: calc(100vh - 51px);
+	height: calc(100vh - 45px);
 }
 
 #panelSetting{

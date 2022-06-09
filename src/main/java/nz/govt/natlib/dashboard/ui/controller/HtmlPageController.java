@@ -6,11 +6,11 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import nz.govt.natlib.dashboard.app.MainSecurityConfig;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
-import nz.govt.natlib.dashboard.domain.service.GlobalSettingService;
+import nz.govt.natlib.dashboard.domain.service.WhitelistSettingService;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -40,9 +40,9 @@ public class HtmlPageController {
     @Autowired
     private RepoFlowSetting repoFlowSetting;
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private WhitelistSettingService whitelistService;
     @Autowired
-    private GlobalSettingService globalSettingService;
+    private RosettaWebServiceImpl rosettaWebService;
 
     @RequestMapping(path = {"/", "/home.html", DashboardConstants.PATH_USER_INDEX_HTML}, method = {RequestMethod.GET, RequestMethod.POST})
     public void getHomeHtml(@ModelAttribute("model") ModelMap model, HttpServletRequest req, HttpServletResponse rsp) throws IOException, TemplateException {
@@ -62,12 +62,12 @@ public class HtmlPageController {
         String htmlDepositJobsActive = swDepositJobsActive.toString(); //conf.getTemplate("deposit-jobs-active.html").toString();
         swDepositJobsActive.close();
 
-        String htmlSettingFlows = conf.getTemplate("setting-flows.html").toString();
-        String htmlSettingGlobal = conf.getTemplate("setting-global.html").toString();
+//        String htmlSettingFlows = conf.getTemplate("setting-flows.html").toString();
+//        String htmlSettingGlobal = conf.getTemplate("setting-global.html").toString();
 
         model.addAttribute("templateDepositJobs", htmlDepositJobsActive);
-        model.addAttribute("templateSettingFlows", htmlSettingFlows);
-        model.addAttribute("templateSettingGlobal", htmlSettingGlobal);
+//        model.addAttribute("templateSettingFlows", htmlSettingFlows);
+//        model.addAttribute("templateSettingGlobal", htmlSettingGlobal);
 
         PdsUserInfo userInfo = (PdsUserInfo) req.getSession().getAttribute(DashboardConstants.KEY_USER_INFO);
         String userName = DashboardHelper.isNull(userInfo) ? "unknown" : userInfo.getUserName();
@@ -75,7 +75,7 @@ public class HtmlPageController {
         model.addAttribute("userName", userName);
         model.addAttribute("redirectUrl", DashboardConstants.PATH_USER_LOGIN_HTML);
 
-        boolean isInitialed = globalSettingService.isInitialed();
+        boolean isInitialed = !whitelistService.isEmptyWhiteList();
         model.addAttribute("initialed", Boolean.toString(isInitialed));
         model.addAttribute("PATH_CONTEXT", req.getContextPath());
 
@@ -89,7 +89,7 @@ public class HtmlPageController {
             return;
         }
 
-        boolean isInitialed = globalSettingService.isInitialed();
+        boolean isInitialed = !whitelistService.isEmptyWhiteList();
         model.addAttribute("initialed", Boolean.toString(isInitialed));
         model.addAttribute("PATH_CONTEXT", req.getContextPath());
 

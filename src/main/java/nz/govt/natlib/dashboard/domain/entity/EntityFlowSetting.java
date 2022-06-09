@@ -5,15 +5,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.concurrent.TimeUnit;
 
 public class EntityFlowSetting extends EntityCommon{
+    private boolean enabled;
+    private Long depositAccountId;
     private String materialFlowId;
     private String materialFlowName;
     private String producerId;
     private String producerName;
-    private boolean enabled;
-    private String name;
+    private String rootPath;
+
     private String streamLocation;
     private String injectionCompleteFileName;
-    private boolean backupEnabled;
+
 
     private Long delays;
     private String delayUnit;
@@ -22,8 +24,14 @@ public class EntityFlowSetting extends EntityCommon{
 
     private int[] weeklyMaxConcurrency = new int[7];
 
-    private EntityStorageLocation injectionEndPoint = new EntityStorageLocation();
-    private EntityStorageLocation backupEndPoint = new EntityStorageLocation();
+
+    public Long getDepositAccountId() {
+        return depositAccountId;
+    }
+
+    public void setDepositAccountId(Long depositAccountId) {
+        this.depositAccountId = depositAccountId;
+    }
 
     public String getMaterialFlowId() {
         return materialFlowId;
@@ -57,20 +65,20 @@ public class EntityFlowSetting extends EntityCommon{
         this.producerName = producerName;
     }
 
+    public String getRootPath() {
+        return rootPath;
+    }
+
+    public void setRootPath(String rootPath) {
+        this.rootPath = rootPath;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getInjectionCompleteFileName() {
@@ -88,30 +96,6 @@ public class EntityFlowSetting extends EntityCommon{
 
     public void setStreamLocation(String streamLocation) {
         this.streamLocation = streamLocation;
-    }
-
-    public boolean isBackupEnabled() {
-        return backupEnabled;
-    }
-
-    public void setBackupEnabled(boolean backupEnabled) {
-        this.backupEnabled = backupEnabled;
-    }
-
-    public EntityStorageLocation getInjectionEndPoint() {
-        return injectionEndPoint;
-    }
-
-    public void setInjectionEndPoint(EntityStorageLocation injectionEndPoint) {
-        this.injectionEndPoint = injectionEndPoint;
-    }
-
-    public EntityStorageLocation getBackupEndPoint() {
-        return backupEndPoint;
-    }
-
-    public void setBackupEndPoint(EntityStorageLocation backupEndPoint) {
-        this.backupEndPoint = backupEndPoint;
     }
 
     public Long getDelays() {
@@ -165,26 +149,7 @@ public class EntityFlowSetting extends EntityCommon{
         } else if (this.delayUnit.equalsIgnoreCase("D")) {
             return TimeUnit.DAYS;
         } else {
-            return null;
+            return TimeUnit.SECONDS;
         }
-    }
-
-    private Boolean auditRst = true;
-    private String auditMsg = "OK";
-
-    public Boolean getAuditRst() {
-        return auditRst;
-    }
-
-    public void setAuditRst(Boolean auditRst) {
-        this.auditRst = auditRst;
-    }
-
-    public String getAuditMsg() {
-        return auditMsg;
-    }
-
-    public void setAuditMsg(String auditMsg) {
-        this.auditMsg = auditMsg;
     }
 }

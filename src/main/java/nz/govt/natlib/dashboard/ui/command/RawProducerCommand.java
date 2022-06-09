@@ -6,7 +6,7 @@ import java.util.List;
 public class RawProducerCommand {
     private String name;
     private String id;
-    private List<RawMaterialFlowCommand> materialFlows=new ArrayList<>();
+    private List<RawMaterialFlowCommand> materialFlows = new ArrayList<>();
 
     public String getName() {
         return name;
