@@ -30,7 +30,7 @@
         </rollingPolicy>
     </appender>
 
-    <appender name="Splunk" class="com.splunk.logging.HttpEventCollectorLogbackAppender">
+    <!--appender name="Splunk" class="com.splunk.logging.HttpEventCollectorLogbackAppender">
         <url>http://localhost:8088</url>
         <token>45cd2f2f-d005-4a63-a2c4-d34dfca4bdf5</token>
         <disableCertificateValidation>true</disableCertificateValidation>
@@ -38,12 +38,12 @@
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>%msg</pattern>
         </layout>
-    </appender>
+    </appender-->
 
 
     <!-- These levels will be overridden by logging.level... properties found in application.properties and
          application-<run-configuration>.properties -->
-    <root level="ERROR">
+    <!--root level="ERROR">
         <appender-ref ref="GeneralLog"/>
     </root>
 
@@ -63,7 +63,6 @@
         <appender-ref ref="GeneralLog"/>
     </logger>
 
-    <!-- Note that log4j.xml had FATAL level -->
     <logger name="org.springframework.web.servlet" level="ERROR" additivity="false">
         <appender-ref ref="GeneralLog"/>
     </logger>
@@ -74,5 +73,5 @@
 
     <root level="INFO">
         <appender-ref ref="Splunk"/>
-    </root>
+    </root-->
 </configuration>

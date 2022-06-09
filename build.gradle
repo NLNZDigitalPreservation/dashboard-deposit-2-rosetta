@@ -47,7 +47,7 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.11'
 //    implementation  group: 'com.sleepycat', name: 'je', version: '18.3.12'
     implementation group: 'oro', name: 'oro', version: '2.0.8'
-    implementation group: 'com.splunk.logging', name: 'splunk-library-javalogging', version: '1.8.0'
+//    implementation group: 'com.splunk.logging', name: 'splunk-library-javalogging', version: '1.8.0'
 
 //    implementation 'com.h2database:h2:1.4.199'
     implementation 'commons-io:commons-io:2.4'

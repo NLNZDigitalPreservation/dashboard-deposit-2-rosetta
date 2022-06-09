@@ -3,7 +3,9 @@ package nz.govt.natlib.dashboard.domain.service;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
+import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositAccount;
+import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -20,6 +22,8 @@ public class DepositAccountSettingService {
     private RosettaWebServiceImpl rosettaWebService;
     @Autowired
     private RepoDepositAccount repoDepositAccount;
+    @Autowired
+    private RepoFlowSetting repoFlowSetting;
 
     public RestResponseCommand getAllDepositAccountSettings() {
         RestResponseCommand rstVal = new RestResponseCommand();
@@ -52,9 +56,17 @@ public class DepositAccountSettingService {
     }
 
     public RestResponseCommand deleteDepositAccountSetting(Long id) {
-        RestResponseCommand rstVal = new RestResponseCommand();
+        RestResponseCommand retVal = new RestResponseCommand();
+        List<EntityFlowSetting> flowSettings = repoFlowSetting.getAll();
+        for (EntityFlowSetting flowSetting : flowSettings) {
+            if (flowSetting.getDepositAccountId() == id.longValue()) {
+                retVal.setRspCode(RestResponseCommand.RSP_USER_OTHER_ERROR);
+                retVal.setRspMsg("The flow is referenced by material flows, can not be deleted");
+                return retVal;
+            }
+        }
         repoDepositAccount.deleteById(id);
-        return rstVal;
+        return retVal;
     }
 
     public RestResponseCommand getDepositAccountDetail(Long id) throws Exception {
@@ -70,9 +82,9 @@ public class DepositAccountSettingService {
             }
         } catch (Exception e) {
             producer.setAuditRst(Boolean.FALSE);
-            producer.setAuditMsg("The essential message is not correct:" +e.getMessage());
-        }finally {
-            if(!StringUtils.isEmpty(pdsHandle)){
+            producer.setAuditMsg("The essential message is not correct:" + e.getMessage());
+        } finally {
+            if (!StringUtils.isEmpty(pdsHandle)) {
                 rosettaWebService.logout(pdsHandle);
             }
         }

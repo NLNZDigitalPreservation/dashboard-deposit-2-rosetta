@@ -28,7 +28,7 @@ public class TimerScheduledExecutors {
     private final Map<Long, ScheduledFuture<?>> mapProcessorJobPreparing = new HashMap<>();
     private final List<ScheduledFuture<?>> listProcessorCommons = new ArrayList<>();
 
-    private static final long initialDelay = 0;
+    private static final long initialDelay = 60;
     @Autowired
     protected RosettaWebServiceImpl rosettaWebService;
     @Autowired
