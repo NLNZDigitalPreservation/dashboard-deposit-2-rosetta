@@ -1,3 +1,3 @@
-#!/bin/sh
+#!/usr/bin/bash
 
-java -jar ./build/libs/dashboard-1.0.0-SNAPSHOT.war --spring.config.location=file:conf/application.properties &
+/home/leefr/software/jdk-15.0.2/bin/java -jar ./build/libs/dashboard-1.2.1-SNAPSHOT.war --spring.config.location=file:conf/application.properties &

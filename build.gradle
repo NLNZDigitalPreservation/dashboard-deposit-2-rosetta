@@ -8,15 +8,15 @@ plugins {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-        url = 'https://repo1.maven.org/maven2'
-    }
-    maven {
-        url = 'https://repo.maven.apache.org/maven2'
-    }
-    maven {
-        url = 'https://splunk.jfrog.io/splunk/ext-releases-local'
-    }
+//    maven {
+//        url = 'https://repo1.maven.org/maven2'
+//    }
+//    maven {
+//        url = 'https://repo.maven.apache.org/maven2'
+//    }
+//    maven {
+//        url = 'https://splunk.jfrog.io/splunk/ext-releases-local'
+//    }
 }
 
 dependencies {
@@ -65,11 +65,11 @@ test {
 //}
 
 group = 'deposit-dashboard'
-version = '1.2.0-SNAPSHOT'
+version = '1.2.1-SNAPSHOT'
 description = 'Dashboard Tool'
-sourceCompatibility = '1.11'
-targetCompatibility = '1.11'
-apply plugin: 'war'
+sourceCompatibility = '1.15'
+targetCompatibility = '1.15'
+//apply plugin: 'war'
 
 //For a Spring Boot War
 //bootWar {
@@ -77,9 +77,9 @@ apply plugin: 'war'
 //}
 
 //For a plain war
-war {
-    archiveFileName = 'deposit-dashboard.war'
-}
+//war {
+//    archiveFileName = 'deposit-dashboard.war'
+//}
 
 task sourcesJar(type: Jar) {
     archiveClassifier.set('sources')
