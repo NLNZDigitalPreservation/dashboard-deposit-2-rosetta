@@ -3,6 +3,8 @@ package nz.govt.natlib.dashboard.domain.service;
 import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
+import nz.govt.natlib.dashboard.domain.repo.RepoWhiteList;
 import nz.govt.natlib.dashboard.ui.command.UserAccessRspCommand;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.slf4j.Logger;
@@ -11,12 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserAccessService {
     private static final Logger log = LoggerFactory.getLogger(UserAccessService.class);
 
     @Autowired
     private RosettaWebServiceImpl rosettaWebService;
+
+    @Autowired
+    private RepoWhiteList repoWhiteList;
 
     @Value("${User.Institution}")
     private String userInstitution;
@@ -46,6 +53,19 @@ public class UserAccessService {
             restResponseCommand.setRspCode(RestResponseCommand.RSP_USER_OTHER_ERROR);
             restResponseCommand.setRspMsg(e.getMessage());
             return restResponseCommand;
+        }
+
+        // Validate the white list
+        EntityWhitelistSetting whitelistSetting = repoWhiteList.getByUserName(username);
+        List<EntityWhitelistSetting> whiteListAll = repoWhiteList.getAll();
+        if (whitelistSetting == null) {
+            if (whiteListAll.size() > 0) {
+                restResponseCommand.setRspCode(RestResponseCommand.RSP_USER_OTHER_ERROR);
+                restResponseCommand.setRspMsg("Please contact the administrator to privilege the access.");
+                return restResponseCommand;
+            } else {
+                restResponseCommand.setRspMsg("You are added to the user list by default");
+            }
         }
 
         UserAccessRspCommand userAccessRspCommand = new UserAccessRspCommand();

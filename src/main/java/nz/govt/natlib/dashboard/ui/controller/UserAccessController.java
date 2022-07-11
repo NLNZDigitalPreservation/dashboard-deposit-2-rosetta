@@ -65,9 +65,13 @@ public class UserAccessController {
                 whitelist.setWhiteUserName(pdsUserInfo.getUserName());
                 whitelist.setWhiteUserRole(EnumUserRole.admin.name());
                 whitelistService.saveWhitelistSetting(whitelist);
+            } else if (!whitelistService.isInWhiteList(pdsUserInfo)) {
+                rstVal.setRspCode(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
+                return rstVal;
             }
-        } else if (!whitelistService.isInWhiteList(pdsUserInfo)) {
-            rstVal.setRspCode(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
+        } else {
+            rstVal.setRspBody(RestResponseCommand.RSP_LOGIN_ERROR);
+            rstVal.setRspMsg("Failed to authenticate the credential.");
             return rstVal;
         }
 
