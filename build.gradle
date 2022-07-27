@@ -39,7 +39,8 @@ dependencies {
     implementation group: 'nz.govt.natlib.ndha', name: 'commons', version: '3.2'
 
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-    implementation group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '3.1.0'
+    implementation group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '3.0.1'
+//    implementation group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '4.0.0'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.12'
 //    implementation group: 'org.dom4j', name: 'dom4j', version: '2.1.3'
     implementation group: 'jaxen', name: 'jaxen', version: '1.2.0'
@@ -48,7 +49,7 @@ dependencies {
 //    implementation  group: 'com.sleepycat', name: 'je', version: '18.3.12'
     implementation group: 'oro', name: 'oro', version: '2.0.8'
 //    implementation group: 'com.splunk.logging', name: 'splunk-library-javalogging', version: '1.8.0'
-
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
 //    implementation 'com.h2database:h2:1.4.199'
     implementation 'commons-io:commons-io:2.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

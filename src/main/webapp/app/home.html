@@ -30,6 +30,7 @@
     <ul class="navbar-nav me-auto mb-2 mb-md-0">
       <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#search-deposit-job"><i class="bi bi-search"></i>&nbsp;Search</button>
       <button class="btn btn-success" onclick="initDepositJob();"><i class="bi bi-arrow-clockwise"></i>&nbsp;Reload</button>
+      <button class="btn btn-success" onclick="exportSelectedJobs();"><i class="bi bi-download"></i>&nbsp;Export Selected Jobs</button>
     </ul>
 
     <ul class="navbar-nav" id="control-right">
@@ -328,7 +329,7 @@
   <script src="./dist/plugins/moment-with-locales.min.js"></script>
   <script src="./dist/daterangepicker.js"></script>
   <script src="./dist/toastr.min.js"></script>
-
+  <script src="./dist/save-file/FileSaver.min.js"></script>
 <!--  <script src="dashboard-constants.js"></script>-->
   <script src="./app/dashboard.js"></script>
   <script src="./app/settings.js"></script>

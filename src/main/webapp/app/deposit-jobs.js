@@ -8,6 +8,8 @@ const contextMenuItemsDepositJobsActive={
     "resume": {name: "Resume", icon: "bi bi-play-circle", disabled: disableDepositJobContextMenuItemActive},
     "sep3": "---------",
     "terminate": {name: "Terminate and Purge", icon: "bi bi-stop-circle", disabled: disableDepositJobContextMenuItemActive},
+    // "sep4": "---------",
+    // "export-jobs": {name: "Export Selected Jobs", icon: "bi bi-download"},
 };
 
 function disableDepositJobContextMenuItemActive(key, opt){
@@ -34,7 +36,7 @@ function disableDepositJobContextMenuItemActive(key, opt){
 }
 
 const gridDepositJobsColumnsActive=[
-    // {headerName: "#", width:45, checkboxSelection: true, pinned: 'left'},
+    {headerName: "#", width:45, headerCheckboxSelection: true, headerCheckboxSelectionFilteredOnly: true, checkboxSelection: true, pinned: 'left'},
     {headerName: "ID", field: "id", width: 90, pinned: 'left'},
     {headerName: "Flow", field: "materialName", pinned: 'left', width: 350, cellRenderer: function(row){
         return row.data.appliedFlowSetting.materialFlowName;
@@ -358,3 +360,38 @@ function initDepositJob(){
 //    $('#search-select-material-flow').html(htmlSearchFlowList);
 //    $('#new-job-select-material-flow').html(htmlNewJob);
 //}
+// gridDepositJobs.exportDataCsv({
+//     prependContent: undefined,
+//     appendContent: undefined,
+//     suppressQuotes: undefined,
+//     columnSeparator: undefined,
+// });
+
+function exportSelectedJobs(){
+    var selectedRows=gridDepositJobs.getSelectedRows();
+    if(!selectedRows){
+        toastr.warning("Please select some jobs!");
+        return;
+    }
+    var req=[];
+    for(var idx=0; idx<selectedRows.length;idx++){
+        var job=selectedRows[idx];
+        req.push(job.id);
+    }
+
+    fetch(PATH_DEPOSIT_JOBS_EXPORT_DATA, { 
+        method: 'POST',
+        redirect: 'follow',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(req)
+    }).then((res) => {
+        if (res.ok) {
+            return res.blob();
+        }
+        return null;
+    }).then((blob) => {
+        if(blob){
+            saveAs(blob, "deposit_jobs.xlsx");
+        }
+    });
+}
