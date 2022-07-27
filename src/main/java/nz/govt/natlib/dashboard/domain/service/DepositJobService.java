@@ -182,19 +182,19 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             log.warn("{} at stage [{}] and state [{}] could not be terminated", job.getInjectionTitle(), job.getStage(), job.getState());
             return job;
         }
-        String pathJob = job.getInjectionPath();
-        EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
-        String injectionCompleteFileName = flowSetting == null ? "ready-for-ingestion-FOLDER-COMPLETED" : flowSetting.getInjectionCompleteFileName();
-        File injectFile = new File(pathJob, injectionCompleteFileName);
-        if (injectFile.exists() && injectFile.isFile()) {
-            boolean rst = injectFile.delete();
-            log.debug("Deleted injectionCompleteFile: {}, {}", injectFile.getAbsolutePath(), rst);
-        }
-        File doneFile = new File(pathJob, "DONE");
-        if (doneFile.exists() && doneFile.isFile()) {
-            boolean rst = doneFile.delete();
-            log.debug("Deleted DONE file: {}, {}", doneFile.getAbsolutePath(), rst);
-        }
+//        String pathJob = job.getInjectionPath();
+//        EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
+//        String injectionCompleteFileName = flowSetting == null ? "ready-for-ingestion-FOLDER-COMPLETED" : flowSetting.getInjectionCompleteFileName();
+//        File injectFile = new File(pathJob, injectionCompleteFileName);
+//        if (injectFile.exists() && injectFile.isFile()) {
+//            boolean rst = injectFile.delete();
+//            log.debug("Deleted injectionCompleteFile: {}, {}", injectFile.getAbsolutePath(), rst);
+//        }
+//        File doneFile = new File(pathJob, "DONE");
+//        if (doneFile.exists() && doneFile.isFile()) {
+//            boolean rst = doneFile.delete();
+//            log.debug("Deleted DONE file: {}, {}", doneFile.getAbsolutePath(), rst);
+//        }
         repoJob.deleteById(job.getId());
         return job;
     }
