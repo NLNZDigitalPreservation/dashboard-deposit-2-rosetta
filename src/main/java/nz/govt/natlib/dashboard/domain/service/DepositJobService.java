@@ -183,7 +183,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             return job;
         }
         String pathJob = job.getInjectionPath();
-        EntityFlowSetting flowSetting = repoFlowSetting.getById(Long.parseLong(job.getDepositSetId()));
+        EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
         String injectionCompleteFileName = flowSetting == null ? "ready-for-ingestion-FOLDER-COMPLETED" : flowSetting.getInjectionCompleteFileName();
         File injectFile = new File(pathJob, injectionCompleteFileName);
         if (injectFile.exists() && injectFile.isFile()) {
