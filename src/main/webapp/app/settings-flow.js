@@ -41,6 +41,10 @@ function initProducerMaterialflowSelector(data){
 }
 
 //
+function set_flow_dropdown_box(producerId){
+    var flows=mapMaterialFlows[producerId];
+    $('#flow-settings select[name="materialFlow"]').html(flows);
+}
 
 class FlowSetting extends BasicSettings{
     getPanelTitle(item){
@@ -130,6 +134,7 @@ class FlowSetting extends BasicSettings{
         $('#flow-settings input[name="enabled"]').prop('checked', data['enabled']);
         $('#flow-settings select[name="depositAccount"]').val(data['depositAccountId']);
         $('#flow-settings select[name="producer"]').val(data['producerId']);
+        set_flow_dropdown_box(data['producerId']);
         $('#flow-settings select[name="materialFlow"]').val(data['materialFlowId']);
         $('#flow-settings input[name="rootPath"]').val(data['rootPath']);
 
