@@ -12,16 +12,23 @@ import nz.govt.natlib.dashboard.ui.command.DepositJobSearchCommand;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import nz.govt.natlib.dashboard.common.metadata.MetsHandler;
 import nz.govt.natlib.dashboard.common.metadata.MetsXmlProperties;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
@@ -175,6 +182,19 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             log.warn("{} at stage [{}] and state [{}] could not be terminated", job.getInjectionTitle(), job.getStage(), job.getState());
             return job;
         }
+//        String pathJob = job.getInjectionPath();
+//        EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
+//        String injectionCompleteFileName = flowSetting == null ? "ready-for-ingestion-FOLDER-COMPLETED" : flowSetting.getInjectionCompleteFileName();
+//        File injectFile = new File(pathJob, injectionCompleteFileName);
+//        if (injectFile.exists() && injectFile.isFile()) {
+//            boolean rst = injectFile.delete();
+//            log.debug("Deleted injectionCompleteFile: {}, {}", injectFile.getAbsolutePath(), rst);
+//        }
+//        File doneFile = new File(pathJob, "DONE");
+//        if (doneFile.exists() && doneFile.isFile()) {
+//            boolean rst = doneFile.delete();
+//            log.debug("Deleted DONE file: {}, {}", doneFile.getAbsolutePath(), rst);
+//        }
         repoJob.deleteById(job.getId());
         return job;
     }
@@ -434,5 +454,74 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         }
 
         return false;
+    }
+
+    //    Export selected jobs to excel document
+    public void exportData(List<Long> reqJobIDs, HttpServletRequest req, HttpServletResponse rsp) throws IOException {
+        Resource resource = new ClassPathResource("deposit-jobs-template.xlsx");
+        Workbook workbook = new XSSFWorkbook(resource.getInputStream());
+        Sheet sheet = workbook.getSheetAt(0);
+
+        int rowIndex = 1;
+        for (Long jobId : reqJobIDs) {
+            EntityDepositJob job = repoJob.getById(jobId);
+            if (job == null) {
+                continue;
+            }
+
+            Row rowExcel = sheet.createRow(rowIndex++);
+
+            Cell cId = rowExcel.createCell(0, CellType.NUMERIC);
+            cId.setCellValue(job.getId());
+
+            Cell cFlow = rowExcel.createCell(1, CellType.STRING);
+            EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
+            if (flowSetting != null) {
+                cFlow.setCellValue(flowSetting.getMaterialFlowId() + "-" + flowSetting.getMaterialFlowName());
+            } else {
+                cFlow.setCellValue("Unknown Material Flow");
+            }
+
+            Cell cTitle = rowExcel.createCell(2, CellType.STRING);
+            cTitle.setCellValue(job.getInjectionTitle());
+
+            Cell cSubFolder = rowExcel.createCell(3, CellType.STRING);
+            cSubFolder.setCellValue(job.getInjectionPath());
+
+            Cell cStatus = rowExcel.createCell(4, CellType.STRING);
+            cStatus.setCellValue(job.getStage() + "-" + job.getState());
+
+            LocalDateTime ldtStartTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getDepositStartTime());
+            Cell cStartTime = rowExcel.createCell(5, CellType.STRING);
+            cStartTime.setCellValue(ldtStartTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+            LocalDateTime ldtLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getDepositStartTime());
+            Cell cLatestUpdateTime = rowExcel.createCell(6, CellType.STRING);
+            cLatestUpdateTime.setCellValue(ldtLatestUpdateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+
+            Cell cNumOfFiles = rowExcel.createCell(7, CellType.NUMERIC);
+            cNumOfFiles.setCellValue(job.getFileCount());
+
+            Cell cSizeOfFiles = rowExcel.createCell(8, CellType.NUMERIC);
+            cSizeOfFiles.setCellValue(job.getFileSize());
+
+            Cell cSipId = rowExcel.createCell(9, CellType.NUMERIC);
+            cSipId.setCellValue(job.getSipID());
+
+            Cell cSipModule = rowExcel.createCell(10, CellType.STRING);
+            cSipModule.setCellValue(job.getSipModule());
+
+            Cell cSipStage = rowExcel.createCell(11, CellType.STRING);
+            cSipStage.setCellValue(job.getSipStage());
+
+            Cell cSipStatus = rowExcel.createCell(12, CellType.STRING);
+            cSipStatus.setCellValue(job.getSipStatus());
+
+            Cell cSipResult = rowExcel.createCell(13, CellType.STRING);
+            cSipResult.setCellValue(job.getResultMessage());
+        }
+        rsp.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        workbook.write(rsp.getOutputStream());
+        workbook.close();
     }
 }

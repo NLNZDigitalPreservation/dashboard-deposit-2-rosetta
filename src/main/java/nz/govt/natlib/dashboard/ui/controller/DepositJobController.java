@@ -14,6 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,5 +98,10 @@ public class DepositJobController {
         RestResponseCommand rsp = new RestResponseCommand();
         rsp.setRspBody(depositJobService.searchDepositJobs(cmd));
         return rsp;
+    }
+
+    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_EXPORT_DATA, method = {RequestMethod.POST, RequestMethod.GET})
+    public void exportDepositJobs(@RequestBody List<Long> cmd, HttpServletRequest req, HttpServletResponse rsp) throws IOException {
+        depositJobService.exportData(cmd, req, rsp);
     }
 }

@@ -54,8 +54,9 @@ function fetchHttp(reqUrl, req, callback){
 
 const gridOptions={
     // scrollbarWidth: 10,
-    suppressRowClickSelection: false,
-    rowSelection: 'single',
+    suppressRowClickSelection: true,
+    // rowSelection: 'single',
+    rowSelection: 'multiple',
     defaultColDef: {
         resizable: true,
         filter: true,
@@ -76,7 +77,7 @@ class CustomizedAgGrid{
                 if (that.funcRowSelected) {
                     var rows=this.api.getSelectedRows();
                     if(!rows || rows.length === 0 || rows.length > 1){
-                        toastr.warning("Please select one row!")
+                        toastr.warning("Please select one row!");
                         return;
                     }
                     that.funcRowSelected(rows[0]);
@@ -215,6 +216,10 @@ class CustomizedAgGrid{
         } else{
             this.funcRowSelected(null);
         }
+    }
+
+    exportDataCsv(params){
+        this.grid.gridOptions.api.exportDataAsCsv(params);
     }
 }
 

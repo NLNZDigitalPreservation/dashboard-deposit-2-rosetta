@@ -42,6 +42,7 @@ public class DashboardConstants {
     public static final String PATH_DEPOSIT_JOBS_UPDATE = PATH_DEPOSIT_JOBS + "/update";
     public static final String PATH_DEPOSIT_JOBS_NEW = PATH_DEPOSIT_JOBS + "/new";
     public static final String PATH_DEPOSIT_JOBS_SEARCH = PATH_DEPOSIT_JOBS + "/search";
+    public static final String PATH_DEPOSIT_JOBS_EXPORT_DATA = PATH_DEPOSIT_JOBS + "/export-data";
 
     public static final String PATH_SYSTEM_EVENT = PATH_ROOT + "/system-events";
     public static final String PATH_SYSTEM_EVENT_ALL = PATH_SYSTEM_EVENT + "/all/get";
