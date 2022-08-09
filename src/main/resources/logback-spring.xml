@@ -74,4 +74,9 @@
     <root level="INFO">
         <appender-ref ref="Splunk"/>
     </root-->
+    <!-- LOG everything at INFO level -->
+    <root level="warn">
+        <appender-ref ref="GeneralLog" />
+        <appender-ref ref="Console" />
+    </root>
 </configuration>

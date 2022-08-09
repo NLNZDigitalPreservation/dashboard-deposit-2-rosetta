@@ -47,11 +47,11 @@ public class MainApplication implements CommandLineRunner {
         String[] beanNames = ctx.getBeanDefinitionNames();
         Arrays.sort(beanNames);
         for (String beanName : beanNames) {
-            System.out.println(ANSI_CYAN + beanName + ANSI_RESET);
+//            System.out.println(ANSI_CYAN + beanName + ANSI_RESET);
             log.info(beanName);
         }
 
-        System.out.println(ANSI_BLUE + "^_^_^_^_^_^_^_^_^_^ Dashboard Initialed ^_^_^_^_^_^_^_^_^_^_^" + ANSI_RESET);
+//        System.out.println(ANSI_BLUE + "^_^_^_^_^_^_^_^_^_^ Dashboard Initialed ^_^_^_^_^_^_^_^_^_^_^" + ANSI_RESET);
         log.info("^_^_^_^_^_^_^_^_^_^ Dashboard Initialed ^_^_^_^_^_^_^_^_^_^_^");
     }
 }

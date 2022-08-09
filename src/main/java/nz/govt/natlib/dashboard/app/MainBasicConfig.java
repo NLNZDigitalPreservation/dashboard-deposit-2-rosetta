@@ -3,8 +3,11 @@ package nz.govt.natlib.dashboard.app;
 import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
+import org.apache.catalina.Context;
+import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
@@ -65,4 +68,18 @@ public class MainBasicConfig {
         System.out.println("End to initial FreeMarkerConfigure");
         return freeMarkerConfigurer;
     }
+
+    @Bean
+    public TomcatServletWebServerFactory tomcatFactory() {
+        return new CustomTomcatServletWebServerFactory();
+    }
+
+    static class CustomTomcatServletWebServerFactory extends TomcatServletWebServerFactory {
+        @Override
+        protected void postProcessContext(Context context) {
+            ((StandardJarScanner) context.getJarScanner()).setScanManifest(false);
+        }
+    }
 }
+
+
