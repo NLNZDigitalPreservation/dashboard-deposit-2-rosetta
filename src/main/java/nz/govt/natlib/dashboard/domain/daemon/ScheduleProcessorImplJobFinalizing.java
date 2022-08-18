@@ -32,6 +32,8 @@ public class ScheduleProcessorImplJobFinalizing extends ScheduleProcessor {
                     }
                 }
                 depositJobService.jobFinalizeEnd(job, EnumDepositJobState.SUCCEED);
+
+                log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
             }
         }
     }

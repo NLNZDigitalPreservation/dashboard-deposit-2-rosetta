@@ -29,7 +29,7 @@ public class TestScheduleProcessorImplJobInjecting extends ScheduleProcessorTest
         assert jobs.size() == 1;
 
         EntityDepositJob job = jobs.get(0);
-        assert job.getStage() == EnumDepositJobStage.INJECT;
+        assert job.getStage() == EnumDepositJobStage.INGEST;
         assert job.getState() == EnumDepositJobState.RUNNING;
         assert job.getFileCount() == 2;
         assert job.getFileSize() == testFileLength_1 + testFileLength_2;

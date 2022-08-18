@@ -53,7 +53,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         job.setInitialTime(nowDatetime);
         job.setLatestTime(nowDatetime);
         job.setDepositSetId("1");
-        job.setStage(EnumDepositJobStage.INJECT);
+        job.setStage(EnumDepositJobStage.INGEST);
         job.setState(EnumDepositJobState.RUNNING);
 
         job.setAppliedFlowSetting(flowSetting);
@@ -165,7 +165,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
 
-        if (job.getStage() == EnumDepositJobStage.INJECT || job.getStage() == EnumDepositJobStage.FINALIZE) {
+        if (job.getStage() == EnumDepositJobStage.INGEST || job.getStage() == EnumDepositJobStage.FINALIZE) {
             job.setState(EnumDepositJobState.RUNNING);
         } else {
             job.setState(EnumDepositJobState.INITIALED);

@@ -46,7 +46,7 @@ public class FlowSettingService {
         DashboardHelper.assertNotNull("MaterialFlowId", flowSetting.getMaterialFlowId());
         DashboardHelper.assertNotNull("Delays", flowSetting.getDelays());
         DashboardHelper.assertNotNull("Stream Location", flowSetting.getStreamLocation());
-        DashboardHelper.assertNotNull("Injection Completed File Name", flowSetting.getInjectionCompleteFileName());
+        DashboardHelper.assertNotNull("Ingestion Completed File Name", flowSetting.getInjectionCompleteFileName());
         DashboardHelper.assertNotNull("DelayUnit", flowSetting.getDelayUnit());
         DashboardHelper.assertNotNull("MaxActiveDays", flowSetting.getMaxActiveDays());
         DashboardHelper.assertNotNull("MaxStorageDays", flowSetting.getMaxSaveDays());

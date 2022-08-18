@@ -1,7 +1,7 @@
 package nz.govt.natlib.dashboard.common.metadata;
 
 public enum EnumDepositJobStage {
-    INJECT,
+    INGEST,
     DEPOSIT,
     FINALIZE,
     FINISHED

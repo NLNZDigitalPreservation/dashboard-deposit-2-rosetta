@@ -21,7 +21,7 @@ function disableDepositJobContextMenuItemActive(key, opt){
 
     switch(key){
         case 'PAUSE':
-            return !(((stage==='INJECT' || stage==='FINALIZE') && state==='RUNNING') || (stage==='DEPOSIT' && state==='INITIALED'));
+            return !(((stage==='INGEST' || stage==='FINALIZE') && state==='RUNNING') || (stage==='DEPOSIT' && state==='INITIALED'));
         case 'RESUME':
             return state!=='PAUSED';
         case 'RETRY':
@@ -102,7 +102,7 @@ function cellFlagIconActive(stage, state){
 
 function calcPercentActive(stage, state){
     var percent=0;
-    if (stage==='INJECT') {
+    if (stage==='INGEST') {
         percent=0;
     }else if(stage==='DEPOSIT'){
         percent=33.33;
@@ -264,16 +264,16 @@ function setValueDepositJobActive(data){
         progress='bg-finished';
     }
 
-    if (stage==='INJECT') {
-        setProgressBarStyle('#progress-stage-name div[name="inject"]', progress, 'INJECT', state);
+    if (stage==='INGEST') {
+        setProgressBarStyle('#progress-stage-name div[name="inject"]', progress, 'INGEST', state);
         setProgressBarStyle('#progress-stage-name div[name="deposit"]', 'bg-none', 'DEPOSIT', '...' );
         setProgressBarStyle('#progress-stage-name div[name="finalize"]', 'bg-none', 'FINALIZE', '...');
     }else if(stage==='DEPOSIT'){
-        setProgressBarStyle('#progress-stage-name div[name="inject"]', 'bg-finished', 'INJECT', 'FINISHED');
+        setProgressBarStyle('#progress-stage-name div[name="inject"]', 'bg-finished', 'INGEST', 'FINISHED');
         setProgressBarStyle('#progress-stage-name div[name="deposit"]', progress, 'DEPOSIT', state);
         setProgressBarStyle('#progress-stage-name div[name="finalize"]', 'bg-none', 'FINALIZE', '...');
     }else if(stage==='FINALIZE'){
-        setProgressBarStyle('#progress-stage-name div[name="inject"]', 'bg-finished', 'INJECT', 'FINISHED');
+        setProgressBarStyle('#progress-stage-name div[name="inject"]', 'bg-finished', 'INGEST', 'FINISHED');
         setProgressBarStyle('#progress-stage-name div[name="deposit"]', 'bg-finished', 'DEPOSIT', 'FINISHED');
         if (progress!=='bg-finished') {
             setProgressBarStyle('#progress-stage-name div[name="finalize"]', progress, 'FINALIZE', '...');
@@ -281,7 +281,7 @@ function setValueDepositJobActive(data){
             setProgressBarStyle('#progress-stage-name div[name="finalize"]', progress, 'FINALIZE', 'FINISHED');
         }
     }else{
-        setProgressBarStyle('#progress-stage-name div[name="inject"]', 'bg-finished', 'INJECT', 'FINISHED');
+        setProgressBarStyle('#progress-stage-name div[name="inject"]', 'bg-finished', 'INGEST', 'FINISHED');
         setProgressBarStyle('#progress-stage-name div[name="deposit"]', 'bg-finished', 'DEPOSIT', 'FINISHED');
         setProgressBarStyle('#progress-stage-name div[name="finalize"]', 'bg-finished', 'FINALIZE', state);
     }

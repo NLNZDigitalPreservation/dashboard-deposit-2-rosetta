@@ -27,6 +27,7 @@ public class ScheduleProcessorImplJobInjecting extends ScheduleProcessor {
         List<UnionFile> injectionDirs = injectionPathScanClient.listRootDir();
         for (UnionFile injectionDir : injectionDirs) {
             if (!injectionDir.isPath()) {
+                log.info("Skip the path which is not subfolder: {}", injectionDir.getAbsolutePath());
                 continue;
             }
 
@@ -41,11 +42,12 @@ public class ScheduleProcessorImplJobInjecting extends ScheduleProcessor {
             //Initial job
             if (job == null) {
                 job = depositJobService.jobInitial(injectionPath.getAbsolutePath(), injectionDir.getName(), flowSetting);
+                log.info("Created a new job: {} {}", job.getId(), job.getInjectionTitle());
             }
 
 
             //Ignore the jobs not in the INITIAL stage
-            if (job.getStage() != EnumDepositJobStage.INJECT || job.getState() != EnumDepositJobState.RUNNING) {
+            if (job.getStage() != EnumDepositJobStage.INGEST || job.getState() != EnumDepositJobState.RUNNING) {
                 log.debug("Skip unprepared job for: {} --> {} at status [{}] [{}]", flowSetting.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
                 continue;
             }
