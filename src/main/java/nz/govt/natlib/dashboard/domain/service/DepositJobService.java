@@ -246,6 +246,11 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             return EnumDepositJobState.RUNNING;
         }
 
+        //Take the "DECLINED" status at any stages as failed
+        if (status.equalsIgnoreCase("DECLINED")) {
+            return EnumDepositJobState.FAILED;
+        }
+
         if (stage.equalsIgnoreCase("Finished")) {
             if (status.equalsIgnoreCase("REJECTED") ||
                     status.equalsIgnoreCase("DECLINED") ||
