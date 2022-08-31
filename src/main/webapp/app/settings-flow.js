@@ -91,7 +91,8 @@ class FlowSetting extends BasicSettings{
         delayUnit: 'S',
         maxActiveDays: 14,
         maxSaveDays: 365,
-        weeklyMaxConcurrency: [1,1,1,1,1,1,1]
+        weeklyMaxConcurrency: [1,1,1,1,1,1,1],
+        actualContentDeleteOptions: 'notDelete',
       }
     	return initialSetting;
     }
@@ -126,6 +127,9 @@ class FlowSetting extends BasicSettings{
         weeklyMaxThreads.push($('#flow-settings input[name="sat"]').val());
         weeklyMaxThreads.push($('#flow-settings input[name="sun"]').val());
         data['weeklyMaxConcurrency']=weeklyMaxThreads;
+
+        data['actualContentDeleteOptions']=$('#flow-settings select[name="actualContentDeleteOptions"] option:selected').attr('value');
+
         return data;
     }
 
@@ -153,6 +157,8 @@ class FlowSetting extends BasicSettings{
         $('#flow-settings input[name="fri"]').val(weeklyMaxThreads[4]);
         $('#flow-settings input[name="sat"]').val(weeklyMaxThreads[5]);
         $('#flow-settings input[name="sun"]').val(weeklyMaxThreads[6]);
+
+        $('#flow-settings select[name="actualContentDeleteOptions"]').val(data['actualContentDeleteOptions']);
 
         var healthAuditMsg;
         if (!data.id || data.auditRst) {

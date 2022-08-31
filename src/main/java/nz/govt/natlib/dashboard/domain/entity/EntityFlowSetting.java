@@ -1,10 +1,12 @@
 package nz.govt.natlib.dashboard.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import nz.govt.natlib.dashboard.common.metadata.EnumActualContentDeletionOptions;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.TimeUnit;
 
-public class EntityFlowSetting extends EntityCommon{
+public class EntityFlowSetting extends EntityCommon {
     private boolean enabled;
     private Long depositAccountId;
     private String materialFlowId;
@@ -24,6 +26,7 @@ public class EntityFlowSetting extends EntityCommon{
 
     private int[] weeklyMaxConcurrency = new int[7];
 
+    private String actualContentDeleteOptions;
 
     public Long getDepositAccountId() {
         return depositAccountId;
@@ -136,6 +139,27 @@ public class EntityFlowSetting extends EntityCommon{
 
     public void setMaxSaveDays(Long maxSaveDays) {
         this.maxSaveDays = maxSaveDays;
+    }
+
+    public String getActualContentDeleteOptions() {
+        return actualContentDeleteOptions;
+    }
+
+    @JsonIgnore
+    public EnumActualContentDeletionOptions getEnumActualContentDeleteOptions() {
+        if (StringUtils.isEmpty(actualContentDeleteOptions)) {
+            return EnumActualContentDeletionOptions.notDelete;
+        }
+        return EnumActualContentDeletionOptions.valueOf(actualContentDeleteOptions);
+    }
+
+    public void setActualContentDeleteOptions(String actualContentDeleteOptions) {
+        this.actualContentDeleteOptions = actualContentDeleteOptions;
+    }
+
+    @JsonIgnore
+    public void setActualContentDeleteOptions(EnumActualContentDeletionOptions actualContentDeleteOptions) {
+        this.actualContentDeleteOptions = actualContentDeleteOptions.name();
     }
 
     @JsonIgnore
