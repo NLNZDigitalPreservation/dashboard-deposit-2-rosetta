@@ -1,39 +1,18 @@
 const contextMenuItemsDepositJobsActive={
     "detail": {name: "Detail", icon: "bi bi-info-circle"},
     "sep1": "---------",
-    "retry": {name: "Retry", icon: "bi bi-arrow-clockwise", disabled: disableDepositJobContextMenuItemActive},
-    "cancel": {name: "Cancel", icon: "bi bi-x-circle", disabled: disableDepositJobContextMenuItemActive},
+    "retry": {name: "Retry", icon: "bi bi-arrow-clockwise"},
+    "cancel": {name: "Cancel", icon: "bi bi-x-circle"},
     "sep2": "---------",
-    "pause": {name: "Pause", icon: "bi bi-pause-circle", disabled: disableDepositJobContextMenuItemActive},
-    "resume": {name: "Resume", icon: "bi bi-play-circle", disabled: disableDepositJobContextMenuItemActive},
+    "pause": {name: "Pause", icon: "bi bi-pause-circle"},
+    "resume": {name: "Resume", icon: "bi bi-play-circle"},
     "sep3": "---------",
-    "terminate": {name: "Terminate and Purge", icon: "bi bi-stop-circle", disabled: disableDepositJobContextMenuItemActive},
+    "terminate": {name: "Terminate and Purge", icon: "bi bi-stop-circle"},
     // "sep4": "---------",
     // "export-jobs": {name: "Export Selected Jobs", icon: "bi bi-download"},
 };
 
-function disableDepositJobContextMenuItemActive(key, opt){
-    var rowIndex=$(this).attr('row-index');
-    var rowData = gridDepositJobs.getRowByIndex(parseInt(rowIndex));
-    if (!rowData) {return;}
-    var stage=rowData.stage, state=rowData.state;
-    key=key.toUpperCase();
 
-    switch(key){
-        case 'PAUSE':
-            return !(((stage==='INGEST' || stage==='FINALIZE') && state==='RUNNING') || (stage==='DEPOSIT' && state==='INITIALED'));
-        case 'RESUME':
-            return state!=='PAUSED';
-        case 'RETRY':
-            return !(stage==='DEPOSIT' && state==='FAILED');
-        case 'TERMINATE':
-            return (stage==='DEPOSIT' && state==='SUCCEED') || (stage==='FINALIZE' && state==='SUCCEED');
-        case 'CANCEL':
-            return !(state==='FAILED');
-        default:
-            return false;
-    }
-}
 
 const gridDepositJobsColumnsActive=[
     {headerName: "#", width:45, headerCheckboxSelection: true, headerCheckboxSelectionFilteredOnly: true, checkboxSelection: true, pinned: 'left'},
@@ -134,6 +113,53 @@ function calcPercentActive(stage, state){
 }
 
 
+function isRowDataValidForAction(action, rowData){
+    action=action.toUpperCase();
+    var stage=rowData.stage, state=rowData.state;
+    switch(action){
+        case 'PAUSE':
+            return ((stage==='INGEST' || stage==='FINALIZE') && state==='RUNNING') || (stage==='DEPOSIT' && state==='INITIALED');
+        case 'RESUME':
+            return state==='PAUSED';
+        case 'RETRY':
+            return stage==='DEPOSIT' && state==='FAILED';
+        case 'TERMINATE':
+            return !((stage==='DEPOSIT' && state==='SUCCEED') || (stage==='FINALIZE' && state==='SUCCEED'));
+        case 'CANCEL':
+            return state==='FAILED';
+        default:
+            return false;
+    }
+}
+
+function isSelectedRowsValidForAction(action, selectedRows){
+    var req=[];
+    for(var idx=0; idx<selectedRows.length;idx++){
+        var rowData=selectedRows[idx];
+        if(!isRowDataValidForAction(action, rowData)){
+            continue;
+        }
+        req.push(rowData);
+    }
+    
+    if(selectedRows.length > 1){
+        if(req.length == 0){
+            alert("The jobs are NOT allowed to apply the " + action + " action.");
+            return null;
+        }else if(req.length < selectedRows.length){
+            var continueFlag=confirm("Some of the selected jobs are NOT allowed to apply the " + action + " action. Would you like to continue?");
+            if(!continueFlag){
+                return null;
+            }
+        }
+        
+    }else if(selectedRows.length == 1 && req.length < selectedRows.length){
+        alert("The job are NOT allowed to apply the " + action + " action.");
+        return null;
+    }
+    return req;
+}
+
 function handleDepositJobActive(action, selectedRow){
     if (action==='detail') {
         setValueDepositJobActive(selectedRow.data);
@@ -141,12 +167,16 @@ function handleDepositJobActive(action, selectedRow){
         return;
     }
 
-    if(action==='terminate' && !confirm("The job will be forced to terminate and purge. Are you sure you will continue?")){
+    if(action==='terminate' && !confirm("The unfinished jobs will be forced to terminate and purge. Would you like to continue?")){
         return;
     }
 
-    var reqNodes=[];
-    reqNodes.push(selectedRow.data);
+    var selectedRows=gridDepositJobs.getSelectedRows();
+
+    var reqNodes=isSelectedRowsValidForAction(action, selectedRows);
+    if (!reqNodes) {
+        return;
+    }
 
     fetchHttp(PATH_DEPOSIT_JOBS_UPDATE + '?action='+action, reqNodes, function(rspNodes){
         // gridDepositJobs.clear(selectedNodes);
@@ -344,28 +374,6 @@ function initDepositJob(){
     });
 }
 
-//function applyUpdatedSettingFlowToDepositJobHtmls(){
-//    var flows=tableFlowSettings.dataset;
-//
-//    var htmlSearchFlowList='', htmlNewJob='';
-//    for(var i=0;i<flows.length;i++){
-//        var flow=flows[i];
-//        htmlSearchFlowList+='<div class="form-check form-check-inline">';
-//        htmlSearchFlowList+='<input class="form-check-input" type="checkbox" id="check-stage-'+flow.name+'" flowId="'+flow.id+'" checked>';
-//        htmlSearchFlowList+='<label class="form-check-label" for="check-stage-'+flow.name+'">'+flow.name+'</label>';
-//        htmlSearchFlowList+='</div>';
-//
-//        htmlNewJob+='<option value="${flow.getId()}">'+flow.name+'</option>';
-//    }
-//    $('#search-select-material-flow').html(htmlSearchFlowList);
-//    $('#new-job-select-material-flow').html(htmlNewJob);
-//}
-// gridDepositJobs.exportDataCsv({
-//     prependContent: undefined,
-//     appendContent: undefined,
-//     suppressQuotes: undefined,
-//     columnSeparator: undefined,
-// });
 
 function exportSelectedJobs(){
     var selectedRows=gridDepositJobs.getSelectedRows();
