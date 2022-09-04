@@ -39,7 +39,7 @@ public class ScheduleProcessorTester extends BasicTester {
         repoFlowSetting.save(flowSetting);
     }
 
-    public void initProcessor(ScheduleProcessor processor) {
+    public void initProcessor(ScheduleProcessorBasic processor) {
         processor.setDepositJobService(depositJobService);
         processor.setRepoDepositAccount(repoDepositAccount);
         processor.setRepoDepositJob(repoDepositJob);

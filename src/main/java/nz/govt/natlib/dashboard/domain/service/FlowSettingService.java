@@ -126,7 +126,7 @@ public class FlowSettingService {
         repoFlowSetting.save(flowSetting);
 
         //Rescheduling or adding the existing timer
-        timerScheduledExecutors.rescheduleDepositJobPreparing(flowSetting);
+        timerScheduledExecutors.rescheduleProcessor(flowSetting);
 
         return flowSetting;
     }
@@ -144,7 +144,7 @@ public class FlowSettingService {
         EntityFlowSetting flowSetting = repoFlowSetting.getById(id);
         if (flowSetting != null) {
             //Close the relevant timer
-            timerScheduledExecutors.closeDepositJobPreparing(flowSetting);
+            timerScheduledExecutors.closeProcessor(flowSetting);
             repoFlowSetting.deleteById(id);
         }
 

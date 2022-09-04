@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
-public class TestScheduleProcessorImplJobInjecting extends ScheduleProcessorTester {
-    private ScheduleProcessor testInstance = new ScheduleProcessorImplJobInjecting();
+public class TestScheduleProcessorBasicImplJobInjecting extends ScheduleProcessorTester {
+    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl(flowSetting);
 
     @BeforeEach
     public void clearAndInit() throws IOException {
@@ -22,7 +22,7 @@ public class TestScheduleProcessorImplJobInjecting extends ScheduleProcessorTest
 
     @Test
     public void testPreparingJobsInjectionNotReady() throws Exception {
-        testInstance.handle(flowSetting);
+        testInstance.handleIngest();
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
@@ -39,7 +39,7 @@ public class TestScheduleProcessorImplJobInjecting extends ScheduleProcessorTest
     public void testPreparingJobsInjectionIsReady() throws Exception {
         addReadyForIngestionFile();
 
-        testInstance.handle(flowSetting);
+        testInstance.handleIngest();
 
         EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;

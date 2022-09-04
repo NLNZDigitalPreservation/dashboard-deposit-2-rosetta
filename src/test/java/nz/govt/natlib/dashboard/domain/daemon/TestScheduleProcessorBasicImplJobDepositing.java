@@ -14,34 +14,35 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class TestScheduleProcessorImplJobDepositing extends ScheduleProcessorTester {
-    private ScheduleProcessor testInstance = new ScheduleProcessorImplJobDepositing();
+public class TestScheduleProcessorBasicImplJobDepositing extends ScheduleProcessorTester {
+    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl(flowSetting);
 
     @BeforeEach
-    public void clearAndInit() throws Exception {
+    public void clearAndInit() {
         initProcessor(testInstance);
         repoDepositJob.deleteAll();
         initSubFolder();
 
-        ScheduleProcessor injectionProcessor = new ScheduleProcessorImplJobInjecting();
+        ScheduleProcessorBasic injectionProcessor = new ScheduleProcessorImpl(flowSetting);
         initProcessor(injectionProcessor);
 
         addReadyForIngestionFile();
 
-        injectionProcessor.handle(flowSetting);
+        injectionProcessor.handleIngest();
     }
 
     @Test
     public void testDepositingJobsInjectionSuccess() throws Exception {
         when(rosettaWebService.deposit(any(), any(), any(), any(), any(), any())).thenReturn(new ResultOfDeposit(true, "OK", sipId));
 
-        testInstance.handle(flowSetting);
+        testInstance.handleIngest();
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
         assert jobs.size() == 1;
 
         EntityDepositJob job = jobs.get(0);
+        testInstance.handleDeposit(job);
         assert job.getStage() == EnumDepositJobStage.DEPOSIT;
         assert job.getState() == EnumDepositJobState.RUNNING;
         assert job.getFileCount() == 2;
@@ -64,13 +65,13 @@ public class TestScheduleProcessorImplJobDepositing extends ScheduleProcessorTes
         job.setState(EnumDepositJobState.INITIALED);
         repoDepositJob.save(job);
 
-        testInstance.handle(flowSetting);
+        testInstance.handleDeposit(job);
 
         jobs = repoDepositJob.getAll();
         assert jobs != null;
         assert jobs.size() == 1;
 
-         job = jobs.get(0);
+        job = jobs.get(0);
         assert job.getStage() == EnumDepositJobStage.DEPOSIT;
         assert job.getState() == EnumDepositJobState.FAILED;
         assert job.getFileCount() == 2;
