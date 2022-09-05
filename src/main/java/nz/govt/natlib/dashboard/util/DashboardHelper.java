@@ -61,6 +61,14 @@ public class DashboardHelper {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMilliSecond), localZoneOffset());
     }
 
+    public static String epochMilliSecondToFrontendReadableLocalTime(Long epochMilliSecond) {
+        if (isNull(epochMilliSecond)) {
+            return "";
+        }
+        LocalDateTime ldt = getLocalDateTimeFromEpochMilliSecond(epochMilliSecond);
+        String rst = String.format("%02d/%02d/%04d,%02d:%02d:%02d", ldt.getDayOfMonth(), ldt.getMonthValue(), ldt.getYear(), ldt.getHour(), ldt.getMinute(), ldt.getSecond());
+        return rst;
+    }
 
     public static String getUid() {
         return UUID.randomUUID().toString();

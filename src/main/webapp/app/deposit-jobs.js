@@ -27,7 +27,7 @@ const gridDepositJobsColumnsActive=[
         var icon=cellFlagIconActive(stage, state);
         return icon;
     }},     
-    {headerName: "StartTime", field: "initialTime", width: 200, cellRenderer: function(row){
+    {headerName: "JobInitialTime", field: "initialTime", width: 200, cellRenderer: function(row){
         return formatDatetimeFromEpochMilliSeconds(row.data.initialTime);
     }},
     {headerName: "LatestUpdateTime", field: "latestTime", width: 200, cellRenderer: function(row){
@@ -44,7 +44,12 @@ const gridDepositJobsColumnsActive=[
     {headerName: "SizeOfFiles", field: "fileSize", width: 160, cellRenderer: function(row){
         return formatContentLength(row.data.fileSize);
     }},
-
+    {headerName: "DepositStartTime", field: "depositStartTime", width: 200, cellRenderer: function(row){
+        return formatDatetimeFromEpochMilliSeconds(row.data.depositStartTime);
+    }},
+    {headerName: "DepositEndTime", field: "depositEndTime", width: 200, cellRenderer: function(row){
+       return formatDatetimeFromEpochMilliSeconds(row.data.depositEndTime);
+    }},
     {headerName: "SipId", field: "sipID", width: 160},
     {headerName: "SipModule", field: "sipModule", width: 160},
     {headerName: "SipStage", field: "sipStage", width: 160},

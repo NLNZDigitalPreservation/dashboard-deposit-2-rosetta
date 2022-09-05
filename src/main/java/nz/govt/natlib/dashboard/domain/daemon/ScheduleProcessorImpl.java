@@ -123,9 +123,9 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             sipStatusInfo = rosettaWebService.getSIPStatusInfo(job.getSipID());
             log.info("Update polling. jobId: {}, jobName: {}, SIPStatusInfo: {}, {}, {}", job.getId(), job.getInjectionTitle(), sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
             job = depositJobService.jobUpdateStatus(job, sipStatusInfo);
-            if (job.getState() == EnumDepositJobState.FAILED || job.getState() == EnumDepositJobState.SUCCEED) {
-                depositJobService.jobDepositFinished(job);
-            }
+            //            if (job.getState() == EnumDepositJobState.FAILED || job.getState() == EnumDepositJobState.SUCCEED) {
+            //                depositJobService.jobDepositFinished(job);
+            //            }
             log.info("Update polling, after. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
         } catch (Exception e) {
             log.error("Failed to scan deposit job status", e);

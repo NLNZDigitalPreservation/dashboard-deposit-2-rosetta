@@ -12,6 +12,7 @@ import nz.govt.natlib.dashboard.ui.command.DepositJobSearchCommand;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import nz.govt.natlib.dashboard.common.metadata.MetsHandler;
 import nz.govt.natlib.dashboard.common.metadata.MetsXmlProperties;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -28,7 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
@@ -95,6 +95,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
         job.setDepositStartTime(nowDatetime);
+        job.setDepositEndTime(nowDatetime);
         job.setResultMessage(error);
         job.setStage(EnumDepositJobStage.DEPOSIT);
         job.setState(EnumDepositJobState.FAILED);
@@ -102,16 +103,21 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     }
 
     public EntityDepositJob jobUpdateStatus(EntityDepositJob job, SipStatusInfo sipStatusInfo) {
+        if (StringUtils.equalsIgnoreCase(job.getSipModule(), sipStatusInfo.getModule()) &&
+                StringUtils.equalsIgnoreCase(job.getSipStage(), sipStatusInfo.getStage()) &&
+                StringUtils.equalsIgnoreCase(job.getSipStatus(), sipStatusInfo.getStatus())) {
+            log.debug("The status info is not updated: jobId={},  sipStatusInfo: ({} {} {})", job.getId(), sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
+            return job;
+        }
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
         job.setSipModule(sipStatusInfo.getModule());
         job.setSipStage(sipStatusInfo.getStage());
         job.setSipStatus(sipStatusInfo.getStatus());
         job.setState(getStateFromSipStatusInfo(sipStatusInfo));
-//        if (job.getState() == EnumDepositJobState.SUCCEED) {
-//            job.setStage(EnumDepositJobStage.FINALIZE); //Going to next step
-//            job.setState(EnumDepositJobState.INITIALED);
-//        }
+        if (job.getState() == EnumDepositJobState.SUCCEED || job.getState() == EnumDepositJobState.FAILED) {
+            job.setDepositEndTime(nowDatetime);
+        }
         repoJob.save(job);
         return job;
     }
@@ -475,11 +481,11 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             }
 
             Row rowExcel = sheet.createRow(rowIndex++);
-
-            Cell cId = rowExcel.createCell(0, CellType.NUMERIC);
+            int colNum = 0;
+            Cell cId = rowExcel.createCell(colNum++, CellType.NUMERIC);
             cId.setCellValue(job.getId());
 
-            Cell cFlow = rowExcel.createCell(1, CellType.STRING);
+            Cell cFlow = rowExcel.createCell(colNum++, CellType.STRING);
             EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
             if (flowSetting != null) {
                 cFlow.setCellValue(flowSetting.getMaterialFlowId() + "-" + flowSetting.getMaterialFlowName());
@@ -487,42 +493,46 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
                 cFlow.setCellValue("Unknown Material Flow");
             }
 
-            Cell cTitle = rowExcel.createCell(2, CellType.STRING);
+            Cell cTitle = rowExcel.createCell(colNum++, CellType.STRING);
             cTitle.setCellValue(job.getInjectionTitle());
 
-            Cell cSubFolder = rowExcel.createCell(3, CellType.STRING);
+            Cell cSubFolder = rowExcel.createCell(colNum++, CellType.STRING);
             cSubFolder.setCellValue(job.getInjectionPath());
 
-            Cell cStatus = rowExcel.createCell(4, CellType.STRING);
+            Cell cStatus = rowExcel.createCell(colNum++, CellType.STRING);
             cStatus.setCellValue(job.getStage() + "-" + job.getState());
 
-            LocalDateTime ldtStartTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getDepositStartTime());
-            Cell cStartTime = rowExcel.createCell(5, CellType.STRING);
-            cStartTime.setCellValue(ldtStartTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            Cell cInitialTime = rowExcel.createCell(colNum++, CellType.STRING);
+            cInitialTime.setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getInitialTime()));
 
-            LocalDateTime ldtLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getDepositStartTime());
-            Cell cLatestUpdateTime = rowExcel.createCell(6, CellType.STRING);
-            cLatestUpdateTime.setCellValue(ldtLatestUpdateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            Cell cLatestUpdateTime = rowExcel.createCell(colNum++, CellType.STRING);
+            cLatestUpdateTime.setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getLatestTime()));
 
-            Cell cNumOfFiles = rowExcel.createCell(7, CellType.NUMERIC);
+            Cell cNumOfFiles = rowExcel.createCell(colNum++, CellType.NUMERIC);
             cNumOfFiles.setCellValue(job.getFileCount());
 
-            Cell cSizeOfFiles = rowExcel.createCell(8, CellType.NUMERIC);
+            Cell cSizeOfFiles = rowExcel.createCell(colNum++, CellType.NUMERIC);
             cSizeOfFiles.setCellValue(job.getFileSize());
 
-            Cell cSipId = rowExcel.createCell(9, CellType.NUMERIC);
+            Cell cDepositStartTime = rowExcel.createCell(colNum++, CellType.STRING);
+            cDepositStartTime.setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getDepositStartTime()));
+
+            Cell cDepositEndTime = rowExcel.createCell(colNum++, CellType.STRING);
+            cDepositEndTime.setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getDepositEndTime()));
+
+            Cell cSipId = rowExcel.createCell(colNum++, CellType.NUMERIC);
             cSipId.setCellValue(job.getSipID());
 
-            Cell cSipModule = rowExcel.createCell(10, CellType.STRING);
+            Cell cSipModule = rowExcel.createCell(colNum++, CellType.STRING);
             cSipModule.setCellValue(job.getSipModule());
 
-            Cell cSipStage = rowExcel.createCell(11, CellType.STRING);
+            Cell cSipStage = rowExcel.createCell(colNum++, CellType.STRING);
             cSipStage.setCellValue(job.getSipStage());
 
-            Cell cSipStatus = rowExcel.createCell(12, CellType.STRING);
+            Cell cSipStatus = rowExcel.createCell(colNum++, CellType.STRING);
             cSipStatus.setCellValue(job.getSipStatus());
 
-            Cell cSipResult = rowExcel.createCell(13, CellType.STRING);
+            Cell cSipResult = rowExcel.createCell(colNum++, CellType.STRING);
             cSipResult.setCellValue(job.getResultMessage());
         }
         rsp.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
