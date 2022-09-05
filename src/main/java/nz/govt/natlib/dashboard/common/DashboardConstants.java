@@ -32,8 +32,6 @@ public class DashboardConstants {
     public static final String PATH_SETTING_GLOBAL_INITIAL = PATH_SETTING_GLOBAL + "/initial";
     public static final String PATH_SETTING_GLOBAL_SAVE = PATH_SETTING_GLOBAL + "/save";
     public static final String PATH_SETTING_GLOBAL_GET = PATH_SETTING_GLOBAL + "/get";
-    public static final String PATH_SETTING_GLOBAL_WHITE_USER_SAVE = PATH_SETTING_GLOBAL + "/white/user/save";
-    public static final String PATH_SETTING_GLOBAL_WHITE_USER_DELETE = PATH_SETTING_GLOBAL + "/white/user/delete";
 
     public static final String PATH_DEPOSIT_JOBS = PATH_ROOT + "/deposit-jobs";
     public static final String PATH_DEPOSIT_JOBS_ACTIVE_GET = PATH_DEPOSIT_JOBS + "/active/get";

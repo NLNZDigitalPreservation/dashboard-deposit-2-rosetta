@@ -38,6 +38,8 @@ public class TimerScheduledExecutors {
     protected RepoDepositJob repoDepositJob;
     @Autowired
     protected FlowSettingService flowSettingService;
+    @Autowired
+    protected RepoGlobalSetting repoGlobalSetting;
 
     @PostConstruct
     public void init() throws InterruptedException {
@@ -58,6 +60,7 @@ public class TimerScheduledExecutors {
         processor.setRepoDepositJob(repoDepositJob);
         processor.setRepoFlowSetting(repoFlowSetting);
         processor.setRosettaWebService(rosettaWebService);
+        processor.setRepoGlobalSetting(repoGlobalSetting);
         Runnable handler = () -> {
             try {
                 processor.handle();

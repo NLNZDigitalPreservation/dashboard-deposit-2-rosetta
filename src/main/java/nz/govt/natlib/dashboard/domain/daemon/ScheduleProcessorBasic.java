@@ -7,6 +7,7 @@ import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
+import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
 import nz.govt.natlib.dashboard.domain.repo.*;
 import nz.govt.natlib.dashboard.domain.service.DepositJobService;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public abstract class ScheduleProcessorBasic {
     protected RepoDepositJob repoDepositJob;
     protected DepositJobService depositJobService;
     protected RepoDepositAccount repoDepositAccount;
+    protected RepoGlobalSetting repoGlobalSetting;
     protected EntityFlowSetting flowSetting;
     protected InjectionPathScan injectionPathScanClient;
 
@@ -37,6 +39,17 @@ public abstract class ScheduleProcessorBasic {
         if (!flowSetting.isEnabled()) {
             log.warn("Disabled Material Flow: {} {}", flowSetting.getId(), flowSetting.getMaterialFlowId());
             return;
+        }
+
+        EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
+        if (globalSetting != null && globalSetting.isPaused()) {
+            LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            LocalDateTime ldtNowDatetime = LocalDateTime.now();
+            if (ldtNowDatetime.isAfter(ldtPausedStartTime) && ldtNowDatetime.isBefore(ldtPausedEndTime)) {
+                log.debug("Skip the paused timeslot.");
+                return;
+            }
         }
 
         //To initial jobs
@@ -124,5 +137,13 @@ public abstract class ScheduleProcessorBasic {
 
     public void setFlowSetting(EntityFlowSetting flowSetting) {
         this.flowSetting = flowSetting;
+    }
+
+    public RepoGlobalSetting getRepoGlobalSetting() {
+        return repoGlobalSetting;
+    }
+
+    public void setRepoGlobalSetting(RepoGlobalSetting repoGlobalSetting) {
+        this.repoGlobalSetting = repoGlobalSetting;
     }
 }
