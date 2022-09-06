@@ -34,8 +34,8 @@ public class GlobalSettingService {
             LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             if (ldtPausedEndTime.isBefore(ldtNowDatetime)) {
                 globalSetting.setPaused(false);
-                globalSetting.setPausedStartTime(strNowDatetime);
-                globalSetting.setPausedEndTime(strNowDatetime);
+                //globalSetting.setPausedStartTime(strNowDatetime);
+                //globalSetting.setPausedEndTime(strNowDatetime);
             }
         }
         rstVal.setRspBody(globalSetting);
@@ -55,9 +55,16 @@ public class GlobalSettingService {
                 rstVal.setRspMsg("The end time is empty.");
                 return rstVal;
             }
-
+            LocalDateTime ldtNowDatetime = LocalDateTime.now();
             LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
+            if (ldtPausedEndTime.isBefore(ldtNowDatetime)) {
+                rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+                rstVal.setRspMsg("The end time must after now.");
+                return rstVal;
+            }
+
             if (ldtPausedEndTime.isBefore(ldtPausedStartTime)) {
                 rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
                 rstVal.setRspMsg("The end time must after the start time.");

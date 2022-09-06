@@ -38,7 +38,7 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
         job.setLatestTime(DashboardHelper.getLocalMilliSeconds(ldt));
         repoDepositJob.save(job);
 
-        testInstance.handleHistoryPruning();
+        testInstance.handleHistoryPruning(job);
 
         job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
 
@@ -61,7 +61,7 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
         repoDepositJob.save(job);
 
         //Pruning
-        testInstance.handleHistoryPruning();
+        testInstance.handleHistoryPruning(job);
 
         job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
 

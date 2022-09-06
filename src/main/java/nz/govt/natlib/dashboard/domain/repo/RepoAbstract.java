@@ -130,6 +130,12 @@ public abstract class RepoAbstract {
         return null;
     }
 
+    public void delete(EntityCommon obj) {
+        if (obj != null && obj.getId() != null) {
+            deleteById(obj.getId());
+        }
+    }
+
     public void deleteById(Long id) {
         String fileName = String.format("%d.json", id);
         delete(this.subStoragePath, fileName);

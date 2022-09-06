@@ -13,6 +13,7 @@ import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import nz.govt.natlib.ndha.common.exlibris.ResultOfDeposit;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -151,15 +152,23 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
         }
 
-        if (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED) {
-            EnumActualContentDeletionOptions deletionOptions = flowSetting.getEnumActualContentDeleteOptions();
+        if ((job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED) ||
+                (job.getStage() == EnumDepositJobStage.FINISHED && job.getState() == EnumDepositJobState.SUCCEED)) {
+            String strDeletionOption = flowSetting.getActualContentDeleteOptions();
+            EnumActualContentDeletionOptions deletionOptions;
+            if (StringUtils.isEmpty(strDeletionOption)) {
+                deletionOptions = EnumActualContentDeletionOptions.notDelete;
+            } else {
+                deletionOptions = EnumActualContentDeletionOptions.valueOf(strDeletionOption);
+            }
+
             boolean isDeleteActualContent = false;
             if (deletionOptions == EnumActualContentDeletionOptions.deleteInstantly) {
                 isDeleteActualContent = true;
             } else if (deletionOptions == EnumActualContentDeletionOptions.deleteExceedMaxStorageDays) {
                 LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
                 LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
-                if (jobLatestUpdateTime.compareTo(deadlineTime) < 0) {
+                if (jobLatestUpdateTime.isBefore(deadlineTime)) {
                     isDeleteActualContent = true;
                 }
             }
@@ -174,16 +183,12 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     }
 
     @Override
-    public void handleHistoryPruning() throws IOException {
-        //Delete the expired history jobs
-        List<EntityDepositJob> listOfHistoryJobs = repoDepositJob.getByFlowId(flowSetting.getId());
-        for (EntityDepositJob job : listOfHistoryJobs) {
-            //Remove canceled and expired job
-            LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
-            LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
-            if (jobLatestUpdateTime.compareTo(deadlineTime) < 0) {
-                repoDepositJob.deleteById(job.getId());
-            }
+    public void handleHistoryPruning(EntityDepositJob job) throws IOException {
+        //Remove canceled and expired job
+        LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
+        LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
+        if (jobLatestUpdateTime.isBefore(deadlineTime)) {
+            repoDepositJob.deleteById(job.getId());
         }
     }
 }

@@ -45,5 +45,6 @@ public class ScheduleProcessorTester extends BasicTester {
         processor.setRepoDepositJob(repoDepositJob);
         processor.setRepoFlowSetting(repoFlowSetting);
         processor.setRosettaWebService(rosettaWebService);
+        processor.setRepoGlobalSetting(repoGlobalSetting);
     }
 }

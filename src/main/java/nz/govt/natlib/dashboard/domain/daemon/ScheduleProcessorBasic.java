@@ -32,8 +32,9 @@ public abstract class ScheduleProcessorBasic {
 
     public ScheduleProcessorBasic(EntityFlowSetting flowSetting) {
         this.flowSetting = flowSetting;
-        this.injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
+        this.injectionPathScanClient = InjectionUtils.createPathScanClient(this.flowSetting.getRootPath());
     }
+
 
     public void handle() throws Exception {
         if (!flowSetting.isEnabled()) {
@@ -51,6 +52,9 @@ public abstract class ScheduleProcessorBasic {
                 return;
             }
         }
+
+        //Initial the scanClient in each loop just in case the RootPath is changed
+        this.injectionPathScanClient = InjectionUtils.createPathScanClient(this.flowSetting.getRootPath());
 
         //To initial jobs
         handleIngest();
@@ -74,10 +78,9 @@ public abstract class ScheduleProcessorBasic {
             handlePollingStatus(job);
 
             handleFinalize(job);
+
+            handleHistoryPruning(job);
         }
-
-        handleHistoryPruning();
-
         injectionPathScanClient.disconnect();
     }
 
@@ -89,7 +92,7 @@ public abstract class ScheduleProcessorBasic {
 
     abstract public void handleFinalize(EntityDepositJob job) throws IOException;
 
-    abstract public void handleHistoryPruning() throws IOException;
+    abstract public void handleHistoryPruning(EntityDepositJob job) throws IOException;
 
     public RosettaWebServiceImpl getRosettaWebService() {
         return rosettaWebService;

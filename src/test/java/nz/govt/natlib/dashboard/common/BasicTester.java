@@ -43,7 +43,7 @@ public class BasicTester {
     protected static RepoDepositJob repoDepositJob;
     protected static RepoDepositAccount repoDepositAccount;
     protected static RepoWhiteList repoWhiteList;
-
+    protected static RepoGlobalSetting repoGlobalSetting;
     protected static RosettaWebServiceImpl rosettaWebService;
     protected static DepositJobService depositJobService;
 

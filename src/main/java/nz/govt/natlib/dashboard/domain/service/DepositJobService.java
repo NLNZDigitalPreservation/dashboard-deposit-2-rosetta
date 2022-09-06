@@ -148,6 +148,13 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     }
 
     public EntityDepositJob retry(EntityDepositJob job) {
+        job.setDepositStartTime(null);
+        job.setDepositEndTime(null);
+        job.setSipID(null);
+        job.setSipModule(null);
+        job.setSipStage(null);
+        job.setSipStatus(null);
+        job.setResultMessage("");
         return jobUpdateStatus(job, EnumDepositJobState.INITIALED);
     }
 
@@ -183,25 +190,17 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     }
 
     public EntityDepositJob terminate(EntityDepositJob job) {
-        if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
-                (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED)) {
-            log.warn("{} at stage [{}] and state [{}] could not be terminated", job.getInjectionTitle(), job.getStage(), job.getState());
-            return job;
-        }
-//        String pathJob = job.getInjectionPath();
-//        EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
-//        String injectionCompleteFileName = flowSetting == null ? "ready-for-ingestion-FOLDER-COMPLETED" : flowSetting.getInjectionCompleteFileName();
-//        File injectFile = new File(pathJob, injectionCompleteFileName);
-//        if (injectFile.exists() && injectFile.isFile()) {
-//            boolean rst = injectFile.delete();
-//            log.debug("Deleted injectionCompleteFile: {}, {}", injectFile.getAbsolutePath(), rst);
-//        }
-//        File doneFile = new File(pathJob, "DONE");
-//        if (doneFile.exists() && doneFile.isFile()) {
-//            boolean rst = doneFile.delete();
-//            log.debug("Deleted DONE file: {}, {}", doneFile.getAbsolutePath(), rst);
-//        }
-        repoJob.deleteById(job.getId());
+        //        if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
+        //                (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED)) {
+        //            log.warn("{} at stage [{}] and state [{}] could not be terminated", job.getInjectionTitle(), job.getStage(), job.getState());
+        //            return job;
+        //        }
+
+        //Delete the existing subfolder
+        InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(job.getAppliedFlowSetting().getRootPath());
+        InjectionUtils.deleteFiles(injectionPathScanClient, new File(job.getInjectionPath()));
+
+        repoJob.delete(job);
         return job;
     }
 

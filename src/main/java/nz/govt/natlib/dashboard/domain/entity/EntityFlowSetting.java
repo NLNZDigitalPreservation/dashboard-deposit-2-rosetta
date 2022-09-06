@@ -145,21 +145,8 @@ public class EntityFlowSetting extends EntityCommon {
         return actualContentDeleteOptions;
     }
 
-    @JsonIgnore
-    public EnumActualContentDeletionOptions getEnumActualContentDeleteOptions() {
-        if (StringUtils.isEmpty(actualContentDeleteOptions)) {
-            return EnumActualContentDeletionOptions.notDelete;
-        }
-        return EnumActualContentDeletionOptions.valueOf(actualContentDeleteOptions);
-    }
-
     public void setActualContentDeleteOptions(String actualContentDeleteOptions) {
         this.actualContentDeleteOptions = actualContentDeleteOptions;
-    }
-
-    @JsonIgnore
-    public void setActualContentDeleteOptions(EnumActualContentDeletionOptions actualContentDeleteOptions) {
-        this.actualContentDeleteOptions = actualContentDeleteOptions.name();
     }
 
     @JsonIgnore

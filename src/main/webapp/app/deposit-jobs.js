@@ -129,7 +129,7 @@ function isRowDataValidForAction(action, rowData){
         case 'RETRY':
             return stage==='DEPOSIT' && state==='FAILED';
         case 'TERMINATE':
-            return !((stage==='DEPOSIT' && state==='SUCCEED') || (stage==='FINALIZE' && state==='SUCCEED'));
+            return true;
         case 'CANCEL':
             return state==='FAILED';
         default:
@@ -149,7 +149,7 @@ function isSelectedRowsValidForAction(action, selectedRows){
     
     if(selectedRows.length > 1){
         if(req.length == 0){
-            alert("The jobs are NOT allowed to apply the " + action + " action.");
+            alert("The selected jobs are NOT allowed to apply the " + action + " action.");
             return null;
         }else if(req.length < selectedRows.length){
             var continueFlag=confirm("Some of the selected jobs are NOT allowed to apply the " + action + " action. Would you like to continue?");
@@ -159,7 +159,7 @@ function isSelectedRowsValidForAction(action, selectedRows){
         }
         
     }else if(selectedRows.length == 1 && req.length < selectedRows.length){
-        alert("The job are NOT allowed to apply the " + action + " action.");
+        alert("The job is NOT allowed to apply the " + action + " action.");
         return null;
     }
     return req;
@@ -172,11 +172,14 @@ function handleDepositJobActive(action, selectedRow){
         return;
     }
 
-    if(action==='terminate' && !confirm("The unfinished jobs will be forced to terminate and purge. Would you like to continue?")){
+    if(action==='terminate' && !confirm("The selected jobs and the related actual contents will be forced to be terminated and purged. Would you like to continue?")){
         return;
     }
 
     var selectedRows=gridDepositJobs.getSelectedRows();
+    if(!selectedRows && selectedRow && selectedRow.data){
+        selectedRows=[selectedRow.data];
+    }
 
     var reqNodes=isSelectedRowsValidForAction(action, selectedRows);
     if (!reqNodes) {
@@ -187,12 +190,12 @@ function handleDepositJobActive(action, selectedRow){
         // gridDepositJobs.clear(selectedNodes);
         var dataset=[], map={};
         for(var i=0; i<rspNodes.length; i++){
-            map[rspNodes[i].injectionTitle]=rspNodes[i];
+            map[rspNodes[i].id]=rspNodes[i];
         }
 
         gridDepositJobs.grid.gridOptions.api.forEachNode(function(node, index){
-            if (map[node.data.injectionTitle]) {
-                node.data=map[node.data.injectionTitle];
+            if (map[node.data.id]) {
+                node.data=map[node.data.id];
                 dataset.push(node.data);
             }
         });
