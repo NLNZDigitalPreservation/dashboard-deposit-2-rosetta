@@ -32,13 +32,13 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         List<UnionFile> injectionDirs = injectionPathScanClient.listRootDir();
         for (UnionFile injectionDir : injectionDirs) {
             if (!injectionDir.isPath()) {
-                log.info("Skip the path which is not subfolder: {}", injectionDir.getAbsolutePath());
+                log.info("Skip the path which is not a subfolder: {}", injectionDir.getAbsolutePath());
                 continue;
             }
 
             File depositDoneFile = new File(injectionDir.getAbsolutePath(), "done");
             if (injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
-                log.debug("The job {} had been deposited", injectionDir.getAbsolutePath());
+                log.debug("Skip the subfolder {}, it had been deposited, 'done' file found.", injectionDir.getAbsolutePath());
                 continue;
             }
 

@@ -129,7 +129,7 @@ function isRowDataValidForAction(action, rowData){
         case 'RETRY':
             return stage==='DEPOSIT' && state==='FAILED';
         case 'TERMINATE':
-            return true;
+            return (stage==='FINISHED' && state==='SUCCEED') || (state==='FAILED') || (state==='CANCELED');
         case 'CANCEL':
             return state==='FAILED';
         default:
@@ -172,9 +172,6 @@ function handleDepositJobActive(action, selectedRow){
         return;
     }
 
-    if(action==='terminate' && !confirm("The selected jobs and the related actual contents will be forced to be terminated and purged. Would you like to continue?")){
-        return;
-    }
 
     var selectedRows=gridDepositJobs.getSelectedRows();
     if(!selectedRows && selectedRow && selectedRow.data){
@@ -183,6 +180,10 @@ function handleDepositJobActive(action, selectedRow){
 
     var reqNodes=isSelectedRowsValidForAction(action, selectedRows);
     if (!reqNodes) {
+        return;
+    }
+
+    if(action==='terminate' && !confirm("The selected jobs and the related actual contents will be forced to be terminated and purged. Would you like to continue?")){
         return;
     }
 

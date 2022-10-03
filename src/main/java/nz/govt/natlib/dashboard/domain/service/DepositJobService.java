@@ -190,17 +190,14 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     }
 
     public EntityDepositJob terminate(EntityDepositJob job) {
-        //        if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
-        //                (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED)) {
-        //            log.warn("{} at stage [{}] and state [{}] could not be terminated", job.getInjectionTitle(), job.getStage(), job.getState());
-        //            return job;
-        //        }
-
-        //Delete the existing subfolder
-        InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(job.getAppliedFlowSetting().getRootPath());
-        InjectionUtils.deleteFiles(injectionPathScanClient, new File(job.getInjectionPath()));
-
-        repoJob.delete(job);
+        if ((job.getStage() == EnumDepositJobStage.FINISHED && job.getState() == EnumDepositJobState.SUCCEED) || job.getState() == EnumDepositJobState.FAILED || job.getState() == EnumDepositJobState.CANCELED) {
+            //Delete the existing subfolder
+            InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(job.getAppliedFlowSetting().getRootPath());
+            InjectionUtils.deleteFiles(injectionPathScanClient, new File(job.getInjectionPath()));
+            repoJob.delete(job);
+        } else {
+            log.error("{} at stage [{}] and state [{}] could not be terminated", job.getInjectionTitle(), job.getStage(), job.getState());
+        }
         return job;
     }
 
@@ -247,13 +244,13 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         String stage = sipStatusInfo.getStage();
         String status = sipStatusInfo.getStatus();
 
-        if (module == null || stage == null || status == null) {
-            return EnumDepositJobState.RUNNING;
+        //Take the "DECLINED" status at any stages as failed
+        if (status != null && status.equalsIgnoreCase("DECLINED")) {
+            return EnumDepositJobState.FAILED;
         }
 
-        //Take the "DECLINED" status at any stages as failed
-        if (status.equalsIgnoreCase("DECLINED")) {
-            return EnumDepositJobState.FAILED;
+        if (module == null || stage == null || status == null) {
+            return EnumDepositJobState.RUNNING;
         }
 
         if (stage.equalsIgnoreCase("Finished")) {
