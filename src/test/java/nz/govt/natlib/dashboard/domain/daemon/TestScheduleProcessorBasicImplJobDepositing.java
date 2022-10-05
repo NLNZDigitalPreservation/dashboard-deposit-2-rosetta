@@ -1,5 +1,7 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
+import nz.govt.natlib.dashboard.common.injection.InjectionPathScan;
+import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
@@ -15,7 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class TestScheduleProcessorBasicImplJobDepositing extends ScheduleProcessorTester {
-    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl(flowSetting);
+    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl();
 
     @BeforeEach
     public void clearAndInit() {
@@ -23,7 +25,7 @@ public class TestScheduleProcessorBasicImplJobDepositing extends ScheduleProcess
         repoDepositJob.deleteAll();
         initSubFolder();
 
-        ScheduleProcessorBasic injectionProcessor = new ScheduleProcessorImpl(flowSetting);
+        ScheduleProcessorBasic injectionProcessor = new ScheduleProcessorImpl();
         initProcessor(injectionProcessor);
 
         addReadyForIngestionFile();
@@ -42,7 +44,7 @@ public class TestScheduleProcessorBasicImplJobDepositing extends ScheduleProcess
         assert jobs.size() == 1;
 
         EntityDepositJob job = jobs.get(0);
-        testInstance.handleDeposit(job);
+        testInstance.handleDeposit(flowSetting, injectionPathScanClient, job);
         assert job.getStage() == EnumDepositJobStage.DEPOSIT;
         assert job.getState() == EnumDepositJobState.RUNNING;
         assert job.getFileCount() == 2;
@@ -65,7 +67,7 @@ public class TestScheduleProcessorBasicImplJobDepositing extends ScheduleProcess
         job.setState(EnumDepositJobState.INITIALED);
         repoDepositJob.save(job);
 
-        testInstance.handleDeposit(job);
+        testInstance.handleDeposit(flowSetting, injectionPathScanClient, job);
 
         jobs = repoDepositJob.getAll();
         assert jobs != null;

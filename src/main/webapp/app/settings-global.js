@@ -38,6 +38,8 @@ class GlobalSetting{
             paused: false,
             pausedStartTime: new Date(),
             pausedEndTime: new Date(),
+            delays: 60,
+            delayUnit: 'S',
         }
         return initialSetting;
     }
@@ -48,6 +50,8 @@ class GlobalSetting{
         data['paused']=$('#modal-global-settings input[name="paused"]').is(':checked');
         data['pausedStartTime']=$('#modal-global-settings input[name="pausedStartTime"]').val();
         data['pausedEndTime']=$('#modal-global-settings input[name="pausedEndTime"]').val();
+        data['delays']=$('#modal-global-settings input[name="delays"]').val();
+        data['delayUnit']='S';
         return data;
     }
 
@@ -56,6 +60,8 @@ class GlobalSetting{
         $('#modal-global-settings input[name="paused"]').prop('checked', data['paused']);
         $('#modal-global-settings input[name="pausedStartTime"]').val(data['pausedStartTime']);
         $('#modal-global-settings input[name="pausedEndTime"]').val(data['pausedEndTime']);
+        $('#modal-global-settings input[name="delays"]').val(data['delays']);
+        $('#modal-global-settings select[name="delayUnit"]').val(data['delayUnit']);
     }
 }
 

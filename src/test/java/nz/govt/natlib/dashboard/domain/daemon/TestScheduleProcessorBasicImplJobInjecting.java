@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class TestScheduleProcessorBasicImplJobInjecting extends ScheduleProcessorTester {
-    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl(flowSetting);
+    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl();
 
     @BeforeEach
     public void clearAndInit() throws IOException {

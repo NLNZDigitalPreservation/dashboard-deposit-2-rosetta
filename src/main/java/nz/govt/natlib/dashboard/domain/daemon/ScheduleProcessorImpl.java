@@ -1,10 +1,7 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
 import com.exlibris.dps.SipStatusInfo;
-import nz.govt.natlib.dashboard.common.injection.InjectionFileStat;
-import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
-import nz.govt.natlib.dashboard.common.injection.UnionFile;
-import nz.govt.natlib.dashboard.common.injection.UnionPath;
+import nz.govt.natlib.dashboard.common.injection.*;
 import nz.govt.natlib.dashboard.common.metadata.EnumActualContentDeletionOptions;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
@@ -14,70 +11,79 @@ import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import nz.govt.natlib.ndha.common.exlibris.ResultOfDeposit;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
-    public ScheduleProcessorImpl(EntityFlowSetting flowSetting) {
-        super(flowSetting);
-    }
-
     @Override
     public void handleIngest() {
-        //Summarize the number and size of files
-        InjectionFileStat stat = new InjectionFileStat();
-        List<UnionFile> injectionDirs = injectionPathScanClient.listRootDir();
-        for (UnionFile injectionDir : injectionDirs) {
-            if (!injectionDir.isPath()) {
-                log.info("Skip the path which is not a subfolder: {}", injectionDir.getAbsolutePath());
+        List<EntityFlowSetting> allFlowSettings = this.repoFlowSetting.getAll();
+        for (EntityFlowSetting flowSetting : allFlowSettings) {
+            if (!flowSetting.isEnabled()) {
+                log.warn("Disabled Material Flow: {} {}", flowSetting.getId(), flowSetting.getMaterialFlowId());
                 continue;
             }
+            //Initial the scanClient in each loop just in case the RootPath is changed
+            InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
 
-            File depositDoneFile = new File(injectionDir.getAbsolutePath(), "done");
-            if (injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
-                log.debug("Skip the subfolder {}, it had been deposited, 'done' file found.", injectionDir.getAbsolutePath());
-                continue;
+
+            //Summarize the number and size of files
+            InjectionFileStat stat = new InjectionFileStat();
+            List<UnionFile> injectionDirs = injectionPathScanClient.listRootDir();
+            for (UnionFile injectionDir : injectionDirs) {
+                if (!injectionDir.isPath()) {
+                    log.info("Skip the path which is not a subfolder: {}", injectionDir.getAbsolutePath());
+                    continue;
+                }
+
+                File depositDoneFile = new File(injectionDir.getAbsolutePath(), "done");
+                if (injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
+                    log.debug("Skip the subfolder {}, it had been deposited, 'done' file found.", injectionDir.getAbsolutePath());
+                    continue;
+                }
+
+                File injectionPath = injectionDir.getAbsolutePath();
+                EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), injectionPath.getName());
+                //Initial job
+                if (job == null) {
+                    job = depositJobService.jobInitial(injectionPath.getAbsolutePath(), injectionDir.getName(), flowSetting);
+                    log.info("Created a new job: {} {}", job.getId(), job.getInjectionTitle());
+                }
+
+
+                //Ignore the jobs not in the INITIAL stage
+                if (job.getStage() != EnumDepositJobStage.INGEST || job.getState() != EnumDepositJobState.RUNNING) {
+                    log.debug("Skip unprepared job for: {} --> {} at status [{}] [{}]", flowSetting.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
+                    continue;
+                }
+
+                stat.stat(injectionPathScanClient, new UnionPath(injectionPath, flowSetting.getStreamLocation()));
+                job = depositJobService.jobUpdateFilesStat(job, stat.getFileCount(), stat.getFileSize());
+
+                File doneFile = new File(injectionPath, flowSetting.getInjectionCompleteFileName());
+                if (!injectionPathScanClient.exists(UnionPath.of(doneFile))) {
+                    log.debug("{} file does not exist in: {}", flowSetting.getInjectionCompleteFileName(), injectionPath.getAbsolutePath());
+                    continue;
+                }
+
+                job = depositJobService.jobScanComplete(job);
+
+                //Flush the file stat
+                stat.stat(injectionPathScanClient, new UnionPath(injectionPath, flowSetting.getStreamLocation()));
+                job = depositJobService.jobUpdateFilesStat(job, stat.getFileCount(), stat.getFileSize());
+
+                log.debug("Initialed new job : {}", job.getId());
             }
-
-            File injectionPath = injectionDir.getAbsolutePath();
-            EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), injectionPath.getName());
-            //Initial job
-            if (job == null) {
-                job = depositJobService.jobInitial(injectionPath.getAbsolutePath(), injectionDir.getName(), flowSetting);
-                log.info("Created a new job: {} {}", job.getId(), job.getInjectionTitle());
-            }
-
-
-            //Ignore the jobs not in the INITIAL stage
-            if (job.getStage() != EnumDepositJobStage.INGEST || job.getState() != EnumDepositJobState.RUNNING) {
-                log.debug("Skip unprepared job for: {} --> {} at status [{}] [{}]", flowSetting.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
-                continue;
-            }
-
-            stat.stat(injectionPathScanClient, new UnionPath(injectionPath, flowSetting.getStreamLocation()));
-            job = depositJobService.jobUpdateFilesStat(job, stat.getFileCount(), stat.getFileSize());
-
-            File doneFile = new File(injectionPath, flowSetting.getInjectionCompleteFileName());
-            if (!injectionPathScanClient.exists(UnionPath.of(doneFile))) {
-                log.debug("{} file does not exist in: {}", flowSetting.getInjectionCompleteFileName(), injectionPath.getAbsolutePath());
-                continue;
-            }
-
-            job = depositJobService.jobScanComplete(job);
-
-            //Flush the file stat
-            stat.stat(injectionPathScanClient, new UnionPath(injectionPath, flowSetting.getStreamLocation()));
-            job = depositJobService.jobUpdateFilesStat(job, stat.getFileCount(), stat.getFileSize());
-
-            log.debug("Initialed new job : {}", job.getId());
         }
     }
 
     @Override
-    public boolean handleDeposit(EntityDepositJob job) {
+    public boolean handleDeposit(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
         if (!(job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.INITIALED)) {
             log.debug("Skip deposit job for: {} --> {} at status [{}] [{}]", flowSetting.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
             return false;
@@ -113,7 +119,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     }
 
     @Override
-    public void handlePollingStatus(EntityDepositJob job) {
+    public void handlePollingStatus(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
         if (job.getStage() != EnumDepositJobStage.DEPOSIT || job.getState() != EnumDepositJobState.RUNNING) {
             log.debug("Skip polling. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
             return;
@@ -134,7 +140,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     }
 
     @Override
-    public void handleFinalize(EntityDepositJob job) throws IOException {
+    public void handleFinalize(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) throws IOException {
         //Finalize success jobs
         if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.INITIALED) ||
@@ -183,12 +189,20 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     }
 
     @Override
-    public void handleHistoryPruning(EntityDepositJob job) throws IOException {
+    public void handleHistoryPruning(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) throws IOException {
         //Remove canceled and expired job
         LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
         LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
         if (jobLatestUpdateTime.isBefore(deadlineTime)) {
             repoDepositJob.deleteById(job.getId());
         }
+    }
+
+    @Override
+    public void handleFlowSettingMissingJob(EntityDepositJob job) throws IOException {
+        EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
+        InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
+        job.setResultMessage("Canceled because the linked flowSetting is deleted.");
+        depositJobService.cancel(job);
     }
 }

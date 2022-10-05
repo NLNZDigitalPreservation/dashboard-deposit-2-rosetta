@@ -87,8 +87,6 @@ class FlowSetting extends BasicSettings{
         rootPath: '',
         streamLocation: 'content/streams',
         injectionCompleteFileName: 'ready-for-ingestion-FOLDER-COMPLETED',
-        delays: 60,
-        delayUnit: 'S',
         maxActiveDays: 14,
         maxSaveDays: 365,
         weeklyMaxConcurrency: [1,1,1,1,1,1,1],
@@ -113,8 +111,6 @@ class FlowSetting extends BasicSettings{
         // Advanced settings
         data['streamLocation']=$('#flow-settings input[name="streamLocation"]').val();
         data['injectionCompleteFileName']=$('#flow-settings input[name="injectionCompleteFileName"]').val();
-        data['delays']=$('#flow-settings input[name="delays"]').val();
-        data['delayUnit']='S';
         data['maxActiveDays']=$('#flow-settings input[name="maxActiveDays"]').val();
         data['maxSaveDays']=$('#flow-settings input[name="maxSaveDays"]').val();
 
@@ -144,8 +140,6 @@ class FlowSetting extends BasicSettings{
 
         $('#flow-settings input[name="streamLocation"]').val(data['streamLocation']);
         $('#flow-settings input[name="injectionCompleteFileName"]').val(data['injectionCompleteFileName']);
-        $('#flow-settings input[name="delays"]').val(data['delays']);
-        $('#flow-settings select[name="delayUnit"]').val(data['delayUnit']);
         $('#flow-settings input[name="maxActiveDays"]').val(data['maxActiveDays']);
         $('#flow-settings input[name="maxSaveDays"]').val(data['maxSaveDays']);
 

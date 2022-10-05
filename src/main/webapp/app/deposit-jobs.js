@@ -169,6 +169,7 @@ function handleDepositJobActive(action, selectedRow){
     if (action==='detail') {
         setValueDepositJobActive(selectedRow.data);
         modalDepositJobDetails.show();
+        console.log("Popup the detail window.");
         return;
     }
 

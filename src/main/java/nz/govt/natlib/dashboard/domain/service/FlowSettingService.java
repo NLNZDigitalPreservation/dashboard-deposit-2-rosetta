@@ -32,8 +32,6 @@ public class FlowSettingService {
     @Autowired
     private RepoDepositJob repoDepositJob;
     @Autowired
-    private TimerScheduledExecutors timerScheduledExecutors;
-    @Autowired
     private RepoDepositAccount repoDepositAccount;
 
     public void validateFlowSetting(EntityFlowSetting flowSetting) throws NullParameterException, WebServiceException, InvalidParameterException {
@@ -41,13 +39,10 @@ public class FlowSettingService {
         DashboardHelper.assertNotNull("Enabled", flowSetting.isEnabled());
         DashboardHelper.assertNotNull("ProducerId", flowSetting.getProducerId());
         DashboardHelper.assertNotNull("RootPath", flowSetting.getRootPath());
-
         DashboardHelper.assertNotNull("ProducerId", flowSetting.getProducerId());
         DashboardHelper.assertNotNull("MaterialFlowId", flowSetting.getMaterialFlowId());
-        DashboardHelper.assertNotNull("Delays", flowSetting.getDelays());
         DashboardHelper.assertNotNull("Stream Location", flowSetting.getStreamLocation());
         DashboardHelper.assertNotNull("Ingestion Completed File Name", flowSetting.getInjectionCompleteFileName());
-        DashboardHelper.assertNotNull("DelayUnit", flowSetting.getDelayUnit());
         DashboardHelper.assertNotNull("MaxActiveDays", flowSetting.getMaxActiveDays());
         DashboardHelper.assertNotNull("MaxStorageDays", flowSetting.getMaxSaveDays());
 
@@ -124,10 +119,6 @@ public class FlowSettingService {
         //Validating input parameters
         this.validateFlowSetting(flowSetting);
         repoFlowSetting.save(flowSetting);
-
-        //Rescheduling or adding the existing timer
-        timerScheduledExecutors.rescheduleProcessor(flowSetting);
-
         return flowSetting;
     }
 
@@ -143,8 +134,6 @@ public class FlowSettingService {
 
         EntityFlowSetting flowSetting = repoFlowSetting.getById(id);
         if (flowSetting != null) {
-            //Close the relevant timer
-            timerScheduledExecutors.closeProcessor(flowSetting);
             repoFlowSetting.deleteById(id);
         }
 

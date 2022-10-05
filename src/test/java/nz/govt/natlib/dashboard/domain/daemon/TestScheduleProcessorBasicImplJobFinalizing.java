@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class TestScheduleProcessorBasicImplJobFinalizing extends ScheduleProcessorTester {
-    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl(flowSetting);
+    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl();
 
     @BeforeEach
     public void clearAndInit() {
@@ -17,7 +17,7 @@ public class TestScheduleProcessorBasicImplJobFinalizing extends ScheduleProcess
         initSubFolder();
 
         //Initial injection
-        ScheduleProcessorBasic injectionProcessor = new ScheduleProcessorImpl(flowSetting);
+        ScheduleProcessorBasic injectionProcessor = new ScheduleProcessorImpl();
         initProcessor(injectionProcessor);
         addReadyForIngestionFile();
         injectionProcessor.handleIngest();
@@ -36,7 +36,7 @@ public class TestScheduleProcessorBasicImplJobFinalizing extends ScheduleProcess
                 repoDepositJob.save(job);
 
                 //Finalizing
-                testInstance.handleFinalize(job);
+                testInstance.handleFinalize(flowSetting,injectionPathScanClient,job);
 
                 EntityDepositJob jobAfterFinalized = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
                 assert jobAfterFinalized != null;

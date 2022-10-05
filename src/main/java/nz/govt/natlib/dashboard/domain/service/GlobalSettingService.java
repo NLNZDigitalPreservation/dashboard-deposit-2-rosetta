@@ -1,6 +1,7 @@
 package nz.govt.natlib.dashboard.domain.service;
 
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
+import nz.govt.natlib.dashboard.domain.daemon.TimerScheduledExecutors;
 import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoGlobalSetting;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
@@ -19,6 +20,8 @@ public class GlobalSettingService {
     private static final long UNIQUE_GLOBAL_SETTING_ID = 0;
     @Autowired
     private RepoGlobalSetting repoGlobalSetting;
+    @Autowired
+    private TimerScheduledExecutors timerScheduledExecutors;
 
     public RestResponseCommand getGlobalSetting() {
         RestResponseCommand rstVal = new RestResponseCommand();
@@ -72,10 +75,31 @@ public class GlobalSettingService {
             }
         }
 
+        try {
+            DashboardHelper.assertNotNull("Delays", globalSetting.getDelays());
+            DashboardHelper.assertNotNull("DelayUnit", globalSetting.getDelayUnit());
+        } catch (Exception e) {
+            rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+            rstVal.setRspMsg(e.getMessage());
+            return rstVal;
+        }
+
         globalSetting.setId(UNIQUE_GLOBAL_SETTING_ID);
         repoGlobalSetting.save(globalSetting);
+
+        //Rescheduling or adding the existing timer
+        timerScheduledExecutors.rescheduleProcessor();
+
         rstVal.setRspBody(globalSetting);
 
         return rstVal;
+    }
+
+    public void setRepoGlobalSetting(RepoGlobalSetting repoGlobalSetting) {
+        this.repoGlobalSetting = repoGlobalSetting;
+    }
+
+    public void setTimerScheduledExecutors(TimerScheduledExecutors timerScheduledExecutors) {
+        this.timerScheduledExecutors = timerScheduledExecutors;
     }
 }

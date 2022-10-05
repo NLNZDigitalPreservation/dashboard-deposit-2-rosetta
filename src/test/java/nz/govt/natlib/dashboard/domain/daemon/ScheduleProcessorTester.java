@@ -1,6 +1,8 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
 import nz.govt.natlib.dashboard.common.BasicTester;
+import nz.govt.natlib.dashboard.common.injection.InjectionPathScan;
+import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -14,6 +16,7 @@ public class ScheduleProcessorTester extends BasicTester {
     protected static final Long maxSaveDays = 180L;
 
     protected static final EntityFlowSetting flowSetting = new EntityFlowSetting();
+    protected static InjectionPathScan injectionPathScanClient;
 
     @BeforeAll
     public static void init() throws IOException {
@@ -37,6 +40,8 @@ public class ScheduleProcessorTester extends BasicTester {
         }
 
         repoFlowSetting.save(flowSetting);
+
+        injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
     }
 
     public void initProcessor(ScheduleProcessorBasic processor) {

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 
 public class TestScheduleProcessorBasicImplJobHistoryPruning extends ScheduleProcessorTester {
-    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl(flowSetting);
+    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl();
 
     @BeforeEach
     public void clearAndInit() {
@@ -21,7 +21,7 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
         initSubFolder();
 
         //Initial injection
-        ScheduleProcessorBasic injectionProcessor = new ScheduleProcessorImpl(flowSetting);
+        ScheduleProcessorBasic injectionProcessor = new ScheduleProcessorImpl();
         initProcessor(injectionProcessor);
         addReadyForIngestionFile();
         injectionProcessor.handleIngest();
@@ -33,12 +33,12 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
         assert job != null;
 
         //Pruning
-        LocalDateTime ldt=LocalDateTime.now();
-        ldt=ldt.minusYears(5);
+        LocalDateTime ldt = LocalDateTime.now();
+        ldt = ldt.minusYears(5);
         job.setLatestTime(DashboardHelper.getLocalMilliSeconds(ldt));
         repoDepositJob.save(job);
 
-        testInstance.handleHistoryPruning(job);
+        testInstance.handleHistoryPruning(flowSetting, injectionPathScanClient, job);
 
         job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
 
@@ -61,7 +61,7 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
         repoDepositJob.save(job);
 
         //Pruning
-        testInstance.handleHistoryPruning(job);
+        testInstance.handleHistoryPruning(flowSetting, injectionPathScanClient, job);
 
         job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
 
