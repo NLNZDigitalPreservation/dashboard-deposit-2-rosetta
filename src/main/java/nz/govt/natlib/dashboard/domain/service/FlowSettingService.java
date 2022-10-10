@@ -51,9 +51,9 @@ public class FlowSettingService {
             throw new InvalidParameterException("Invalid RootPath: the Root Path does not exist.");
         }
 
-        EntityDepositAccountSetting depositAccount=repoDepositAccount.getById(flowSetting.getDepositAccountId());
-        if(depositAccount==null){
-            throw new InvalidParameterException("The Deposit Account does not exist, depositAccountId:"+flowSetting.getDepositAccountId());
+        EntityDepositAccountSetting depositAccount = repoDepositAccount.getById(flowSetting.getDepositAccountId());
+        if (depositAccount == null) {
+            throw new InvalidParameterException("The Deposit Account does not exist, depositAccountId:" + flowSetting.getDepositAccountId());
         }
 
         String pdsHandle;
@@ -93,11 +93,14 @@ public class FlowSettingService {
                 throw new InvalidParameterException("Duplicate MaterialFlowId");
             }
         }
+        flowSettings.clear();
     }
 
     public RestResponseCommand getAllFlowSettings() {
         RestResponseCommand retVal = new RestResponseCommand();
-        retVal.setRspBody(repoFlowSetting.getAll());
+        List<EntityFlowSetting> allFlowSettings = repoFlowSetting.getAll();
+        retVal.setRspBody(allFlowSettings);
+        allFlowSettings.clear();
         return retVal;
     }
 

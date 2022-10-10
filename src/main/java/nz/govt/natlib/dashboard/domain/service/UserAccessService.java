@@ -62,6 +62,7 @@ public class UserAccessService {
             if (whiteListAll.size() > 0) {
                 restResponseCommand.setRspCode(RestResponseCommand.RSP_USER_OTHER_ERROR);
                 restResponseCommand.setRspMsg("Please contact the administrator to privilege the access.");
+                whiteListAll.clear();
                 return restResponseCommand;
             } else {
                 restResponseCommand.setRspMsg("You are added to the user list by default");

@@ -84,6 +84,7 @@ public class DepositJobController {
 
         RestResponseCommand rsp = new RestResponseCommand();
         rsp.setRspBody(retVal);
+        retVal.clear();
         return rsp;
     }
 
@@ -96,7 +97,9 @@ public class DepositJobController {
     @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_SEARCH, method = {RequestMethod.POST, RequestMethod.GET})
     public RestResponseCommand searchDepositJobs(@RequestBody DepositJobSearchCommand cmd) {
         RestResponseCommand rsp = new RestResponseCommand();
-        rsp.setRspBody(depositJobService.searchDepositJobs(cmd));
+        List<EntityDepositJob> jobs = depositJobService.searchDepositJobs(cmd);
+        rsp.setRspBody(jobs);
+        jobs.clear();
         return rsp;
     }
 

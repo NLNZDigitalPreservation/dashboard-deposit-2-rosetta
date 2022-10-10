@@ -79,7 +79,9 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
 
                 log.debug("Initialed new job : {}", job.getId());
             }
+            injectionDirs.clear();
         }
+        allFlowSettings.clear();
     }
 
     @Override
@@ -201,7 +203,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     @Override
     public void handleFlowSettingMissingJob(EntityDepositJob job) throws IOException {
         EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
-        InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
+//        InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
         job.setResultMessage("Canceled because the linked flowSetting is deleted.");
         depositJobService.cancel(job);
     }

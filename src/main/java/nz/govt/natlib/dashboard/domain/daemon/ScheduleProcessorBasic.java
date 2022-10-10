@@ -99,7 +99,13 @@ public abstract class ScheduleProcessorBasic {
                     handleFlowSettingMissingJob(job);
                 }
             }
+            jobs.clear();
         }
+        allJobGroups.forEach((k, v) -> {
+            v.clear();
+        });
+        allJobGroups.clear();
+        allJobs.clear();
     }
 
     abstract public void handleIngest();

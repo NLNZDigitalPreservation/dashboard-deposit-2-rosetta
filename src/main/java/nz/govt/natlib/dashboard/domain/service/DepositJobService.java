@@ -275,15 +275,22 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
                 return true;
             }
         }
+        progressFiles.clear();
 
         InputStream inputStream = injectionPathScanClient.readFile(injectionPath + File.separator + "content", "mets.xml");
         if (inputStream == null) {
             return false;
         }
         MetsXmlProperties prop = MetsHandler.parse(inputStream);
+        try {
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (prop == null || prop.getListFiles() == null || prop.getListFiles().size() == 0) {
             return false;
         }
+
 
         List<UnionFile> streamFiles = injectionPathScanClient.listFile(injectionPath + File.separator + "content" + File.separator + "streams");
         if (streamFiles == null || streamFiles.size() == 0) {
@@ -294,6 +301,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         for (UnionFile f : streamFiles) {
             mapStreamFiles.put(f.getName(), f);
         }
+        streamFiles.clear();
 
         for (MetsXmlProperties.GeneralFileCharacters generalFileCharacters : prop.getListFiles()) {
             if (!mapStreamFiles.containsKey(generalFileCharacters.getFileOriginalName())) {
@@ -304,6 +312,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
                 return false;
             }
         }
+        mapStreamFiles.clear();
 
         return true;
     }
