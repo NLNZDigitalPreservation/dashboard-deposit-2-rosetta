@@ -85,7 +85,7 @@ class FlowSetting extends BasicSettings{
         materialFlowId: '',
         materialFlowName: '',
         rootPath: '',
-        streamLocation: 'content/streams',
+        streamLocation: 'content',
         injectionCompleteFileName: 'ready-for-ingestion-FOLDER-COMPLETED',
         maxActiveDays: 14,
         maxSaveDays: 365,
