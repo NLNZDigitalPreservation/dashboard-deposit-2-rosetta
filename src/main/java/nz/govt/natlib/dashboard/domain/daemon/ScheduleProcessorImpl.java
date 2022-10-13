@@ -121,7 +121,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     }
 
     @Override
-    public void handlePollingStatus(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
+    public void handlePollingStatus(EntityDepositJob job) {
         if (job.getStage() != EnumDepositJobStage.DEPOSIT || job.getState() != EnumDepositJobState.RUNNING) {
             log.debug("Skip polling. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
             return;
@@ -132,9 +132,6 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             sipStatusInfo = rosettaWebService.getSIPStatusInfo(job.getSipID());
             log.info("Update polling. jobId: {}, jobName: {}, SIPStatusInfo: {}, {}, {}", job.getId(), job.getInjectionTitle(), sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
             job = depositJobService.jobUpdateStatus(job, sipStatusInfo);
-            //            if (job.getState() == EnumDepositJobState.FAILED || job.getState() == EnumDepositJobState.SUCCEED) {
-            //                depositJobService.jobDepositFinished(job);
-            //            }
             log.info("Update polling, after. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
         } catch (Exception e) {
             log.error("Failed to scan deposit job status", e);
@@ -202,9 +199,14 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
 
     @Override
     public void handleFlowSettingMissingJob(EntityDepositJob job) throws IOException {
-        EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
-//        InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
-        job.setResultMessage("Canceled because the linked flowSetting is deleted.");
-        depositJobService.cancel(job);
+        try {
+            if (job.getStage() == EnumDepositJobStage.FINISHED && (job.getState() == EnumDepositJobState.FAILED || job.getState() == EnumDepositJobState.CANCELED || job.getState() == EnumDepositJobState.SUCCEED)) {
+                return;
+            }
+            depositJobService.cancelFlowMissingJob(job);
+        } catch (Exception e) {
+            log.error("Failed to cancel the flow missing job, {}", job.getId(), e);
+            throw new IOException(e.getMessage());
+        }
     }
 }

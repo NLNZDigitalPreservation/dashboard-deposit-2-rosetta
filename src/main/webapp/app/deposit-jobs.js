@@ -267,12 +267,19 @@ function setProgressBarStyle(objFilter, className, stage, state){
 function setValueDepositJobActive(data){
     if (!data) {return false;}
 
-    if (data.state==='FAILED') {
+    //    if (data.state==='FAILED') {
+    //        $('#deposit-job-health').show();
+    //        $('#deposit-job-health').html('<i class="bi bi-exclamation-triangle-fill text-danger"></i>&nbsp;' + data.resultMessage)
+    //    }else{
+    //        $('#deposit-job-health').hide();
+    //    }
+    if((data.resultMessage && data.resultMessage !== "") || data.state==='FAILED'){
         $('#deposit-job-health').show();
         $('#deposit-job-health').html('<i class="bi bi-exclamation-triangle-fill text-danger"></i>&nbsp;' + data.resultMessage)
     }else{
-        $('#deposit-job-health').hide();        
+        $('#deposit-job-health').hide();
     }
+
 
     $('#deposit-job-title').val(data['injectionTitle']);
     $('#deposit-job-path').val(data['injectionPath']);

@@ -210,9 +210,18 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         job.setLatestTime(nowDatetime);
         job.setStage(EnumDepositJobStage.FINISHED);
         job.setState(EnumDepositJobState.CANCELED);
-        job.setResultMessage("");
+        job.setResultMessage("Canceled by user.");
         repoJob.save(job);
         return job;
+    }
+
+    public void cancelFlowMissingJob(EntityDepositJob job) {
+        long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
+        job.setLatestTime(nowDatetime);
+        job.setStage(EnumDepositJobStage.FINISHED);
+        job.setState(EnumDepositJobState.CANCELED);
+        job.setResultMessage("Canceled because the linked flowSetting is deleted.");
+        repoJob.save(job);
     }
 
     public void jobDepositFinished(EntityDepositJob job) {

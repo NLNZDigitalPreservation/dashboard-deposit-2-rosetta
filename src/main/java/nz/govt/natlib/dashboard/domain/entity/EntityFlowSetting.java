@@ -14,6 +14,8 @@ public class EntityFlowSetting extends EntityCommon {
 
     private Long maxActiveDays;
     private Long maxSaveDays;
+    private Long delays;
+    private String delayUnit;
 
     private int[] weeklyMaxConcurrency = new int[7];
 
@@ -122,5 +124,21 @@ public class EntityFlowSetting extends EntityCommon {
 
     public void setActualContentDeleteOptions(String actualContentDeleteOptions) {
         this.actualContentDeleteOptions = actualContentDeleteOptions;
+    }
+
+    public Long getDelays() {
+        return delays;
+    }
+
+    public void setDelays(Long delays) {
+        this.delays = delays;
+    }
+
+    public String getDelayUnit() {
+        return delayUnit;
+    }
+
+    public void setDelayUnit(String delayUnit) {
+        this.delayUnit = delayUnit;
     }
 }

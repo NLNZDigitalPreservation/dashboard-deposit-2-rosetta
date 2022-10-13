@@ -79,6 +79,11 @@ public abstract class ScheduleProcessorBasic {
                 log.debug("Now: {}, day: {}, maxConcurrencyJobs: {}, countRunning: {}", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), nowDay, maxConcurrencyJobs, countRunning);
 
                 for (EntityDepositJob job : jobs) {
+                    if (job.getState() == EnumDepositJobState.PAUSED) {
+                        log.debug("Skip the Paused the job: {}", job.getId());
+                        continue;
+                    }
+
                     //Only launch the deposit task when Rosetta is idle
                     if (countRunning < maxConcurrencyJobs) {
                         if (handleDeposit(flowSetting, injectionPathScanClient, job)) {
@@ -86,7 +91,7 @@ public abstract class ScheduleProcessorBasic {
                         }
                     }
 
-                    handlePollingStatus(flowSetting, injectionPathScanClient, job);
+                    handlePollingStatus(job);
 
                     handleFinalize(flowSetting, injectionPathScanClient, job);
 
@@ -101,9 +106,7 @@ public abstract class ScheduleProcessorBasic {
             }
             jobs.clear();
         }
-        allJobGroups.forEach((k, v) -> {
-            v.clear();
-        });
+        allJobGroups.forEach((k, v) -> v.clear());
         allJobGroups.clear();
         allJobs.clear();
     }
@@ -112,7 +115,7 @@ public abstract class ScheduleProcessorBasic {
 
     abstract public boolean handleDeposit(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job);
 
-    abstract public void handlePollingStatus(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job);
+    abstract public void handlePollingStatus(EntityDepositJob job);
 
     abstract public void handleFinalize(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) throws IOException;
 

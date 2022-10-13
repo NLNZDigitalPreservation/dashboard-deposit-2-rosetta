@@ -49,7 +49,7 @@ public class TestScheduleProcessorBasicImplJobStatusPolling extends ScheduleProc
         sipStatusInfo.setStatus("SUCCEED");
         when(rosettaWebService.getSIPStatusInfo(sipId)).thenReturn(sipStatusInfo);
 
-        testInstance.handlePollingStatus(flowSetting, injectionPathScanClient, job);
+        testInstance.handlePollingStatus(job);
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
@@ -76,7 +76,7 @@ public class TestScheduleProcessorBasicImplJobStatusPolling extends ScheduleProc
         sipStatusInfo.setStatus("SUCCEED");
         when(rosettaWebService.getSIPStatusInfo(sipId)).thenReturn(sipStatusInfo);
 
-        testInstance.handlePollingStatus(flowSetting, injectionPathScanClient, job);
+        testInstance.handlePollingStatus(job);
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
@@ -103,7 +103,7 @@ public class TestScheduleProcessorBasicImplJobStatusPolling extends ScheduleProc
         sipStatusInfo.setStatus("ERROR");
         when(rosettaWebService.getSIPStatusInfo(sipId)).thenReturn(sipStatusInfo);
 
-        testInstance.handlePollingStatus(flowSetting, injectionPathScanClient, job);
+        testInstance.handlePollingStatus(job);
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
