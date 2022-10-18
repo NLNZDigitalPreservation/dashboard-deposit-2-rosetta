@@ -32,8 +32,6 @@ public class FlowSettingService {
     @Autowired
     private RepoDepositJob repoDepositJob;
     @Autowired
-    private TimerScheduledExecutors timerScheduledExecutors;
-    @Autowired
     private RepoDepositAccount repoDepositAccount;
 
     public void validateFlowSetting(EntityFlowSetting flowSetting) throws NullParameterException, WebServiceException, InvalidParameterException {
@@ -41,13 +39,10 @@ public class FlowSettingService {
         DashboardHelper.assertNotNull("Enabled", flowSetting.isEnabled());
         DashboardHelper.assertNotNull("ProducerId", flowSetting.getProducerId());
         DashboardHelper.assertNotNull("RootPath", flowSetting.getRootPath());
-
         DashboardHelper.assertNotNull("ProducerId", flowSetting.getProducerId());
         DashboardHelper.assertNotNull("MaterialFlowId", flowSetting.getMaterialFlowId());
-        DashboardHelper.assertNotNull("Delays", flowSetting.getDelays());
         DashboardHelper.assertNotNull("Stream Location", flowSetting.getStreamLocation());
-        DashboardHelper.assertNotNull("Injection Completed File Name", flowSetting.getInjectionCompleteFileName());
-        DashboardHelper.assertNotNull("DelayUnit", flowSetting.getDelayUnit());
+        DashboardHelper.assertNotNull("Ingestion Completed File Name", flowSetting.getInjectionCompleteFileName());
         DashboardHelper.assertNotNull("MaxActiveDays", flowSetting.getMaxActiveDays());
         DashboardHelper.assertNotNull("MaxStorageDays", flowSetting.getMaxSaveDays());
 
@@ -56,9 +51,9 @@ public class FlowSettingService {
             throw new InvalidParameterException("Invalid RootPath: the Root Path does not exist.");
         }
 
-        EntityDepositAccountSetting depositAccount=repoDepositAccount.getById(flowSetting.getDepositAccountId());
-        if(depositAccount==null){
-            throw new InvalidParameterException("The Deposit Account does not exist, depositAccountId:"+flowSetting.getDepositAccountId());
+        EntityDepositAccountSetting depositAccount = repoDepositAccount.getById(flowSetting.getDepositAccountId());
+        if (depositAccount == null) {
+            throw new InvalidParameterException("The Deposit Account does not exist, depositAccountId:" + flowSetting.getDepositAccountId());
         }
 
         String pdsHandle;
@@ -98,11 +93,14 @@ public class FlowSettingService {
                 throw new InvalidParameterException("Duplicate MaterialFlowId");
             }
         }
+        flowSettings.clear();
     }
 
     public RestResponseCommand getAllFlowSettings() {
         RestResponseCommand retVal = new RestResponseCommand();
-        retVal.setRspBody(repoFlowSetting.getAll());
+        List<EntityFlowSetting> allFlowSettings = repoFlowSetting.getAll();
+        retVal.setRspBody(allFlowSettings);
+        allFlowSettings.clear();
         return retVal;
     }
 
@@ -124,10 +122,6 @@ public class FlowSettingService {
         //Validating input parameters
         this.validateFlowSetting(flowSetting);
         repoFlowSetting.save(flowSetting);
-
-        //Rescheduling or adding the existing timer
-        timerScheduledExecutors.rescheduleDepositJobPreparing(flowSetting);
-
         return flowSetting;
     }
 
@@ -143,8 +137,6 @@ public class FlowSettingService {
 
         EntityFlowSetting flowSetting = repoFlowSetting.getById(id);
         if (flowSetting != null) {
-            //Close the relevant timer
-            timerScheduledExecutors.closeDepositJobPreparing(flowSetting);
             repoFlowSetting.deleteById(id);
         }
 

@@ -58,6 +58,7 @@ public class RawMaterialFlowController {
                 producerCmd.setName(producer.getDescription());
                 return producerCmd;
             }).collect(Collectors.toList());
+            producers.clear();
 
             for (RawProducerCommand producerCmd : rawProducerList) {
                 List<MaterialFlow> materialFlows = rosettaWebService.getMaterialFlows(producerCmd.getId());
@@ -67,9 +68,13 @@ public class RawMaterialFlowController {
                     flowCmd.setName(flow.getDescription());
                     return flowCmd;
                 }).collect(Collectors.toList());
+                materialFlows.clear();
+
                 producerCmd.setMaterialFlows(rawMaterialFlowList);
             }
             rstVal.setRspBody(rawProducerList);
+            rawProducerList.forEach(RawProducerCommand::clear);
+            rawProducerList.clear();
         } catch (Exception e) {
             log.error("Failed to get raw producers", e);
             rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);

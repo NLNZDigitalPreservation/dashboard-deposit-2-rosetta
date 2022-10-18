@@ -41,6 +41,8 @@
           <li><a class="dropdown-item" href="#" onclick="settingFlow.popupPanel();">Materialflow Settings</a></li>
           <li><a class="dropdown-item" href="#" onclick="settingWhitelist.popupPanel();">User White List</a></li>
           <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#" onclick="modalGlobalSetting.showSettingDetail();">Global Setting</a></li>
+          <li><hr class="dropdown-divider"></li>
           <!-- <li><a class="dropdown-item" href="#" onclick="signOut();"><i class="bi bi-power"></i> Sign out</a></li> -->
           <li><a class="dropdown-item" href="./auth/logout.json" style="color:red;"><i class="bi bi-power"></i>Sign out: ${userName}</a></li>
         </ul>
@@ -55,7 +57,7 @@
   <div id="modal-sso-login" style="display: none;"></div>
 
   <!-- Global settings: initial the system -->
-  <div class="modal fade" id="modal-global-setting-initial" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal fade" id="modal-global-initial" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -203,17 +205,15 @@
                   <div class="card-body">
                       <div class="input-group mb-3">
                           <span class="input-group-text">Stream Path</span>
-                          <input type="text" class="form-control" placeholder="content/streams" , name="streamLocation">
+                          <input type="text" class="form-control" placeholder="content" , name="streamLocation">
                       </div>
                       <div class="input-group mb-3">
-                          <span class="input-group-text">Injection Completed File Name</span>
+                          <span class="input-group-text">Ingestion Completed File Name</span>
                           <input type="text" class="form-control" placeholder="ready-for-ingestion-FOLDER-COMPLETED" ,
                                  name="injectionCompleteFileName">
                       </div>
 
                       <div class="input-group mb-3">
-                          <span class="input-group-text">Scan Interval (Seconds)</span>                        
-                          <input type="text" class="form-control" placeholder="1" , name="delays">
                           <span class="input-group-text">Max Active Days</span>
                           <input type="text" class="form-control" placeholder="14" , name="maxActiveDays">
                           <span class="input-group-text">Max Storage Days</span>
@@ -236,6 +236,15 @@
                           <input type="text" class="form-control" name="sat">
                           <span class="input-group-text">Sun</span>
                           <input type="text" class="form-control" name="sun">
+                      </div>
+
+                      <div class="input-group mb-3">
+                          <span class="input-group-text">Deletion Options For Actual Content:</span>
+                          <select class="form-control form-select mt-0" name="actualContentDeleteOptions">
+                            <option value="notDelete">Not delete</option>
+                            <option value="deleteExceedMaxStorageDays">Delete when exceeds the MAX Storage Days</option>
+                            <option value="deleteInstantly">Delete instantly when finished</option>
+                          </select>              
                       </div>
                   </div>
 
@@ -314,6 +323,52 @@
     </div>
   </div>
 
+
+  <!-- Modal: Global settings -->
+  <div class="modal fade" id="modal-global-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Global Settings</h5>
+          <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" name="id" style="display: none;">
+          <div class="card bg-white mb-1" id="global-pause-settings">
+            <div class="card-header"><h5>Pause Settings</h5></div>
+            <div class="card-body">                
+                <div class="form-check form-switch mb-3">
+                  <input class="form-check-input" type="checkbox" role="switch" name="paused" id="global-setting-pause-enabled" checked>
+                  <label class="form-check-label" for="global-setting-pause-enabled">Enable Paused</label>
+                </div>
+                <div class="input-group mb-3"> 
+                    <span class="input-group-text">Between</span>
+                    <input class="form-control" type="datetime-local" name="pausedStartTime">           
+                    <span class="input-group-text">and</span>
+                    <input class="form-control" type="datetime-local" name="pausedEndTime">                  
+                </div>
+            </div>
+          </div>
+
+          <div class="card bg-white mb-1" id="global-pause-settings">
+            <div class="card-header"><h5>On Timer</h5></div>
+            <div class="card-body">
+                <div class="input-group mb-3">
+                    <span class="input-group-text">Scan Interval (Seconds)</span>                        
+                    <input type="text" class="form-control" placeholder="60", name="delays">
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="modalGlobalSetting.saveSettingItem();">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   ${templateDepositJobs}
 
   <script>
@@ -336,6 +391,7 @@
   <script src="./app/settings-deposit-account.js"></script>
   <script src="./app/settings-flow.js"></script>
   <script src="./app/settings-whitelist.js"></script>
+  <script src="./app/settings-global.js"></script>
   <script src="./app/deposit-jobs.js"></script>
 
 
@@ -343,7 +399,8 @@
   <script>
     const HTML_IFRAME_LOGIN='<iframe src="login.html" scrolling="no" frameborder="0" allowfullscreen> </iframe>';
     const IS_GLOBAL_SETTING_INITIALED=true;
-    const modalGlobalSettingInitial = new bootstrap.Modal(document.getElementById('modal-global-setting-initial'), {keyboard: false});
+    const modalGlobalInitial = new bootstrap.Modal(document.getElementById('modal-global-initial'), {keyboard: false});
+
 
     function loginCallback(){
       $('#modal-sso-login').hide();
@@ -386,7 +443,7 @@
           initDepositJob();
           // initFlowSettings();
         }else{
-          modalGlobalSettingInitial.show();
+          modalGlobalInitial.show();
         }
     });
   </script>

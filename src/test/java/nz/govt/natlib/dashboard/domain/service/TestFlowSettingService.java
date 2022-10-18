@@ -5,7 +5,6 @@ import nz.govt.natlib.dashboard.common.exception.InvalidParameterException;
 import nz.govt.natlib.dashboard.common.exception.NullParameterException;
 import nz.govt.natlib.dashboard.common.exception.WebServiceException;
 import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
-import nz.govt.natlib.dashboard.domain.daemon.TimerScheduledExecutors;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityStorageLocation;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
@@ -19,7 +18,6 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class TestFlowSettingService extends BasicTester {
@@ -33,10 +31,6 @@ public class TestFlowSettingService extends BasicTester {
         ReflectionTestUtils.setField(testInstance, "rosettaWebService", rosettaWebService);
         ReflectionTestUtils.setField(testInstance, "repoDepositAccount", repoDepositAccount);
         ReflectionTestUtils.setField(testInstance, "repoFlowSetting", repoFlowSetting);
-
-        TimerScheduledExecutors timerScheduledExecutors = mock(TimerScheduledExecutors.class);
-
-        ReflectionTestUtils.setField(testInstance, "timerScheduledExecutors", timerScheduledExecutors);
     }
 
 
@@ -159,8 +153,6 @@ public class TestFlowSettingService extends BasicTester {
             assert false;
         }
 
-        flowSetting.setDelays(500L);
-        flowSetting.setDelayUnit("D");
         flowSetting.setRootPath(FileUtils.getTempDirectoryPath());
 
         try {
@@ -173,8 +165,6 @@ public class TestFlowSettingService extends BasicTester {
 
         EntityFlowSetting flowSettingAfterEdit = repoFlowSetting.getById(rst.getId());
         assert flowSettingAfterEdit != null;
-        assert flowSettingAfterEdit.getDelays() == 500;
-        assert flowSettingAfterEdit.getDelayUnit().equals("D");
     }
 
 
@@ -189,8 +179,6 @@ public class TestFlowSettingService extends BasicTester {
         flowSetting.setMaterialFlowId("12345");
         flowSetting.setMaterialFlowName("Material-Test");
 
-        flowSetting.setDelays(300L);
-        flowSetting.setDelayUnit("S");
         flowSetting.setMaxActiveDays(14L);
         flowSetting.setMaxSaveDays(365L);
     }

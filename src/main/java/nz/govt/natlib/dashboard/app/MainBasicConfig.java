@@ -3,8 +3,13 @@ package nz.govt.natlib.dashboard.app;
 import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
+import org.apache.catalina.Context;
+import org.apache.tomcat.util.scan.StandardJarScanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
@@ -14,7 +19,7 @@ import java.lang.Exception;
 
 @Configuration
 public class MainBasicConfig {
-//    private final static Logger log = LoggerFactory.getLogger(MainBasicConfig.class);
+    private final static Logger log = LoggerFactory.getLogger(MainBasicConfig.class);
 //    private final static String JE_LOG_FILE_MAX = Long.toString(512 * 1014 * 1014);
 
     @Value("${system.storage.path}")
@@ -40,7 +45,7 @@ public class MainBasicConfig {
     @PostConstruct
     public void init() {
         if (proxyEnable.equalsIgnoreCase("YES") || proxyEnable.equalsIgnoreCase("TRUE")) {
-            System.out.println("Proxy is enabled.");
+            log.info("Proxy is enabled.");
             System.setProperty("http.proxyHost", proxyHost);
             System.setProperty("http.proxyPort", proxyPort);
             System.setProperty("https.proxyHost", proxyHost);
@@ -50,19 +55,33 @@ public class MainBasicConfig {
 
     @Bean(BeanDefinition.SCOPE_SINGLETON)
     public RosettaWebServiceImpl rosettaWebService() throws Exception {
-        System.out.println("Start to initial Rosetta Web Service");
+        log.info("Start to initial Rosetta Web Service");
         RosettaWebServiceImpl bean = new RosettaWebServiceImpl(pdsUrl, wsdlUrlProducer, wsdlUrlDeposit, wsdlUrlSip, wsdlUrlDeliveryAccess);
 //        bean.init();
-        System.out.println("End to initial Rosetta Web Service");
+        log.info("End to initial Rosetta Web Service");
         return bean;
     }
 
     @Bean
     public FreeMarkerConfigurer freeMarkerConfigurer() {
-        System.out.println("Start to initial FreeMarkerConfigure");
+        log.info("Start to initial FreeMarkerConfigure");
         FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
         freeMarkerConfigurer.setTemplateLoaderPath("/app");
-        System.out.println("End to initial FreeMarkerConfigure");
+        log.info("End to initial FreeMarkerConfigure");
         return freeMarkerConfigurer;
     }
+
+    @Bean
+    public TomcatServletWebServerFactory tomcatFactory() {
+        return new CustomTomcatServletWebServerFactory();
+    }
+
+    static class CustomTomcatServletWebServerFactory extends TomcatServletWebServerFactory {
+        @Override
+        protected void postProcessContext(Context context) {
+            ((StandardJarScanner) context.getJarScanner()).setScanManifest(false);
+        }
+    }
 }
+
+

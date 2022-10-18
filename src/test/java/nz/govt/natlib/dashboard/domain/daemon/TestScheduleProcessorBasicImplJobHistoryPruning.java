@@ -9,11 +9,11 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-public class TestScheduleProcessorImplJobHistoryPruning extends ScheduleProcessorTester {
-    private ScheduleProcessor testInstance = new ScheduleProcessorImplJobHistoryPruning();
+public class TestScheduleProcessorBasicImplJobHistoryPruning extends ScheduleProcessorTester {
+    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl();
 
     @BeforeEach
-    public void clearAndInit() throws Exception {
+    public void clearAndInit() {
         repoDepositJob.deleteAll();
 
         initProcessor(testInstance);
@@ -21,10 +21,10 @@ public class TestScheduleProcessorImplJobHistoryPruning extends ScheduleProcesso
         initSubFolder();
 
         //Initial injection
-        ScheduleProcessor injectionProcessor = new ScheduleProcessorImplJobInjecting();
+        ScheduleProcessorBasic injectionProcessor = new ScheduleProcessorImpl();
         initProcessor(injectionProcessor);
         addReadyForIngestionFile();
-        injectionProcessor.handle(flowSetting);
+        injectionProcessor.handleIngest();
     }
 
     @Test
@@ -33,12 +33,12 @@ public class TestScheduleProcessorImplJobHistoryPruning extends ScheduleProcesso
         assert job != null;
 
         //Pruning
-        LocalDateTime ldt=LocalDateTime.now();
-        ldt=ldt.minusYears(5);
+        LocalDateTime ldt = LocalDateTime.now();
+        ldt = ldt.minusYears(5);
         job.setLatestTime(DashboardHelper.getLocalMilliSeconds(ldt));
         repoDepositJob.save(job);
 
-        testInstance.handle(flowSetting);
+        testInstance.handleHistoryPruning(flowSetting, injectionPathScanClient, job);
 
         job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
 
@@ -61,7 +61,7 @@ public class TestScheduleProcessorImplJobHistoryPruning extends ScheduleProcesso
         repoDepositJob.save(job);
 
         //Pruning
-        testInstance.handle(flowSetting);
+        testInstance.handleHistoryPruning(flowSetting, injectionPathScanClient, job);
 
         job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
 

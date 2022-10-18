@@ -28,6 +28,7 @@ public class WhitelistSettingService {
         RestResponseCommand rstVal = new RestResponseCommand();
         List<EntityWhitelistSetting> data = repoWhiteList.getAll();
         rstVal.setRspBody(data);
+        data.clear();
         return rstVal;
     }
 

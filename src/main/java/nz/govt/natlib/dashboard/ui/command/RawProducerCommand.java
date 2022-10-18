@@ -31,4 +31,8 @@ public class RawProducerCommand {
     public void setMaterialFlows(List<RawMaterialFlowCommand> materialFlows) {
         this.materialFlows = materialFlows;
     }
+
+    public void clear() {
+        this.materialFlows.clear();
+    }
 }

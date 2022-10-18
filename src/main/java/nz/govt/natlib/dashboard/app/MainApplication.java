@@ -42,16 +42,16 @@ public class MainApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // Note that this is just here for debugging purposes. It can be deleted at any time.
-        System.out.println(ANSI_GREEN + "Let's inspect the beans provided by Spring Boot:" + ANSI_RESET);
+//        System.out.println(ANSI_GREEN + "Let's inspect the beans provided by Spring Boot:" + ANSI_RESET);
         log.info("Let's inspect the beans provided by Spring Boot:");
         String[] beanNames = ctx.getBeanDefinitionNames();
         Arrays.sort(beanNames);
         for (String beanName : beanNames) {
-            System.out.println(ANSI_CYAN + beanName + ANSI_RESET);
+//            System.out.println(ANSI_CYAN + beanName + ANSI_RESET);
             log.info(beanName);
         }
 
-        System.out.println(ANSI_BLUE + "^_^_^_^_^_^_^_^_^_^ Dashboard Initialed ^_^_^_^_^_^_^_^_^_^_^" + ANSI_RESET);
+//        System.out.println(ANSI_BLUE + "^_^_^_^_^_^_^_^_^_^ Dashboard Initialed ^_^_^_^_^_^_^_^_^_^_^" + ANSI_RESET);
         log.info("^_^_^_^_^_^_^_^_^_^ Dashboard Initialed ^_^_^_^_^_^_^_^_^_^_^");
     }
 }

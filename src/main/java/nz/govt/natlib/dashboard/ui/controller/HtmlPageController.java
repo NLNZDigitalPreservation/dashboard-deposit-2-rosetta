@@ -80,6 +80,7 @@ public class HtmlPageController {
         model.addAttribute("PATH_CONTEXT", req.getContextPath());
 
         printHtml("home.html", model, rsp);
+        model.clear();
     }
 
     @RequestMapping(path = {DashboardConstants.PATH_USER_LOGIN_HTML}, method = {RequestMethod.GET, RequestMethod.POST})

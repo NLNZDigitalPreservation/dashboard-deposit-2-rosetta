@@ -7,5 +7,5 @@ public enum EnumEntityKey {
     StorageLocation,
     DepositJob,
     SystemEvent,
-    WhiteListSetting
+    WhiteListSetting,
 }

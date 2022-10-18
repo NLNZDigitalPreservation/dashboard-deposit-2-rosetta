@@ -2,6 +2,8 @@ package nz.govt.natlib.dashboard.common;
 
 import com.google.common.io.Files;
 import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.common.injection.InjectionPathScan;
+import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.repo.*;
 import nz.govt.natlib.dashboard.domain.service.DepositJobService;
@@ -43,7 +45,7 @@ public class BasicTester {
     protected static RepoDepositJob repoDepositJob;
     protected static RepoDepositAccount repoDepositAccount;
     protected static RepoWhiteList repoWhiteList;
-
+    protected static RepoGlobalSetting repoGlobalSetting;
     protected static RosettaWebServiceImpl rosettaWebService;
     protected static DepositJobService depositJobService;
 
@@ -52,6 +54,11 @@ public class BasicTester {
         repoIdGenerator = new RepoIdGenerator();
         ReflectionTestUtils.setField(repoIdGenerator, "systemStoragePath", storagePath);
         repoIdGenerator.init();
+
+        repoGlobalSetting=new RepoGlobalSetting();
+        ReflectionTestUtils.setField(repoGlobalSetting, "systemStoragePath", storagePath);
+        ReflectionTestUtils.setField(repoGlobalSetting, "idGenerator", repoIdGenerator);
+        repoGlobalSetting.init();
 
         repoFlowSetting = new RepoFlowSetting();
         ReflectionTestUtils.setField(repoFlowSetting, "systemStoragePath", storagePath);

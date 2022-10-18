@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
-public class TestScheduleProcessorImplJobInjecting extends ScheduleProcessorTester {
-    private ScheduleProcessor testInstance = new ScheduleProcessorImplJobInjecting();
+public class TestScheduleProcessorBasicImplJobInjecting extends ScheduleProcessorTester {
+    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl();
 
     @BeforeEach
     public void clearAndInit() throws IOException {
@@ -22,14 +22,14 @@ public class TestScheduleProcessorImplJobInjecting extends ScheduleProcessorTest
 
     @Test
     public void testPreparingJobsInjectionNotReady() throws Exception {
-        testInstance.handle(flowSetting);
+        testInstance.handleIngest();
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
         assert jobs.size() == 1;
 
         EntityDepositJob job = jobs.get(0);
-        assert job.getStage() == EnumDepositJobStage.INJECT;
+        assert job.getStage() == EnumDepositJobStage.INGEST;
         assert job.getState() == EnumDepositJobState.RUNNING;
         assert job.getFileCount() == 2;
         assert job.getFileSize() == testFileLength_1 + testFileLength_2;
@@ -39,7 +39,7 @@ public class TestScheduleProcessorImplJobInjecting extends ScheduleProcessorTest
     public void testPreparingJobsInjectionIsReady() throws Exception {
         addReadyForIngestionFile();
 
-        testInstance.handle(flowSetting);
+        testInstance.handleIngest();
 
         EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;

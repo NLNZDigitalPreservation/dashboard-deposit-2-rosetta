@@ -85,13 +85,12 @@ class FlowSetting extends BasicSettings{
         materialFlowId: '',
         materialFlowName: '',
         rootPath: '',
-        streamLocation: 'content/streams',
+        streamLocation: 'content',
         injectionCompleteFileName: 'ready-for-ingestion-FOLDER-COMPLETED',
-        delays: 60,
-        delayUnit: 'S',
         maxActiveDays: 14,
         maxSaveDays: 365,
-        weeklyMaxConcurrency: [1,1,1,1,1,1,1]
+        weeklyMaxConcurrency: [1,1,1,1,1,1,1],
+        actualContentDeleteOptions: 'notDelete',
       }
     	return initialSetting;
     }
@@ -112,8 +111,6 @@ class FlowSetting extends BasicSettings{
         // Advanced settings
         data['streamLocation']=$('#flow-settings input[name="streamLocation"]').val();
         data['injectionCompleteFileName']=$('#flow-settings input[name="injectionCompleteFileName"]').val();
-        data['delays']=$('#flow-settings input[name="delays"]').val();
-        data['delayUnit']='S';
         data['maxActiveDays']=$('#flow-settings input[name="maxActiveDays"]').val();
         data['maxSaveDays']=$('#flow-settings input[name="maxSaveDays"]').val();
 
@@ -126,6 +123,9 @@ class FlowSetting extends BasicSettings{
         weeklyMaxThreads.push($('#flow-settings input[name="sat"]').val());
         weeklyMaxThreads.push($('#flow-settings input[name="sun"]').val());
         data['weeklyMaxConcurrency']=weeklyMaxThreads;
+
+        data['actualContentDeleteOptions']=$('#flow-settings select[name="actualContentDeleteOptions"] option:selected').attr('value');
+
         return data;
     }
 
@@ -140,8 +140,6 @@ class FlowSetting extends BasicSettings{
 
         $('#flow-settings input[name="streamLocation"]').val(data['streamLocation']);
         $('#flow-settings input[name="injectionCompleteFileName"]').val(data['injectionCompleteFileName']);
-        $('#flow-settings input[name="delays"]').val(data['delays']);
-        $('#flow-settings select[name="delayUnit"]').val(data['delayUnit']);
         $('#flow-settings input[name="maxActiveDays"]').val(data['maxActiveDays']);
         $('#flow-settings input[name="maxSaveDays"]').val(data['maxSaveDays']);
 
@@ -153,6 +151,8 @@ class FlowSetting extends BasicSettings{
         $('#flow-settings input[name="fri"]').val(weeklyMaxThreads[4]);
         $('#flow-settings input[name="sat"]').val(weeklyMaxThreads[5]);
         $('#flow-settings input[name="sun"]').val(weeklyMaxThreads[6]);
+
+        $('#flow-settings select[name="actualContentDeleteOptions"]').val(data['actualContentDeleteOptions']);
 
         var healthAuditMsg;
         if (!data.id || data.auditRst) {

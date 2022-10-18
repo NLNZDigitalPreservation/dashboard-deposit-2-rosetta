@@ -29,6 +29,7 @@ public class DepositAccountSettingService {
         RestResponseCommand rstVal = new RestResponseCommand();
         List<EntityDepositAccountSetting> data = repoDepositAccount.getAll();
         rstVal.setRspBody(data);
+        data.clear();
         return rstVal;
     }
 

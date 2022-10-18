@@ -14,8 +14,8 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class TestScheduleProcessorImplJobStatusPolling extends ScheduleProcessorTester {
-    private ScheduleProcessor testInstance = new ScheduleProcessorImplJobStatusPolling();
+public class TestScheduleProcessorBasicImplJobStatusPolling extends ScheduleProcessorTester {
+    private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl();
 
     @BeforeEach
     public void clearAndInit() throws Exception {
@@ -23,17 +23,17 @@ public class TestScheduleProcessorImplJobStatusPolling extends ScheduleProcessor
 
         initSubFolder();
 
-        //Initial injection
-        ScheduleProcessor injectionProcessor = new ScheduleProcessorImplJobInjecting();
-        initProcessor(injectionProcessor);
+        //Initial processor
+        ScheduleProcessorBasic scheduleProcessor = new ScheduleProcessorImpl();
+        initProcessor(scheduleProcessor);
         addReadyForIngestionFile();
-        injectionProcessor.handle(flowSetting);
+        scheduleProcessor.handleIngest();
 
         //Deposit job
-        ScheduleProcessor depositProcessor = new ScheduleProcessorImplJobDepositing();
-        initProcessor(depositProcessor);
+        List<EntityDepositJob> jobs = repoDepositJob.getAll();
+        EntityDepositJob job = jobs.get(0);
         when(rosettaWebService.deposit(any(), any(), any(), any(), any(), any())).thenReturn(new ResultOfDeposit(true, "OK", sipId));
-        depositProcessor.handle(flowSetting);
+        scheduleProcessor.handleDeposit(flowSetting, injectionPathScanClient, job);
     }
 
     @Test
@@ -49,7 +49,7 @@ public class TestScheduleProcessorImplJobStatusPolling extends ScheduleProcessor
         sipStatusInfo.setStatus("SUCCEED");
         when(rosettaWebService.getSIPStatusInfo(sipId)).thenReturn(sipStatusInfo);
 
-        testInstance.handle(flowSetting);
+        testInstance.handlePollingStatus(job);
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
@@ -76,7 +76,7 @@ public class TestScheduleProcessorImplJobStatusPolling extends ScheduleProcessor
         sipStatusInfo.setStatus("SUCCEED");
         when(rosettaWebService.getSIPStatusInfo(sipId)).thenReturn(sipStatusInfo);
 
-        testInstance.handle(flowSetting);
+        testInstance.handlePollingStatus(job);
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
@@ -103,7 +103,7 @@ public class TestScheduleProcessorImplJobStatusPolling extends ScheduleProcessor
         sipStatusInfo.setStatus("ERROR");
         when(rosettaWebService.getSIPStatusInfo(sipId)).thenReturn(sipStatusInfo);
 
-        testInstance.handle(flowSetting);
+        testInstance.handlePollingStatus(job);
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;

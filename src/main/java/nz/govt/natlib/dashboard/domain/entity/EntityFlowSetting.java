@@ -1,10 +1,6 @@
 package nz.govt.natlib.dashboard.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import java.util.concurrent.TimeUnit;
-
-public class EntityFlowSetting extends EntityCommon{
+public class EntityFlowSetting extends EntityCommon {
     private boolean enabled;
     private Long depositAccountId;
     private String materialFlowId;
@@ -16,14 +12,14 @@ public class EntityFlowSetting extends EntityCommon{
     private String streamLocation;
     private String injectionCompleteFileName;
 
-
-    private Long delays;
-    private String delayUnit;
     private Long maxActiveDays;
     private Long maxSaveDays;
+    private Long delays;
+    private String delayUnit;
 
     private int[] weeklyMaxConcurrency = new int[7];
 
+    private String actualContentDeleteOptions;
 
     public Long getDepositAccountId() {
         return depositAccountId;
@@ -98,22 +94,6 @@ public class EntityFlowSetting extends EntityCommon{
         this.streamLocation = streamLocation;
     }
 
-    public Long getDelays() {
-        return delays;
-    }
-
-    public void setDelays(Long delays) {
-        this.delays = delays;
-    }
-
-    public String getDelayUnit() {
-        return delayUnit;
-    }
-
-    public void setDelayUnit(String delayUnit) {
-        this.delayUnit = delayUnit;
-    }
-
     public int[] getWeeklyMaxConcurrency() {
         return weeklyMaxConcurrency;
     }
@@ -138,18 +118,27 @@ public class EntityFlowSetting extends EntityCommon{
         this.maxSaveDays = maxSaveDays;
     }
 
-    @JsonIgnore
-    public TimeUnit getDelayTimeUnit() {
-        if (this.delayUnit.equalsIgnoreCase("S")) {
-            return TimeUnit.SECONDS;
-        } else if (this.delayUnit.equalsIgnoreCase("M")) {
-            return TimeUnit.MINUTES;
-        } else if (this.delayUnit.equalsIgnoreCase("H")) {
-            return TimeUnit.HOURS;
-        } else if (this.delayUnit.equalsIgnoreCase("D")) {
-            return TimeUnit.DAYS;
-        } else {
-            return TimeUnit.SECONDS;
-        }
+    public String getActualContentDeleteOptions() {
+        return actualContentDeleteOptions;
+    }
+
+    public void setActualContentDeleteOptions(String actualContentDeleteOptions) {
+        this.actualContentDeleteOptions = actualContentDeleteOptions;
+    }
+
+    public Long getDelays() {
+        return delays;
+    }
+
+    public void setDelays(Long delays) {
+        this.delays = delays;
+    }
+
+    public String getDelayUnit() {
+        return delayUnit;
+    }
+
+    public void setDelayUnit(String delayUnit) {
+        this.delayUnit = delayUnit;
     }
 }
