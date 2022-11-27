@@ -129,13 +129,23 @@ class FlowSetting extends BasicSettings{
         return data;
     }
 
+    setValueOfDropdownBox(data){
+        $('#flow-settings select[name="depositAccount"]').val(data['depositAccountId']);
+        fetchHttp(PATH_RAW_PRODUCER_MATERIAL_FLOW+'?depositAccountId='+data['depositAccountId'], null, function(producerDataset){
+            var htmlProducers=combineProducers(producerDataset);
+            $('#flow-settings select[name="producer"]').html(htmlProducers);
+            $('#flow-settings select[name="producer"]').val(data['producerId']);
+
+            var htmlFlows=mapMaterialFlows[data['producerId']];
+            $('#flow-settings select[name="materialFlow"]').html(htmlFlows);
+            $('#flow-settings select[name="materialFlow"]').val(data['materialFlowId']);
+        });
+    }
+
     setValue(data){
         $('#flow-settings input[name="id"]').val(data['id']);
         $('#flow-settings input[name="enabled"]').prop('checked', data['enabled']);
-        $('#flow-settings select[name="depositAccount"]').val(data['depositAccountId']);
-        $('#flow-settings select[name="producer"]').val(data['producerId']);
-        set_flow_dropdown_box(data['producerId']);
-        $('#flow-settings select[name="materialFlow"]').val(data['materialFlowId']);
+        this.setValueOfDropdownBox(data);
         $('#flow-settings input[name="rootPath"]').val(data['rootPath']);
 
         $('#flow-settings input[name="streamLocation"]').val(data['streamLocation']);
