@@ -131,7 +131,7 @@ function isRowDataValidForAction(action, rowData){
         case 'TERMINATE':
             return (stage==='FINISHED' && state==='SUCCEED') || (state==='FAILED') || (state==='CANCELED');
         case 'CANCEL':
-            return state==='FAILED';
+            return state!=='RUNNING';
         default:
             return false;
     }

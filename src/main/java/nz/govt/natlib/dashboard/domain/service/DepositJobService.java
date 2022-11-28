@@ -202,7 +202,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     }
 
     public EntityDepositJob cancel(EntityDepositJob job) {
-        if (job.getStage() != EnumDepositJobStage.DEPOSIT || job.getState() != EnumDepositJobState.FAILED) {
+        if (job.getState() == EnumDepositJobState.RUNNING) {
             log.warn("{} at stage [{}] and state [{}] could not be canceled", job.getInjectionTitle(), job.getStage(), job.getState());
             return job;
         }
