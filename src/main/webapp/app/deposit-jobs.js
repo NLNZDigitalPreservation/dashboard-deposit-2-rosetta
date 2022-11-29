@@ -37,7 +37,7 @@ const gridDepositJobsColumnsActive=[
     {headerName: "Progress", field: "statusLatest", width: 120, cellRenderer: function(row){
         var stage=row.data.stage, state=row.data.state;
         var percent=calcPercentActive(stage, state);
-        return getProgressDIVActive(percent);
+        return getProgressDIVActive(stage, state, percent);
     }},
 
     {headerName: "NumOfFiles", field: "fileCount", width: 160},
@@ -57,8 +57,12 @@ const gridDepositJobsColumnsActive=[
     // {headerName: "Deposit Result", field: "resultMessage", width: 200},
 ];
 
-function getProgressDIVActive(percent){
-    return '<div style="width: calc(100% + 44px); height:100%; margin-left:-22px; text-align: center; background: linear-gradient(to right, rgb(40,167,69, 0.8) ' + percent + '%, rgba(192,192,192,0.5) ' + percent + '% 100%);">' + percent + '%</div>';
+function getProgressDIVActive(stage, state, percent){
+    if(stage==='FINISHED' && state==='CANCELED'){
+        return '<div style="width: calc(100% + 44px); height:100%; margin-left:-22px; text-align: center; background: linear-gradient(to right, rgb(40,167,69, 0.8) ' + 0 + '%, rgba(192,192,192,0.45) ' + 0 + '% 100%);">' + percent + '%</div>';
+    }else{
+        return '<div style="width: calc(100% + 44px); height:100%; margin-left:-22px; text-align: center; background: linear-gradient(to right, rgb(40,167,69, 0.8) ' + percent + '%, rgba(192,192,192,0.5) ' + percent + '% 100%);">' + percent + '%</div>';
+    }
 }
 
 function cellFlagIconActive(stage, state){
