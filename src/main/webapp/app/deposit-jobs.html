@@ -15,9 +15,9 @@
 
               <div class="mb-3">
                 <label for="search-select-material-flow" class="form-label">Material Flow</label>
-                <div id="search-select-material-flow">
+                <div id="search-select-material-flow" style="height:20vh; overflow-y: auto;">
                   <#list flowSettings as flow>
-                  <div class="form-check form-check-inline">
+                  <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="check-stage-${flow.getMaterialFlowName()}" flowId="${flow.getId()}" checked>
                     <label class="form-check-label" for="check-stage-${flow.getMaterialFlowName()}">${flow.getMaterialFlowName()}</label>
                   </div>

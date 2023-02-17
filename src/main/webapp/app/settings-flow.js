@@ -23,12 +23,18 @@ function combineMaterialFlows(items){
 function initProducerMaterialflowSelector(data){
   var html=combineProducers(data);
   $('#flow-settings select[name="producer"]').html(html);
+  $('#flow-settings select[name="producer"]').val(null);
+  $('#flow-settings select[name="materialFlow"]').html('');
+  $('#flow-settings select[name="materialFlow"]').val(null);
+  /**
   var selectedId=$('#flow-settings select[name="producer"] option:selected').val();
   if(selectedId!=null){
     $('#flow-settings select[name="materialFlow"]').html(mapMaterialFlows[selectedId]);
   }else{
     $('#flow-settings select[name="materialFlow"]').html('');
   }
+  */
+
 
   $('#flow-settings select[name="producer"]').change(function() {
     var selectedId=$('#flow-settings select[name="producer"] option:selected').val();
@@ -37,6 +43,7 @@ function initProducerMaterialflowSelector(data){
     console.log(flows);
 
     $('#flow-settings select[name="materialFlow"]').html(flows);
+    $('#flow-settings select[name="materialFlow"]').val(null);
   });
 }
 
@@ -64,9 +71,10 @@ class FlowSetting extends BasicSettings{
                 html+='<option value="' + item.id + '">' + item.depositUserInstitute + ' | ' + item.depositUserName + '</option>';
             }
             $('#flow-settings select[name="depositAccount"]').html(html);
+            $('#flow-settings select[name="depositAccount"]').val(null);
 
-            var selectedId=$('#flow-settings select[name="depositAccount"] option:selected').val();
-            fetchHttp(PATH_RAW_PRODUCER_MATERIAL_FLOW+'?depositAccountId='+selectedId, null, initProducerMaterialflowSelector);
+            // var selectedId=$('#flow-settings select[name="depositAccount"] option:selected').val();
+            // fetchHttp(PATH_RAW_PRODUCER_MATERIAL_FLOW+'?depositAccountId='+selectedId, null, initProducerMaterialflowSelector);
         });
 
         $('#flow-settings select[name="depositAccount"]').change(function() {
@@ -130,16 +138,22 @@ class FlowSetting extends BasicSettings{
     }
 
     setValueOfDropdownBox(data){
-        $('#flow-settings select[name="depositAccount"]').val(data['depositAccountId']);
-        fetchHttp(PATH_RAW_PRODUCER_MATERIAL_FLOW+'?depositAccountId='+data['depositAccountId'], null, function(producerDataset){
-            var htmlProducers=combineProducers(producerDataset);
-            $('#flow-settings select[name="producer"]').html(htmlProducers);
-            $('#flow-settings select[name="producer"]').val(data['producerId']);
+        if(data['id'] === null){
+            $('#flow-settings select[name="depositAccount"]').val(null);
+            $('#flow-settings select[name="producer"]').val(null);
+            $('#flow-settings select[name="materialFlow"]').val(null);
+        }else{
+            $('#flow-settings select[name="depositAccount"]').val(data['depositAccountId']);
+            fetchHttp(PATH_RAW_PRODUCER_MATERIAL_FLOW+'?depositAccountId='+data['depositAccountId'], null, function(producerDataset){
+                var htmlProducers=combineProducers(producerDataset);
+                $('#flow-settings select[name="producer"]').html(htmlProducers);
+                $('#flow-settings select[name="producer"]').val(data['producerId']);
 
-            var htmlFlows=mapMaterialFlows[data['producerId']];
-            $('#flow-settings select[name="materialFlow"]').html(htmlFlows);
-            $('#flow-settings select[name="materialFlow"]').val(data['materialFlowId']);
-        });
+                var htmlFlows=mapMaterialFlows[data['producerId']];
+                $('#flow-settings select[name="materialFlow"]').html(htmlFlows);
+                $('#flow-settings select[name="materialFlow"]').val(data['materialFlowId']);
+            });
+        }
     }
 
     setValue(data){
