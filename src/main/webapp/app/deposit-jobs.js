@@ -180,7 +180,7 @@ function isSelectedRowsValidForAction(action, selectedRows){
         }else if(req.length < selectedRows.length){
             gReqNodes=req;
             gAction=action;
-            showUnavailableActionAlert("Some of the selected jobs are NOT allowed to apply the " + action + " action. Would you like to continue? </br> The available status for " + action + " are shown below:", action, continueProcessDepositJobAction);
+            showUnavailableActionAlert("Some of the selected jobs are NOT allowed to apply the " + action + " action. Click 'Confirm' to continue. </br> The available status for " + action + " are shown below:", action, continueProcessDepositJobAction);
             return;
         }
     }else if(selectedRows.length == 1 && req.length < selectedRows.length){
