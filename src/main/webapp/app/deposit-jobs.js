@@ -121,6 +121,24 @@ function calcPercentActive(stage, state){
     return percent;
 }
 
+function getErrorMessageForAction(action, rowData){
+    action=action.toUpperCase();
+    var stage=rowData.stage, state=rowData.state;
+    switch(action){
+        case 'PAUSE':
+            return 'The jobs with INGEST-RUNNING, DEPOSIT-INITIALED and FINALIZE-RUNNING status can be paused.';
+        case 'RESUME':
+            return 'The jobs with PAUSED status can be resumed.';
+        case 'RETRY':
+            return 'The jobs with DEPOSIT-FAILED status can be retried';
+        case 'TERMINATE':
+            return 'The jobs with FAILED, CANCELED and FINISHED-SUCCEED status can be terminated.';
+        case 'CANCEL':
+            return 'The RUNNING jobs can NOT be canceled.';
+        default:
+            return 'Unknown action: ' + action;
+    }
+}
 
 function isRowDataValidForAction(action, rowData){
     action=action.toUpperCase();
@@ -135,13 +153,16 @@ function isRowDataValidForAction(action, rowData){
         case 'TERMINATE':
             return (stage==='FINISHED' && state==='SUCCEED') || (state==='FAILED') || (state==='CANCELED');
         case 'CANCEL':
-            return state!=='RUNNING';
+            return state!=='RUNNING' && state!=="CANCELED";
         default:
             return false;
     }
 }
 
+var gReqNodes;
+var gAction;
 function isSelectedRowsValidForAction(action, selectedRows){
+    action = action.toUpperCase();
     var req=[];
     for(var idx=0; idx<selectedRows.length;idx++){
         var rowData=selectedRows[idx];
@@ -153,20 +174,24 @@ function isSelectedRowsValidForAction(action, selectedRows){
     
     if(selectedRows.length > 1){
         if(req.length == 0){
-            alert("The selected jobs are NOT allowed to apply the " + action + " action.");
-            return null;
+            gReqNodes=null;
+            showUnavailableActionAlert("The selected jobs are NOT allowed to apply the " + action + " action. The available status for " + action + " are shown below:", action);
+            return;
         }else if(req.length < selectedRows.length){
-            var continueFlag=confirm("Some of the selected jobs are NOT allowed to apply the " + action + " action. Would you like to continue?");
-            if(!continueFlag){
-                return null;
-            }
+            gReqNodes=req;
+            gAction=action;
+            showUnavailableActionAlert("Some of the selected jobs are NOT allowed to apply the " + action + " action. Click 'Confirm' to continue. </br> The available status for " + action + " are shown below:", action, continueProcessDepositJobAction);
+            return;
         }
-        
     }else if(selectedRows.length == 1 && req.length < selectedRows.length){
-        alert("The job is NOT allowed to apply the " + action + " action.");
-        return null;
+        gReqNodes=null;
+        var errMsg=getErrorMessageForAction(action, selectedRows[0]);
+        showUnavailableActionAlert("The job is NOT allowed to apply the " + action + " action. The available status for " + action + " are shown below:", action);
+        return;
     }
-    return req;
+    gReqNodes = req;
+    gAction=action;
+    continueProcessDepositJobAction(req, action);
 }
 
 function handleDepositJobActive(action, selectedRow){
@@ -183,12 +208,19 @@ function handleDepositJobActive(action, selectedRow){
         selectedRows=[selectedRow.data];
     }
 
-    var reqNodes=isSelectedRowsValidForAction(action, selectedRows);
+//    var reqNodes=isSelectedRowsValidForAction(action, selectedRows);
+//    if (!reqNodes) {
+//        return;
+//    }
+    isSelectedRowsValidForAction(action, selectedRows);
+}
+
+ function continueProcessDepositJobAction(reqNodes, action){
     if (!reqNodes) {
         return;
     }
 
-    if(action==='terminate' && !confirm("The selected jobs and the related actual contents will be forced to be terminated and purged. Would you like to continue?")){
+    if(action.toUpperCase() ==='TERMINATE' && !confirm("The selected jobs and the related actual contents will be forced to be terminated and purged. Would you like to continue?")){
         return;
     }
 
@@ -206,7 +238,7 @@ function handleDepositJobActive(action, selectedRow){
             }
         });
 
-        if(action==='terminate'){
+        if(action==='TERMINATE'){
             gridDepositJobs.removeByDataSet(dataset);
         }else{
             gridDepositJobs.update(dataset);

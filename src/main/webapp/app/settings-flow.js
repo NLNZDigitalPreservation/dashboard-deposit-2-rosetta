@@ -59,7 +59,11 @@ class FlowSetting extends BasicSettings{
     }
 
     getPanelDescription(item){
-        return 'Material Flow: ' + item.materialFlowName;
+        var desc='Material Flow: ' + item.materialFlowName;
+        if(!item.enabled){
+            desc += '&nbsp; <span class="badge bg-secondary rounded-pill">Disabled</span>';
+        }
+        return desc;
     }
 
     popupPanelPost(){

@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="./dist/toastr.min.css">
   <link rel="stylesheet" href="./app/dashboard.css">
   <script src="./dist/jquery-3.5.1.min.js"></script>
+
 </head>
 
 <body style="overflow: hidden;">
@@ -38,7 +39,7 @@
         <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-gear"></i>Settings</a>
         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="dropdown01">
           <li><a class="dropdown-item" href="#" onclick="settingDepositAccount.popupPanel();">Deposit Account Settings</a></li>
-          <li><a class="dropdown-item" href="#" onclick="settingFlow.popupPanel();">Materialflow Settings</a></li>
+          <li><a class="dropdown-item" href="#" onclick="settingFlow.popupPanel();">Material Flow Settings</a></li>
           <li><a class="dropdown-item" href="#" onclick="settingWhitelist.popupPanel();">User White List</a></li>
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="#" onclick="modalGlobalSetting.showSettingDetail();">Global Setting</a></li>
@@ -144,7 +145,7 @@
     <div class="card">
       <div class="card-header d-flex bd-highlight mb-3">
         <div class="p-1 bd-highlight">
-          <h5>Flow Settings</h5>            
+          <h5>Material Flow Settings</h5>
         </div>        
         <!-- <div class="p-3 bd-highlight">Flex item</div> -->
         <div class="ms-auto p-1 bd-highlight">
@@ -169,7 +170,7 @@
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Flow Settings</h5>
+          <h5 class="modal-title" id="staticBackdropLabel">Material Flow Settings</h5>
           <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">        
@@ -368,6 +369,40 @@
     </div>
   </div>
 
+  <!-- Error Message -->
+  <div class="modal fade" id="static-error-message" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header bg-warning">
+                  <h5 class="modal-title" id="static-error-message-title"><i class="bi bi-exclamation-circle-fill"></i>&nbsp;Warning</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <div>
+                      <div id="static-error-message-description"></div>
+                      <table class="table table-striped table-bordered" style="font-size:0.8em;">
+                          <thead class="bg-info">
+                          <tr>
+                              <th scope="col">State\Stage</th>
+                              <th scope="col">INGEST</th>
+                              <th scope="col">DEPOSIT</th>
+                              <th scope="col">FINALIZE</th>
+                              <th scope="col">FINISHED</th>
+                          </tr>
+                          </thead>
+                          <tbody id="static-error-message-details">
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" onclick="continue_deposit_jobs_action();">Confirm</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
 
   ${templateDepositJobs}
 
@@ -393,14 +428,14 @@
   <script src="./app/settings-whitelist.js"></script>
   <script src="./app/settings-global.js"></script>
   <script src="./app/deposit-jobs.js"></script>
-
+  <script src="./app/deposit-jobs-actions.js"></script>
 
 
   <script>
     const HTML_IFRAME_LOGIN='<iframe src="login.html" scrolling="no" frameborder="0" allowfullscreen> </iframe>';
     const IS_GLOBAL_SETTING_INITIALED=true;
     const modalGlobalInitial = new bootstrap.Modal(document.getElementById('modal-global-initial'), {keyboard: false});
-
+    const modalAlertWindow = new bootstrap.Modal(document.getElementById('static-error-message'), {keyboard: false});
 
     function loginCallback(){
       $('#modal-sso-login').hide();
@@ -427,6 +462,23 @@
       });
     }
 
+    var func_continue_deposit_jobs_action;
+
+    function showUnavailableActionAlert(msg, action, callback){
+        func_continue_deposit_jobs_action=callback;
+
+        $("#static-error-message-description").html(msg);
+        var table_body=create_available_status_tips(action);
+        $("#static-error-message-details").html(table_body);
+        modalAlertWindow.show();
+    }
+
+    function continue_deposit_jobs_action(){
+        modalAlertWindow.hide();
+        if(func_continue_deposit_jobs_action){
+            func_continue_deposit_jobs_action(gReqNodes, gAction);
+        }
+    }
     
     $(function(){
         toastr.options=Object.assign(toastr.options,{
