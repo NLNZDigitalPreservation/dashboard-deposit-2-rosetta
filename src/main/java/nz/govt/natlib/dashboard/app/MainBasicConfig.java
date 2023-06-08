@@ -1,8 +1,10 @@
 package nz.govt.natlib.dashboard.app;
 
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
+import nz.govt.natlib.dashboard.common.core.RosettaWebServiceStub;
 import org.apache.catalina.Context;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.slf4j.Logger;
@@ -42,6 +44,9 @@ public class MainBasicConfig {
     @Value("${ProxyPort}")
     private String proxyPort;
 
+    @Value("${TestEnabled}")
+    private boolean isTestMode;
+
     @PostConstruct
     public void init() {
         if (proxyEnable.equalsIgnoreCase("YES") || proxyEnable.equalsIgnoreCase("TRUE")) {
@@ -54,9 +59,15 @@ public class MainBasicConfig {
     }
 
     @Bean(BeanDefinition.SCOPE_SINGLETON)
-    public RosettaWebServiceImpl rosettaWebService() throws Exception {
+    public RosettaWebService rosettaWebService() throws Exception {
         log.info("Start to initial Rosetta Web Service");
-        RosettaWebServiceImpl bean = new RosettaWebServiceImpl(pdsUrl, wsdlUrlProducer, wsdlUrlDeposit, wsdlUrlSip, wsdlUrlDeliveryAccess);
+        RosettaWebService bean;
+        if (isTestMode) {
+            log.warn("Started with testing mode.");
+            bean = new RosettaWebServiceStub();
+        } else {
+            bean = new RosettaWebServiceImpl(pdsUrl, wsdlUrlProducer, wsdlUrlDeposit, wsdlUrlSip, wsdlUrlDeliveryAccess);
+        }
 //        bean.init();
         log.info("End to initial Rosetta Web Service");
         return bean;

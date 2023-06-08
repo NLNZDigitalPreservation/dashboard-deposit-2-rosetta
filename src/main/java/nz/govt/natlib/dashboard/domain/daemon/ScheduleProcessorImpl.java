@@ -10,6 +10,7 @@ import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import nz.govt.natlib.ndha.common.exlibris.ResultOfDeposit;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -159,6 +160,46 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
 
         if ((job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED) ||
                 (job.getStage() == EnumDepositJobStage.FINISHED && job.getState() == EnumDepositJobState.SUCCEED)) {
+            // Backup the sidecar file
+            if (flowSetting.isBackupEnabled()) {
+                File targetDirectory = new File(flowSetting.getBackupPath(), job.getInjectionTitle());
+                if (!targetDirectory.exists()) {
+                    boolean ret = targetDirectory.mkdirs();
+                    if (!ret) {
+                        log.error("Failed to create backup directory: {}", targetDirectory.getAbsolutePath());
+                        return;
+                    } else {
+                        log.error("Created the backup directory: {}", targetDirectory.getAbsolutePath());
+                    }
+                }
+
+                String subFolders = flowSetting.getBackupSubFolders();
+                if (StringUtils.isEmpty(subFolders)) {
+                    log.error("Sub folders are empty. flow setting: {}", flowSetting.getMaterialFlowName());
+                    return;
+                }
+                subFolders.lines().forEach(subFolder -> {
+                    File srcSubFolder = new File(job.getInjectionPath(), subFolder);
+                    if (srcSubFolder.exists()) {
+                        File destSubFolder = new File(targetDirectory, subFolder);
+                        boolean ret = destSubFolder.mkdirs();
+                        if (!ret) {
+                            log.error("Failed to create sub folder: {}", destSubFolder.getAbsolutePath());
+                            return;
+                        } else {
+                            log.error("Created the sub folder: {}", destSubFolder.getAbsolutePath());
+                        }
+                        try {
+                            FileUtils.copyDirectory(srcSubFolder, destSubFolder, true);
+                            log.debug("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), destSubFolder.getAbsolutePath());
+                        } catch (IOException e) {
+                            log.error("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), destSubFolder.getAbsolutePath());
+                        }
+                    }
+                });
+            }
+
+            // Delete the actual contents
             String strDeletionOption = flowSetting.getActualContentDeleteOptions();
             EnumActualContentDeletionOptions deletionOptions;
             if (StringUtils.isEmpty(strDeletionOption)) {
@@ -188,7 +229,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     }
 
     @Override
-    public void handleHistoryPruning(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) throws IOException {
+    public void handleHistoryPruning(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
         //Remove canceled and expired job
         LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
         LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());

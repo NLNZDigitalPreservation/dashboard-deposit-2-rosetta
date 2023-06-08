@@ -1,7 +1,7 @@
 package nz.govt.natlib.dashboard.domain.service;
 
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.exception.InvalidParameterException;
 import nz.govt.natlib.dashboard.common.exception.NullParameterException;
 import nz.govt.natlib.dashboard.common.exception.WebServiceException;
@@ -26,7 +26,7 @@ import java.util.List;
 public class FlowSettingService {
     private static final Logger log = LoggerFactory.getLogger(FlowSettingService.class);
     @Autowired
-    private RosettaWebServiceImpl rosettaWebService;
+    private RosettaWebService rosettaWebService;
     @Autowired
     private RepoFlowSetting repoFlowSetting;
     @Autowired
@@ -94,6 +94,15 @@ public class FlowSettingService {
             }
         }
         flowSettings.clear();
+
+        if (flowSetting.isBackupEnabled()) {
+            if (StringUtils.isEmpty(flowSetting.getBackupPath())) {
+                throw new InvalidParameterException("The backup path is empty.");
+            }
+            if (StringUtils.isEmpty(flowSetting.getBackupSubFolders())) {
+                throw new InvalidParameterException("The sub folders is empty.");
+            }
+        }
     }
 
     public RestResponseCommand getAllFlowSettings() {
