@@ -160,44 +160,9 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
 
         if ((job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED) ||
                 (job.getStage() == EnumDepositJobStage.FINISHED && job.getState() == EnumDepositJobState.SUCCEED)) {
-            // Backup the sidecar file
-            if (flowSetting.isBackupEnabled()) {
-                File targetDirectory = new File(flowSetting.getBackupPath(), job.getInjectionTitle());
-                if (!targetDirectory.exists()) {
-                    boolean ret = targetDirectory.mkdirs();
-                    if (!ret) {
-                        log.error("Failed to create backup directory: {}", targetDirectory.getAbsolutePath());
-                        return;
-                    } else {
-                        log.error("Created the backup directory: {}", targetDirectory.getAbsolutePath());
-                    }
-                }
 
-                String subFolders = flowSetting.getBackupSubFolders();
-                if (StringUtils.isEmpty(subFolders)) {
-                    log.error("Sub folders are empty. flow setting: {}", flowSetting.getMaterialFlowName());
-                    return;
-                }
-                subFolders.lines().forEach(subFolder -> {
-                    File srcSubFolder = new File(job.getInjectionPath(), subFolder);
-                    if (srcSubFolder.exists()) {
-                        File destSubFolder = new File(targetDirectory, subFolder);
-                        boolean ret = destSubFolder.mkdirs();
-                        if (!ret) {
-                            log.error("Failed to create sub folder: {}", destSubFolder.getAbsolutePath());
-                            return;
-                        } else {
-                            log.error("Created the sub folder: {}", destSubFolder.getAbsolutePath());
-                        }
-                        try {
-                            FileUtils.copyDirectory(srcSubFolder, destSubFolder, true);
-                            log.debug("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), destSubFolder.getAbsolutePath());
-                        } catch (IOException e) {
-                            log.error("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), destSubFolder.getAbsolutePath());
-                        }
-                    }
-                });
-            }
+            // Backup the actual contents
+            this.backupActualContents(flowSetting, job);
 
             // Delete the actual contents
             String strDeletionOption = flowSetting.getActualContentDeleteOptions();
@@ -248,6 +213,71 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         } catch (Exception e) {
             log.error("Failed to cancel the flow missing job, {}", job.getId(), e);
             throw new IOException(e.getMessage());
+        }
+    }
+
+    private void backupActualContents(EntityFlowSetting flowSetting, EntityDepositJob job) {
+        if (StringUtils.isEmpty(flowSetting.getActualContentBackupOptions()) ||
+                StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "notBackup")) {
+            return;
+        }
+
+        File targetDirectory = new File(flowSetting.getBackupPath(), job.getInjectionTitle());
+        if (!targetDirectory.exists()) {
+            boolean ret = targetDirectory.mkdirs();
+            if (!ret) {
+                log.error("Failed to create backup directory: {}", targetDirectory.getAbsolutePath());
+                return;
+            } else {
+                log.error("Created the backup directory: {}", targetDirectory.getAbsolutePath());
+            }
+        }
+
+        File[] existingFiles = targetDirectory.listFiles();
+        if (existingFiles != null && existingFiles.length > 0) {
+            log.warn("The backup target folder is not empty: {}", targetDirectory);
+            return;
+        }
+
+        String subFolders = flowSetting.getBackupSubFolders();
+        if (StringUtils.isEmpty(subFolders)) {
+            log.error("Sub folders are empty. flow setting: {}", flowSetting.getMaterialFlowName());
+            return;
+        }
+
+        // Backup the sidecar file
+        if (StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "backupSubFolder")) {
+            subFolders.lines().forEach(subFolder -> {
+                File srcSubFolder = new File(job.getInjectionPath(), subFolder);
+                if (srcSubFolder.exists()) {
+                    File destSubFolder = new File(targetDirectory, subFolder);
+                    boolean ret = destSubFolder.mkdirs();
+                    if (!ret) {
+                        log.error("Failed to create sub folder: {}", destSubFolder.getAbsolutePath());
+                        return;
+                    } else {
+                        log.error("Created the sub folder: {}", destSubFolder.getAbsolutePath());
+                    }
+                    try {
+                        FileUtils.copyDirectory(srcSubFolder, destSubFolder, true);
+                        log.debug("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), destSubFolder.getAbsolutePath());
+                    } catch (IOException e) {
+                        log.error("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), destSubFolder.getAbsolutePath());
+                    }
+                }
+            });
+        } else if (StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "backupContentsWithoutSubFolderName")) {
+            subFolders.lines().forEach(subFolder -> {
+                File srcSubFolder = new File(job.getInjectionPath(), subFolder);
+                if (srcSubFolder.exists()) {
+                    try {
+                        FileUtils.copyDirectory(srcSubFolder, targetDirectory, true);
+                        log.debug("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), targetDirectory.getAbsolutePath());
+                    } catch (IOException e) {
+                        log.error("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), targetDirectory.getAbsolutePath());
+                    }
+                }
+            });
         }
     }
 }

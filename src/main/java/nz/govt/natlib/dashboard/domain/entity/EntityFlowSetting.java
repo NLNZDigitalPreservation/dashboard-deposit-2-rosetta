@@ -21,7 +21,8 @@ public class EntityFlowSetting extends EntityCommon {
 
     private String actualContentDeleteOptions;
 
-    private boolean backupEnabled;
+    private Boolean backupEnabled;
+    private String actualContentBackupOptions;
     private String backupPath;
     private String backupSubFolders;
 
@@ -146,12 +147,20 @@ public class EntityFlowSetting extends EntityCommon {
         this.delayUnit = delayUnit;
     }
 
-    public boolean isBackupEnabled() {
+    public Boolean getBackupEnabled() {
         return backupEnabled;
     }
 
-    public void setBackupEnabled(boolean backupEnabled) {
+    public void setBackupEnabled(Boolean backupEnabled) {
         this.backupEnabled = backupEnabled;
+    }
+
+    public String getActualContentBackupOptions() {
+        return actualContentBackupOptions;
+    }
+
+    public void setActualContentBackupOptions(String actualContentBackupOptions) {
+        this.actualContentBackupOptions = actualContentBackupOptions;
     }
 
     public String getBackupPath() {

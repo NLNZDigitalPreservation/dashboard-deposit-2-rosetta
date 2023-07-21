@@ -95,7 +95,7 @@ public class FlowSettingService {
         }
         flowSettings.clear();
 
-        if (flowSetting.isBackupEnabled()) {
+        if (!StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "notBackup")) {
             if (StringUtils.isEmpty(flowSetting.getBackupPath())) {
                 throw new InvalidParameterException("The backup path is empty.");
             }

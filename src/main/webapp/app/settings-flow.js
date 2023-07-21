@@ -103,7 +103,7 @@ class FlowSetting extends BasicSettings{
         maxSaveDays: 365,
         weeklyMaxConcurrency: [1,1,1,1,1,1,1],
         actualContentDeleteOptions: 'notDelete',
-        backupEnabled: false,
+        actualContentBackupOptions: 'notBackup',
         backupPath: '',
         backupSubFolders: ''
       }
@@ -143,7 +143,7 @@ class FlowSetting extends BasicSettings{
         
         
         // Backup settings
-        data['backupEnabled']=$('#flow-settings input[name="backupEnabled"]').is(':checked');
+        data['actualContentBackupOptions']=$('#flow-settings select[name="actualContentBackupOptions"] option:selected').attr('value');
         data['backupPath']=$('#flow-settings input[name="backupPath"]').val();
         data['backupSubFolders']=$('#flow-settings textarea[name="backupSubFolders"]').val();
 
@@ -192,10 +192,9 @@ class FlowSetting extends BasicSettings{
         $('#flow-settings select[name="actualContentDeleteOptions"]').val(data['actualContentDeleteOptions']);
 
         //Backup options
-        $('#flow-settings input[name="backupEnabled"]').prop('checked', data['backupEnabled']);
+        $('#flow-settings select[name="actualContentBackupOptions"]').val(data['actualContentBackupOptions']);
         $('#flow-settings input[name="backupPath"]').val(data['backupPath']);
         $('#flow-settings textarea[name="backupSubFolders"]').val(data['backupSubFolders']);
-
 
         var healthAuditMsg;
         if (!data.id || data.auditRst) {
