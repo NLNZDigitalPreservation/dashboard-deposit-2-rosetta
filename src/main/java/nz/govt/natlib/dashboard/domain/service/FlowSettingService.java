@@ -45,6 +45,7 @@ public class FlowSettingService {
         DashboardHelper.assertNotNull("Ingestion Completed File Name", flowSetting.getInjectionCompleteFileName());
         DashboardHelper.assertNotNull("MaxActiveDays", flowSetting.getMaxActiveDays());
         DashboardHelper.assertNotNull("MaxStorageDays", flowSetting.getMaxSaveDays());
+        DashboardHelper.assertNotNull("ActualContentBackupOptions", flowSetting.getActualContentBackupOptions());
 
         File rootPath = new File(flowSetting.getRootPath());
         if (!rootPath.exists() || !rootPath.isDirectory()) {
