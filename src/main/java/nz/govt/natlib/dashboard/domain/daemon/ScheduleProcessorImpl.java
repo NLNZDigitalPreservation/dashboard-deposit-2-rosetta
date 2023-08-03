@@ -229,7 +229,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                 log.error("Failed to create backup directory: {}", targetDirectory.getAbsolutePath());
                 return;
             } else {
-                log.error("Created the backup directory: {}", targetDirectory.getAbsolutePath());
+                log.debug("Created the backup directory: {}", targetDirectory.getAbsolutePath());
             }
         }
 
@@ -256,7 +256,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                         log.error("Failed to create sub folder: {}", destSubFolder.getAbsolutePath());
                         return;
                     } else {
-                        log.error("Created the sub folder: {}", destSubFolder.getAbsolutePath());
+                        log.debug("Created the sub folder: {}", destSubFolder.getAbsolutePath());
                     }
                     try {
                         FileUtils.copyDirectory(srcSubFolder, destSubFolder, true);
