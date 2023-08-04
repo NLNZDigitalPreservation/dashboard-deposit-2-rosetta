@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class ScheduleProcessorBasic {
+    protected static final String BACKUP_COMPLETED_FILE = "BACKUP-COMPLETED";
     @Autowired
     protected RosettaWebService rosettaWebService;
     @Autowired

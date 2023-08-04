@@ -222,7 +222,25 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             return;
         }
 
+        //BACKUP-COMPLETED FILE
+        File backupCompletedFilePath = new File(job.getInjectionPath(), BACKUP_COMPLETED_FILE);
+        if (backupCompletedFilePath.exists()) {
+            log.debug("BACKUP-COMPLETED is existing, and skip backup: {}", backupCompletedFilePath.getAbsolutePath());
+            return;
+        }
+
+
         File targetDirectory = new File(flowSetting.getBackupPath(), job.getInjectionTitle());
+        //Clear the existing directory
+        try {
+            if (targetDirectory.exists() && targetDirectory.isDirectory()) {
+                FileUtils.deleteDirectory(targetDirectory);
+            }
+        } catch (IOException e) {
+            log.error("Failed to clear the existing directory: {}", targetDirectory.getAbsolutePath(), e);
+            return;
+        }
+
         if (!targetDirectory.exists()) {
             boolean ret = targetDirectory.mkdirs();
             if (!ret) {
@@ -235,7 +253,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
 
         File[] existingFiles = targetDirectory.listFiles();
         if (existingFiles != null && existingFiles.length > 0) {
-            log.warn("The backup target folder is not empty: {}", targetDirectory);
+            log.error("The backup target folder is not empty: {}", targetDirectory);
             return;
         }
 
@@ -278,6 +296,14 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                     }
                 }
             });
+        }
+        try {
+            boolean ret = backupCompletedFilePath.createNewFile();
+            if (!ret) {
+                log.error("Failed to create the BACKUP-COMPLETED file: {}", backupCompletedFilePath.getAbsolutePath());
+            }
+        } catch (IOException e) {
+            log.error("Failed to create the BACKUP-COMPLETED file: {}", backupCompletedFilePath.getAbsolutePath());
         }
     }
 }
