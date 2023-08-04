@@ -247,6 +247,19 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         repoJob.save(job);
     }
 
+    public void jobCompletedBackup(EntityDepositJob job) {
+        long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
+        job.setLatestTime(nowDatetime);
+        job.setBackupCompleted(true);
+        repoJob.save(job);
+    }
+
+    public void jobDeletedActualContent(EntityDepositJob job) {
+        long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
+        job.setLatestTime(nowDatetime);
+        job.setActualContentDeleted(true);
+        repoJob.save(job);
+    }
 
     private EnumDepositJobState getStateFromSipStatusInfo(SipStatusInfo sipStatusInfo) {
         String module = sipStatusInfo.getModule();

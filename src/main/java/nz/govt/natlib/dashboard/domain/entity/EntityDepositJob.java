@@ -4,7 +4,7 @@ package nz.govt.natlib.dashboard.domain.entity;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
 
-public class EntityDepositJob extends EntityCommon{
+public class EntityDepositJob extends EntityCommon {
     private Long initialTime;
     private Long latestTime;
     private Long depositStartTime;
@@ -30,6 +30,10 @@ public class EntityDepositJob extends EntityCommon{
     private String resultMessage;
 
     private EntityFlowSetting appliedFlowSetting;
+
+    private boolean actualContentDeleted = false;
+    private boolean backupCompleted = false;
+
 
     public Long getInitialTime() {
         return initialTime;
@@ -173,5 +177,21 @@ public class EntityDepositJob extends EntityCommon{
 
     public void setAppliedFlowSetting(EntityFlowSetting appliedFlowSetting) {
         this.appliedFlowSetting = appliedFlowSetting;
+    }
+
+    public boolean isActualContentDeleted() {
+        return actualContentDeleted;
+    }
+
+    public void setActualContentDeleted(boolean actualContentDeleted) {
+        this.actualContentDeleted = actualContentDeleted;
+    }
+
+    public boolean isBackupCompleted() {
+        return backupCompleted;
+    }
+
+    public void setBackupCompleted(boolean backupCompleted) {
+        this.backupCompleted = backupCompleted;
     }
 }

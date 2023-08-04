@@ -165,31 +165,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             this.backupActualContents(flowSetting, job);
 
             // Delete the actual contents
-            String strDeletionOption = flowSetting.getActualContentDeleteOptions();
-            EnumActualContentDeletionOptions deletionOptions;
-            if (StringUtils.isEmpty(strDeletionOption)) {
-                deletionOptions = EnumActualContentDeletionOptions.notDelete;
-            } else {
-                deletionOptions = EnumActualContentDeletionOptions.valueOf(strDeletionOption);
-            }
-
-            boolean isDeleteActualContent = false;
-            if (deletionOptions == EnumActualContentDeletionOptions.deleteInstantly) {
-                isDeleteActualContent = true;
-            } else if (deletionOptions == EnumActualContentDeletionOptions.deleteExceedMaxStorageDays) {
-                LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
-                LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
-                if (jobLatestUpdateTime.isBefore(deadlineTime)) {
-                    isDeleteActualContent = true;
-                }
-            }
-
-            log.info("Deletion options: {}, isDeleteActualContent: {}", deletionOptions.name(), isDeleteActualContent);
-            if (isDeleteActualContent) {
-                File ingestPath = new File(job.getInjectionPath());
-                InjectionUtils.deleteFiles(injectionPathScanClient, ingestPath);
-                log.info("Delete the actual content of job: {}, folder: {}", job.getId(), ingestPath.getAbsolutePath());
-            }
+            this.deleteActualContents(flowSetting,injectionPathScanClient,job);
         }
     }
 
@@ -222,13 +198,10 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             return;
         }
 
-        //BACKUP-COMPLETED FILE
-        File backupCompletedFilePath = new File(job.getInjectionPath(), BACKUP_COMPLETED_FILE);
-        if (backupCompletedFilePath.exists()) {
-            log.debug("BACKUP-COMPLETED is existing, and skip backup: {}", backupCompletedFilePath.getAbsolutePath());
+        if (job.isBackupCompleted()){
+            log.debug("Skip completed backup: {}", job.getInjectionTitle());
             return;
         }
-
 
         File targetDirectory = new File(flowSetting.getBackupPath(), job.getInjectionTitle());
         //Clear the existing directory
@@ -297,13 +270,40 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                 }
             });
         }
-        try {
-            boolean ret = backupCompletedFilePath.createNewFile();
-            if (!ret) {
-                log.error("Failed to create the BACKUP-COMPLETED file: {}", backupCompletedFilePath.getAbsolutePath());
+
+        depositJobService.jobCompletedBackup(job);
+    }
+
+    private void deleteActualContents(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
+        if (job.isActualContentDeleted()){
+            return;
+        }
+
+        String strDeletionOption = flowSetting.getActualContentDeleteOptions();
+        EnumActualContentDeletionOptions deletionOptions;
+        if (StringUtils.isEmpty(strDeletionOption)) {
+            deletionOptions = EnumActualContentDeletionOptions.notDelete;
+        } else {
+            deletionOptions = EnumActualContentDeletionOptions.valueOf(strDeletionOption);
+        }
+
+        boolean isDeleteActualContent = false;
+        if (deletionOptions == EnumActualContentDeletionOptions.deleteInstantly) {
+            isDeleteActualContent = true;
+        } else if (deletionOptions == EnumActualContentDeletionOptions.deleteExceedMaxStorageDays) {
+            LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
+            LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
+            if (jobLatestUpdateTime.isBefore(deadlineTime)) {
+                isDeleteActualContent = true;
             }
-        } catch (IOException e) {
-            log.error("Failed to create the BACKUP-COMPLETED file: {}", backupCompletedFilePath.getAbsolutePath());
+        }
+
+        log.info("Deletion options: {}, isDeleteActualContent: {}", deletionOptions.name(), isDeleteActualContent);
+        if (isDeleteActualContent) {
+            File ingestPath = new File(job.getInjectionPath());
+            InjectionUtils.deleteFiles(injectionPathScanClient, ingestPath);
+            depositJobService.jobDeletedActualContent(job);
+            log.info("Delete the actual content of job: {}, folder: {}", job.getId(), ingestPath.getAbsolutePath());
         }
     }
 }
