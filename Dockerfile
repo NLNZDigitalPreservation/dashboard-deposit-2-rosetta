@@ -17,6 +17,6 @@ FROM openjdk:17-jdk-alpine
 WORKDIR /root/deployment
 
 COPY --from=base /root/deployment/dashboard/build/libs/dashboard*.jar /root/deployment/dashboard.jar
+RUN ls -l /root/deployment/
 
-
-ENTRYPOINT ["java", "-jar", "dashboard.jar"]
+ENTRYPOINT ["java", "-jar", "/root/deployment/dashboard.jar"]
