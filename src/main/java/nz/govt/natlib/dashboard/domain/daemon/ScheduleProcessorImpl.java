@@ -165,7 +165,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             this.backupActualContents(flowSetting, job);
 
             // Delete the actual contents
-            this.deleteActualContents(flowSetting,injectionPathScanClient,job);
+            this.deleteActualContents(flowSetting, injectionPathScanClient, job);
         }
     }
 
@@ -192,14 +192,28 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         }
     }
 
+    private boolean isSubFoldersExisting(String subFolders, EntityDepositJob job) {
+        long existingSubFolders = subFolders.lines().filter(subFolder -> {
+            File srcSubFolder = new File(job.getInjectionPath(), subFolder);
+            return srcSubFolder.exists();
+        }).count();
+        return existingSubFolders > 0;
+    }
+
     private void backupActualContents(EntityFlowSetting flowSetting, EntityDepositJob job) {
         if (StringUtils.isEmpty(flowSetting.getActualContentBackupOptions()) ||
                 StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "notBackup")) {
             return;
         }
 
-        if (job.isBackupCompleted()){
+        if (job.isBackupCompleted()) {
             log.debug("Skip completed backup: {}", job.getInjectionTitle());
+            return;
+        }
+
+        String subFolders = flowSetting.getBackupSubFolders();
+        if (StringUtils.isEmpty(subFolders) || (!isSubFoldersExisting(subFolders, job))) {
+            log.info("Sub folders are empty. flow setting: {}", flowSetting.getMaterialFlowName());
             return;
         }
 
@@ -227,12 +241,6 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         File[] existingFiles = targetDirectory.listFiles();
         if (existingFiles != null && existingFiles.length > 0) {
             log.error("The backup target folder is not empty: {}", targetDirectory);
-            return;
-        }
-
-        String subFolders = flowSetting.getBackupSubFolders();
-        if (StringUtils.isEmpty(subFolders)) {
-            log.error("Sub folders are empty. flow setting: {}", flowSetting.getMaterialFlowName());
             return;
         }
 
@@ -275,7 +283,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     }
 
     private void deleteActualContents(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
-        if (job.isActualContentDeleted()){
+        if (job.isActualContentDeleted()) {
             return;
         }
 
