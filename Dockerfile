@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 AS base
+FROM ubuntu:22.04 as build
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -10,13 +10,14 @@ RUN mkdir dashboard && \
     cd ./dashboard && \
     git checkout origin/containerize && \
     ./install_maven_dependencies.sh && \
-    ./gradlew clean build -x test
+    ./gradlew clean build -x test && \
+    ls -l  /root/deployment/dashboard/build/libs
 
 # Recreate a clean image without the building tools
 FROM openjdk:17-jdk-alpine
+COPY --from=build /root/deployment/dashboard/build/libs/ /root/deployment/
 WORKDIR /root/deployment
-
-COPY --from=base /root/deployment/dashboard/build/libs/dashboard*.jar /root/deployment/dashboard.jar
-RUN ls -l /root/deployment/
+RUN ls -al /root && \
+    java -version
 
 ENTRYPOINT ["sleep", "3000"]
