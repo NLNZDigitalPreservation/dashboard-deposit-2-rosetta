@@ -12,11 +12,6 @@ RUN mkdir dashboard && \
     ./install_maven_dependencies.sh && \
     ./gradlew clean build -x test
 
-WORKDIR /root/dashboard
-RUN mv /root/deployment/dashboard/build/libs/dashboard*.jar ./dashboard.jar && \
-    rm -rf /root/deployment
-
-
 # Recreate a clean image without the building tools
 FROM openjdk:17-jdk-alpine
 WORKDIR /root/deployment
