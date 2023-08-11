@@ -19,4 +19,4 @@ WORKDIR /root/deployment
 COPY --from=base /root/deployment/dashboard/build/libs/dashboard*.jar /root/deployment/dashboard.jar
 RUN ls -l /root/deployment/
 
-ENTRYPOINT ["java", "-jar", "/root/deployment/dashboard.jar"]
+ENTRYPOINT ["sleep", "3000"]
