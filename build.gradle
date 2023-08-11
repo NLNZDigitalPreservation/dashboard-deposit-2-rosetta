@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.5.13'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
-    id 'war'
+//    id 'war'
 }
 
 repositories {
@@ -77,6 +77,10 @@ description = 'Dashboard Tool'
 sourceCompatibility = '1.11'
 targetCompatibility = '1.11'
 //apply plugin: 'war'
+
+jar {
+    enabled = false
+}
 
 //For a Spring Boot War
 //bootWar {
