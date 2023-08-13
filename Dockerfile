@@ -10,6 +10,7 @@ RUN apk add --no-check-certificate openjdk17 && \
 
 WORKDIR /deployment
 RUN mv /compiled/dashboard-deposit*/target/*.war deposit-dashboard.war && \
-    rm -rf /compiled
+    rm -rf /compiled && \
+    rm -rf /root/.m2
 
 ENTRYPOINT ["java", "-jar", "deposit-dashboard.war", "--spring.config.location=file:/deployment/conf/application.properties"]
