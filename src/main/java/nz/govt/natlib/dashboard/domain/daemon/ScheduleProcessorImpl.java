@@ -10,6 +10,7 @@ import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import nz.govt.natlib.ndha.common.exlibris.ResultOfDeposit;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -159,36 +160,17 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
 
         if ((job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED) ||
                 (job.getStage() == EnumDepositJobStage.FINISHED && job.getState() == EnumDepositJobState.SUCCEED)) {
-            String strDeletionOption = flowSetting.getActualContentDeleteOptions();
-            EnumActualContentDeletionOptions deletionOptions;
-            if (StringUtils.isEmpty(strDeletionOption)) {
-                deletionOptions = EnumActualContentDeletionOptions.notDelete;
-            } else {
-                deletionOptions = EnumActualContentDeletionOptions.valueOf(strDeletionOption);
-            }
 
-            boolean isDeleteActualContent = false;
-            if (deletionOptions == EnumActualContentDeletionOptions.deleteInstantly) {
-                isDeleteActualContent = true;
-            } else if (deletionOptions == EnumActualContentDeletionOptions.deleteExceedMaxStorageDays) {
-                LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
-                LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
-                if (jobLatestUpdateTime.isBefore(deadlineTime)) {
-                    isDeleteActualContent = true;
-                }
-            }
+            // Backup the actual contents
+            this.backupActualContents(flowSetting, job);
 
-            log.info("Deletion options: {}, isDeleteActualContent: {}", deletionOptions.name(), isDeleteActualContent);
-            if (isDeleteActualContent) {
-                File ingestPath = new File(job.getInjectionPath());
-                InjectionUtils.deleteFiles(injectionPathScanClient, ingestPath);
-                log.info("Delete the actual content of job: {}, folder: {}", job.getId(), ingestPath.getAbsolutePath());
-            }
+            // Delete the actual contents
+            this.deleteActualContents(flowSetting, injectionPathScanClient, job);
         }
     }
 
     @Override
-    public void handleHistoryPruning(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) throws IOException {
+    public void handleHistoryPruning(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
         //Remove canceled and expired job
         LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
         LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
@@ -207,6 +189,129 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         } catch (Exception e) {
             log.error("Failed to cancel the flow missing job, {}", job.getId(), e);
             throw new IOException(e.getMessage());
+        }
+    }
+
+    private boolean isSubFoldersExisting(String subFolders, EntityDepositJob job) {
+        long existingSubFolders = subFolders.lines().filter(subFolder -> {
+            File srcSubFolder = new File(job.getInjectionPath(), subFolder);
+            return srcSubFolder.exists();
+        }).count();
+        return existingSubFolders > 0;
+    }
+
+    private void backupActualContents(EntityFlowSetting flowSetting, EntityDepositJob job) {
+        if (StringUtils.isEmpty(flowSetting.getActualContentBackupOptions()) ||
+                StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "notBackup")) {
+            return;
+        }
+
+        if (job.isBackupCompleted()) {
+            log.debug("Skip completed backup: {}", job.getInjectionTitle());
+            return;
+        }
+
+        String subFolders = flowSetting.getBackupSubFolders();
+        if (StringUtils.isEmpty(subFolders) || (!isSubFoldersExisting(subFolders, job))) {
+            log.info("Sub folders are empty. flow setting: {}", flowSetting.getMaterialFlowName());
+            return;
+        }
+
+        File targetDirectory = new File(flowSetting.getBackupPath(), job.getInjectionTitle());
+        //Clear the existing directory
+        try {
+            if (targetDirectory.exists() && targetDirectory.isDirectory()) {
+                FileUtils.deleteDirectory(targetDirectory);
+            }
+        } catch (IOException e) {
+            log.error("Failed to clear the existing directory: {}", targetDirectory.getAbsolutePath(), e);
+            return;
+        }
+
+        if (!targetDirectory.exists()) {
+            boolean ret = targetDirectory.mkdirs();
+            if (!ret) {
+                log.error("Failed to create backup directory: {}", targetDirectory.getAbsolutePath());
+                return;
+            } else {
+                log.debug("Created the backup directory: {}", targetDirectory.getAbsolutePath());
+            }
+        }
+
+        File[] existingFiles = targetDirectory.listFiles();
+        if (existingFiles != null && existingFiles.length > 0) {
+            log.error("The backup target folder is not empty: {}", targetDirectory);
+            return;
+        }
+
+        // Backup the sidecar file
+        if (StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "backupSubFolder")) {
+            subFolders.lines().forEach(subFolder -> {
+                File srcSubFolder = new File(job.getInjectionPath(), subFolder);
+                if (srcSubFolder.exists()) {
+                    File destSubFolder = new File(targetDirectory, subFolder);
+                    boolean ret = destSubFolder.mkdirs();
+                    if (!ret) {
+                        log.error("Failed to create sub folder: {}", destSubFolder.getAbsolutePath());
+                        return;
+                    } else {
+                        log.debug("Created the sub folder: {}", destSubFolder.getAbsolutePath());
+                    }
+                    try {
+                        FileUtils.copyDirectory(srcSubFolder, destSubFolder, true);
+                        log.debug("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), destSubFolder.getAbsolutePath());
+                    } catch (IOException e) {
+                        log.error("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), destSubFolder.getAbsolutePath());
+                    }
+                }
+            });
+        } else if (StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "backupContentsWithoutSubFolderName")) {
+            subFolders.lines().forEach(subFolder -> {
+                File srcSubFolder = new File(job.getInjectionPath(), subFolder);
+                if (srcSubFolder.exists()) {
+                    try {
+                        FileUtils.copyDirectory(srcSubFolder, targetDirectory, true);
+                        log.debug("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), targetDirectory.getAbsolutePath());
+                    } catch (IOException e) {
+                        log.error("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), targetDirectory.getAbsolutePath());
+                    }
+                }
+            });
+        }
+
+        depositJobService.jobCompletedBackup(job);
+    }
+
+    private void deleteActualContents(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
+        if (job.isActualContentDeleted()) {
+            return;
+        }
+
+        String strDeletionOption = flowSetting.getActualContentDeleteOptions();
+        EnumActualContentDeletionOptions deletionOptions;
+        if (StringUtils.isEmpty(strDeletionOption)) {
+            deletionOptions = EnumActualContentDeletionOptions.notDelete;
+        } else {
+            deletionOptions = EnumActualContentDeletionOptions.valueOf(strDeletionOption);
+        }
+
+        boolean isDeleteActualContent = false;
+        if (deletionOptions == EnumActualContentDeletionOptions.deleteInstantly) {
+            isDeleteActualContent = true;
+        } else if (deletionOptions == EnumActualContentDeletionOptions.deleteExceedMaxStorageDays) {
+            LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
+            LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
+            if (jobLatestUpdateTime.isBefore(deadlineTime)) {
+                isDeleteActualContent = true;
+            }
+        }
+
+        log.info("Deletion options: {}, isDeleteActualContent: {}", deletionOptions.name(), isDeleteActualContent);
+        if (isDeleteActualContent) {
+            File ingestPath = new File(job.getInjectionPath());
+            InjectionUtils.deleteFiles(injectionPathScanClient, ingestPath);
+            depositJobService.jobDeletedActualContent(job);
+            log.info("Delete the actual content of job: {}, folder: {}", job.getId(), ingestPath.getAbsolutePath());
         }
     }
 }

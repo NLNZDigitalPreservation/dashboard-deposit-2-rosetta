@@ -181,6 +181,8 @@ public class TestFlowSettingService extends BasicTester {
 
         flowSetting.setMaxActiveDays(14L);
         flowSetting.setMaxSaveDays(365L);
+
+        flowSetting.setActualContentBackupOptions("notBackup");
     }
 
     private void setValues(EntityStorageLocation storage) {

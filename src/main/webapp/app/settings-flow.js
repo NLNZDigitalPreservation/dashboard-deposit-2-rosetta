@@ -103,6 +103,9 @@ class FlowSetting extends BasicSettings{
         maxSaveDays: 365,
         weeklyMaxConcurrency: [1,1,1,1,1,1,1],
         actualContentDeleteOptions: 'notDelete',
+        actualContentBackupOptions: 'notBackup',
+        backupPath: '',
+        backupSubFolders: ''
       }
     	return initialSetting;
     }
@@ -137,6 +140,12 @@ class FlowSetting extends BasicSettings{
         data['weeklyMaxConcurrency']=weeklyMaxThreads;
 
         data['actualContentDeleteOptions']=$('#flow-settings select[name="actualContentDeleteOptions"] option:selected').attr('value');
+        
+        
+        // Backup settings
+        data['actualContentBackupOptions']=$('#flow-settings select[name="actualContentBackupOptions"] option:selected').attr('value');
+        data['backupPath']=$('#flow-settings input[name="backupPath"]').val();
+        data['backupSubFolders']=$('#flow-settings textarea[name="backupSubFolders"]').val();
 
         return data;
     }
@@ -181,6 +190,11 @@ class FlowSetting extends BasicSettings{
         $('#flow-settings input[name="sun"]').val(weeklyMaxThreads[6]);
 
         $('#flow-settings select[name="actualContentDeleteOptions"]').val(data['actualContentDeleteOptions']);
+
+        //Backup options
+        $('#flow-settings select[name="actualContentBackupOptions"]').val(data['actualContentBackupOptions']);
+        $('#flow-settings input[name="backupPath"]').val(data['backupPath']);
+        $('#flow-settings textarea[name="backupSubFolders"]').val(data['backupSubFolders']);
 
         var healthAuditMsg;
         if (!data.id || data.auditRst) {

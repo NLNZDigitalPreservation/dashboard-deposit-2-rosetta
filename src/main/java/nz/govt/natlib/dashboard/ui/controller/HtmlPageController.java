@@ -6,7 +6,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import nz.govt.natlib.dashboard.app.MainSecurityConfig;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
-import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
@@ -42,7 +42,7 @@ public class HtmlPageController {
     @Autowired
     private WhitelistSettingService whitelistService;
     @Autowired
-    private RosettaWebServiceImpl rosettaWebService;
+    private RosettaWebService rosettaWebService;
 
     @RequestMapping(path = {"/", "/home.html", DashboardConstants.PATH_USER_INDEX_HTML}, method = {RequestMethod.GET, RequestMethod.POST})
     public void getHomeHtml(@ModelAttribute("model") ModelMap model, HttpServletRequest req, HttpServletResponse rsp) throws IOException, TemplateException {

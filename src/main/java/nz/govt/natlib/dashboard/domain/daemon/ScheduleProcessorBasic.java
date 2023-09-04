@@ -1,6 +1,6 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
-import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.injection.InjectionPathScan;
 import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
@@ -23,8 +23,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class ScheduleProcessorBasic {
+    protected static final String BACKUP_COMPLETED_FILE = "BACKUP-COMPLETED";
     @Autowired
-    protected RosettaWebServiceImpl rosettaWebService;
+    protected RosettaWebService rosettaWebService;
     @Autowired
     protected DepositJobService depositJobService;
     @Autowired
@@ -123,7 +124,7 @@ public abstract class ScheduleProcessorBasic {
 
     abstract public void handleFlowSettingMissingJob(EntityDepositJob job) throws IOException;
 
-    public void setRosettaWebService(RosettaWebServiceImpl rosettaWebService) {
+    public void setRosettaWebService(RosettaWebService rosettaWebService) {
         this.rosettaWebService = rosettaWebService;
     }
 

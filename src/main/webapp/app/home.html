@@ -239,6 +239,7 @@
                           <input type="text" class="form-control" name="sun">
                       </div>
 
+                      <!-- Delete section -->
                       <div class="input-group mb-3">
                           <span class="input-group-text">Deletion Options For Actual Content:</span>
                           <select class="form-control form-select mt-0" name="actualContentDeleteOptions">
@@ -246,6 +247,28 @@
                             <option value="deleteExceedMaxStorageDays">Delete when exceeds the MAX Storage Days</option>
                             <option value="deleteInstantly">Delete instantly when finished</option>
                           </select>              
+                      </div>
+
+                      <!-- Backup section -->
+                        <!--                      <div class="form-check form-switch mb-3">-->
+                        <!--                          <input class="form-check-input" type="checkbox" role="switch" name="backupEnabled">-->
+                        <!--                          <label class="form-check-label" for="flow-setting-enabled">If backup the actual content for this material flow.</label>-->
+                        <!--                      </div>-->
+                      <div class="input-group mb-3">
+                          <span class="input-group-text">Backup Options For Actual Content:</span>
+                          <select class="form-control form-select mt-0" name="actualContentBackupOptions">
+                              <option value="notBackup">Not backup</option>
+                              <option value="backupContentsWithoutSubFolderName">Backup the contents without the subfolder name</option>
+                              <option value="backupSubFolder">Backup the structure of the subfolder</option>
+                          </select>
+                      </div>
+                      <div class="input-group mb-3">
+                          <span class="input-group-text">Backup Location</span>
+                          <input type="text" class="form-control" name="backupPath" aria-describedby="desc-backup-path">
+                      </div>
+                      <div class="input-group mb-3">
+                          <span class="input-group-text">Sub folders for backup</span>
+                          <textarea class="form-control" rows="3" name="backupSubFolders" placeholder="You can input multiple sub folders. Each sub folder in a line"></textarea>
                       </div>
                   </div>
 

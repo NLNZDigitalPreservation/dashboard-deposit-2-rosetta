@@ -4,7 +4,7 @@ import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.app.MainSecurityConfig;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
-import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.metadata.EnumUserRole;
 import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
@@ -32,7 +32,7 @@ public class UserAccessController {
     @Autowired
     private RepoFlowSetting repoFlowSetting;
     @Autowired
-    private RosettaWebServiceImpl rosettaWebService;
+    private RosettaWebService rosettaWebService;
     @Autowired
     private WhitelistSettingService whitelistService;
 

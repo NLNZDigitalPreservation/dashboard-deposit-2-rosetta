@@ -1,7 +1,7 @@
 package nz.govt.natlib.dashboard.domain.service;
 
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.exception.InvalidParameterException;
 import nz.govt.natlib.dashboard.common.exception.NullParameterException;
 import nz.govt.natlib.dashboard.common.exception.WebServiceException;
@@ -26,7 +26,7 @@ import java.util.List;
 public class FlowSettingService {
     private static final Logger log = LoggerFactory.getLogger(FlowSettingService.class);
     @Autowired
-    private RosettaWebServiceImpl rosettaWebService;
+    private RosettaWebService rosettaWebService;
     @Autowired
     private RepoFlowSetting repoFlowSetting;
     @Autowired
@@ -45,6 +45,7 @@ public class FlowSettingService {
         DashboardHelper.assertNotNull("Ingestion Completed File Name", flowSetting.getInjectionCompleteFileName());
         DashboardHelper.assertNotNull("MaxActiveDays", flowSetting.getMaxActiveDays());
         DashboardHelper.assertNotNull("MaxStorageDays", flowSetting.getMaxSaveDays());
+        DashboardHelper.assertNotNull("ActualContentBackupOptions", flowSetting.getActualContentBackupOptions());
 
         File rootPath = new File(flowSetting.getRootPath());
         if (!rootPath.exists() || !rootPath.isDirectory()) {
@@ -94,6 +95,15 @@ public class FlowSettingService {
             }
         }
         flowSettings.clear();
+
+        if (!StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "notBackup")) {
+            if (StringUtils.isEmpty(flowSetting.getBackupPath())) {
+                throw new InvalidParameterException("The backup path is empty.");
+            }
+            if (StringUtils.isEmpty(flowSetting.getBackupSubFolders())) {
+                throw new InvalidParameterException("The sub folders is empty.");
+            }
+        }
     }
 
     public RestResponseCommand getAllFlowSettings() {

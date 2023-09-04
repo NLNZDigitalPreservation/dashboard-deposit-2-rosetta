@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class RosettaWebServiceImpl {
+public class RosettaWebServiceImpl implements RosettaWebService {
 //    private static final Logger log = LoggerFactory.getLogger(RosettaWebServiceImpl.class);
 
     private final String pdsUrl;

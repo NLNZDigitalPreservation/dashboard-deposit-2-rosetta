@@ -2,7 +2,7 @@ package nz.govt.natlib.dashboard.ui.controller;
 
 import nz.govt.natlib.dashboard.common.DashboardConstants;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositAccount;
 import nz.govt.natlib.dashboard.ui.command.RawMaterialFlowCommand;
@@ -26,7 +26,7 @@ public class RawMaterialFlowController {
     private static final Logger log = LoggerFactory.getLogger(RawMaterialFlowController.class);
 
     @Autowired
-    private RosettaWebServiceImpl rosettaWebService;
+    private RosettaWebService rosettaWebService;
 
     @Autowired
     private RepoDepositAccount repoDepositAccount;

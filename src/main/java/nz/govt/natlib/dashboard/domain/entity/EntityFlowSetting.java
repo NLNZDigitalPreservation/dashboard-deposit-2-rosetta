@@ -21,6 +21,11 @@ public class EntityFlowSetting extends EntityCommon {
 
     private String actualContentDeleteOptions;
 
+    private Boolean backupEnabled;
+    private String actualContentBackupOptions;
+    private String backupPath;
+    private String backupSubFolders;
+
     public Long getDepositAccountId() {
         return depositAccountId;
     }
@@ -140,5 +145,37 @@ public class EntityFlowSetting extends EntityCommon {
 
     public void setDelayUnit(String delayUnit) {
         this.delayUnit = delayUnit;
+    }
+
+    public Boolean getBackupEnabled() {
+        return backupEnabled;
+    }
+
+    public void setBackupEnabled(Boolean backupEnabled) {
+        this.backupEnabled = backupEnabled;
+    }
+
+    public String getActualContentBackupOptions() {
+        return actualContentBackupOptions;
+    }
+
+    public void setActualContentBackupOptions(String actualContentBackupOptions) {
+        this.actualContentBackupOptions = actualContentBackupOptions;
+    }
+
+    public String getBackupPath() {
+        return backupPath;
+    }
+
+    public void setBackupPath(String backupPath) {
+        this.backupPath = backupPath;
+    }
+
+    public String getBackupSubFolders() {
+        return backupSubFolders;
+    }
+
+    public void setBackupSubFolders(String backupSubFolders) {
+        this.backupSubFolders = backupSubFolders;
     }
 }

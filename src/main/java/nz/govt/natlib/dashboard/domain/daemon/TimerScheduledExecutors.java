@@ -47,6 +47,7 @@ public class TimerScheduledExecutors {
                 scheduleProcessor.handle();
             } catch (Throwable e) {
                 log.error("Failed to execute processor", e);
+                log.error("Failed to execute processor: {}", e.getMessage());
             }
         };
         this.futureScheduleProcessor = _schedule_executor.scheduleWithFixedDelay(handler, delays, delays, delayUnit);
