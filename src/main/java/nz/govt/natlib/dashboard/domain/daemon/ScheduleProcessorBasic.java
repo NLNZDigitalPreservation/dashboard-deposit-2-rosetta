@@ -43,15 +43,24 @@ public abstract class ScheduleProcessorBasic {
 
     public void handle() throws Exception {
         log.debug("On timer heartbeat.");
-        EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
-        if (globalSetting != null && globalSetting.isPaused()) {
-            LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            LocalDateTime ldtNowDatetime = LocalDateTime.now();
-            if (ldtNowDatetime.isAfter(ldtPausedStartTime) && ldtNowDatetime.isBefore(ldtPausedEndTime)) {
-                log.debug("Skip the paused timeslot.");
-                return;
+
+        try {
+            EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
+            if (globalSetting != null && globalSetting.isPaused()) {
+                try {
+                    LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    LocalDateTime ldtNowDatetime = LocalDateTime.now();
+                    if (ldtNowDatetime.isAfter(ldtPausedStartTime) && ldtNowDatetime.isBefore(ldtPausedEndTime)) {
+                        log.debug("Skip the paused timeslot.");
+                        return;
+                    }
+                } catch (Exception e) {
+                    log.error("Failed to parse the datetime fields", e);
+                }
             }
+        } catch (Exception e) {
+            log.error("Failed to parse the global settings", e);
         }
 
         //To initial jobs
@@ -82,6 +91,11 @@ public abstract class ScheduleProcessorBasic {
                 for (EntityDepositJob job : jobs) {
                     if (job.getState() == EnumDepositJobState.PAUSED) {
                         log.debug("Skip the Paused the job: {}", job.getId());
+                        continue;
+                    }
+
+                    if (!injectionPathScanClient.exists(job.getInjectionPath())) {
+                        log.error("The original directory does not exist: {}", job.getInjectionPath());
                         continue;
                     }
 

@@ -148,6 +148,11 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             depositJobService.jobFinalizeStart(job);
 
             File depositDoneFile = new File(job.getInjectionPath(), "done");
+            if (!depositDoneFile.getParentFile().exists()) {
+                log.error("The original directory does not exist: {}", job.getInjectionPath());
+                return;
+            }
+
             if (!injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
                 if (!depositDoneFile.createNewFile()) {
                     log.error("Failed to create file: {}", depositDoneFile.getAbsolutePath());
