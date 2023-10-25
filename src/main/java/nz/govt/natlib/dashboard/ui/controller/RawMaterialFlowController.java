@@ -2,7 +2,7 @@ package nz.govt.natlib.dashboard.ui.controller;
 
 import nz.govt.natlib.dashboard.common.DashboardConstants;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.RosettaApi;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositAccount;
 import nz.govt.natlib.dashboard.ui.command.RawMaterialFlowCommand;
@@ -26,7 +26,7 @@ public class RawMaterialFlowController {
     private static final Logger log = LoggerFactory.getLogger(RawMaterialFlowController.class);
 
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private RosettaApi rosettaApi;
 
     @Autowired
     private RepoDepositAccount repoDepositAccount;
@@ -51,7 +51,7 @@ public class RawMaterialFlowController {
         }
 
         try {
-            List<Producer> producers = rosettaWebService.getProducers(depositUsername);
+            List<Producer> producers = rosettaApi.getProducers(depositUsername);
             List<RawProducerCommand> rawProducerList = producers.stream().map(producer -> {
                 RawProducerCommand producerCmd = new RawProducerCommand();
                 producerCmd.setId(producer.getID());
@@ -61,7 +61,7 @@ public class RawMaterialFlowController {
             producers.clear();
 
             for (RawProducerCommand producerCmd : rawProducerList) {
-                List<MaterialFlow> materialFlows = rosettaWebService.getMaterialFlows(producerCmd.getId());
+                List<MaterialFlow> materialFlows = rosettaApi.getMaterialFlows(producerCmd.getId());
                 List<RawMaterialFlowCommand> rawMaterialFlowList = materialFlows.stream().map(flow -> {
                     RawMaterialFlowCommand flowCmd = new RawMaterialFlowCommand();
                     flowCmd.setId(flow.getID());

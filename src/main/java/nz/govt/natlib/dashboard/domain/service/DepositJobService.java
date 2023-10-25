@@ -2,7 +2,7 @@ package nz.govt.natlib.dashboard.domain.service;
 
 import com.exlibris.dps.SipStatusInfo;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.RosettaApi;
 import nz.govt.natlib.dashboard.common.injection.*;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
@@ -39,7 +39,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     private static final Logger log = LoggerFactory.getLogger(DepositJobService.class);
     private static final Map<Long, Semaphore> DB_JOB_TOKENS = new HashMap<>();
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private RosettaApi rosettaApi;
     @Autowired
     private RepoDepositJob repoJob;
     @Autowired

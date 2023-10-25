@@ -2,7 +2,7 @@ package nz.govt.natlib.dashboard.domain.service;
 
 import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.RosettaApi;
 import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoWhiteList;
 import nz.govt.natlib.dashboard.ui.command.UserAccessRspCommand;
@@ -20,7 +20,7 @@ public class UserAccessService {
     private static final Logger log = LoggerFactory.getLogger(UserAccessService.class);
 
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private RosettaApi rosettaApi;
 
     @Autowired
     private RepoWhiteList repoWhiteList;
@@ -39,12 +39,12 @@ public class UserAccessService {
         String pdsHandle;
         PdsUserInfo pdsUserInfo;
         try {
-            pdsHandle = rosettaWebService.login(userInstitution, username, password);
+            pdsHandle = rosettaApi.login(userInstitution, username, password);
             if (DashboardHelper.isNull(pdsHandle)) {
                 restResponseCommand.setRspCode(RestResponseCommand.RSP_USER_NAME_PASSWORD_ERROR);
                 return restResponseCommand;
             }
-            pdsUserInfo = rosettaWebService.getPdsUserByPdsHandle(pdsHandle);
+            pdsUserInfo = rosettaApi.getPdsUserByPdsHandle(pdsHandle);
             if (DashboardHelper.isNull(pdsUserInfo)) {
                 restResponseCommand.setRspCode(RestResponseCommand.RSP_USER_QUERY_ERROR);
                 return restResponseCommand;
@@ -86,7 +86,7 @@ public class UserAccessService {
         }
 
         try {
-            rosettaWebService.logout(pdsHandle);
+            rosettaApi.logout(pdsHandle);
         } catch (Exception e) {
             restResponseCommand.setRspCode(RestResponseCommand.RSP_USER_OTHER_ERROR);
             restResponseCommand.setRspMsg(e.getMessage());

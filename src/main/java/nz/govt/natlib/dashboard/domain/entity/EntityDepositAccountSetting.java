@@ -28,4 +28,8 @@ public class EntityDepositAccountSetting extends EntityCommon {
     public void setDepositUserPassword(String depositUserPassword) {
         this.depositUserPassword = depositUserPassword;
     }
+
+    public String toString() {
+        return String.format("%s-%s:*****", depositUserName, depositUserInstitute);
+    }
 }

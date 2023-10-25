@@ -4,7 +4,7 @@ import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
 import nz.govt.natlib.dashboard.common.auth.HttpAccessManagementFilter;
 import nz.govt.natlib.dashboard.common.auth.PrivilegeManagementHandler;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.RosettaApi;
 import nz.govt.natlib.dashboard.domain.repo.RepoWhiteList;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.catalina.session.StandardSession;
@@ -46,7 +46,7 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
     private String baseUrl;
 
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private RosettaApi rosettaApi;
 
     @Autowired
     private RepoWhiteList repoWhiteList;

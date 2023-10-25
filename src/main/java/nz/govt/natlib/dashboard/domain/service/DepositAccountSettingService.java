@@ -1,7 +1,7 @@
 package nz.govt.natlib.dashboard.domain.service;
 
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.RosettaApi;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositAccount;
@@ -19,7 +19,7 @@ import java.util.List;
 public class DepositAccountSettingService {
     private static final Logger log = LoggerFactory.getLogger(DepositAccountSettingService.class);
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private RosettaApi rosettaApi;
     @Autowired
     private RepoDepositAccount repoDepositAccount;
     @Autowired
@@ -42,7 +42,7 @@ public class DepositAccountSettingService {
 //        rosettaWebService.login(producer.getDepositUserInstitute(), producer.getDepositUserName(), producer.getDepositUserPassword());
 
         RestResponseCommand rstVal = new RestResponseCommand();
-        String pdsHandle = rosettaWebService.login(producer.getDepositUserInstitute(), producer.getDepositUserName(), producer.getDepositUserPassword());
+        String pdsHandle = rosettaApi.login(producer.getDepositUserInstitute(), producer.getDepositUserName(), producer.getDepositUserPassword());
         if (StringUtils.isEmpty(pdsHandle)) {
             String err_msg = "Invalid deposit username or password";
             log.error(err_msg);
@@ -50,7 +50,7 @@ public class DepositAccountSettingService {
             rstVal.setRspMsg(err_msg);
             return rstVal;
         }
-        rosettaWebService.logout(pdsHandle);
+        rosettaApi.logout(pdsHandle);
 
         repoDepositAccount.save(producer);
         return rstVal;
@@ -76,7 +76,7 @@ public class DepositAccountSettingService {
         String pdsHandle = null;
 
         try {
-            pdsHandle = rosettaWebService.login(producer.getDepositUserInstitute(), producer.getDepositUserName(), producer.getDepositUserPassword());
+            pdsHandle = rosettaApi.login(producer.getDepositUserInstitute(), producer.getDepositUserName(), producer.getDepositUserPassword());
             if (StringUtils.isEmpty(pdsHandle)) {
                 producer.setAuditRst(Boolean.FALSE);
                 producer.setAuditMsg("The essential message is not correct");
@@ -86,7 +86,7 @@ public class DepositAccountSettingService {
             producer.setAuditMsg("The essential message is not correct:" + e.getMessage());
         } finally {
             if (!StringUtils.isEmpty(pdsHandle)) {
-                rosettaWebService.logout(pdsHandle);
+                rosettaApi.logout(pdsHandle);
             }
         }
 

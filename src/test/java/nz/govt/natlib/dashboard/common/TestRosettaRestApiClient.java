@@ -1,7 +1,7 @@
 package nz.govt.natlib.dashboard.common;
 
 import com.exlibris.dps.*;
-import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
+import nz.govt.natlib.dashboard.common.core.RosettaRestApiClient;
 import nz.govt.natlib.dashboard.util.CustomizedPdsClient;
 import nz.govt.natlib.ndha.common.exlibris.MaterialFlow;
 import nz.govt.natlib.ndha.common.exlibris.Producer;
@@ -25,14 +25,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TestRosettaWebServiceImpl {
+public class TestRosettaRestApiClient {
     private static final String PDSUrl = "https://slbpdstest.natlib.govt.nz/pds?";
     private static final String ProducerWsdlUrl = "https://wlguatdpsilb.natlib.govt.nz/dpsws/deposit/ProducerWebServices?wsdl";
     private static final String DepositWsdlUrl = "https://wlguatdpsilb.natlib.govt.nz/dpsws/deposit/DepositWebServices?wsdl";
     private static final String SipWsdlUrl = "https://wlguatoprilb.natlib.govt.nz/dpsws/repository/SipWebServices?wsdl";
     private static final String DPSSearchUrl = "https://wlguatdpsilb.natlib.govt.nz/delivery/sru";
     private static final String DeliveryAccessWsdlUrl = "https://wlguatdpsilb.natlib.govt.nz/dpsws/delivery/DeliveryAccessWS?wsdl";
-    private static final RosettaWebServiceImpl rosettaWebService = new RosettaWebServiceImpl(PDSUrl, ProducerWsdlUrl, DepositWsdlUrl, SipWsdlUrl, DeliveryAccessWsdlUrl);
+    private static final RosettaRestApiClient rosettaWebService = new RosettaRestApiClient(PDSUrl, ProducerWsdlUrl, DepositWsdlUrl, SipWsdlUrl, DeliveryAccessWsdlUrl);
 
     private static final String _PRODUCER_AGENT_ID = "NLNZ";
     private static final String INSTITUTION = "INS00";
@@ -66,7 +66,7 @@ public class TestRosettaWebServiceImpl {
 
     @Test
     public void testGetProducer() throws Exception {
-        RosettaWebServiceImpl localRosettaWebService = new RosettaWebServiceImpl(PDSUrl, ProducerWsdlUrl, DepositWsdlUrl, SipWsdlUrl, DeliveryAccessWsdlUrl);
+        RosettaRestApiClient localRosettaWebService = new RosettaRestApiClient(PDSUrl, ProducerWsdlUrl, DepositWsdlUrl, SipWsdlUrl, DeliveryAccessWsdlUrl);
 //        localRosettaWebService._init();
         try {
             localRosettaWebService.getProducers("leefr");

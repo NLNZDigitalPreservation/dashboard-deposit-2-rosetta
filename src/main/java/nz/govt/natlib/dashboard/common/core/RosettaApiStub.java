@@ -9,7 +9,7 @@ import nz.govt.natlib.ndha.common.exlibris.ResultOfDeposit;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RosettaWebServiceStub implements RosettaWebService {
+public class RosettaApiStub implements RosettaApi {
     private static final String INSTITUTION = "INS00";
     private static final String USERNAME = "myself";
     private static final String PASSWORD = "******";
@@ -20,7 +20,7 @@ public class RosettaWebServiceStub implements RosettaWebService {
 
     @Override
     public String login(String institution, String username, String password) throws Exception {
-        return RosettaWebServiceStub.PDSHANDLE;
+        return RosettaApiStub.PDSHANDLE;
     }
 
     @Override
@@ -31,15 +31,15 @@ public class RosettaWebServiceStub implements RosettaWebService {
     @Override
     public PdsUserInfo getPdsUserByPdsHandle(String pdsHandle) throws Exception {
         PdsUserInfo info = new PdsUserInfo();
-        info.setUserId(RosettaWebServiceStub.USERNAME);
-        info.setUserName(RosettaWebServiceStub.USERNAME);
-        info.setPid(RosettaWebServiceStub.PDSHANDLE);
+        info.setUserId(RosettaApiStub.USERNAME);
+        info.setUserName(RosettaApiStub.USERNAME);
+        info.setPid(RosettaApiStub.PDSHANDLE);
         return info;
     }
 
     @Override
     public String getInternalUserIdByExternalId(String userName) {
-        return RosettaWebServiceStub.PDSHANDLE;
+        return RosettaApiStub.PDSHANDLE;
     }
 
     @Override

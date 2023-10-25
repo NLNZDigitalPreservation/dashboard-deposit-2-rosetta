@@ -1,9 +1,7 @@
 package nz.govt.natlib.dashboard.common;
 
 import com.google.common.io.Files;
-import nz.govt.natlib.dashboard.common.core.RosettaWebServiceImpl;
-import nz.govt.natlib.dashboard.common.injection.InjectionPathScan;
-import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
+import nz.govt.natlib.dashboard.common.core.RosettaRestApiClient;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.repo.*;
 import nz.govt.natlib.dashboard.domain.service.DepositJobService;
@@ -46,7 +44,7 @@ public class BasicTester {
     protected static RepoDepositAccount repoDepositAccount;
     protected static RepoWhiteList repoWhiteList;
     protected static RepoGlobalSetting repoGlobalSetting;
-    protected static RosettaWebServiceImpl rosettaWebService;
+    protected static RosettaRestApiClient rosettaWebService;
     protected static DepositJobService depositJobService;
 
     public static void init() throws IOException {
@@ -80,7 +78,7 @@ public class BasicTester {
         ReflectionTestUtils.setField(repoWhiteList, "idGenerator", repoIdGenerator);
         repoWhiteList.init();
 
-        rosettaWebService = mock(RosettaWebServiceImpl.class);
+        rosettaWebService = mock(RosettaRestApiClient.class);
 
         depositJobService = new DepositJobService();
         ReflectionTestUtils.setField(depositJobService, "rosettaWebService", rosettaWebService);

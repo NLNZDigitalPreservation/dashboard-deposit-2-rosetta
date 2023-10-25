@@ -95,7 +95,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         EntityDepositAccountSetting depositAccount = repoDepositAccount.getById(flowSetting.getDepositAccountId());
         String pdsHandle;
         try {
-            pdsHandle = rosettaWebService.login(depositAccount.getDepositUserInstitute(), depositAccount.getDepositUserName(), depositAccount.getDepositUserPassword());
+            pdsHandle = rosettaApi.login(depositAccount.getDepositUserInstitute(), depositAccount.getDepositUserName(), depositAccount.getDepositUserPassword());
         } catch (Exception e) {
             log.error("Failed to submit job", e);
             return false;
@@ -103,7 +103,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
 
         ResultOfDeposit resultOfDeposit;
         try {
-            resultOfDeposit = this.rosettaWebService.deposit(job.getInjectionTitle(), pdsHandle, depositAccount.getDepositUserInstitute(), flowSetting.getProducerId(), flowSetting.getMaterialFlowId(), job.getDepositSetId());
+            resultOfDeposit = this.rosettaApi.deposit(job.getInjectionTitle(), pdsHandle, depositAccount.getDepositUserInstitute(), flowSetting.getProducerId(), flowSetting.getMaterialFlowId(), job.getDepositSetId());
         } catch (Exception e) {
             log.error("Failed to submit job", e);
             return false;
@@ -130,7 +130,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         SipStatusInfo sipStatusInfo;
         try {
             log.info("Update polling, before. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
-            sipStatusInfo = rosettaWebService.getSIPStatusInfo(job.getSipID());
+            sipStatusInfo = rosettaApi.getSIPStatusInfo(job.getSipID());
             log.info("Update polling. jobId: {}, jobName: {}, SIPStatusInfo: {}, {}, {}", job.getId(), job.getInjectionTitle(), sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
             job = depositJobService.jobUpdateStatus(job, sipStatusInfo);
             log.info("Update polling, after. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());

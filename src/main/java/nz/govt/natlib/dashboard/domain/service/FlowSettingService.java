@@ -1,11 +1,10 @@
 package nz.govt.natlib.dashboard.domain.service;
 
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.RosettaApi;
 import nz.govt.natlib.dashboard.common.exception.InvalidParameterException;
 import nz.govt.natlib.dashboard.common.exception.NullParameterException;
 import nz.govt.natlib.dashboard.common.exception.WebServiceException;
-import nz.govt.natlib.dashboard.domain.daemon.TimerScheduledExecutors;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
@@ -26,7 +25,7 @@ import java.util.List;
 public class FlowSettingService {
     private static final Logger log = LoggerFactory.getLogger(FlowSettingService.class);
     @Autowired
-    private RosettaWebService rosettaWebService;
+    private RosettaApi rosettaApi;
     @Autowired
     private RepoFlowSetting repoFlowSetting;
     @Autowired
@@ -59,7 +58,7 @@ public class FlowSettingService {
 
         String pdsHandle;
         try {
-            pdsHandle = rosettaWebService.login(depositAccount.getDepositUserInstitute(), depositAccount.getDepositUserName(), depositAccount.getDepositUserPassword());
+            pdsHandle = rosettaApi.login(depositAccount.getDepositUserInstitute(), depositAccount.getDepositUserName(), depositAccount.getDepositUserPassword());
         } catch (Exception e) {
             throw new WebServiceException(e);
         }
@@ -69,11 +68,11 @@ public class FlowSettingService {
 
         //Verify ProduceId and MaterialFlowId
         try {
-            if (!rosettaWebService.isValidProducer(depositAccount.getDepositUserName(), flowSetting.getProducerId())) {
+            if (!rosettaApi.isValidProducer(depositAccount.getDepositUserName(), flowSetting.getProducerId())) {
                 throw new InvalidParameterException("Invalid producerId");
             }
 
-            if (!rosettaWebService.isValidMaterialFlow(flowSetting.getProducerId(), flowSetting.getMaterialFlowId())) {
+            if (!rosettaApi.isValidMaterialFlow(flowSetting.getProducerId(), flowSetting.getMaterialFlowId())) {
                 throw new InvalidParameterException("Invalid materialFlowId");
             }
         } catch (Exception e) {
