@@ -12,8 +12,6 @@ const contextMenuItemsDepositJobsActive={
     // "export-jobs": {name: "Export Selected Jobs", icon: "bi bi-download"},
 };
 
-
-
 const gridDepositJobsColumnsActive=[
     {headerName: "#", width:45, headerCheckboxSelection: true, headerCheckboxSelectionFilteredOnly: true, checkboxSelection: true, pinned: 'left'},
     {headerName: "ID", field: "id", width: 90, pinned: 'left'},
@@ -22,11 +20,10 @@ const gridDepositJobsColumnsActive=[
     }},
     {headerName: "JobTitle", field: "injectionTitle", width: 485, pinned: 'left'},
 
-    {headerName: "Status", field: "state", width: 180, pinned: 'left', cellRenderer: function(row){
-        var  stage=row.data.stage, state=row.data.state;
-        var icon=cellFlagIconActive(stage, state);
-        return icon;
-    }},     
+    {headerName: "Stage", field: "stage", width: 120},
+
+    {headerName: "State", field: "state", width: 120},
+
     {headerName: "JobInitialTime", field: "initialTime", width: 200, cellRenderer: function(row){
         return formatDatetimeFromEpochMilliSeconds(row.data.initialTime);
     }},
@@ -63,29 +60,6 @@ function getProgressDIVActive(stage, state, percent){
     }else{
         return '<div style="width: calc(100% + 44px); height:100%; margin-left:-22px; text-align: center; background: linear-gradient(to right, rgb(40,167,69, 0.8) ' + percent + '%, rgba(192,192,192,0.5) ' + percent + '% 100%);">' + percent + '%</div>';
     }
-}
-
-function cellFlagIconActive(stage, state){
-    var icon;
-    switch(state){
-        case 'SUCCEED':
-            if (stage==='FINALIZE') {
-                icon = '<i class="bi bi-check-circle-fill text-success">&nbsp;</i>';
-            }else{
-                icon = '<i class="bi bi-cursor-fill text-primary">&nbsp;</i>';
-            }
-            break;
-        case 'FAILED':
-            icon = '<i class="bi bi-exclamation-circle-fill text-danger">&nbsp;</i>';
-            break;
-        case 'CANCELED':
-            icon = '<i class="bi bi-x-circle-fill text-secondary">&nbsp;</i>';
-            break;
-        default:
-            icon = '<i class="bi bi-cursor-fill text-primary">&nbsp;</i>';
-    }
-
-    return icon+stage+'-'+state;
 }
 
 function calcPercentActive(stage, state){
