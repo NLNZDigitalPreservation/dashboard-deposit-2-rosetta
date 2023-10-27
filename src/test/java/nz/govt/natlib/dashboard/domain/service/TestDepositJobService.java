@@ -1,11 +1,12 @@
 package nz.govt.natlib.dashboard.domain.service;
 
-import com.exlibris.dps.SipStatusInfo;
 import nz.govt.natlib.dashboard.common.BasicTester;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
+import nz.govt.natlib.dashboard.common.metadata.ResultOfDeposit;
+import nz.govt.natlib.dashboard.common.metadata.SipStatusInfo;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
-import nz.govt.natlib.ndha.common.exlibris.ResultOfDeposit;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class TestDepositJobService extends BasicTester {
@@ -80,8 +82,8 @@ public class TestDepositJobService extends BasicTester {
             String injectionPath = "20201023_GTG_parent_grouping__Get_Growing";
             ResultOfDeposit resultOfDeposit;
             try {
-                when(rosettaWebService.deposit(anyString(), anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(new ResultOfDeposit(true, "OK", "12345"));
-                resultOfDeposit = rosettaWebService.deposit(injectionPath, pdsHandle, institution, producerId, materialFlowId, "1");
+                when(rosettaWebService.deposit(any(), any(), any(), any(), any())).thenReturn(new ResultOfDeposit(true, "OK", "12345"));
+                resultOfDeposit = rosettaWebService.deposit(depositAccount, injectionPath, producerId, materialFlowId, "1");
                 assert resultOfDeposit.isSuccess();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -94,7 +96,7 @@ public class TestDepositJobService extends BasicTester {
 
             ResultOfDeposit resultOfDeposit = null;
             try {
-                resultOfDeposit = rosettaWebService.deposit(injectionPath, pdsHandle, institution, producerId, materialFlowId, "1");
+                resultOfDeposit = rosettaWebService.deposit(depositAccount, injectionPath, producerId, materialFlowId, "1");
             } catch (Exception e) {
                 e.printStackTrace();
                 assert false;
@@ -116,8 +118,8 @@ public class TestDepositJobService extends BasicTester {
         sipStatusInfo.setStage("Finished");
         sipStatusInfo.setStatus("Finished");
         try {
-            when(rosettaWebService.getSIPStatusInfo(sipId)).thenReturn(sipStatusInfo);
-            sipStatusInfo = rosettaWebService.getSIPStatusInfo(sipId);
+            when(rosettaWebService.getSIPStatusInfo(depositAccount, sipId)).thenReturn(sipStatusInfo);
+            sipStatusInfo = rosettaWebService.getSIPStatusInfo(depositAccount, sipId);
         } catch (Exception e) {
             e.printStackTrace();
             assert false;

@@ -1,15 +1,11 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
-import com.exlibris.dps.SipStatusInfo;
 import nz.govt.natlib.dashboard.common.injection.*;
-import nz.govt.natlib.dashboard.common.metadata.EnumActualContentDeletionOptions;
-import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
-import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
+import nz.govt.natlib.dashboard.common.metadata.*;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
-import nz.govt.natlib.ndha.common.exlibris.ResultOfDeposit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -86,24 +82,17 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     }
 
     @Override
-    public boolean handleDeposit(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
+    public boolean handleDeposit(EntityDepositAccountSetting depositAccount,EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
         if (!(job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.INITIALED)) {
             log.debug("Skip deposit job for: {} --> {} at status [{}] [{}]", flowSetting.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
             return false;
         }
 
-        EntityDepositAccountSetting depositAccount = repoDepositAccount.getById(flowSetting.getDepositAccountId());
-        String pdsHandle;
-        try {
-            pdsHandle = rosettaApi.login(depositAccount.getDepositUserInstitute(), depositAccount.getDepositUserName(), depositAccount.getDepositUserPassword());
-        } catch (Exception e) {
-            log.error("Failed to submit job", e);
-            return false;
-        }
+
 
         ResultOfDeposit resultOfDeposit;
         try {
-            resultOfDeposit = this.rosettaApi.deposit(job.getInjectionTitle(), pdsHandle, depositAccount.getDepositUserInstitute(), flowSetting.getProducerId(), flowSetting.getMaterialFlowId(), job.getDepositSetId());
+            resultOfDeposit = this.rosettaWebService.deposit(depositAccount, job.getInjectionTitle(), flowSetting.getProducerId(), flowSetting.getMaterialFlowId(), job.getDepositSetId());
         } catch (Exception e) {
             log.error("Failed to submit job", e);
             return false;
@@ -122,7 +111,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     }
 
     @Override
-    public void handlePollingStatus(EntityDepositJob job) {
+    public void handlePollingStatus(EntityDepositAccountSetting depositAccount,EntityDepositJob job) {
         if (job.getStage() != EnumDepositJobStage.DEPOSIT || job.getState() != EnumDepositJobState.RUNNING) {
             log.debug("Skip polling. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
             return;
@@ -130,8 +119,8 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         SipStatusInfo sipStatusInfo;
         try {
             log.info("Update polling, before. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
-            sipStatusInfo = rosettaApi.getSIPStatusInfo(job.getSipID());
-            log.info("Update polling. jobId: {}, jobName: {}, SIPStatusInfo: {}, {}, {}", job.getId(), job.getInjectionTitle(), sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
+            sipStatusInfo = rosettaWebService.getSIPStatusInfo(depositAccount,job.getSipID());
+            log.info("Update polling. jobId: {}, jobName: {}, SIPStatusInfo: {}, {}", job.getId(), job.getInjectionTitle(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
             job = depositJobService.jobUpdateStatus(job, sipStatusInfo);
             log.info("Update polling, after. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
         } catch (Exception e) {

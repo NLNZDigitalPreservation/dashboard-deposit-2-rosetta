@@ -1,10 +1,11 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
-import nz.govt.natlib.dashboard.common.core.RosettaApi;
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.injection.InjectionPathScan;
 import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
+import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 public abstract class ScheduleProcessorBasic {
     protected static final String BACKUP_COMPLETED_FILE = "BACKUP-COMPLETED";
     @Autowired
-    protected RosettaApi rosettaApi;
+    protected RosettaWebService rosettaWebService;
     @Autowired
     protected DepositJobService depositJobService;
     @Autowired
@@ -79,6 +80,13 @@ public abstract class ScheduleProcessorBasic {
                     log.warn("Disabled Material Flow: {} {}", flowSetting.getId(), flowSetting.getMaterialFlowId());
                     continue;
                 }
+
+                EntityDepositAccountSetting depositAccount = repoDepositAccount.getById(flowSetting.getDepositAccountId());
+                if (depositAccount == null) {
+                    log.error("The related deposit account does not exist: {}", flowSetting.getDepositAccountId());
+                    continue;
+                }
+
                 InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
 
                 long countRunning = jobs.stream().filter(job -> job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.RUNNING).count();
@@ -101,12 +109,12 @@ public abstract class ScheduleProcessorBasic {
 
                     //Only launch the deposit task when Rosetta is idle
                     if (countRunning < maxConcurrencyJobs) {
-                        if (handleDeposit(flowSetting, injectionPathScanClient, job)) {
+                        if (handleDeposit(depositAccount, flowSetting, injectionPathScanClient, job)) {
                             countRunning++; //To be sure Rosetta not over load.
                         }
                     }
 
-                    handlePollingStatus(job);
+                    handlePollingStatus(depositAccount, job);
 
                     handleFinalize(flowSetting, injectionPathScanClient, job);
 
@@ -128,9 +136,9 @@ public abstract class ScheduleProcessorBasic {
 
     abstract public void handleIngest();
 
-    abstract public boolean handleDeposit(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job);
+    abstract public boolean handleDeposit(EntityDepositAccountSetting depositAccount, EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job);
 
-    abstract public void handlePollingStatus(EntityDepositJob job);
+    abstract public void handlePollingStatus(EntityDepositAccountSetting depositAccount, EntityDepositJob job);
 
     abstract public void handleFinalize(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) throws IOException;
 
@@ -138,8 +146,8 @@ public abstract class ScheduleProcessorBasic {
 
     abstract public void handleFlowSettingMissingJob(EntityDepositJob job) throws IOException;
 
-    public void setRosettaWebService(RosettaApi rosettaApi) {
-        this.rosettaApi = rosettaApi;
+    public void setRosettaWebService(RosettaWebService rosettaWebService) {
+        this.rosettaWebService = rosettaWebService;
     }
 
     public void setDepositJobService(DepositJobService depositJobService) {

@@ -4,7 +4,7 @@ import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.app.MainSecurityConfig;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
-import nz.govt.natlib.dashboard.common.core.RosettaApi;
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.metadata.EnumUserRole;
 import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
@@ -32,7 +32,7 @@ public class UserAccessController {
     @Autowired
     private RepoFlowSetting repoFlowSetting;
     @Autowired
-    private RosettaApi rosettaApi;
+    private RosettaWebService rosettaWebService;
     @Autowired
     private WhitelistSettingService whitelistService;
 
@@ -42,7 +42,7 @@ public class UserAccessController {
 
         String pdsHandle = null;
         try {
-            pdsHandle = rosettaApi.login("INS00", cmd.getUsername(), cmd.getPassword());
+            pdsHandle = rosettaWebService.login("INS00", cmd.getUsername(), cmd.getPassword());
         } catch (Exception e) {
             rstVal.setRspCode(RestResponseCommand.RSP_NETWORK_EXCEPTION);
             rstVal.setRspMsg("Failed to call pds service");
@@ -51,7 +51,7 @@ public class UserAccessController {
 
         PdsUserInfo pdsUserInfo;
         try {
-            pdsUserInfo = rosettaApi.getPdsUserByPdsHandle(pdsHandle);
+            pdsUserInfo = rosettaWebService.getPdsUserByPdsHandle(pdsHandle);
         } catch (Exception e) {
             rstVal.setRspCode(RestResponseCommand.RSP_NETWORK_EXCEPTION);
             rstVal.setRspMsg("Failed to call pds service");
@@ -93,7 +93,7 @@ public class UserAccessController {
     public void logout(HttpServletRequest req, HttpServletResponse rsp) throws Exception {
         PdsUserInfo userInfo = (PdsUserInfo) req.getSession().getAttribute(DashboardConstants.KEY_USER_INFO);
         if (!DashboardHelper.isNull(userInfo)) {
-            rosettaApi.logout(userInfo.getPid());
+            rosettaWebService.logout(userInfo.getPid());
         }
         req.getSession().invalidate();
 

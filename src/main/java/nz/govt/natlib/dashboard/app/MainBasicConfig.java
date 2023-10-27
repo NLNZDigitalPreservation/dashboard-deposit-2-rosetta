@@ -1,9 +1,6 @@
 package nz.govt.natlib.dashboard.app;
 
-import nz.govt.natlib.dashboard.common.core.RosettaApi;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-import nz.govt.natlib.dashboard.common.core.RosettaApiStub;
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import org.apache.catalina.Context;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.slf4j.Logger;
@@ -34,16 +31,10 @@ public class MainBasicConfig {
 
 
     @Bean(BeanDefinition.SCOPE_SINGLETON)
-    public RosettaApi rosettaRestApi() throws Exception {
+    public RosettaWebService rosettaRestApi() throws Exception {
         log.info("Start to initial Rosetta Web Service");
-        RosettaApi bean;
-        if (isTestMode) {
-            log.warn("Started with testing mode.");
-            bean = new RosettaApiStub();
-        } else {
-            bean = new RosettaApi(pdsUrl, restApiUrl);
-        }
-//        bean.init();
+        RosettaWebService bean = new RosettaWebService(pdsUrl, restApiUrl);
+
         log.info("End to initial Rosetta Web Service");
         return bean;
     }

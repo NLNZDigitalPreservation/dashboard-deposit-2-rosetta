@@ -1,0 +1,10 @@
+{
+  "link": "string",
+  "id": "123",
+  "externalId": "123",
+  "externalSystem": "Goobi",
+  "stage": "Finished",
+  "status": "APPROVED",
+  "numberOfIEs": "5",
+  "iePids": "IE1000,IE2000"
+}

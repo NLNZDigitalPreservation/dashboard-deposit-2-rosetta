@@ -2,14 +2,13 @@ package nz.govt.natlib.dashboard.ui.controller;
 
 import nz.govt.natlib.dashboard.common.DashboardConstants;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaApi;
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.dto.DtoMaterialFlowRsp;
+import nz.govt.natlib.dashboard.common.core.dto.DtoProducersRsp;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositAccount;
 import nz.govt.natlib.dashboard.ui.command.RawMaterialFlowCommand;
 import nz.govt.natlib.dashboard.ui.command.RawProducerCommand;
-import nz.govt.natlib.ndha.common.exlibris.MaterialFlow;
-import nz.govt.natlib.ndha.common.exlibris.Producer;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ public class RawMaterialFlowController {
     private static final Logger log = LoggerFactory.getLogger(RawMaterialFlowController.class);
 
     @Autowired
-    private RosettaApi rosettaApi;
+    private RosettaWebService rosettaWebService;
 
     @Autowired
     private RepoDepositAccount repoDepositAccount;
@@ -36,36 +35,30 @@ public class RawMaterialFlowController {
     public RestResponseCommand getRawProducersAndMaterialFlows(@RequestParam("depositAccountId") Long depositAccountId) {
         RestResponseCommand rstVal = new RestResponseCommand();
 
-        EntityDepositAccountSetting depositAccountSetting = repoDepositAccount.getById(depositAccountId);
-        if (depositAccountSetting == null) {
+        EntityDepositAccountSetting depositAccount = repoDepositAccount.getById(depositAccountId);
+        if (depositAccount == null) {
             rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             rstVal.setRspMsg(String.format("There is no Deposit Account related to the id [%d]", depositAccountId));
             return rstVal;
         }
 
-        String depositUsername = depositAccountSetting.getDepositUserName();
-        if (StringUtils.isEmpty(depositUsername)) {
-            rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
-            rstVal.setRspMsg("Please input the deposit username to query the producers");
-            return rstVal;
-        }
 
         try {
-            List<Producer> producers = rosettaApi.getProducers(depositUsername);
+            List<DtoProducersRsp.Producer> producers = rosettaWebService.getProducers(depositAccount);
             List<RawProducerCommand> rawProducerList = producers.stream().map(producer -> {
                 RawProducerCommand producerCmd = new RawProducerCommand();
-                producerCmd.setId(producer.getID());
-                producerCmd.setName(producer.getDescription());
+                producerCmd.setId(producer.getId());
+                producerCmd.setName(producer.getName());
                 return producerCmd;
             }).collect(Collectors.toList());
             producers.clear();
 
             for (RawProducerCommand producerCmd : rawProducerList) {
-                List<MaterialFlow> materialFlows = rosettaApi.getMaterialFlows(producerCmd.getId());
+                List<DtoMaterialFlowRsp.MaterialFlow> materialFlows = rosettaWebService.getMaterialFlows(depositAccount, producerCmd.getId());
                 List<RawMaterialFlowCommand> rawMaterialFlowList = materialFlows.stream().map(flow -> {
                     RawMaterialFlowCommand flowCmd = new RawMaterialFlowCommand();
-                    flowCmd.setId(flow.getID());
-                    flowCmd.setName(flow.getDescription());
+                    flowCmd.setId(flow.getId());
+                    flowCmd.setName(flow.getName());
                     return flowCmd;
                 }).collect(Collectors.toList());
                 materialFlows.clear();

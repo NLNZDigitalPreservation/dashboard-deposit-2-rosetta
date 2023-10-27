@@ -1,17 +1,20 @@
 package nz.govt.natlib.dashboard.common;
 
 import com.google.common.io.Files;
-import nz.govt.natlib.dashboard.common.core.RosettaRestApiClient;
+import nz.govt.natlib.dashboard.common.core.RosettaRestApi;
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.repo.*;
 import nz.govt.natlib.dashboard.domain.service.DepositJobService;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +22,11 @@ import java.io.IOException;
 import static org.mockito.Mockito.mock;
 
 public class BasicTester {
+    private static final String INSTITUTION = "INS00";
+    private static final String USERNAME = "NLZNDashboard";
+    private static final String PASSWORD = "Password01";
+    protected static final EntityDepositAccountSetting depositAccount = new EntityDepositAccountSetting();
+
     protected static final File testDir = Files.createTempDir();
     protected static final String storagePath = new File(testDir, "storage").getAbsolutePath();
     protected static final String scanRootPath = new File(testDir, "magazine").getAbsolutePath();
@@ -37,23 +45,31 @@ public class BasicTester {
     protected static final String sipId = "12345";
     protected static final String pdsHandle = DashboardHelper.getUid();
 
-
+    protected static RosettaRestApi restApi;
     protected static RepoIdGenerator repoIdGenerator;
     protected static RepoFlowSetting repoFlowSetting;
     protected static RepoDepositJob repoDepositJob;
     protected static RepoDepositAccount repoDepositAccount;
     protected static RepoWhiteList repoWhiteList;
     protected static RepoGlobalSetting repoGlobalSetting;
-    protected static RosettaRestApiClient rosettaWebService;
     protected static DepositJobService depositJobService;
 
+    protected static RosettaWebService rosettaWebService = new RosettaWebService("http://localhost", "http://localhost");
+
     public static void init() throws IOException {
+        depositAccount.setDepositUserInstitute(INSTITUTION);
+        depositAccount.setDepositUserName(USERNAME);
+        depositAccount.setDepositUserPassword(PASSWORD);
+
+        restApi = mock(RosettaRestApi.class);
+        rosettaWebService.setRestApi(restApi);
+
         //Initial services
         repoIdGenerator = new RepoIdGenerator();
         ReflectionTestUtils.setField(repoIdGenerator, "systemStoragePath", storagePath);
         repoIdGenerator.init();
 
-        repoGlobalSetting=new RepoGlobalSetting();
+        repoGlobalSetting = new RepoGlobalSetting();
         ReflectionTestUtils.setField(repoGlobalSetting, "systemStoragePath", storagePath);
         ReflectionTestUtils.setField(repoGlobalSetting, "idGenerator", repoIdGenerator);
         repoGlobalSetting.init();
@@ -77,8 +93,6 @@ public class BasicTester {
         ReflectionTestUtils.setField(repoWhiteList, "systemStoragePath", storagePath);
         ReflectionTestUtils.setField(repoWhiteList, "idGenerator", repoIdGenerator);
         repoWhiteList.init();
-
-        rosettaWebService = mock(RosettaRestApiClient.class);
 
         depositJobService = new DepositJobService();
         ReflectionTestUtils.setField(depositJobService, "rosettaWebService", rosettaWebService);
@@ -176,5 +190,15 @@ public class BasicTester {
             e.printStackTrace();
             assert false;
         }
+    }
+
+    public String readResourceFile(String path) {
+        Resource resource = new ClassPathResource(path);
+        try {
+            return IOUtils.toString(resource.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

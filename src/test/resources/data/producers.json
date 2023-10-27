@@ -1,0 +1,525 @@
+{
+  "producer": [
+    {
+      "active": true,
+      "id": "741697717",
+      "name": " Auckland Workers' Educational Association",
+      "group": {
+        "value": "Published",
+        "desc": "Published"
+      },
+      "classification": {
+        "value": "None",
+        "desc": "None "
+      },
+      "negotiator": null,
+      "profile": {
+        "id": "741700519",
+        "name": " Auckland Workers' Educational Association - Published",
+        "link": "/rest/v0/producers/producer-profiles/741700519"
+      },
+      "account_type": {
+        "value": "GROUP",
+        "desc": "Group"
+      },
+      "producer_type": {
+        "value": "2",
+        "desc": "Trusted"
+      },
+      "local_field1": {
+        "value": "1",
+        "desc": "none"
+      },
+      "producer_information": {
+        "institution": " Auckland Workers' Educational Association",
+        "department": "-",
+        "telephone1": "000 0000",
+        "telephone2": null,
+        "fax": null,
+        "email": "ndha.admin@dia.govt.nz",
+        "street": "-",
+        "suburb": null,
+        "city": null,
+        "country": {
+          "value": "NewZealand",
+          "desc": "New Zealand"
+        },
+        "notes": "PMFs set to 0%",
+        "send_reports": false,
+        "website_url": null,
+        "postal_code": null
+      },
+      "link": "/rest/v0/producers/741697717"
+    },
+    {
+      "active": true,
+      "id": "757978879",
+      "name": " Denton, John Mowbray, b 1870 ",
+      "group": {
+        "value": "Unpublished",
+        "desc": "Unpublished"
+      },
+      "classification": {
+        "value": "None",
+        "desc": "None "
+      },
+      "negotiator": null,
+      "profile": {
+        "id": "2",
+        "name": "Unpublished",
+        "link": "/rest/v0/producers/producer-profiles/2"
+      },
+      "account_type": {
+        "value": "INDIVIDUAL",
+        "desc": "Individual"
+      },
+      "producer_type": {
+        "value": "2",
+        "desc": "Trusted"
+      },
+      "local_field1": {
+        "value": "1",
+        "desc": "none"
+      },
+      "producer_information": {
+        "institution": "John Mowbray",
+        "department": "Denton",
+        "telephone1": "0000",
+        "telephone2": null,
+        "fax": null,
+        "email": "ndha.admin@dia.govt.nz",
+        "street": "xxxx",
+        "suburb": null,
+        "city": null,
+        "country": {
+          "value": "NewZealand",
+          "desc": "New Zealand"
+        },
+        "notes": "document came care of Richard Denton",
+        "send_reports": false,
+        "website_url": null,
+        "postal_code": null
+      },
+      "link": "/rest/v0/producers/757978879"
+    },
+    {
+      "active": true,
+      "id": "33926739",
+      "name": " International Institute of Modern Letters",
+      "group": {
+        "value": "Unpublished",
+        "desc": "Unpublished"
+      },
+      "classification": {
+        "value": "None",
+        "desc": "None "
+      },
+      "negotiator": null,
+      "profile": {
+        "id": "2",
+        "name": "Unpublished",
+        "link": "/rest/v0/producers/producer-profiles/2"
+      },
+      "account_type": {
+        "value": "GROUP",
+        "desc": "Group"
+      },
+      "producer_type": {
+        "value": "1",
+        "desc": "Registered"
+      },
+      "local_field1": {
+        "value": "1",
+        "desc": "none"
+      },
+      "producer_information": {
+        "institution": "Victoria University of Wellington",
+        "department": "International Institute of Modern Letters",
+        "telephone1": "04 4636854",
+        "telephone2": null,
+        "fax": null,
+        "email": "NDHA.Admin@dia.govt.nz",
+        "street": "PO Box 600",
+        "suburb": "Wellington",
+        "city": "New Zealand",
+        "country": {
+          "value": "NewZealand",
+          "desc": "New Zealand"
+        },
+        "notes": "modernletters@vuw.ac.nz",
+        "send_reports": false,
+        "website_url": "http://www.victoria.ac.nz/modernletters/",
+        "postal_code": null
+      },
+      "link": "/rest/v0/producers/33926739"
+    },
+    {
+      "active": true,
+      "id": "323020486",
+      "name": " New Zealand Productivity Commission",
+      "group": {
+        "value": "Published",
+        "desc": "Published"
+      },
+      "classification": {
+        "value": "None",
+        "desc": "None "
+      },
+      "negotiator": null,
+      "profile": {
+        "id": "661118554",
+        "name": " New Zealand Productivity Commission - Published",
+        "link": "/rest/v0/producers/producer-profiles/661118554"
+      },
+      "account_type": {
+        "value": "GROUP",
+        "desc": "Group"
+      },
+      "producer_type": {
+        "value": "2",
+        "desc": "Trusted"
+      },
+      "local_field1": {
+        "value": "1",
+        "desc": "none"
+      },
+      "producer_information": {
+        "institution": " New Zealand Productivity Commission",
+        "department": "-",
+        "telephone1": "04 903 5150",
+        "telephone2": null,
+        "fax": null,
+        "email": "ndha.admin@dia.govt.nz",
+        "street": "PO Box 8036",
+        "suburb": null,
+        "city": "Wellington",
+        "country": {
+          "value": "NewZealand",
+          "desc": "New Zealand"
+        },
+        "notes": "info@productivity.govt.nz\r\nPMFs set to 0%",
+        "send_reports": false,
+        "website_url": "http://www.productivity.govt.nz/",
+        "postal_code": "6143"
+      },
+      "link": "/rest/v0/producers/323020486"
+    },
+    {
+      "active": true,
+      "id": "789742448",
+      "name": " Ridley-Smith, Roger (Dr), 1931- ",
+      "group": {
+        "value": "Unpublished",
+        "desc": "Unpublished"
+      },
+      "classification": {
+        "value": "None",
+        "desc": "None "
+      },
+      "negotiator": null,
+      "profile": {
+        "id": "2",
+        "name": "Unpublished",
+        "link": "/rest/v0/producers/producer-profiles/2"
+      },
+      "account_type": {
+        "value": "INDIVIDUAL",
+        "desc": "Individual"
+      },
+      "producer_type": {
+        "value": "1",
+        "desc": "Registered"
+      },
+      "local_field1": {
+        "value": "1",
+        "desc": "none"
+      },
+      "producer_information": {
+        "institution": "Roger",
+        "department": "Ridley-Smith",
+        "telephone1": "0011234567",
+        "telephone2": null,
+        "fax": null,
+        "email": "NDHA.Admin@dia.govt.nz",
+        "street": "123",
+        "suburb": null,
+        "city": null,
+        "country": {
+          "value": "NewZealand",
+          "desc": "New Zealand"
+        },
+        "notes": null,
+        "send_reports": false,
+        "website_url": null,
+        "postal_code": null
+      },
+      "link": "/rest/v0/producers/789742448"
+    },
+    {
+      "active": true,
+      "id": "57015997",
+      "name": " de guzman leah",
+      "group": {
+        "value": "Published",
+        "desc": "Published"
+      },
+      "classification": null,
+      "negotiator": null,
+      "profile": {
+        "id": "1",
+        "name": "Published",
+        "link": "/rest/v0/producers/producer-profiles/1"
+      },
+      "account_type": {
+        "value": "INDIVIDUAL",
+        "desc": "Individual"
+      },
+      "producer_type": {
+        "value": "1",
+        "desc": "Registered"
+      },
+      "local_field1": null,
+      "producer_information": {
+        "institution": "Leah",
+        "department": "De Guzman",
+        "telephone1": "646 344 1006",
+        "telephone2": null,
+        "fax": null,
+        "email": "leahvd@gmail.com",
+        "street": "30 kowhai st",
+        "suburb": "Castlecliff",
+        "city": "Wanganui",
+        "country": {
+          "value": "NewZealand",
+          "desc": "New Zealand"
+        },
+        "notes": null,
+        "send_reports": false,
+        "website_url": null,
+        "postal_code": "4501"
+      },
+      "link": "/rest/v0/producers/57015997"
+    },
+    {
+      "active": false,
+      "id": "663671167",
+      "name": "$noregazZzm",
+      "group": {
+        "value": "Published",
+        "desc": "Published"
+      },
+      "classification": {
+        "value": "None",
+        "desc": "None "
+      },
+      "negotiator": {
+        "user_name": "duncans",
+        "full_name": "Sholto Duncan",
+        "link": "/rest/v0/users/13544895"
+      },
+      "profile": {
+        "id": "1",
+        "name": "Published",
+        "link": "/rest/v0/producers/producer-profiles/1"
+      },
+      "account_type": {
+        "value": "INDIVIDUAL",
+        "desc": "Individual"
+      },
+      "producer_type": {
+        "value": "1",
+        "desc": "Registered"
+      },
+      "local_field1": {
+        "value": "1",
+        "desc": "none"
+      },
+      "producer_information": {
+        "institution": "$noregazZzm",
+        "department": "-",
+        "telephone1": "0000",
+        "telephone2": null,
+        "fax": null,
+        "email": "ndha.admin@dia.govt.nz",
+        "street": "-",
+        "suburb": null,
+        "city": "Auckland",
+        "country": {
+          "value": "NewZealand",
+          "desc": "New Zealand"
+        },
+        "notes": null,
+        "send_reports": false,
+        "website_url": "http://snoregazzzm.bandcamp.com/",
+        "postal_code": null
+      },
+      "link": "/rest/v0/producers/663671167"
+    },
+    {
+      "active": true,
+      "id": "765596542",
+      "name": "1000",
+      "group": {
+        "value": "Published",
+        "desc": "Published"
+      },
+      "classification": {
+        "value": "None",
+        "desc": "None "
+      },
+      "negotiator": {
+        "user_name": "duncans",
+        "full_name": "Sholto Duncan",
+        "link": "/rest/v0/users/13544895"
+      },
+      "profile": {
+        "id": "1",
+        "name": "Published",
+        "link": "/rest/v0/producers/producer-profiles/1"
+      },
+      "account_type": {
+        "value": "INDIVIDUAL",
+        "desc": "Individual"
+      },
+      "producer_type": {
+        "value": "1",
+        "desc": "Registered"
+      },
+      "local_field1": {
+        "value": "1",
+        "desc": "none"
+      },
+      "producer_information": {
+        "institution": "1000",
+        "department": "-",
+        "telephone1": "0000",
+        "telephone2": null,
+        "fax": null,
+        "email": "ndha.admin@dia.govt.nz",
+        "street": "-",
+        "suburb": null,
+        "city": "Auckland",
+        "country": {
+          "value": "NewZealand",
+          "desc": "New Zealand"
+        },
+        "notes": null,
+        "send_reports": false,
+        "website_url": "http://1000.bandcamp.com/",
+        "postal_code": null
+      },
+      "link": "/rest/v0/producers/765596542"
+    },
+    {
+      "active": true,
+      "id": "1330965322",
+      "name": "1080p",
+      "group": {
+        "value": "Published",
+        "desc": "Published"
+      },
+      "classification": {
+        "value": "None",
+        "desc": "None "
+      },
+      "negotiator": {
+        "user_name": "duncans",
+        "full_name": "Sholto Duncan",
+        "link": "/rest/v0/users/13544895"
+      },
+      "profile": {
+        "id": "1",
+        "name": "Published",
+        "link": "/rest/v0/producers/producer-profiles/1"
+      },
+      "account_type": {
+        "value": "GROUP",
+        "desc": "Group"
+      },
+      "producer_type": {
+        "value": "1",
+        "desc": "Registered"
+      },
+      "local_field1": {
+        "value": "1",
+        "desc": "none"
+      },
+      "producer_information": {
+        "institution": "1080p",
+        "department": "-",
+        "telephone1": "0000",
+        "telephone2": null,
+        "fax": null,
+        "email": "ndha.admin@dia.govt.nz",
+        "street": "-",
+        "suburb": null,
+        "city": "Vancouver",
+        "country": {
+          "value": "Other",
+          "desc": "International"
+        },
+        "notes": null,
+        "send_reports": false,
+        "website_url": "https://1080pcollection.bandcamp.com/",
+        "postal_code": null
+      },
+      "link": "/rest/v0/producers/1330965322"
+    },
+    {
+      "active": true,
+      "id": "876975684",
+      "name": "10A",
+      "group": {
+        "value": "Published",
+        "desc": "Published"
+      },
+      "classification": {
+        "value": "None",
+        "desc": "None "
+      },
+      "negotiator": {
+        "user_name": "duncans",
+        "full_name": "Sholto Duncan",
+        "link": "/rest/v0/users/13544895"
+      },
+      "profile": {
+        "id": "1",
+        "name": "Published",
+        "link": "/rest/v0/producers/producer-profiles/1"
+      },
+      "account_type": {
+        "value": "INDIVIDUAL",
+        "desc": "Individual"
+      },
+      "producer_type": {
+        "value": "1",
+        "desc": "Registered"
+      },
+      "local_field1": {
+        "value": "1",
+        "desc": "none"
+      },
+      "producer_information": {
+        "institution": "10A",
+        "department": "-",
+        "telephone1": "0000",
+        "telephone2": null,
+        "fax": null,
+        "email": "ndha.admin@dia.govt.nz",
+        "street": "-",
+        "suburb": null,
+        "city": null,
+        "country": {
+          "value": "NewZealand",
+          "desc": "New Zealand"
+        },
+        "notes": null,
+        "send_reports": false,
+        "website_url": "http://10amusic.bandcamp.com/",
+        "postal_code": null
+      },
+      "link": "/rest/v0/producers/876975684"
+    }
+  ],
+  "total_record_count": 10
+}

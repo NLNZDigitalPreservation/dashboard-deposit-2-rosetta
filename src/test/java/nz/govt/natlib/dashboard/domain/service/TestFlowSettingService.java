@@ -46,8 +46,8 @@ public class TestFlowSettingService extends BasicTester {
             try {
                 //Set mock data
                 when(rosettaWebService.login(any(), any(), any())).thenReturn(pdsHandle);
-                when(rosettaWebService.isValidProducer("serverside", flowSetting.getProducerId())).thenReturn(true);
-                when(rosettaWebService.isValidMaterialFlow(flowSetting.getProducerId(), flowSetting.getMaterialFlowId())).thenReturn(true);
+                when(rosettaWebService.isValidProducer(depositAccount, flowSetting.getProducerId())).thenReturn(true);
+                when(rosettaWebService.isValidMaterialFlow(depositAccount, flowSetting.getProducerId(), flowSetting.getMaterialFlowId())).thenReturn(true);
 
                 testInstance.validateFlowSetting(flowSetting);
                 assert true;
@@ -83,7 +83,7 @@ public class TestFlowSettingService extends BasicTester {
 
             try {
                 //Set mock data
-                when(rosettaWebService.isValidProducer("serverside", flowSetting.getProducerId())).thenReturn(false);
+                when(rosettaWebService.isValidProducer(depositAccount, flowSetting.getProducerId())).thenReturn(false);
 
                 testInstance.validateFlowSetting(flowSetting);
 
@@ -102,7 +102,7 @@ public class TestFlowSettingService extends BasicTester {
 
             try {
                 //Set mock data
-                when(rosettaWebService.isValidMaterialFlow(flowSetting.getProducerId(), flowSetting.getMaterialFlowId())).thenReturn(true);
+                when(rosettaWebService.isValidMaterialFlow(depositAccount, flowSetting.getProducerId(), flowSetting.getMaterialFlowId())).thenReturn(true);
 
                 testInstance.validateFlowSetting(flowSetting);
 
@@ -123,8 +123,8 @@ public class TestFlowSettingService extends BasicTester {
         EntityFlowSetting rst = null;
         try {
             when(rosettaWebService.login(anyString(), anyString(), anyString())).thenReturn(UUID.randomUUID().toString());
-            when(rosettaWebService.isValidProducer(anyString(), anyString())).thenReturn(true);
-            when(rosettaWebService.isValidMaterialFlow(anyString(), anyString())).thenReturn(true);
+            when(rosettaWebService.isValidProducer(any(), anyString())).thenReturn(true);
+            when(rosettaWebService.isValidMaterialFlow(any(), anyString(), anyString())).thenReturn(true);
             rst = testInstance.saveFlowSetting(flowSetting);
             assert rst != null;
             assert !DashboardHelper.isNull(rst.getId());
@@ -143,8 +143,8 @@ public class TestFlowSettingService extends BasicTester {
         EntityFlowSetting rst = null;
         try {
             when(rosettaWebService.login(anyString(), anyString(), anyString())).thenReturn(UUID.randomUUID().toString());
-            when(rosettaWebService.isValidProducer(anyString(), anyString())).thenReturn(true);
-            when(rosettaWebService.isValidMaterialFlow(anyString(), anyString())).thenReturn(true);
+            when(rosettaWebService.isValidProducer(any(), anyString())).thenReturn(true);
+            when(rosettaWebService.isValidMaterialFlow(any(), anyString(), anyString())).thenReturn(true);
             rst = testInstance.saveFlowSetting(flowSetting);
             assert rst != null;
             assert !DashboardHelper.isNull(rst.getId());

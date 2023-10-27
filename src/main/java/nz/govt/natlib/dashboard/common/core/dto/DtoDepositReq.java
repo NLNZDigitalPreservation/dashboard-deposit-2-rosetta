@@ -1,6 +1,6 @@
-package nz.govt.natlib.dashboard.common.core;
+package nz.govt.natlib.dashboard.common.core.dto;
 
-public class RestRequestDeposit {
+public class DtoDepositReq {
     private String link = "string";
     private String subdirectory;
     private Producer producer;
@@ -22,7 +22,7 @@ public class RestRequestDeposit {
         this.subdirectory = subdirectory;
     }
 
-    public RestRequestDeposit.Producer getProducer() {
+    public DtoDepositReq.Producer getProducer() {
         return producer;
     }
 

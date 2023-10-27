@@ -1,7 +1,7 @@
 package nz.govt.natlib.dashboard.domain.service;
 
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.common.core.RosettaApi;
+import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.exception.InvalidParameterException;
 import nz.govt.natlib.dashboard.common.exception.NullParameterException;
 import nz.govt.natlib.dashboard.common.exception.WebServiceException;
@@ -25,7 +25,7 @@ import java.util.List;
 public class FlowSettingService {
     private static final Logger log = LoggerFactory.getLogger(FlowSettingService.class);
     @Autowired
-    private RosettaApi rosettaApi;
+    private RosettaWebService rosettaWebService;
     @Autowired
     private RepoFlowSetting repoFlowSetting;
     @Autowired
@@ -58,7 +58,7 @@ public class FlowSettingService {
 
         String pdsHandle;
         try {
-            pdsHandle = rosettaApi.login(depositAccount.getDepositUserInstitute(), depositAccount.getDepositUserName(), depositAccount.getDepositUserPassword());
+            pdsHandle = rosettaWebService.login(depositAccount.getDepositUserInstitute(), depositAccount.getDepositUserName(), depositAccount.getDepositUserPassword());
         } catch (Exception e) {
             throw new WebServiceException(e);
         }
@@ -68,11 +68,11 @@ public class FlowSettingService {
 
         //Verify ProduceId and MaterialFlowId
         try {
-            if (!rosettaApi.isValidProducer(depositAccount.getDepositUserName(), flowSetting.getProducerId())) {
+            if (!rosettaWebService.isValidProducer(depositAccount, flowSetting.getProducerId())) {
                 throw new InvalidParameterException("Invalid producerId");
             }
 
-            if (!rosettaApi.isValidMaterialFlow(flowSetting.getProducerId(), flowSetting.getMaterialFlowId())) {
+            if (!rosettaWebService.isValidMaterialFlow(depositAccount,flowSetting.getProducerId(), flowSetting.getMaterialFlowId())) {
                 throw new InvalidParameterException("Invalid materialFlowId");
             }
         } catch (Exception e) {
