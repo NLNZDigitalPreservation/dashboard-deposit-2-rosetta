@@ -88,8 +88,6 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             return false;
         }
 
-
-
         ResultOfDeposit resultOfDeposit;
         try {
             resultOfDeposit = this.rosettaWebService.deposit(depositAccount, job.getInjectionTitle(), flowSetting.getProducerId(), flowSetting.getMaterialFlowId(), job.getDepositSetId());

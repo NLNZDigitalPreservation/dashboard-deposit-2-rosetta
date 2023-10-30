@@ -40,10 +40,6 @@ public class RosettaWebService {
 
     public String login(String institution, String username, String password) throws Exception {
         try {
-            if (pdsClient == null) {
-                pdsClient = CustomizedPdsClient.getInstance();
-                pdsClient.init(pdsUrl, false);
-            }
             return pdsClient.login(institution, username, password);
         } catch (Exception e) {
             String err = String.format("Login failed: institution=%s, username=%s, password=********, %s", institution, username, e.getMessage());
@@ -54,10 +50,6 @@ public class RosettaWebService {
 
     public String logout(String pdsHandle) throws Exception {
         try {
-            if (pdsClient == null) {
-                pdsClient = CustomizedPdsClient.getInstance();
-                pdsClient.init(pdsUrl, false);
-            }
             return pdsClient.logout(pdsHandle);
         } catch (Exception e) {
             String err = String.format("Logout failed: pdsHandle=%s: %s", pdsHandle, e.getMessage());
@@ -156,15 +148,11 @@ public class RosettaWebService {
     public ResultOfDeposit deposit(EntityDepositAccountSetting depositAccount, String injectionRootDirectory, String depositUserProducerId, String materialFlowID, String depositSetID) throws Exception {
         try {
             if (!isValidProducer(depositAccount, depositUserProducerId)) {
-                String err = String.format("Invalid producer: %s", depositUserProducerId);
-                System.out.println(err);
-                throw new Exception("Invalid producer: " + depositUserProducerId);
+                log.warn("Invalid producer: {}", depositUserProducerId);
             }
 
             if (!isValidMaterialFlow(depositAccount, depositUserProducerId, materialFlowID)) {
-                String err = String.format("Invalid material flow: %s", materialFlowID);
-                System.out.println(err);
-                throw new Exception("Invalid material flow: " + materialFlowID);
+                log.warn("Invalid material flow: {}", materialFlowID);
             }
 
             DtoDepositReq reqBody = new DtoDepositReq();
@@ -178,7 +166,10 @@ public class RosettaWebService {
             boolean result = false;
             String sipId = "", sipReason = "";
             if (ret != null) {
-                result = !StringUtils.isEmpty(ret.getSip_id());
+                if (!StringUtils.equalsIgnoreCase(ret.getStatus(), "Rejected") && !StringUtils.equalsIgnoreCase(ret.getStatus(), "Declined")) {
+                    result = !StringUtils.isEmpty(ret.getSip_id());
+                }
+
                 sipId = ret.getSip_id();
                 sipReason = ret.getSip_reason();
             }
@@ -210,5 +201,9 @@ public class RosettaWebService {
 
     public void setRestApi(RosettaRestApi restApi) {
         this.restApi = restApi;
+    }
+
+    public void setPdsClient(CustomizedPdsClient pdsClient) {
+        this.pdsClient = pdsClient;
     }
 }

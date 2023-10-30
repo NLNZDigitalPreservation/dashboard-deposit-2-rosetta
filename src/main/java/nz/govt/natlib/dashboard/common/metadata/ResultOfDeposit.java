@@ -5,11 +5,11 @@ public class ResultOfDeposit {
     private final String theResultMessage;
     private final String theSipID;
 
-    public static ResultOfDeposit create(boolean success, String resultMessage, String sipID) {
-        return new ResultOfDeposit(success, resultMessage, sipID);
+    public static ResultOfDeposit create(boolean success, String sipID, String resultMessage) {
+        return new ResultOfDeposit(success, sipID, resultMessage);
     }
 
-    public ResultOfDeposit(boolean success, String resultMessage, String sipID) {
+    public ResultOfDeposit(boolean success, String sipID, String resultMessage) {
         this.isSuccessful = success;
         this.theResultMessage = resultMessage;
         this.theSipID = sipID;
