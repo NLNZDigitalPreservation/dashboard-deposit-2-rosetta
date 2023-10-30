@@ -118,7 +118,8 @@ public class TestDepositJobService extends BasicTester {
         sipStatusInfo.setStage("Finished");
         sipStatusInfo.setStatus("Finished");
         try {
-            when(rosettaWebService.getSIPStatusInfo(depositAccount, sipId)).thenReturn(sipStatusInfo);
+            String depositResponse = this.readResourceFile("data/sipstatusinfo-succeed.json");
+            when(restApi.fetch(any(),any(),any(),any())).thenReturn(depositResponse);
             sipStatusInfo = rosettaWebService.getSIPStatusInfo(depositAccount, sipId);
         } catch (Exception e) {
             e.printStackTrace();

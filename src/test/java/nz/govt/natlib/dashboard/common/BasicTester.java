@@ -6,6 +6,7 @@ import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.repo.*;
 import nz.govt.natlib.dashboard.domain.service.DepositJobService;
+import nz.govt.natlib.dashboard.util.CustomizedPdsClient;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -46,6 +47,7 @@ public class BasicTester {
     protected static final String pdsHandle = DashboardHelper.getUid();
 
     protected static RosettaRestApi restApi;
+    protected static CustomizedPdsClient pdsClient;
     protected static RepoIdGenerator repoIdGenerator;
     protected static RepoFlowSetting repoFlowSetting;
     protected static RepoDepositJob repoDepositJob;
@@ -62,7 +64,9 @@ public class BasicTester {
         depositAccount.setDepositUserPassword(PASSWORD);
 
         restApi = mock(RosettaRestApi.class);
+        pdsClient = mock(CustomizedPdsClient.class);
         rosettaWebService.setRestApi(restApi);
+        rosettaWebService.setPdsClient(pdsClient);
 
         //Initial services
         repoIdGenerator = new RepoIdGenerator();
