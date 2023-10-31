@@ -60,10 +60,6 @@ public class RosettaWebService {
 
     public PdsUserInfo getPdsUserByPdsHandle(String pdsHandle) throws Exception {
         try {
-            if (pdsClient == null) {
-                pdsClient = CustomizedPdsClient.getInstance();
-                pdsClient.init(pdsUrl, false);
-            }
             return pdsClient.getPdsUserByPdsHandle(pdsHandle);
         } catch (Exception e) {
             String err = String.format("Get PdsUserByPdsHandle failed: pdsHandle=%s: %s", pdsHandle, e.getMessage());
