@@ -69,7 +69,10 @@ public class TestRosettaWebServiceImpl {
         RosettaWebServiceImpl localRosettaWebService = new RosettaWebServiceImpl(PDSUrl, ProducerWsdlUrl, DepositWsdlUrl, SipWsdlUrl, DeliveryAccessWsdlUrl);
 //        localRosettaWebService._init();
         try {
-            localRosettaWebService.getProducers("leefr");
+            List<Producer> producers= localRosettaWebService.getProducers("leefr");
+            producers.forEach(p->{
+                System.out.println(p.toString());
+            });
         } catch (Exception e) {
 
         }
@@ -92,7 +95,11 @@ public class TestRosettaWebServiceImpl {
         String startRecord = "1";
         String endRecord = "20";
 
-//        String xml= MockProducerWebServices.getProducerXml();
+//        String xml=
+
+
+//
+//        rWebServices.getProducerXml();
 //        when(producerWebServices.getInternalUserIdByExternalId(USERNAME)).thenReturn(_PRODUCER_AGENT_ID);
 //        when(producerWebServices.getProducersOfProducerAgent(_PRODUCER_AGENT_ID)).thenReturn(xml);
 
@@ -122,7 +129,7 @@ public class TestRosettaWebServiceImpl {
 
     @Test
     public void testGetSipIEs() {
-        String sipId = "742449";
+        String sipId = "749344";
         SipWebServices sipApi = rosettaWebService.getSipWebServices();
         String reply = sipApi.getSipIEs(sipId);
         System.out.println(reply);
@@ -130,7 +137,7 @@ public class TestRosettaWebServiceImpl {
 
     @Test
     public void testGetSipStatus() {
-        String sipId = "747793";
+        String sipId = "749344";
         SipWebServices sipApi = rosettaWebService.getSipWebServices();
         String reply = sipApi.getSipStatus(sipId);
         System.out.println(reply);

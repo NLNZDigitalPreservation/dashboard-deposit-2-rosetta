@@ -60,6 +60,9 @@ dependencies {
     implementation 'commons-io:commons-io:2.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'junit:junit:4.13.1'
+    testImplementation 'com.exlibris:dps-deposit-dao:8.1.0'
+    testImplementation 'com.exlibris:dps-deposit-model:8.1.0'
+    testImplementation 'log4j:log4j:1.2.17'
 }
 
 test {
