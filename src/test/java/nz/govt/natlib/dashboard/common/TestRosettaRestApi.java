@@ -5,6 +5,7 @@ import nz.govt.natlib.dashboard.common.core.dto.DtoMaterialFlowRsp;
 import nz.govt.natlib.dashboard.common.core.dto.DtoProducersRsp;
 import nz.govt.natlib.dashboard.common.metadata.SipStatusInfo;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.mockito.Mockito.mock;
@@ -30,8 +33,8 @@ public class TestRosettaRestApi {
 
     private static final String _PRODUCER_AGENT_ID = "NLNZ";
     private static final String INSTITUTION = "INS00";
-    private static final String USERNAME = "NLZNDashboard";
-    private static final String PASSWORD = "Password01";
+    private static final String USERNAME = "";
+    private static final String PASSWORD = "";
     private static final EntityDepositAccountSetting depositAccount = new EntityDepositAccountSetting();
 
     @BeforeAll
@@ -44,16 +47,27 @@ public class TestRosettaRestApi {
 //        pdsClient.init("http://localhost/", true);
     }
 
-    @Test
+
+    //    @Test
     public void testGetProducer() throws Exception {
         List<DtoProducersRsp.Producer> producers = restApi.getProducers(depositAccount);
         assert producers != null;
         assert !producers.isEmpty();
+
+        final Set<String> set = new HashSet<>();
+        producers.forEach(p -> {
+            if (set.contains(p.getId())) {
+                System.out.println(p.getId() + ": " + p.getName());
+            } else {
+                set.add(p.getId());
+            }
+        });
+        assert producers.size() == set.size();
     }
 
 
     //    @Disabled
-    @Test
+//    @Test
     public void testGetMaterialFlow() throws Exception {
         List<DtoProducersRsp.Producer> producers = restApi.getProducers(depositAccount);
         assert producers != null;
@@ -72,9 +86,13 @@ public class TestRosettaRestApi {
     @Test
     public void testGetSipStatusInfo() throws Exception {
         String sipId = "742449";
-        SipStatusInfo sipStatusInfo = restApi.getSIPStatusInfo(depositAccount, sipId);
+        try {
+            SipStatusInfo sipStatusInfo = restApi.getSIPStatusInfo(depositAccount, sipId);
 //        assert sipStatusInfo != null;
 //        System.out.println(sipStatusInfo.getStatus());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

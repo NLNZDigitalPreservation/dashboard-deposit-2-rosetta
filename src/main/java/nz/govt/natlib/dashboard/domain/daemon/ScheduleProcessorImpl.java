@@ -90,7 +90,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
 
         ResultOfDeposit resultOfDeposit;
         try {
-            resultOfDeposit = this.rosettaWebService.deposit(depositAccount, job.getInjectionTitle(), flowSetting.getProducerId(), flowSetting.getMaterialFlowId(), job.getDepositSetId());
+            resultOfDeposit = this.rosettaWebService.deposit(depositAccount, job.getInjectionTitle(), flowSetting.getProducerId(), flowSetting.getMaterialFlowId());
         } catch (Exception e) {
             log.error("Failed to submit job", e);
             return false;

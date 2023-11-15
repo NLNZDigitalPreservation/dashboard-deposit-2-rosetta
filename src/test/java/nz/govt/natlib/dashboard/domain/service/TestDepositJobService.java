@@ -82,8 +82,8 @@ public class TestDepositJobService extends BasicTester {
             String injectionPath = "20201023_GTG_parent_grouping__Get_Growing";
             ResultOfDeposit resultOfDeposit;
             try {
-                when(rosettaWebService.deposit(any(), any(), any(), any(), any())).thenReturn(new ResultOfDeposit(true, "OK", "12345"));
-                resultOfDeposit = rosettaWebService.deposit(depositAccount, injectionPath, producerId, materialFlowId, "1");
+                when(rosettaWebService.deposit(any(), any(), any(), any())).thenReturn(new ResultOfDeposit(true, "OK", "12345"));
+                resultOfDeposit = rosettaWebService.deposit(depositAccount, injectionPath, producerId, materialFlowId);
                 assert resultOfDeposit.isSuccess();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -96,7 +96,7 @@ public class TestDepositJobService extends BasicTester {
 
             ResultOfDeposit resultOfDeposit = null;
             try {
-                resultOfDeposit = rosettaWebService.deposit(depositAccount, injectionPath, producerId, materialFlowId, "1");
+                resultOfDeposit = rosettaWebService.deposit(depositAccount, injectionPath, producerId, materialFlowId);
             } catch (Exception e) {
                 e.printStackTrace();
                 assert false;

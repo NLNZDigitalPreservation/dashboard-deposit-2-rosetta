@@ -22,7 +22,7 @@ public class DtoProducersRsp {
         this.total_record_count = total_record_count;
     }
 
-    public static class Producer{
+    public static class Producer {
         private boolean active;
         private String id;
         private String name;

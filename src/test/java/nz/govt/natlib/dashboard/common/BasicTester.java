@@ -196,7 +196,7 @@ public class BasicTester {
         }
     }
 
-    public String readResourceFile(String path) {
+    public static String readResourceFile(String path) {
         Resource resource = new ClassPathResource(path);
         try {
             return IOUtils.toString(resource.getInputStream());

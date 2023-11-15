@@ -30,6 +30,19 @@ public class TestFlowSettingService extends BasicTester {
         ReflectionTestUtils.setField(testInstance, "rosettaWebService", rosettaWebService);
         ReflectionTestUtils.setField(testInstance, "repoDepositAccount", repoDepositAccount);
         ReflectionTestUtils.setField(testInstance, "repoFlowSetting", repoFlowSetting);
+
+        //Set mock data
+        try {
+            when(pdsClient.login(anyString(), anyString(), anyString())).thenReturn(UUID.randomUUID().toString());
+            String producers = readResourceFile("data/producers.json");
+            when(restApi.fetch(any(), any(), eq("/producers"), any())).thenReturn(producers);
+            String producerDetail = readResourceFile("data/producer-detail.json");
+            when(restApi.fetch(any(), any(), eq("/producers/0001"), any())).thenReturn(producerDetail);
+            String materialflows = readResourceFile("data/materialflows.json");
+            when(restApi.fetch(any(), any(), eq("/producers/producer-profiles/9527/material-flows?limit=100&offset=0"), any())).thenReturn(materialflows);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -43,13 +56,6 @@ public class TestFlowSettingService extends BasicTester {
             flowSetting.setId(1L);
 
             try {
-                //Set mock data
-                when(pdsClient.login(anyString(), anyString(), anyString())).thenReturn(UUID.randomUUID().toString());
-                String producers = this.readResourceFile("data/producers.json");
-                when(restApi.fetch(any(), any(), eq("/producers"), any())).thenReturn(producers);
-                String materialflows = this.readResourceFile("data/materialflows.json");
-                when(restApi.fetch(any(), any(), eq("/producers/producer-profiles/0001/material-flows"), any())).thenReturn(materialflows);
-
                 testInstance.validateFlowSetting(flowSetting);
                 assert true;
             } catch (Exception e) {
@@ -121,13 +127,9 @@ public class TestFlowSettingService extends BasicTester {
         EntityFlowSetting flowSetting = new EntityFlowSetting();
         setValues(flowSetting);
 
-        EntityFlowSetting rst = null;
+        EntityFlowSetting rst;
         try {
             when(pdsClient.login(anyString(), anyString(), anyString())).thenReturn(UUID.randomUUID().toString());
-            String producers = this.readResourceFile("data/producers.json");
-            when(restApi.fetch(any(), any(), eq("/producers"), any())).thenReturn(producers);
-            String materialflows = this.readResourceFile("data/materialflows.json");
-            when(restApi.fetch(any(), any(), eq("/producers/producer-profiles/0001/material-flows"), any())).thenReturn(materialflows);
             rst = testInstance.saveFlowSetting(flowSetting);
             assert rst != null;
             assert !DashboardHelper.isNull(rst.getId());
@@ -146,10 +148,6 @@ public class TestFlowSettingService extends BasicTester {
         EntityFlowSetting rst = null;
         try {
             when(pdsClient.login(anyString(), anyString(), anyString())).thenReturn(UUID.randomUUID().toString());
-            String producers = this.readResourceFile("data/producers.json");
-            when(restApi.fetch(any(), any(), eq("/producers"), any())).thenReturn(producers);
-            String materialflows = this.readResourceFile("data/materialflows.json");
-            when(restApi.fetch(any(), any(), eq("/producers/producer-profiles/0001/material-flows"), any())).thenReturn(materialflows);
             rst = testInstance.saveFlowSetting(flowSetting);
             assert rst != null;
             assert !DashboardHelper.isNull(rst.getId());

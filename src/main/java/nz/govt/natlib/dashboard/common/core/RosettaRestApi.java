@@ -11,10 +11,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Base64;
+import java.util.List;
 
 public class RosettaRestApi {
     private static final Logger log = LoggerFactory.getLogger(RosettaRestApi.class);
     private final String rosettaRestApiUrl;
+    private String cookie = "";
 
     public RosettaRestApi(String rosettaRestApiUrl) {
         this.rosettaRestApiUrl = rosettaRestApiUrl;
@@ -35,20 +37,17 @@ public class RosettaRestApi {
         }
 
         HttpClient client = HttpClient.newHttpClient();
-
-        HttpRequest req = HttpRequest.newBuilder()
-                .method(method, HttpRequest.BodyPublishers.ofString(json))
-                .uri(new URI(this.rosettaRestApiUrl + path))
-                .header("Authorization", this.getBasicAuthenticationHeader(depositAccount))
-                .header("Accept", "application/json")
-                .header("Content-Type", "application/json")
-                .build();
-
+        HttpRequest req = HttpRequest.newBuilder().method(method, HttpRequest.BodyPublishers.ofString(json)).uri(new URI(this.rosettaRestApiUrl + path)).header("Authorization", this.getBasicAuthenticationHeader(depositAccount)).header("Accept", "application/json").header("Content-Type", "application/json").header("Cookie", this.cookie).build();
         HttpResponse<String> rsp = client.send(req, HttpResponse.BodyHandlers.ofString());
         if (rsp.statusCode() != 200) {
-            String err = String.format("Failed to request: %s, error: %s", path, rsp.body());
+            String err = String.format("Failed to request: %s, error: %s. Account: %s-%s", path, rsp.body(), depositAccount.getDepositUserName(), depositAccount.getDepositUserInstitute());
             log.error(err);
-            return null;
+            throw new Exception(err);
+        }
+
+        List<String> cookies = rsp.headers().allValues("Set-Cookie");
+        if (cookies != null && !cookies.isEmpty()) {
+            this.cookie = String.join(";", cookies);
         }
 
         //Parse json

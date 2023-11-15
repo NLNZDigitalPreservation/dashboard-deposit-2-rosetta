@@ -3,10 +3,7 @@ package nz.govt.natlib.dashboard.common.core;
 import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nz.govt.natlib.dashboard.common.core.dto.DtoDepositReq;
-import nz.govt.natlib.dashboard.common.core.dto.DtoDepositRsp;
-import nz.govt.natlib.dashboard.common.core.dto.DtoMaterialFlowRsp;
-import nz.govt.natlib.dashboard.common.core.dto.DtoProducersRsp;
+import nz.govt.natlib.dashboard.common.core.dto.*;
 import nz.govt.natlib.dashboard.common.metadata.ResultOfDeposit;
 import nz.govt.natlib.dashboard.common.metadata.SipStatusInfo;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
@@ -23,16 +20,10 @@ import java.util.List;
 
 public class RosettaWebService {
     private static final Logger log = LoggerFactory.getLogger(RosettaWebService.class);
-
-    private final String pdsUrl;
     private RosettaRestApi restApi;
-
-
     private CustomizedPdsClient pdsClient;
 
-
     public RosettaWebService(String pdsUrl, String rosettaRestApiUrl) {
-        this.pdsUrl = pdsUrl;
         this.restApi = new RosettaRestApi(rosettaRestApiUrl);
         this.pdsClient = CustomizedPdsClient.getInstance();
         this.pdsClient.init(pdsUrl, false);
@@ -86,49 +77,59 @@ public class RosettaWebService {
     }
 
     public List<DtoProducersRsp.Producer> getProducers(EntityDepositAccountSetting depositAccount) throws Exception {
-        List<DtoProducersRsp.Producer> producers;
-        try {
-            String ret = this.restApi.fetch(depositAccount, "GET", "/producers", null);
-            DtoProducersRsp producersRsp = (DtoProducersRsp) this.jsonToObject(ret, DtoProducersRsp.class);
-            if (producersRsp != null && producersRsp.getProducer() != null) {
-                producers = producersRsp.getProducer();
+        List<DtoProducersRsp.Producer> producers = new ArrayList<>();
+        int offset = 0;
+        while (true) {
+            String ret = this.restApi.fetch(depositAccount, "GET", "/producers?limit=100&offset=" + offset, null);
+            DtoProducersRsp rsp = (DtoProducersRsp) this.jsonToObject(ret, DtoProducersRsp.class);
+            log.debug("Got producers, offset={}", offset);
+            if (rsp != null && rsp.getTotal_record_count() > 0 && rsp.getProducer() != null) {
+                producers.addAll(rsp.getProducer());
+                offset += 1; //offset means next datasets
             } else {
-                producers = new ArrayList<>();
+                break;
             }
-            return producers;
-        } catch (Exception e) {
-            String err = String.format("Failed to get producers: depositUserName=%s: %s", depositAccount, e.getMessage());
-            log.error(err);
-            throw e;
+        }
+        log.debug("{} producers with account: {}-{}", producers.size(), depositAccount.getDepositUserName(), depositAccount.getDepositUserInstitute());
+        return producers;
+    }
+
+    public String getProducerProfileId(EntityDepositAccountSetting depositAccount, String producerId) throws Exception {
+        String ret = this.restApi.fetch(depositAccount, "GET", "/producers/" + producerId, null);
+        DtoProducerDetailRsp rsp = (DtoProducerDetailRsp) this.jsonToObject(ret, DtoProducerDetailRsp.class);
+        if (rsp != null && rsp.getProfile() != null) {
+            return rsp.getProfile().getId();
+        } else {
+            return null;
         }
     }
 
     public boolean isValidProducer(EntityDepositAccountSetting depositAccount, String producerId) throws Exception {
-        List<DtoProducersRsp.Producer> producers = getProducers(depositAccount);
-        for (DtoProducersRsp.Producer producer : producers) {
-            if (producer.getId().equals(producerId)) {
-                return true;
-            }
-        }
-        return false;
+        String profileId = this.getProducerProfileId(depositAccount, producerId);
+        return !StringUtils.isEmpty(profileId);
     }
 
-    public List<DtoMaterialFlowRsp.MaterialFlow> getMaterialFlows(EntityDepositAccountSetting depositAccount, String producerID) throws Exception {
-        List<DtoMaterialFlowRsp.MaterialFlow> materialFlows;
-        try {
-            String ret = this.restApi.fetch(depositAccount, "GET", "/producers/producer-profiles/" + producerID + "/material-flows", null);
-            DtoMaterialFlowRsp rsp = (DtoMaterialFlowRsp) this.jsonToObject(ret, DtoMaterialFlowRsp.class);
-            if (rsp != null && rsp.getProfile_material_flow() != null) {
-                materialFlows = rsp.getProfile_material_flow();
-            } else {
-                materialFlows = new ArrayList<>();
-            }
+    public List<DtoMaterialFlowRsp.MaterialFlow> getMaterialFlows(EntityDepositAccountSetting depositAccount, String producerId) throws Exception {
+        List<DtoMaterialFlowRsp.MaterialFlow> materialFlows = new ArrayList<>();
+
+        String profileId = this.getProducerProfileId(depositAccount, producerId);
+        if (StringUtils.isEmpty(profileId)) {
+            log.error("Can not find the producer profile with the producer id: {}", producerId);
             return materialFlows;
-        } catch (Exception e) {
-            String err = String.format("Failed to get material flows: producerID=%s: %s", producerID, e.getMessage());
-            System.out.println(err);
-            throw e;
         }
+
+        int offset = 0;
+        while (true) {
+            String ret = this.restApi.fetch(depositAccount, "GET", "/producers/producer-profiles/" + profileId + "/material-flows?limit=100&offset=" + offset, null);
+            DtoMaterialFlowRsp rsp = (DtoMaterialFlowRsp) this.jsonToObject(ret, DtoMaterialFlowRsp.class);
+            if (rsp != null && rsp.getTotal_record_count() > 0 && rsp.getProfile_material_flow() != null) {
+                materialFlows.addAll(rsp.getProfile_material_flow());
+                offset +=1;
+            } else {
+                break;
+            }
+        }
+        return materialFlows;
     }
 
     public boolean isValidMaterialFlow(EntityDepositAccountSetting depositAccount, String producerId, String materialFlowId) throws Exception {
@@ -141,7 +142,7 @@ public class RosettaWebService {
         return false;
     }
 
-    public ResultOfDeposit deposit(EntityDepositAccountSetting depositAccount, String injectionRootDirectory, String depositUserProducerId, String materialFlowID, String depositSetID) throws Exception {
+    public ResultOfDeposit deposit(EntityDepositAccountSetting depositAccount, String injectionRootDirectory, String depositUserProducerId, String materialFlowID) throws Exception {
         try {
             if (!isValidProducer(depositAccount, depositUserProducerId)) {
                 log.warn("Invalid producer: {}", depositUserProducerId);
@@ -180,19 +181,6 @@ public class RosettaWebService {
     public SipStatusInfo getSIPStatusInfo(EntityDepositAccountSetting depositAccount, String sipId) throws Exception {
         String rsp = this.restApi.fetch(depositAccount, "POST", "/sips/" + sipId, null);
         return (SipStatusInfo) this.jsonToObject(rsp, SipStatusInfo.class);
-    }
-
-
-    public CustomizedPdsClient getPdsClient() {
-        if (pdsClient == null) {
-            pdsClient = CustomizedPdsClient.getInstance();
-            pdsClient.init(pdsUrl, false);
-        }
-        return pdsClient;
-    }
-
-    public RosettaRestApi getRestApi() {
-        return restApi;
     }
 
     public void setRestApi(RosettaRestApi restApi) {
