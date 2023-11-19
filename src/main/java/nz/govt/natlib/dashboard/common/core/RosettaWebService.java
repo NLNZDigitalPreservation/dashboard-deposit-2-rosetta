@@ -90,7 +90,7 @@ public class RosettaWebService {
                 break;
             }
         }
-        log.debug("{} producers with account: {}-{}", producers.size(), depositAccount.getDepositUserName(), depositAccount.getDepositUserInstitute());
+        log.debug("{} producers with account: {}", producers.size(), depositAccount);
         return producers;
     }
 

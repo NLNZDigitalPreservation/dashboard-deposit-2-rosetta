@@ -44,7 +44,8 @@ public class RawMaterialFlowController {
 
 
         try {
-            List<DtoProducersRsp.Producer> producers = rosettaWebService.getProducers(depositAccount);
+//            List<DtoProducersRsp.Producer> producers = rosettaWebService.getProducers(depositAccount);
+            List<DtoProducersRsp.Producer> producers = depositAccount.getProducers();
             List<RawProducerCommand> rawProducerList = producers.stream().map(producer -> {
                 RawProducerCommand producerCmd = new RawProducerCommand();
                 producerCmd.setId(producer.getId());

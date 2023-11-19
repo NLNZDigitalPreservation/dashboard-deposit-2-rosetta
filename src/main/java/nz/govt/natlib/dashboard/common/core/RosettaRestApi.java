@@ -40,7 +40,7 @@ public class RosettaRestApi {
         HttpRequest req = HttpRequest.newBuilder().method(method, HttpRequest.BodyPublishers.ofString(json)).uri(new URI(this.rosettaRestApiUrl + path)).header("Authorization", this.getBasicAuthenticationHeader(depositAccount)).header("Accept", "application/json").header("Content-Type", "application/json").header("Cookie", this.cookie).build();
         HttpResponse<String> rsp = client.send(req, HttpResponse.BodyHandlers.ofString());
         if (rsp.statusCode() != 200) {
-            String err = String.format("Failed to request: %s, error: %s. Account: %s-%s", path, rsp.body(), depositAccount.getDepositUserName(), depositAccount.getDepositUserInstitute());
+            String err = String.format("Failed to request: %s, error: %s. Account: %s", path, rsp.body(), depositAccount);
             log.error(err);
             throw new Exception(err);
         }

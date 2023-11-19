@@ -2,6 +2,7 @@ package nz.govt.natlib.dashboard.domain.service;
 
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.dto.DtoProducersRsp;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositAccount;
@@ -52,7 +53,11 @@ public class DepositAccountSettingService {
         }
         rosettaWebService.logout(pdsHandle);
 
+        List<DtoProducersRsp.Producer> producers = rosettaWebService.getProducers(producer);
+        producer.setProducers(producers);
+
         repoDepositAccount.save(producer);
+        producers.clear();
         return rstVal;
     }
 
