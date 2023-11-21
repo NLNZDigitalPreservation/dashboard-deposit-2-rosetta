@@ -191,7 +191,49 @@
 
                       <div class="input-group mb-3">
                           <span class="input-group-text">Producer</span>
-                          <select class="form-control form-select mt-0" name="producer"></select>
+                          <div class="dropdown" style="width: 40%;">
+                              <input type="text" name="producer" class="form-control form-select mt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
+                              <form class="dropdown-menu p-4 bg-light" style="width: 40vw;">
+                                  <div class="row">
+                                      <div class="col-8">
+                                          <div class="form-group has-search">
+                                              <span class="form-control-feedback"><i class="bi bi-funnel"></i></span>
+                                              <input type="text" class="form-control" placeholder="Filter">
+                                          </div>
+                                      </div>
+                                      <div class="col-2"></div>
+                                      <div class="col-2">
+                                          <button type="submit" class="btn btn-primary">Confirm</button>
+                                      </div>
+                                  </div>
+                                  <div id="dropdown-grid-producers" style="width: 100%; height: 500px;"></div>
+                              </form>
+                          </div>
+
+                          <span class="input-group-text">Material Flow</span>
+                          <div class="dropdown" style="width: 40%;">
+                              <input type="text" name="materialFlow" class="form-control form-select mt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
+                              <form class="dropdown-menu p-4 bg-light" style="width: 40vw;">
+                                  <div class="row">
+                                      <div class="col-8">
+                                          <div class="form-group has-search">
+                                              <span class="form-control-feedback"><i class="bi bi-funnel"></i></span>
+                                              <input type="text" class="form-control" placeholder="Filter">
+                                          </div>
+                                      </div>
+                                      <div class="col-2"></div>
+                                      <div class="col-2">
+                                          <button type="submit" class="btn btn-primary">Confirm</button>
+                                      </div>
+                                  </div>
+                                  <div id="dropdown-grid-materialflows" style="width: 100%; height: 500px;"></div>
+                              </form>
+                          </div>
+                      </div>
+
+                      <div class="input-group mb-3">
+                          <span class="input-group-text">Producer</span>
+                          <select class="form-control form-select mt-0" name="producer" data-live-search="true"></select>
                           <span class="input-group-text">Material Flow</span>
                           <select class="form-control form-select mt-0" name="materialFlow"></select>
                       </div>
@@ -426,6 +468,27 @@
       </div>
   </div>
 
+  <!-- Producer select form -->
+  <div class="modal fade" id="static-producer-select" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header bg-warning">
+                  <h5 class="modal-title" id="static-producer-select-title"><i class="bi bi-exclamation-circle-fill"></i>&nbsp;Producers</h5>
+
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <div>
+                      <div id="static-producer-select-grid"></div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" onclick="continue_deposit_jobs_action();">Confirm</button>
+              </div>
+          </div>
+      </div>
+  </div>
 
   ${templateDepositJobs}
 

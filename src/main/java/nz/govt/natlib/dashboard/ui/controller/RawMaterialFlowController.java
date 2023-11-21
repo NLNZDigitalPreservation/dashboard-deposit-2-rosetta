@@ -54,18 +54,18 @@ public class RawMaterialFlowController {
             }).collect(Collectors.toList());
             producers.clear();
 
-            for (RawProducerCommand producerCmd : rawProducerList) {
-                List<DtoMaterialFlowRsp.MaterialFlow> materialFlows = rosettaWebService.getMaterialFlows(depositAccount, producerCmd.getId());
-                List<RawMaterialFlowCommand> rawMaterialFlowList = materialFlows.stream().map(flow -> {
-                    RawMaterialFlowCommand flowCmd = new RawMaterialFlowCommand();
-                    flowCmd.setId(flow.getId());
-                    flowCmd.setName(flow.getName());
-                    return flowCmd;
-                }).collect(Collectors.toList());
-                materialFlows.clear();
-
-                producerCmd.setMaterialFlows(rawMaterialFlowList);
-            }
+//            for (RawProducerCommand producerCmd : rawProducerList) {
+//                List<DtoMaterialFlowRsp.MaterialFlow> materialFlows = rosettaWebService.getMaterialFlows(depositAccount, producerCmd.getId());
+//                List<RawMaterialFlowCommand> rawMaterialFlowList = materialFlows.stream().map(flow -> {
+//                    RawMaterialFlowCommand flowCmd = new RawMaterialFlowCommand();
+//                    flowCmd.setId(flow.getId());
+//                    flowCmd.setName(flow.getName());
+//                    return flowCmd;
+//                }).collect(Collectors.toList());
+//                materialFlows.clear();
+//
+//                producerCmd.setMaterialFlows(rawMaterialFlowList);
+//            }
             rstVal.setRspBody(rawProducerList);
             rawProducerList.forEach(RawProducerCommand::clear);
             rawProducerList.clear();
