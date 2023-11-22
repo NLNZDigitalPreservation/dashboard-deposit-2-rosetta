@@ -16,27 +16,24 @@ public class TestScheduleProcessorBasicImplJobInjecting extends ScheduleProcesso
     @BeforeEach
     public void clearAndInit() throws IOException {
         initProcessor(testInstance);
-
+        testInstance.processingJobs.clear();
         initSubFolder();
     }
 
     @Test
-    public void testPreparingJobsInjectionNotReady() throws Exception {
+    public void testPreparingJobsIngestNotReady() {
         testInstance.handleIngest();
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
-        assert jobs.size() == 1;
+        assert jobs.isEmpty();
 
-        EntityDepositJob job = jobs.get(0);
-        assert job.getStage() == EnumDepositJobStage.INGEST;
-        assert job.getState() == EnumDepositJobState.RUNNING;
-        assert job.getFileCount() == 2;
-        assert job.getFileSize() == testFileLength_1 + testFileLength_2;
+        //Verify is it cached
+        assert testInstance.processingJobs.isEmpty();
     }
 
     @Test
-    public void testPreparingJobsInjectionIsReady() throws Exception {
+    public void testPreparingJobsIngestIsReady() {
         addReadyForIngestionFile();
 
         testInstance.handleIngest();
@@ -47,10 +44,48 @@ public class TestScheduleProcessorBasicImplJobInjecting extends ScheduleProcesso
         assert job.getState() == EnumDepositJobState.INITIALED;
         assert job.getFileCount() == 2;
         assert job.getFileSize() == testFileLength_1 + testFileLength_2;
+
+        //Verify is it cached
+        assert testInstance.processingJobs.size() == 1;
+
+        testInstance.handleIngest();
+        //Verify is it cached
+        assert testInstance.processingJobs.size() == 1;
+    }
+
+    @Test
+    public void testIngestDepositDone() {
+        addReadyForIngestionFile();
+        testInstance.handleIngest();
+        EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        assert job != null;
+        assert job.getStage() == EnumDepositJobStage.DEPOSIT;
+        assert job.getState() == EnumDepositJobState.INITIALED;
+        assert job.getFileCount() == 2;
+        assert job.getFileSize() == testFileLength_1 + testFileLength_2;
+
+        //Verify is it cached
+        assert testInstance.processingJobs.size() == 1;
+
+        addDepositDoneFile();
+        testInstance.handleIngest();
+
+        //Verify is it cached
+        assert testInstance.processingJobs.size() == 1;
+    }
+
+    @Test
+    public void testIngestDepositDoneFromStart() {
+        addDepositDoneFile();
+        testInstance.handleIngest();
+
+        //Verify is it cached
+        assert testInstance.processingJobs.size() == 1;
     }
 
     @AfterEach
     public void clear() {
         clearSubFolders();
+        clearJobs();
     }
 }
