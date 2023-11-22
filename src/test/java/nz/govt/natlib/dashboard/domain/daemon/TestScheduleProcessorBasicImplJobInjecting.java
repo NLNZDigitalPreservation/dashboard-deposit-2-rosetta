@@ -7,14 +7,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 public class TestScheduleProcessorBasicImplJobInjecting extends ScheduleProcessorTester {
     private final ScheduleProcessorBasic testInstance = new ScheduleProcessorImpl();
 
     @BeforeEach
-    public void clearAndInit() throws IOException {
+    public void clearAndInit() {
         initProcessor(testInstance);
         testInstance.processingJobs.clear();
         initSubFolder();
