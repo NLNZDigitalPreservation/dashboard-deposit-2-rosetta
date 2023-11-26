@@ -47,12 +47,24 @@ public abstract class ScheduleProcessorBasic {
     protected Map<String, Boolean> processingJobs = Collections.synchronizedMap(new HashMap<>());
 
     public void scan() {
+        log.debug("On timer heartbeat: scan.");
+        EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
+        if (globalSetting != null && globalSetting.isPaused()) {
+            LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            LocalDateTime ldtNowDatetime = LocalDateTime.now();
+            if (ldtNowDatetime.isAfter(ldtPausedStartTime) && ldtNowDatetime.isBefore(ldtPausedEndTime)) {
+                log.debug("Skip the paused timeslot.");
+                return;
+            }
+        }
+
         //To initial jobs
         handleIngest();
     }
 
     public void pipeline() throws Exception {
-        log.debug("On timer heartbeat.");
+        log.debug("On timer heartbeat: pipeline.");
         EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
         if (globalSetting != null && globalSetting.isPaused()) {
             LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
