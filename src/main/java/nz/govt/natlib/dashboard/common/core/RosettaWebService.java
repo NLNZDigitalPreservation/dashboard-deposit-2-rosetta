@@ -23,10 +23,10 @@ public class RosettaWebService {
     private RosettaRestApi restApi;
     private CustomizedPdsClient pdsClient;
 
-    public RosettaWebService(String pdsUrl, String rosettaRestApiUrl) {
+    public RosettaWebService(String pdsUrl, String rosettaRestApiUrl,boolean isTestMode) {
         this.restApi = new RosettaRestApi(rosettaRestApiUrl);
         this.pdsClient = CustomizedPdsClient.getInstance();
-        this.pdsClient.init(pdsUrl, false);
+        this.pdsClient.init(pdsUrl, isTestMode);
     }
 
     public String login(String institution, String username, String password) throws Exception {

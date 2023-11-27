@@ -1,56 +1,33 @@
-var mapMaterialFlows={};
-function combineProducers(items){
-  var html='';
-  for(var i=0; i<items.length; i++){
-    var item=items[i];
-    html+='<option value="' + item.id + '">' + item.id + '-' + item.name + '</option>';
+//var dataProducers=[];
+const gridProducers=new Tabulator("#dropdown-grid-producers", {
+    height:"450px",
+    layout:"fitColumns",
+    placeholder:"No Data Set",
+    reactiveData:true, //turn on data reactivity
+    data:[], //load data into table
+    columns:[
+        {title:"ProducerID", field:"id", sorter:"string", width:250, headerFilter:"input"},
+        {title:"Name", field:"name", sorter:"string", headerFilter:"input"},
+        {title:"Active", field:"active", width:100, sorter:"boolean", formatter:"tickCross", headerFilter:"tickCross"},
+    ],
+});
 
-    var flowHtml=combineMaterialFlows(item.materialFlows);
-    mapMaterialFlows[item.id]=flowHtml;
-  }
-  return html;
-}
+function initProducersSelectorGrid(data){
+//    gridProducers.setData(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId);
 
-function combineMaterialFlows(items){
-  var html='';
-  for(var i=0; i<items.length; i++){
-    var item=items[i];
-    html+='<option value="' + item.id + '">' + item.id + '-' + item.name + '</option>';
-  }
-  return html;
-}
-
-function initProducerMaterialflowSelector(data){
-  var html=combineProducers(data);
-  $('#flow-settings select[name="producer"]').html(html);
-  $('#flow-settings select[name="producer"]').val(null);
-  $('#flow-settings select[name="materialFlow"]').html('');
-  $('#flow-settings select[name="materialFlow"]').val(null);
-  /**
-  var selectedId=$('#flow-settings select[name="producer"] option:selected').val();
-  if(selectedId!=null){
-    $('#flow-settings select[name="materialFlow"]').html(mapMaterialFlows[selectedId]);
-  }else{
-    $('#flow-settings select[name="materialFlow"]').html('');
-  }
-  */
-
-
-  $('#flow-settings select[name="producer"]').change(function() {
-    var selectedId=$('#flow-settings select[name="producer"] option:selected').val();
-    var flows=mapMaterialFlows[selectedId];
-
-    console.log(flows);
-
-    $('#flow-settings select[name="materialFlow"]').html(flows);
-    $('#flow-settings select[name="materialFlow"]').val(null);
-  });
-}
-
-//
-function set_flow_dropdown_box(producerId){
-    var flows=mapMaterialFlows[producerId];
-    $('#flow-settings select[name="materialFlow"]').html(flows);
+//    while(dataProducers.length >0){
+//        dataProducers.pop;
+//    }
+//    for(var i=0;i<data.length;i++){
+//        dataProducers.push(data[i]);
+//    }
+    gridProducers.replaceData(data).then(function(){
+                                       //run code after table has been successfully updated
+                                       console.log("Updated");
+                                   })
+                                   .catch(function(error){
+                                       console.log(error);
+                                   });;
 }
 
 class FlowSetting extends BasicSettings{
@@ -82,8 +59,8 @@ class FlowSetting extends BasicSettings{
         });
 
         $('#flow-settings select[name="depositAccount"]').change(function() {
-            var selectedId=$(this).val();
-            fetchHttp(PATH_RAW_PRODUCER_MATERIAL_FLOW+'?depositAccountId='+selectedId, null, initProducerMaterialflowSelector);
+            var depositAccountId=$(this).val();
+            fetchHttp(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId, null, initProducersSelectorGrid);
         });
     }
 

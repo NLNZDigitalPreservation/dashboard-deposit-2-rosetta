@@ -34,19 +34,22 @@ function fetchHttp(reqUrl, req, callback){
         return;
     }
 
-    if(response.rspCode===0){
-        var payload=JSON.parse(response.rspBody);
-        callback(payload);
-    }else if(response.rspCode===1001){
-        retryUrl=reqUrl;
-        retryReq=req;
-        retryCallback=callback;
-        popupSSOLoginWindow();
+    if(response.hasOwnProperty('rspCode')){
+        if(response.rspCode===0){
+            var payload=JSON.parse(response.rspBody);
+            callback(payload);
+        }else if(response.rspCode===1001){
+            retryUrl=reqUrl;
+            retryReq=req;
+            retryCallback=callback;
+            popupSSOLoginWindow();
+        }
+        else{
+            toastr.error(response.rspCode + ": " + response.rspMsg);
+        }
+    }else{
+        callback(response);
     }
-    else{
-        toastr.error(response.rspCode + ": " + response.rspMsg);
-    }
-    
   }).catch((e) => {
     toastr.error(e);
   });

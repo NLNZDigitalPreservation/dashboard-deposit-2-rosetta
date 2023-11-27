@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Deposit | Dashboard</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <!-- <meta name="theme-color" content="#7952b3"> -->
+    <title>Deposit | Dashboard</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <!-- <meta name="theme-color" content="#7952b3"> -->
 
-  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
-  <link rel="stylesheet" href="./dist/bootstrap.css">
-  <!-- <link rel="stylesheet" href="./dist/font/fontawesome-free.min.css"> -->
-  <link rel="stylesheet" href="./dist/bootstrap-icons.css">
-  <link rel="stylesheet" href="./dist/icheck-bootstrap.min.css">
-  <link rel="stylesheet" href="./dist/ag-theme-alpine.css">
-  <link rel="stylesheet" href="./dist/jquery/menu/jquery.contextMenu.css">
-  <link rel="stylesheet" href="./dist/daterangepicker.css">
-  <link rel="stylesheet" href="./dist/toastr.min.css">
-  <link rel="stylesheet" href="./app/dashboard.css">
-  <script src="./dist/jquery-3.5.1.min.js"></script>
-
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+    <link rel="stylesheet" href="./dist/bootstrap.css">
+    <!-- <link rel="stylesheet" href="./dist/font/fontawesome-free.min.css"> -->
+    <link rel="stylesheet" href="./dist/bootstrap-icons.css">
+    <link rel="stylesheet" href="./dist/icheck-bootstrap.min.css">
+    <link rel="stylesheet" href="./dist/ag-theme-alpine.css">
+    <link rel="stylesheet" href="./dist/jquery/menu/jquery.contextMenu.css">
+    <link rel="stylesheet" href="./dist/daterangepicker.css">
+    <link rel="stylesheet" href="./dist/toastr.min.css">
+    <link rel="stylesheet" href="./dist/tabulator/css/tabulator.min.css">
+    <link rel="stylesheet" href="./app/dashboard.css">
+    <script src="./dist/jquery-3.5.1.min.js"></script>
+    <script src="./dist/tabulator/js/tabulator.min.js"></script>
 </head>
 
 <body style="overflow: hidden;">
@@ -191,51 +192,15 @@
 
                       <div class="input-group mb-3">
                           <span class="input-group-text">Producer</span>
-                          <div class="dropdown" style="width: 40%;">
-                              <input type="text" name="producer" class="form-control form-select mt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
-                              <form class="dropdown-menu p-4 bg-light" style="width: 40vw;">
-                                  <div class="row">
-                                      <div class="col-8">
-                                          <div class="form-group has-search">
-                                              <span class="form-control-feedback"><i class="bi bi-funnel"></i></span>
-                                              <input type="text" class="form-control" placeholder="Filter">
-                                          </div>
-                                      </div>
-                                      <div class="col-2"></div>
-                                      <div class="col-2">
-                                          <button type="submit" class="btn btn-primary">Confirm</button>
-                                      </div>
-                                  </div>
-                                  <div id="dropdown-grid-producers" style="width: 100%; height: 500px;"></div>
-                              </form>
-                          </div>
-
+                          <input type="text" name="producer" class="form-control form-select mt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
+                          <form class="dropdown-menu bg-light">
+                              <div id="dropdown-grid-producers" style="width: 40vw; height: 450px;"></div>
+                          </form>
                           <span class="input-group-text">Material Flow</span>
-                          <div class="dropdown" style="width: 40%;">
-                              <input type="text" name="materialFlow" class="form-control form-select mt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
-                              <form class="dropdown-menu p-4 bg-light" style="width: 40vw;">
-                                  <div class="row">
-                                      <div class="col-8">
-                                          <div class="form-group has-search">
-                                              <span class="form-control-feedback"><i class="bi bi-funnel"></i></span>
-                                              <input type="text" class="form-control" placeholder="Filter">
-                                          </div>
-                                      </div>
-                                      <div class="col-2"></div>
-                                      <div class="col-2">
-                                          <button type="submit" class="btn btn-primary">Confirm</button>
-                                      </div>
-                                  </div>
-                                  <div id="dropdown-grid-materialflows" style="width: 100%; height: 500px;"></div>
-                              </form>
-                          </div>
-                      </div>
-
-                      <div class="input-group mb-3">
-                          <span class="input-group-text">Producer</span>
-                          <select class="form-control form-select mt-0" name="producer" data-live-search="true"></select>
-                          <span class="input-group-text">Material Flow</span>
-                          <select class="form-control form-select mt-0" name="materialFlow"></select>
+                          <input type="text" name="materialFlow" class="form-control form-select mt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
+                          <form class="dropdown-menu p-4 bg-light" style="width: 40vw;">
+                              <div id="dropdown-grid-materialflows" style="width: 100%; height: 500px;"></div>
+                          </form>
                       </div>
 
                       <div class="input-group mb-3">
@@ -258,9 +223,9 @@
 
                       <div class="input-group mb-3">
                           <span class="input-group-text">Max Active Days</span>
-                          <input type="text" class="form-control" placeholder="14" , name="maxActiveDays">
+                          <input type="text" class="form-control" placeholder="14", name="maxActiveDays">
                           <span class="input-group-text">Max Storage Days</span>
-                          <input type="text" class="form-control" placeholder="365" , name="maxSaveDays">
+                          <input type="text" class="form-control" placeholder="365", name="maxSaveDays">
                       </div>
 
                       <div class="input-group mb-3">
