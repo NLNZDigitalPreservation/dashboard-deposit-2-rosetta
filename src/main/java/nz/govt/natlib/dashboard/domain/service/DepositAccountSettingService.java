@@ -79,11 +79,11 @@ public class DepositAccountSettingService {
             pdsHandle = rosettaWebService.login(producer.getDepositUserInstitute(), producer.getDepositUserName(), producer.getDepositUserPassword());
             if (StringUtils.isEmpty(pdsHandle)) {
                 producer.setAuditRst(Boolean.FALSE);
-                producer.setAuditMsg("The essential message is not correct");
+                producer.setAuditMsg("The credential message is not correct");
             }
         } catch (Exception e) {
             producer.setAuditRst(Boolean.FALSE);
-            producer.setAuditMsg("The essential message is not correct:" + e.getMessage());
+            producer.setAuditMsg("The credential message is not correct:" + e.getMessage());
         } finally {
             if (!StringUtils.isEmpty(pdsHandle)) {
                 rosettaWebService.logout(pdsHandle);

@@ -55,7 +55,7 @@ public class BasicTester {
         ReflectionTestUtils.setField(repoIdGenerator, "systemStoragePath", storagePath);
         repoIdGenerator.init();
 
-        repoGlobalSetting=new RepoGlobalSetting();
+        repoGlobalSetting = new RepoGlobalSetting();
         ReflectionTestUtils.setField(repoGlobalSetting, "systemStoragePath", storagePath);
         ReflectionTestUtils.setField(repoGlobalSetting, "idGenerator", repoIdGenerator);
         repoGlobalSetting.init();
@@ -174,6 +174,24 @@ public class BasicTester {
     public void addReadyForIngestionFile() {
         try {
             FileUtils.write(new File(new File(scanRootPath, subFolderName), completedFileName), "");
+        } catch (IOException e) {
+            e.printStackTrace();
+            assert false;
+        }
+    }
+
+    public void addDepositDoneFile() {
+        try {
+            FileUtils.write(new File(new File(scanRootPath, subFolderName), "done"), "");
+        } catch (IOException e) {
+            e.printStackTrace();
+            assert false;
+        }
+    }
+
+    public void clearJobs() {
+        try {
+            FileUtils.deleteDirectory(new File(storagePath,"jobs"));
         } catch (IOException e) {
             e.printStackTrace();
             assert false;

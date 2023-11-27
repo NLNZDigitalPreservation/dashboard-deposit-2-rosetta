@@ -1,6 +1,5 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
-import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoGlobalSetting;
 import org.slf4j.Logger;
@@ -42,15 +41,25 @@ public class TimerScheduledExecutors {
             delays = globalSetting.getDelays();
             delayUnit = globalSetting.getDelayTimeUnit();
         }
-        Runnable handler = () -> {
+        Runnable scan = () -> {
             try {
-                scheduleProcessor.handle();
+                scheduleProcessor.scan();
             } catch (Throwable e) {
                 log.error("Failed to execute processor", e);
                 log.error("Failed to execute processor: {}", e.getMessage());
             }
         };
-        this.futureScheduleProcessor = _schedule_executor.scheduleWithFixedDelay(handler, delays, delays, delayUnit);
+        this.futureScheduleProcessor = _schedule_executor.scheduleWithFixedDelay(scan, delays, delays, delayUnit);
+
+        Runnable pipeline = () -> {
+            try {
+                scheduleProcessor.pipeline();
+            } catch (Throwable e) {
+                log.error("Failed to execute processor", e);
+                log.error("Failed to execute processor: {}", e.getMessage());
+            }
+        };
+        this.futureScheduleProcessor = _schedule_executor.scheduleWithFixedDelay(pipeline, delays, delays, delayUnit);
     }
 
     public void close() {

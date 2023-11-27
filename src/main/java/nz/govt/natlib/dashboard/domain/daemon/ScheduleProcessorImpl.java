@@ -37,48 +37,53 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             InjectionFileStat stat = new InjectionFileStat();
             List<UnionFile> injectionDirs = injectionPathScanClient.listRootDir();
             for (UnionFile injectionDir : injectionDirs) {
+                File injectionPath = injectionDir.getAbsolutePath();
+                String subFolderFullPath = injectionPath.getAbsolutePath();
+                if (this.processingJobs.containsKey(subFolderFullPath)) {
+                    log.debug("Ignore the [processing] subfolder: {}", subFolderFullPath);
+                    continue;
+                }
+
                 if (!injectionDir.isPath()) {
                     log.info("Skip the path which is not a subfolder: {}", injectionDir.getAbsolutePath());
                     continue;
                 }
 
-                File depositDoneFile = new File(injectionDir.getAbsolutePath(), "done");
+                File depositDoneFile = new File(injectionPath, "done");
                 if (injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
-                    log.debug("Skip the subfolder {}, it had been deposited, 'done' file found.", injectionDir.getAbsolutePath());
+                    log.debug("Ignore the subfolder {}, it had been deposited, 'done' file found.", injectionDir.getAbsolutePath());
+                    this.processingJobs.put(subFolderFullPath, Boolean.TRUE);
                     continue;
                 }
 
-                File injectionPath = injectionDir.getAbsolutePath();
+                //Ignore the unprepared subfolders
+                File predepositDoneFile = new File(injectionPath, flowSetting.getInjectionCompleteFileName());
+                if (!injectionPathScanClient.exists(UnionPath.of(predepositDoneFile))) {
+                    log.debug("Ignore the subfolder {}, {} file does not exist", subFolderFullPath, flowSetting.getInjectionCompleteFileName());
+                    continue;
+                }
+
+                //Ignore the jobs not in the INITIAL stage
                 EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), injectionPath.getName());
+                if (job != null && (job.getStage() != EnumDepositJobStage.INGEST || job.getState() != EnumDepositJobState.RUNNING)) {
+                    log.debug("Ignore the subfolder, it had been in the pipeline: {}, status [{}] [{}]", subFolderFullPath, job.getStage(), job.getState());
+                    this.processingJobs.put(subFolderFullPath, Boolean.TRUE);
+                    continue;
+                }
+
                 //Initial job
                 if (job == null) {
                     job = depositJobService.jobInitial(injectionPath.getAbsolutePath(), injectionDir.getName(), flowSetting);
                     log.info("Created a new job: {} {}", job.getId(), job.getInjectionTitle());
                 }
 
-
-                //Ignore the jobs not in the INITIAL stage
-                if (job.getStage() != EnumDepositJobStage.INGEST || job.getState() != EnumDepositJobState.RUNNING) {
-                    log.debug("Skip unprepared job for: {} --> {} at status [{}] [{}]", flowSetting.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
-                    continue;
-                }
-
-                stat.stat(injectionPathScanClient, new UnionPath(injectionPath, flowSetting.getStreamLocation()));
-                job = depositJobService.jobUpdateFilesStat(job, stat.getFileCount(), stat.getFileSize());
-
-                File doneFile = new File(injectionPath, flowSetting.getInjectionCompleteFileName());
-                if (!injectionPathScanClient.exists(UnionPath.of(doneFile))) {
-                    log.debug("{} file does not exist in: {}", flowSetting.getInjectionCompleteFileName(), injectionPath.getAbsolutePath());
-                    continue;
-                }
-
-                job = depositJobService.jobScanComplete(job);
-
                 //Flush the file stat
                 stat.stat(injectionPathScanClient, new UnionPath(injectionPath, flowSetting.getStreamLocation()));
                 job = depositJobService.jobUpdateFilesStat(job, stat.getFileCount(), stat.getFileSize());
+                job = depositJobService.jobScanComplete(job);
 
-                log.debug("Initialed new job : {}", job.getId());
+                log.debug("Ingested new job : {}", job.getId());
+                this.processingJobs.put(subFolderFullPath, Boolean.TRUE);
             }
             injectionDirs.clear();
         }
