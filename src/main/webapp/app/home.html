@@ -192,12 +192,12 @@
 
                       <div class="input-group mb-3">
                           <span class="input-group-text">Producer</span>
-                          <input type="text" name="producer" class="form-control form-select mt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
+                          <input type="text" id="input-producer" name="producer" class="form-control form-select mt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
                           <form class="dropdown-menu bg-light">
                               <div id="dropdown-grid-producers" style="width: 40vw; height: 450px;"></div>
                           </form>
                           <span class="input-group-text">Material Flow</span>
-                          <input type="text" name="materialFlow" class="form-control form-select mt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
+                          <input type="text" id="input-material-flow" name="materialFlow" class="form-control form-select mt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
                           <form class="dropdown-menu p-4 bg-light" style="width: 40vw;">
                               <div id="dropdown-grid-materialflows" style="width: 100%; height: 500px;"></div>
                           </form>
@@ -540,6 +540,14 @@
           "timeOut": "5000",
           "extendedTimeOut": "1000",
         });
+
+         document.getElementById('input-producer').addEventListener('show.bs.dropdown', event => {
+            console.log("shown");
+            var depositAccountId=$('#flow-settings select[name="depositAccount"]').val();
+            gridProducers.setData(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId);
+            //gridProducers.setData(dataProducers);
+            //console.log(dataProducers);
+         });
 
         if (IS_GLOBAL_SETTING_INITIALED) {
           $('main').show();

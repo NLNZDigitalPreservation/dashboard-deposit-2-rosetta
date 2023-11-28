@@ -1,7 +1,9 @@
-//var dataProducers=[];
+var dataProducers=[];
 const gridProducers=new Tabulator("#dropdown-grid-producers", {
     height:"450px",
+    //renderVertical: "basic",
     layout:"fitColumns",
+    autoColumns: false,
     placeholder:"No Data Set",
     reactiveData:true, //turn on data reactivity
     data:[], //load data into table
@@ -15,19 +17,15 @@ const gridProducers=new Tabulator("#dropdown-grid-producers", {
 function initProducersSelectorGrid(data){
 //    gridProducers.setData(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId);
 
-//    while(dataProducers.length >0){
-//        dataProducers.pop;
-//    }
-//    for(var i=0;i<data.length;i++){
-//        dataProducers.push(data[i]);
-//    }
-    gridProducers.replaceData(data).then(function(){
-                                       //run code after table has been successfully updated
-                                       console.log("Updated");
-                                   })
-                                   .catch(function(error){
-                                       console.log(error);
-                                   });;
+
+//    gridProducers.replaceData(data)
+//    .then(function(){
+//
+//    })
+//    .catch(function(error){
+//        console.log(error);
+//    });
+    dataProducers=data;
 }
 
 class FlowSetting extends BasicSettings{
