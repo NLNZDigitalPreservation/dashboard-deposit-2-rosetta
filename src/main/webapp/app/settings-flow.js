@@ -1,31 +1,17 @@
-var dataProducers=[];
-const gridProducers=new Tabulator("#dropdown-grid-producers", {
-    height:"450px",
-    //renderVertical: "basic",
-    layout:"fitColumns",
-    autoColumns: false,
-    placeholder:"No Data Set",
-    reactiveData:true, //turn on data reactivity
-    data:[], //load data into table
-    columns:[
-        {title:"ProducerID", field:"id", sorter:"string", width:250, headerFilter:"input"},
-        {title:"Name", field:"name", sorter:"string", headerFilter:"input"},
-        {title:"Active", field:"active", width:100, sorter:"boolean", formatter:"tickCross", headerFilter:"tickCross"},
-    ],
-});
+const gridOptions = {
+  columnDefs: [
+      {headerName:"ProducerID", field:"id", sorter:"string", width:250, headerFilter:"input"},
+      {headerName:"Name", field:"name", sorter:"string", headerFilter:"input"},
+      {headerName:"Active", field:"active", width:100, sorter:"boolean", formatter:"tickCross", headerFilter:"tickCross"},
+  ],
+  rowData: []
+};
 
-function initProducersSelectorGrid(data){
-//    gridProducers.setData(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId);
+const gridProducers=new agGrid.Grid(document.querySelector('#dropdown-grid-producers'), gridOptions);
 
-
-//    gridProducers.replaceData(data)
-//    .then(function(){
-//
-//    })
-//    .catch(function(error){
-//        console.log(error);
-//    });
-    dataProducers=data;
+function initProducersSelectorGrid(dataset){
+    gridProducers.gridOptions.api.setRowData(dataset);
+    gridProducers.gridOptions.api.redrawRows(true);
 }
 
 class FlowSetting extends BasicSettings{
