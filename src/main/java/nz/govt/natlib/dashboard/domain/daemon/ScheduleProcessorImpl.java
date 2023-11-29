@@ -45,7 +45,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                 }
 
                 if (!injectionDir.isPath()) {
-                    log.info("Skip the path which is not a subfolder: {}", injectionDir.getAbsolutePath());
+                    log.debug("Skip the path which is not a subfolder: {}", injectionDir.getAbsolutePath());
                     continue;
                 }
 
@@ -65,8 +65,13 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
 
                 //Ignore the jobs not in the INITIAL stage
                 EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), injectionPath.getName());
-                if (job != null && (job.getStage() != EnumDepositJobStage.INGEST || job.getState() != EnumDepositJobState.RUNNING)) {
-                    log.debug("Ignore the subfolder, it had been in the pipeline: {}, status [{}] [{}]", subFolderFullPath, job.getStage(), job.getState());
+                if (job != null && (job.getState() == EnumDepositJobState.PAUSED || job.getState() == EnumDepositJobState.CANCELED)) {
+                    log.debug("Ignore the subfolder, it's paused or cancelled: {}, status [{}] [{}]", subFolderFullPath, job.getStage(), job.getState());
+                    continue;
+                }
+
+                if (job != null && (job.getStage() != EnumDepositJobStage.INGEST)) {
+                    log.debug("Ignore the subfolder, it's ingested: {}, status [{}] [{}]", subFolderFullPath, job.getStage(), job.getState());
                     this.processingJobs.put(subFolderFullPath, Boolean.TRUE);
                     continue;
                 }
