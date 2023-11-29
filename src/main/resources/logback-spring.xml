@@ -28,7 +28,7 @@
                 <maxFileSize>20MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
             <!-- <maxHistory>50</maxHistory>-->
-            <totalSizeCap>10GB</totalSizeCap>
+            <!-- <totalSizeCap>10GB</totalSizeCap>-->
         </rollingPolicy>
     </appender>
 
