@@ -1,6 +1,7 @@
 package nz.govt.natlib.dashboard.domain.repo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.govt.natlib.dashboard.common.metadata.EnumEntityKey;
 import nz.govt.natlib.dashboard.domain.entity.EntityCommon;
@@ -42,7 +43,7 @@ public abstract class RepoAbstract {
     }
 
     public Object json2Object(String json, Class<?> clazz) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
             return objectMapper.readValue(json, clazz);
         } catch (IOException e) {
