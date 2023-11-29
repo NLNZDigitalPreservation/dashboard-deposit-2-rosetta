@@ -25,7 +25,7 @@ public class TestScheduleProcessorBasicImplJobInjecting extends ScheduleProcesso
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
-        assert jobs.isEmpty();
+        assert jobs.size() == 1;
 
         //Verify is it cached
         assert testInstance.processingJobs.isEmpty();

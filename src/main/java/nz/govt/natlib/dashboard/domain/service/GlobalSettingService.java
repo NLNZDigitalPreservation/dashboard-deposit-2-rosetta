@@ -87,9 +87,6 @@ public class GlobalSettingService {
         globalSetting.setId(UNIQUE_GLOBAL_SETTING_ID);
         repoGlobalSetting.save(globalSetting);
 
-        //Rescheduling or adding the existing timer
-        timerScheduledExecutors.rescheduleProcessor();
-
         rstVal.setRspBody(globalSetting);
 
         return rstVal;
