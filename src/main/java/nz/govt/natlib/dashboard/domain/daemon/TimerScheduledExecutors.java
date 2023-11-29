@@ -59,6 +59,7 @@ public class TimerScheduledExecutors {
             }
         };
         Thread scanProcessor = new Thread(scan);
+        scanProcessor.setName("scan timer");
         scanProcessor.start();
 
         Runnable pipeline = () -> {
@@ -75,6 +76,7 @@ public class TimerScheduledExecutors {
             }
         };
         Thread pipelineProcessor = new Thread(pipeline);
+        pipelineProcessor.setName("pipeline timer");
         pipelineProcessor.start();
     }
 
