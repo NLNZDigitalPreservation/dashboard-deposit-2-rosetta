@@ -67,7 +67,7 @@ const gridOptions={
     },
     // domLayout: 'autoHeight',
     rowData: [],
-    getRowNodeId: function(data){
+    getRowId: function(data){
         return data.id;
     },
 };
@@ -87,11 +87,11 @@ class CustomizedAgGrid{
                 }
             }
         });
-        this.grid=new agGrid.Grid(gridContainer, Object.assign(this.customizedGridOptions, gridOptions));
+        this.grid=new agGrid.createGrid(gridContainer, Object.assign(this.customizedGridOptions, gridOptions));
     }
 
     getSelectedRow(){
-        var rows=this.grid.gridOptions.api.getSelectedRows();
+        var rows=this.grid.getSelectedRows();
         if(!rows || rows.length === 0 || rows.length > 1){
             return;
         }
@@ -99,7 +99,7 @@ class CustomizedAgGrid{
     }
 
     getSelectedRows(){
-        var rows=this.grid.gridOptions.api.getSelectedRows();
+        var rows=this.grid.getSelectedRows();
         if(!rows || rows.length === 0){
             return;
         }
@@ -108,7 +108,7 @@ class CustomizedAgGrid{
 
     getAllNodes(){
         var nodes=[];
-        this.grid.gridOptions.api.forEachNode(function(node, index){
+        this.grid.forEachNode(function(node, index){
             nodes.push(node);
         });
         return nodes;
@@ -116,14 +116,14 @@ class CustomizedAgGrid{
 
     getAllRows(){
         var data=[];
-        this.grid.gridOptions.api.forEachNode(function(node, index){
+        this.grid.forEachNode(function(node, index){
             data.push(node.data);
         });
         return data;
     }
 
     getNodeById(id){
-        return this.grid.gridOptions.api.getRowNode(parseInt(id));
+        return this.grid.getRowNode(parseInt(id));
     }
 
     getRowById(id){
@@ -136,7 +136,7 @@ class CustomizedAgGrid{
     }
 
     getNodeByIndex(index){
-        return this.grid.gridOptions.api.getDisplayedRowAtIndex(index);
+        return this.grid.getDisplayedRowAtIndex(index);
     }
 
     getRowByIndex(index){
@@ -149,22 +149,22 @@ class CustomizedAgGrid{
     }
 
     add(dataset){
-        this.grid.gridOptions.api.applyTransaction({add: dataset});
+        this.grid.applyTransaction({add: dataset});
         this.redrawRows();
     }
 
     update(dataset){
-        this.grid.gridOptions.api.applyTransaction({update: dataset});
+        this.grid.applyTransaction({update: dataset});
         this.redrawRows();
     }
 
     removeAll(){
-        this.grid.gridOptions.api.setRowData([]);
+        this.grid.setGridOption('rowData', []);
         this.redrawRows();
     }
 
     removeByDataSet(dataset){
-        this.grid.gridOptions.api.applyTransaction({remove: dataset});
+        this.grid.applyTransaction({remove: dataset});
         this.redrawRows();
     }
 
@@ -178,21 +178,21 @@ class CustomizedAgGrid{
     }
 
     deselectAll(){
-        this.grid.gridOptions.api.deselectAll();
+        this.grid.deselectAll();
         this.redrawRows();
     }
 
     filter(keyWord){
-        this.grid.gridOptions.api.setQuickFilter(keyWord);
+        this.grid.setQuickFilter(keyWord);
     }
 
     setRowData(dataset){
-        this.grid.gridOptions.api.setRowData(dataset);
+        this.grid.setGridOption('rowData', dataset);
         this.redrawRows();
     }
 
     redrawRows(selectedData){
-        this.grid.gridOptions.api.redrawRows(true);
+        this.grid.redrawRows(true);
 
         var selectedRow=this.getSelectedRow();
 //        if (tableFlowSettings && selectedRow) {
@@ -222,7 +222,7 @@ class CustomizedAgGrid{
     }
 
     exportDataCsv(params){
-        this.grid.gridOptions.api.exportDataAsCsv(params);
+        this.grid.exportDataAsCsv(params);
     }
 }
 

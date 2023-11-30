@@ -1,5 +1,5 @@
 //Producer selector
-const gridProducers=new agGrid.Grid(document.querySelector('#dropdown-grid-producers'),  {
+const gridProducers=agGrid.createGrid(document.querySelector('#dropdown-grid-producers'),  {
       columnDefs: [
           {headerName:"ProducerID", field:"id", width:250},
           {headerName:"Name", field:"name", width:1000},
@@ -11,7 +11,7 @@ const gridProducers=new agGrid.Grid(document.querySelector('#dropdown-grid-produ
 });
 
 function onSelectionChangedProducer(){
-    const selectedRows = gridProducers.gridOptions.api.getSelectedRows();
+    const selectedRows = gridProducers.getSelectedRows();
     console.log(selectedRows);
     if(!selectedRows || selectedRows.length < 1){
         return;
@@ -19,8 +19,8 @@ function onSelectionChangedProducer(){
     var selNode=selectedRows[0];
     var depositAccountId=$('#flow-settings select[name="depositAccount"]').val();
     fetchHttp(PATH_RAW_MATERIAL_FLOWS+'?depositAccountId=' + depositAccountId+'&producerId='+selNode['id'], null, function(dataset){
-        gridMaterialFlows.gridOptions.api.setRowData(dataset);
-        gridMaterialFlows.gridOptions.api.redrawRows(true);
+        gridMaterialFlows.setGridOption('rowData', dataset);
+        gridMaterialFlows.redrawRows(true);
     });
 
     $('#input-producer').val(selNode['id'] + ' | ' + selNode['name']);
@@ -29,11 +29,11 @@ function onSelectionChangedProducer(){
 
 $('#filter-producer').on('input', function(){
     var val=$(this).val();
-    gridProducers.gridOptions.api.setQuickFilter(val);
+    gridProducers.setQuickFilter(val);
 });
 
 //Material flow selector
-const gridMaterialFlows=new agGrid.Grid(document.querySelector('#dropdown-grid-materialflows'),  {
+const gridMaterialFlows=agGrid.createGrid(document.querySelector('#dropdown-grid-materialflows'),  {
       columnDefs: [
           {headerName:"MaterialFlowID", field:"id", width:250},
           {headerName:"Name", field:"name", width:1000},
@@ -44,7 +44,7 @@ const gridMaterialFlows=new agGrid.Grid(document.querySelector('#dropdown-grid-m
 });
 
 function onSelectionChangedMaterialFlow(){
-    const selectedRows = gridMaterialFlows.gridOptions.api.getSelectedRows();
+    const selectedRows = gridMaterialFlows.getSelectedRows();
     console.log(selectedRows);
     if(!selectedRows || selectedRows.length < 1){
         return;
@@ -55,7 +55,7 @@ function onSelectionChangedMaterialFlow(){
 
 $('#filter-materialflow').on('input', function(){
     var val=$(this).val();
-    gridMaterialFlows.gridOptions.api.setQuickFilter(val);
+    gridMaterialFlows.setQuickFilter(val);
 });
 
 
@@ -92,8 +92,8 @@ class FlowSetting extends BasicSettings{
             $('#input-materialflow').val('');
             var depositAccountId=$(this).val();
             fetchHttp(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId, null, function(dataset){
-                gridProducers.gridOptions.api.setRowData(dataset);
-                gridProducers.gridOptions.api.redrawRows(true);
+                gridProducers.setGridOption('rowData', dataset);
+                gridProducers.redrawRows(true);
             });
         });
     }
