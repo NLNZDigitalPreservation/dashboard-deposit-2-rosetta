@@ -1,18 +1,63 @@
-const gridOptions = {
-  columnDefs: [
-      {headerName:"ProducerID", field:"id", sorter:"string", width:250, headerFilter:"input"},
-      {headerName:"Name", field:"name", sorter:"string", headerFilter:"input"},
-      {headerName:"Active", field:"active", width:100, sorter:"boolean", formatter:"tickCross", headerFilter:"tickCross"},
-  ],
-  rowData: []
-};
+//Producer selector
+const gridProducers=new agGrid.Grid(document.querySelector('#dropdown-grid-producers'),  {
+      columnDefs: [
+          {headerName:"ProducerID", field:"id", width:250},
+          {headerName:"Name", field:"name", width:1000},
+          {headerName:"Active", field:"active", width:100, pinned: 'right' },
+      ],
+      rowSelection: 'single',
+      onSelectionChanged: onSelectionChangedProducer,
+      rowData: []
+});
 
-const gridProducers=new agGrid.Grid(document.querySelector('#dropdown-grid-producers'), gridOptions);
+function onSelectionChangedProducer(){
+    const selectedRows = gridProducers.gridOptions.api.getSelectedRows();
+    console.log(selectedRows);
+    if(!selectedRows || selectedRows.length < 1){
+        return;
+    }
+    var selNode=selectedRows[0];
+    var depositAccountId=$('#flow-settings select[name="depositAccount"]').val();
+    fetchHttp(PATH_RAW_MATERIAL_FLOWS+'?depositAccountId=' + depositAccountId+'&producerId='+selNode['id'], null, function(dataset){
+        gridMaterialFlows.gridOptions.api.setRowData(dataset);
+        gridMaterialFlows.gridOptions.api.redrawRows(true);
+    });
 
-function initProducersSelectorGrid(dataset){
-    gridProducers.gridOptions.api.setRowData(dataset);
-    gridProducers.gridOptions.api.redrawRows(true);
+    $('#input-producer').val(selNode['id'] + ' | ' + selNode['name']);
+    $('#input-materialflow').val('');
 }
+
+$('#filter-producer').on('input', function(){
+    var val=$(this).val();
+    gridProducers.gridOptions.api.setQuickFilter(val);
+});
+
+//Material flow selector
+const gridMaterialFlows=new agGrid.Grid(document.querySelector('#dropdown-grid-materialflows'),  {
+      columnDefs: [
+          {headerName:"MaterialFlowID", field:"id", width:250},
+          {headerName:"Name", field:"name", width:1000},
+      ],
+      rowSelection: 'single',
+      onSelectionChanged: onSelectionChangedMaterialFlow,
+      rowData: []
+});
+
+function onSelectionChangedMaterialFlow(){
+    const selectedRows = gridMaterialFlows.gridOptions.api.getSelectedRows();
+    console.log(selectedRows);
+    if(!selectedRows || selectedRows.length < 1){
+        return;
+    }
+    var selNode=selectedRows[0];
+    $('#input-materialflow').val(selNode['id'] + ' | ' + selNode['name']);
+}
+
+$('#filter-materialflow').on('input', function(){
+    var val=$(this).val();
+    gridMaterialFlows.gridOptions.api.setQuickFilter(val);
+});
+
 
 class FlowSetting extends BasicSettings{
     getPanelTitle(item){
@@ -43,8 +88,13 @@ class FlowSetting extends BasicSettings{
         });
 
         $('#flow-settings select[name="depositAccount"]').change(function() {
+            $('#input-producer').val('');
+            $('#input-materialflow').val('');
             var depositAccountId=$(this).val();
-            fetchHttp(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId, null, initProducersSelectorGrid);
+            fetchHttp(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId, null, function(dataset){
+                gridProducers.gridOptions.api.setRowData(dataset);
+                gridProducers.gridOptions.api.redrawRows(true);
+            });
         });
     }
 

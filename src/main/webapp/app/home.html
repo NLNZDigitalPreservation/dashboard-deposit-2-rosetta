@@ -26,7 +26,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark" style="padding: 0 0 0 5px; background: linear-gradient(to right, #212529, #212529, #198754, #212529);">
     <a href="#" class="navbar-brand"><img src="./img/natlib-logo-orange.png" width="35" height="35">&nbsp;Deposit&nbsp;Dashboard</a>
     <form class="d-flex">
-      <input id="filter-deposit-job" class="form-control me-2" type="search" placeholder="Filter" aria-label="Search">
+      <input id="filter-deposit-job" class="form-control me-2" type="search" placeholder="Type to filter" aria-label="Search">
     </form>
 
     <ul class="navbar-nav me-auto mb-2 mb-md-0">
@@ -188,18 +188,21 @@
                       <div class="input-group mb-3">
                           <span class="input-group-text">Deposit Account</span>
                           <select class="form-control form-select mt-0" name="depositAccount"></select>
+                          <button type="button" class="btn btn-primary" onclick="settingFlow.saveSettingItem();" style="width: 50px;"><i class="bi bi-arrow-clockwise"></i></button>
                       </div>
 
                       <div class="input-group mb-3">
                           <span class="input-group-text">Producer</span>
-                          <input type="text" id="input-producer" name="producer" class="form-control form-select mt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
-                          <form class="dropdown-menu bg-light">
-                              <div id="dropdown-grid-producers" style="width: 40vw; height: 450px;"></div>
+                          <input type="text" id="input-producer" name="producer" readonly="readonly" class="form-control form-select mt-0 dropdown-toggle bg-white" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
+                          <form class="dropdown-menu p-1 bg-light border border-2">
+                              <input id="filter-producer" class="form-control mb-2" type="search" placeholder="Type to filter producer" aria-label="Search" style="width: 300px;">
+                              <div class="ag-theme-alpine" id="dropdown-grid-producers" style="width: 40vw; height: 450px;"></div>
                           </form>
                           <span class="input-group-text">Material Flow</span>
-                          <input type="text" id="input-material-flow" name="materialFlow" class="form-control form-select mt-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
-                          <form class="dropdown-menu p-4 bg-light" style="width: 40vw;">
-                              <div id="dropdown-grid-materialflows" style="width: 100%; height: 500px;"></div>
+                          <input type="text" id="input-materialflow" name="materialFlow" readonly="readonly" class="form-control form-select mt-0 dropdown-toggle bg-white" data-bs-toggle="dropdown" aria-expanded="true" data-bs-auto-close="outside">
+                          <form class="dropdown-menu p-1 bg-light border border-2">
+                              <input id="filter-materialflow" class="form-control mb-2" type="search" placeholder="Type to filter material flow" aria-label="Search" style="width: 300px;">
+                              <div class="ag-theme-alpine" id="dropdown-grid-materialflows" style="width: 40vw; height: 500px;"></div>
                           </form>
                       </div>
 
@@ -542,7 +545,7 @@
         });
 
          document.getElementById('input-producer').addEventListener('show.bs.dropdown', event => {
-            console.log("shown");
+            //console.log("shown");
             //var depositAccountId=$('#flow-settings select[name="depositAccount"]').val();
             //gridProducers.setData(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId);
             //gridProducers.setData(dataProducers);

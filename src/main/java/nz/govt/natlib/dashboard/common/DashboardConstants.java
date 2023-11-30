@@ -8,9 +8,9 @@ import java.util.Map;
 public class DashboardConstants {
     public static final String PATH_ROOT = "/restful";
 
-    public static final String PATH_RAW_PRODUCER_MATERIAL_FLOW = PATH_ROOT + "/raw/producer-material-flows";
+    public static final String PATH_RAW_PRODUCER_MATERIAL_FLOW = PATH_ROOT + "/raw/producer-materialflows";
     public static final String PATH_RAW_PRODUCERS = PATH_ROOT + "/raw/producers";
-    public static final String PATH_RAW_MATERIAL_FLOWS = PATH_ROOT + "/raw/material-flows";
+    public static final String PATH_RAW_MATERIAL_FLOWS = PATH_ROOT + "/raw/materialflows";
 
 
     public static final String PATH_SETTING_DEPOSIT_ACCOUNT = PATH_ROOT + "/setting/deposit-account";
