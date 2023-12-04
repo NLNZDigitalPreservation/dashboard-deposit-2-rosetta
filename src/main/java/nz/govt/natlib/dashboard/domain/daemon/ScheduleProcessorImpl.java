@@ -156,7 +156,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.INITIALED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.RUNNING)) {
-            depositJobService.jobFinalizeStart(job);
+            job = depositJobService.jobFinalizeStart(job);
 
             File depositDoneFile = new File(job.getInjectionPath(), "done");
             if (!injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
@@ -166,19 +166,15 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                     return;
                 }
             }
-            depositJobService.jobFinalizeEnd(job, EnumDepositJobState.SUCCEED);
-            log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
-        }
 
-
-        if (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED) {
             // Backup the actual contents
             this.backupActualContents(flowSetting, job);
 
             // Delete the actual contents
             this.deleteActualContents(flowSetting, injectionPathScanClient, job);
 
-            depositJobService.jobUpdateStatus(job, EnumDepositJobStage.FINISHED, EnumDepositJobState.SUCCEED);
+            job = depositJobService.jobFinalizeEnd(job, EnumDepositJobState.SUCCEED);
+            log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
         } else if (job.getState() == EnumDepositJobState.CANCELED && job.getStage() != EnumDepositJobStage.FINISHED) {
             LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxActiveDays());
             LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
