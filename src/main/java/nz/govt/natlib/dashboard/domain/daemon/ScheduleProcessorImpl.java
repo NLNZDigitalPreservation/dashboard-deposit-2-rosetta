@@ -202,7 +202,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
         if (jobLatestUpdateTime.isBefore(deadlineTime)) {
             log.info("Pruning the history job: {}", job.getId());
-            repoDepositJob.deleteById(job.getId());
+            repoDepositJob.moveToHistory(job.getId());
         } else {
             log.debug("Ignore pruning the history job: {} {}", job.getId(), jobLatestUpdateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         }
