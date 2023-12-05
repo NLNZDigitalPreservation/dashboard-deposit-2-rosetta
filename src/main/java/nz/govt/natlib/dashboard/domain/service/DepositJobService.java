@@ -108,6 +108,8 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
                 StringUtils.equalsIgnoreCase(job.getSipStatus(), sipStatusInfo.getStatus())) {
             log.debug("The status info is not updated: jobId={},  sipStatusInfo: ({} {} {})", job.getId(), sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
             return job;
+        } else {
+            log.info("Updated status: {}, {} {} {}==> {} {} {}", job.getId(), job.getSipModule(), job.getStage(), job.getState(), sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
         }
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
