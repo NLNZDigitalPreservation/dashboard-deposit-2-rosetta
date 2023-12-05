@@ -2,6 +2,7 @@ package nz.govt.natlib.dashboard.domain.repo;
 
 import nz.govt.natlib.dashboard.common.metadata.EnumEntityKey;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
+import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -13,15 +14,16 @@ import java.util.List;
 @Component("RepoDepositJob")
 public class RepoDepositJob extends RepoAbstract {
     public static final String SUB_FOLDER = "jobs";
+    public static final String HISTORY_FOLDER = "jobs-history";
 
     @PostConstruct
     public void init() {
         this.subStoragePath = this.systemStoragePath + File.separator + SUB_FOLDER;
-        this.entityKey=EnumEntityKey.DepositJob;
+        this.entityKey = EnumEntityKey.DepositJob;
     }
 
     public EntityDepositJob getById(Long id) {
-        return (EntityDepositJob) getById(id,EntityDepositJob.class);
+        return (EntityDepositJob) getById(id, EntityDepositJob.class);
     }
 
     public EntityDepositJob getByFlowIdAndInjectionTitle(Long flowId, String injectionTitle) {
@@ -90,5 +92,16 @@ public class RepoDepositJob extends RepoAbstract {
             }
         }
         return retVal;
+    }
+
+    public boolean moveToHistory(Long id) {
+        String fileName = String.format("%d.json", id);
+        EntityDepositJob job = this.getById(id);
+        File historyPath = new File(this.systemStoragePath, HISTORY_FOLDER);
+
+        this.save(historyPath.getAbsolutePath(), fileName, job);
+        this.deleteById(id);
+
+        return true;
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -155,37 +156,55 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.INITIALED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.RUNNING)) {
-            depositJobService.jobFinalizeStart(job);
+            job = depositJobService.jobFinalizeStart(job);
 
             File depositDoneFile = new File(job.getInjectionPath(), "done");
             if (!injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
+                log.warn("The succeed finished job: {} has no [done] file: {}", job.getId(), depositDoneFile.getAbsolutePath());
                 if (!depositDoneFile.createNewFile()) {
                     log.error("Failed to create file: {}", depositDoneFile.getAbsolutePath());
                     return;
                 }
             }
-            depositJobService.jobFinalizeEnd(job, EnumDepositJobState.SUCCEED);
-            log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
-        }
-
-        if ((job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED) ||
-                (job.getStage() == EnumDepositJobStage.FINISHED && job.getState() == EnumDepositJobState.SUCCEED)) {
 
             // Backup the actual contents
             this.backupActualContents(flowSetting, job);
 
             // Delete the actual contents
             this.deleteActualContents(flowSetting, injectionPathScanClient, job);
+
+            job = depositJobService.jobFinalizeEnd(job, EnumDepositJobState.SUCCEED);
+            log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
+        } else if (job.getState() == EnumDepositJobState.CANCELED && job.getStage() != EnumDepositJobStage.FINISHED) {
+            LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxActiveDays());
+            LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
+            if (jobLatestUpdateTime.isBefore(deadlineTime)) {
+                // Backup the actual contents
+                this.backupActualContents(flowSetting, job);
+
+                // Delete the actual contents
+                this.deleteActualContents(flowSetting, injectionPathScanClient, job);
+
+                depositJobService.jobUpdateStatus(job, EnumDepositJobStage.FINISHED, job.getState());
+            }
         }
     }
 
     @Override
     public void handleHistoryPruning(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
+        if (job.getStage() != EnumDepositJobStage.FINISHED) {
+            log.debug("Ignore pruning the history job: {} {}", job.getId(), job.getStage());
+            return;
+        }
+
         //Remove canceled and expired job
         LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
         LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
         if (jobLatestUpdateTime.isBefore(deadlineTime)) {
-            repoDepositJob.deleteById(job.getId());
+            log.info("Pruning the history job: {}", job.getId());
+            repoDepositJob.moveToHistory(job.getId());
+        } else {
+            log.debug("Ignore pruning the history job: {} {}", job.getId(), jobLatestUpdateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         }
     }
 

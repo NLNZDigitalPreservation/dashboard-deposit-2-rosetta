@@ -231,20 +231,22 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         repoJob.save(job);
     }
 
-    public void jobFinalizeStart(EntityDepositJob job) {
+    public EntityDepositJob jobFinalizeStart(EntityDepositJob job) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
         job.setStage(EnumDepositJobStage.FINALIZE);
         job.setState(EnumDepositJobState.RUNNING);
         repoJob.save(job);
+        return job;
     }
 
-    public void jobFinalizeEnd(EntityDepositJob job, EnumDepositJobState state) {
+    public EntityDepositJob jobFinalizeEnd(EntityDepositJob job, EnumDepositJobState state) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
         job.setStage(EnumDepositJobStage.FINISHED);
         job.setState(state);
         repoJob.save(job);
+        return job;
     }
 
     public void jobCompletedBackup(EntityDepositJob job) {

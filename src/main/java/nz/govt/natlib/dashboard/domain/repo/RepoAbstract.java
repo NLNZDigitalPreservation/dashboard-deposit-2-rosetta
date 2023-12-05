@@ -36,7 +36,7 @@ public abstract class RepoAbstract {
         try {
             json = objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Failed to convert object to json", e);
         }
 
         return json;
@@ -47,7 +47,7 @@ public abstract class RepoAbstract {
         try {
             return objectMapper.readValue(json, clazz);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to convert json to object", e);
         }
         return null;
     }
