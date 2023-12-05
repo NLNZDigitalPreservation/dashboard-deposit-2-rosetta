@@ -88,7 +88,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                 job = depositJobService.jobUpdateFilesStat(job, stat.getFileCount(), stat.getFileSize());
                 job = depositJobService.jobScanComplete(job);
 
-                log.debug("Ingested new job : {}", job.getId());
+                log.info("Ingested new job : {}", job.getId());
                 this.processingJobs.put(subFolderFullPath, Boolean.TRUE);
             }
             injectionDirs.clear();
@@ -135,16 +135,16 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     @Override
     public void handlePollingStatus(EntityDepositJob job) {
         if (job.getStage() != EnumDepositJobStage.DEPOSIT || job.getState() != EnumDepositJobState.RUNNING) {
-            log.debug("Skip polling. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
+            log.debug("Ignore polling. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
             return;
         }
         SipStatusInfo sipStatusInfo;
         try {
-            log.info("Update polling, before. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
+            log.debug("Polling, before. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
             sipStatusInfo = rosettaWebService.getSIPStatusInfo(job.getSipID());
-            log.info("Update polling. jobId: {}, jobName: {}, SIPStatusInfo: {}, {}, {}", job.getId(), job.getInjectionTitle(), sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
+            log.debug("Polling, jobId: {}, jobName: {}, SIPStatusInfo: {}, {}, {}", job.getId(), job.getInjectionTitle(), sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
             job = depositJobService.jobUpdateStatus(job, sipStatusInfo);
-            log.info("Update polling, after. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
+            log.debug("Polling, after. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
         } catch (Exception e) {
             log.error("Failed to scan deposit job status", e);
         }
@@ -186,6 +186,8 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                 this.deleteActualContents(flowSetting, injectionPathScanClient, job);
 
                 depositJobService.jobUpdateStatus(job, EnumDepositJobStage.FINISHED, job.getState());
+
+                log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
             }
         }
     }
@@ -201,8 +203,8 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
         LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
         if (jobLatestUpdateTime.isBefore(deadlineTime)) {
-            log.info("Pruning the history job: {}", job.getId());
             repoDepositJob.moveToHistory(job.getId());
+            log.info("Pruned the history job: {}", job.getId());
         } else {
             log.debug("Ignore pruning the history job: {} {}", job.getId(), jobLatestUpdateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         }
