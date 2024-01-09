@@ -52,6 +52,6 @@ public class MainApplication implements CommandLineRunner {
         }
 
 //        System.out.println(ANSI_BLUE + "^_^_^_^_^_^_^_^_^_^ Dashboard Initialed ^_^_^_^_^_^_^_^_^_^_^" + ANSI_RESET);
-        log.info("^_^_^_^_^_^_^_^_^_^ Dashboard Initialed ^_^_^_^_^_^_^_^_^_^_^");
+//        log.info("^_^_^_^_^_^_^_^_^_^ Dashboard Initialed ^_^_^_^_^_^_^_^_^_^_^");
     }
 }

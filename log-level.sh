@@ -9,7 +9,7 @@ echo ""
 echo "Going to reset log level"
 curl -X "POST" "http://localhost:1901/deposit-dashboard/actuator/loggers/nz.govt.natlib.dashboard" \
      -H "Content-Type: application/json; charset=utf-8" \
-     -d $'{  "configuredLevel": "ERROR"}'
+     -d $'{  "configuredLevel": "DEBUG"}'
 echo ""
 
 #Checking the current log level:
