@@ -1,3 +1,6 @@
+function formatCellDatetimeFromEpochMilliSeconds(cell){
+    return formatDatetimeFromEpochMilliSeconds(cell.getValue());
+}
 const contextMenuItemsDepositJobsActive={
     "detail": {name: "Detail", icon: "bi bi-info-circle"},
     "sep1": "---------",
@@ -13,45 +16,40 @@ const contextMenuItemsDepositJobsActive={
 };
 
 const gridDepositJobsColumnsActive=[
-    {headerName: "#", width:45, headerCheckboxSelection: true, headerCheckboxSelectionFilteredOnly: true, checkboxSelection: true, pinned: 'left'},
-    {headerName: "ID", field: "id", width: 90, pinned: 'left'},
-    {headerName: "Flow", field: "materialName", pinned: 'left', width: 350, cellRenderer: function(row){
-        return row.data.appliedFlowSetting.materialFlowName;
+//    {title: "#", width:45, headerCheckboxSelection: true, headerCheckboxSelectionFilteredOnly: true, checkboxSelection: true, pinned: 'left'},
+    {formatter:"rowSelection", width:5, titleFormatter:"rowSelection", hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+        cell.getRow().toggleSelect();
     }},
-    {headerName: "JobTitle", field: "injectionTitle", width: 485, pinned: 'left'},
-
-    {headerName: "Stage", field: "stage", width: 120},
-
-    {headerName: "State", field: "state", width: 120},
-
-    {headerName: "JobInitialTime", field: "initialTime", width: 200, cellRenderer: function(row){
-        return formatDatetimeFromEpochMilliSeconds(row.data.initialTime);
+    {title: "ID", field: "id", width: 90},
+    {title: "Flow", field: "materialName", width: 350, formatter: function(cell){
+        var data=cell.getRow().getData();
+        return data.appliedFlowSetting.materialFlowName;
     }},
-    {headerName: "LatestUpdateTime", field: "latestTime", width: 200, cellRenderer: function(row){
-       return formatDatetimeFromEpochMilliSeconds(row.data.latestTime);
-    }},
+    {title: "JobTitle", field: "injectionTitle", width: 485},
 
-    {headerName: "Progress", field: "statusLatest", width: 120, cellRenderer: function(row){
-        var stage=row.data.stage, state=row.data.state;
+    {title: "Stage", field: "stage", width: 120},
+
+    {title: "State", field: "state", width: 120},
+
+    {title: "JobInitialTime", field: "initialTime", width: 200, formatter: formatCellDatetimeFromEpochMilliSeconds},
+    {title: "LatestUpdateTime", field: "latestTime", width: 200, formatter: formatCellDatetimeFromEpochMilliSeconds},
+
+    {title: "Progress", field: "statusLatest", width: 120, formatter: function(cell){
+        var data=cell.getRow().getData();
+        var stage=data.stage, state=data.state;
         var percent=calcPercentActive(stage, state);
         return getProgressDIVActive(stage, state, percent);
     }},
 
-    {headerName: "NumOfFiles", field: "fileCount", width: 160},
-    {headerName: "SizeOfFiles", field: "fileSize", width: 160, cellRenderer: function(row){
-        return formatContentLength(row.data.fileSize);
-    }},
-    {headerName: "DepositStartTime", field: "depositStartTime", width: 200, cellRenderer: function(row){
-        return formatDatetimeFromEpochMilliSeconds(row.data.depositStartTime);
-    }},
-    {headerName: "DepositEndTime", field: "depositEndTime", width: 200, cellRenderer: function(row){
-       return formatDatetimeFromEpochMilliSeconds(row.data.depositEndTime);
-    }},
-    {headerName: "SipId", field: "sipID", width: 160},
-    {headerName: "SipModule", field: "sipModule", width: 160},
-    {headerName: "SipStage", field: "sipStage", width: 160},
-    {headerName: "SipStatus", field: "sipStatus", width: 160},
-    // {headerName: "Deposit Result", field: "resultMessage", width: 200},
+    {title: "NumOfFiles", field: "fileCount", width: 160},
+    {title: "SizeOfFiles", field: "fileSize", width: 160, formatter: formatContentLength},
+    {title: "DepositStartTime", field: "depositStartTime", width: 200, formatter: formatCellDatetimeFromEpochMilliSeconds},
+    {title: "DepositEndTime", field: "depositEndTime", width: 200, formatter: formatCellDatetimeFromEpochMilliSeconds},
+    {title: "SipId", field: "sipID", width: 160},
+    {title: "SipModule", field: "sipModule", width: 160},
+    {title: "SipStage", field: "sipStage", width: 160},
+    {title: "SipStatus", field: "sipStatus", width: 160},
+    // {title: "Deposit Result", field: "resultMessage", width: 200},
 ];
 
 function getProgressDIVActive(stage, state, percent){
@@ -354,7 +352,16 @@ const modalDepositJobDetails = new bootstrap.Modal(document.getElementById('depo
 const modalDepositJobSearch = new bootstrap.Modal(document.getElementById('deposit-job-details'), {keyboard: false});
 const modalDepositJobManualNew = new bootstrap.Modal(document.getElementById('deposit-job-details'), {keyboard: false});
 
-const gridDepositJobs=new CustomizedAgGrid($('#grid-deposit-jobs')[0], Object.assign({columnDefs: gridDepositJobsColumnsActive}), null);
+const gridDepositJobs=new Tabulator('#grid-deposit-jobs', {
+//    height: "100%",
+    data:[],
+    layout: 'fitDataStretch',
+    columns: gridDepositJobsColumnsActive,
+    rowFormatter:function(row){
+//        row.getElement().classList.add("bg-dark");
+//        row.getElement().classList.add("text-light");
+    },
+});
 
 var jobStartDate=moment().subtract(14, 'days'), jobEndDate=moment();
 function initDepositJob(){
@@ -383,8 +390,9 @@ function initDepositJob(){
     });
     
     fetchHttp(PATH_DEPOSIT_JOBS_ACTIVE_GET, null, function(rsp){
-        gridDepositJobs.setRowData(rsp);
+        gridDepositJobs.replaceData(rsp);
     });
+//    gridDepositJobs.replaceData(PATH_DEPOSIT_JOBS_ACTIVE_GET);
 
     $('#deposit-job-details input').prop('disabled', true);
     $('#deposit-job-details select').prop('disabled', true);

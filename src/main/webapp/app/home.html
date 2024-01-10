@@ -9,6 +9,7 @@
 
     <link rel="icon" type="image/x-icon" href="./favicon.ico" />
     <link rel="stylesheet" href="./dist/bootstrap.css">
+
     <!-- <link rel="stylesheet" href="./dist/font/fontawesome-free.min.css"> -->
     <link rel="stylesheet" href="./dist/bootstrap-icons.css">
     <link rel="stylesheet" href="./dist/icheck-bootstrap.min.css">
@@ -17,8 +18,13 @@
     <link rel="stylesheet" href="./dist/jquery/menu/jquery.contextMenu.css">
     <link rel="stylesheet" href="./dist/daterangepicker.css">
     <link rel="stylesheet" href="./dist/toastr.min.css">
-    <link rel="stylesheet" href="./dist/tabulator/css/tabulator.min.css">
     <link rel="stylesheet" href="./app/dashboard.css">
+
+<!--    <link rel="stylesheet" href="./app/tabulator.css">-->
+    <link rel="stylesheet" href="./app/tabulator-bootstrap5-dark.css">
+<!--        <link rel="stylesheet" href="./dist/tabulator/css/tabulator_bootstrap5.min.css">-->
+
+
     <script src="./dist/jquery-3.5.1.min.js"></script>
     <script src="./dist/tabulator/js/tabulator.min.js"></script>
 </head>
@@ -54,7 +60,7 @@
   </nav>
 
   <main style="display: none;">
-        <div class="ag-theme-alpine-dark" id="grid-deposit-jobs"></div>
+        <div id="grid-deposit-jobs" class="tabulator-bootstrap5-dark tabulator"></div>
   </main>
 
   <div id="modal-sso-login" style="display: none;"></div>
