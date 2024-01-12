@@ -1,22 +1,47 @@
-function formatCellDatetimeFromEpochMilliSeconds(cell){
-    return formatDatetimeFromEpochMilliSeconds(cell.getValue());
-}
-const contextMenuItemsDepositJobsActive={
-    "detail": {name: "Detail", icon: "bi bi-info-circle"},
-    "sep1": "---------",
-    "retry": {name: "Retry", icon: "bi bi-arrow-clockwise"},
-    "cancel": {name: "Cancel", icon: "bi bi-x-circle"},
-    "sep2": "---------",
-    "pause": {name: "Pause", icon: "bi bi-pause-circle"},
-    "resume": {name: "Resume", icon: "bi bi-play-circle"},
-    "sep3": "---------",
-    "terminate": {name: "Terminate and Purge", icon: "bi bi-stop-circle"},
-    // "sep4": "---------",
-    // "export-jobs": {name: "Export Selected Jobs", icon: "bi bi-download"},
-};
+var contextMenuDepositJobsActive = [
+    {
+        label:"<i class='bi bi-info-circle'>&nbsp;</i> Detail",
+        action:function(e, row){
+            setValueDepositJobActive(row.getData());
+            modalDepositJobDetails.show();
+        }
+    },
+    {separator:true},
+    {
+        label:"<i class='bi bi-arrow-clockwise'>&nbsp;</i> Retry",
+        action:function(e, row){
+            handleDepositJobActive("retry",row);
+        }
+    },
+    {
+        label:"<i class='bi bi-x-circle'>&nbsp;</i> Cancel",
+        action:function(e, row){
+            handleDepositJobActive("cancel",row);
+        }
+    },
+    {separator:true},
+    {
+        label:"<i class='bi bi-pause-circle'>&nbsp;</i> Pause",
+        action:function(e, row){
+            handleDepositJobActive("pause",row);
+        }
+    },
+    {
+        label:"<i class='bi bi-play-circle'>&nbsp;</i> Resume",
+        action:function(e, row){
+            handleDepositJobActive("resume",row);
+        }
+    },
+    {separator:true},
+    {
+        label:"<i class='bi bi-stop-circle'>&nbsp;</i> Terminate and Purge",
+        action:function(e, row){
+            handleDepositJobActive("terminate",row);
+        }
+    }
+]
 
 const gridDepositJobsColumnsActive=[
-//    {title: "#", width:45, headerCheckboxSelection: true, headerCheckboxSelectionFilteredOnly: true, checkboxSelection: true, pinned: 'left'},
     {formatter:"rowSelection", width:5, titleFormatter:"rowSelection", hozAlign:"center", headerSort:false, cellClick:function(e, cell){
         cell.getRow().toggleSelect();
     }},
@@ -26,31 +51,43 @@ const gridDepositJobsColumnsActive=[
         return data.appliedFlowSetting.materialFlowName;
     }},
     {title: "JobTitle", field: "injectionTitle", width: 485},
-
     {title: "Stage", field: "stage", width: 120},
-
     {title: "State", field: "state", width: 120},
-
     {title: "JobInitialTime", field: "initialTime", width: 200, formatter: formatCellDatetimeFromEpochMilliSeconds},
     {title: "LatestUpdateTime", field: "latestTime", width: 200, formatter: formatCellDatetimeFromEpochMilliSeconds},
-
     {title: "Progress", field: "statusLatest", width: 120, formatter: function(cell){
         var data=cell.getRow().getData();
         var stage=data.stage, state=data.state;
         var percent=calcPercentActive(stage, state);
         return getProgressDIVActive(stage, state, percent);
     }},
-
     {title: "NumOfFiles", field: "fileCount", width: 160},
-    {title: "SizeOfFiles", field: "fileSize", width: 160, formatter: formatContentLength},
+    {title: "SizeOfFiles", field: "fileSize", width: 160, formatter: function(cell){
+        return formatContentLength(cell.getValue());
+    }},
     {title: "DepositStartTime", field: "depositStartTime", width: 200, formatter: formatCellDatetimeFromEpochMilliSeconds},
     {title: "DepositEndTime", field: "depositEndTime", width: 200, formatter: formatCellDatetimeFromEpochMilliSeconds},
     {title: "SipId", field: "sipID", width: 160},
     {title: "SipModule", field: "sipModule", width: 160},
     {title: "SipStage", field: "sipStage", width: 160},
     {title: "SipStatus", field: "sipStatus", width: 160},
-    // {title: "Deposit Result", field: "resultMessage", width: 200},
 ];
+
+function formatDatasets(dataNodes){
+    if (!dataNodes){
+        return [];
+    }
+
+    for (var node in dataNodes){
+        node["materialName"]=node.appliedFlowSetting;
+    }
+
+    return dataNodes;
+}
+
+function formatCellDatetimeFromEpochMilliSeconds(cell){
+    return formatDatetimeFromEpochMilliSeconds(cell.getValue());
+}
 
 function getProgressDIVActive(stage, state, percent){
     if(stage==='FINISHED' && state==='CANCELED'){
@@ -133,7 +170,12 @@ function isRowDataValidForAction(action, rowData){
 
 var gReqNodes;
 var gAction;
-function isSelectedRowsValidForAction(action, selectedRows){
+function handleDepositJobActive(action, selectedRow){
+    var selectedRows=gridDepositJobs.getSelectedData();
+    if(selectedRows.length===0 && selectedRow && selectedRow.getData()){
+        selectedRows=[selectedRow.getData()];
+    }
+
     action = action.toUpperCase();
     var req=[];
     for(var idx=0; idx<selectedRows.length;idx++){
@@ -143,7 +185,7 @@ function isSelectedRowsValidForAction(action, selectedRows){
         }
         req.push(rowData);
     }
-    
+
     if(selectedRows.length > 1){
         if(req.length == 0){
             gReqNodes=null;
@@ -166,29 +208,8 @@ function isSelectedRowsValidForAction(action, selectedRows){
     continueProcessDepositJobAction(req, action);
 }
 
-function handleDepositJobActive(action, selectedRow){
-    if (action==='detail') {
-        setValueDepositJobActive(selectedRow.data);
-        modalDepositJobDetails.show();
-        console.log("Popup the detail window.");
-        return;
-    }
-
-
-    var selectedRows=gridDepositJobs.getSelectedRows();
-    if(!selectedRows && selectedRow && selectedRow.data){
-        selectedRows=[selectedRow.data];
-    }
-
-//    var reqNodes=isSelectedRowsValidForAction(action, selectedRows);
-//    if (!reqNodes) {
-//        return;
-//    }
-    isSelectedRowsValidForAction(action, selectedRows);
-}
-
  function continueProcessDepositJobAction(reqNodes, action){
-    if (!reqNodes) {
+    if (!reqNodes || reqNodes.length===0) {
         return;
     }
 
@@ -197,28 +218,11 @@ function handleDepositJobActive(action, selectedRow){
     }
 
     fetchHttp(PATH_DEPOSIT_JOBS_UPDATE + '?action='+action, reqNodes, function(rspNodes){
-        // gridDepositJobs.clear(selectedNodes);
-        var dataset=[], map={};
-        for(var i=0; i<rspNodes.length; i++){
-            map[rspNodes[i].id]=rspNodes[i];
-        }
-
-        gridDepositJobs.grid.gridOptions.api.forEachNode(function(node, index){
-            if (map[node.data.id]) {
-                node.data=map[node.data.id];
-                dataset.push(node.data);
-            }
-        });
-
-        if(action==='TERMINATE'){
-            gridDepositJobs.removeByDataSet(dataset);
-        }else{
-            gridDepositJobs.update(dataset);
-        }
+          gridDepositJobs.updateData(rspNodes);
     });
 }
 
-function searchDepoitJob(){
+function searchDepositJob(){
     var req={
         dtStart: moment(jobStartDate).valueOf(),
         dtEnd: moment(jobEndDate).valueOf()
@@ -255,9 +259,6 @@ function submitNewDepositJob(){
     req['nfsDirectory']=$('#input-nfs-directory').val();
     req['forcedReplaceExistingJob']=$('#forcedReplaceExistingJob').is(':checked');
     fetchHttp(PATH_DEPOSIT_JOBS_NEW, req, function(job){
-        // var dataset=[];
-        // dataset.push(job);
-        // gridDepositJobs.add(dataset);
         toastr.info("The job is scheduled.");
         modalDepositJobManualNew.hide();
     });
@@ -275,12 +276,6 @@ function setProgressBarStyle(objFilter, className, stage, state){
 function setValueDepositJobActive(data){
     if (!data) {return false;}
 
-    //    if (data.state==='FAILED') {
-    //        $('#deposit-job-health').show();
-    //        $('#deposit-job-health').html('<i class="bi bi-exclamation-triangle-fill text-danger"></i>&nbsp;' + data.resultMessage)
-    //    }else{
-    //        $('#deposit-job-health').hide();
-    //    }
     if((data.resultMessage && data.resultMessage !== "") || data.state==='FAILED'){
         $('#deposit-job-health').show();
         $('#deposit-job-health').html('<i class="bi bi-exclamation-triangle-fill text-danger"></i>&nbsp;' + data.resultMessage)
@@ -341,10 +336,6 @@ function setValueDepositJobActive(data){
         setProgressBarStyle('#progress-stage-name div[name="finalize"]', 'bg-finished', 'FINALIZE', state);
     }
 
-
-    //Value appliedFlowSetting
-//    setValueMaterialFlow(data.appliedFlowSetting, '#ul-flow-setting-job-applied');
-
     return true;
 }
 
@@ -354,13 +345,12 @@ const modalDepositJobManualNew = new bootstrap.Modal(document.getElementById('de
 
 const gridDepositJobs=new Tabulator('#grid-deposit-jobs', {
 //    height: "100%",
+    index:"id",
     data:[],
     layout: 'fitDataStretch',
+    groupBy: 'stage',
+    rowContextMenu: contextMenuDepositJobsActive, //add context menu to rows
     columns: gridDepositJobsColumnsActive,
-    rowFormatter:function(row){
-//        row.getElement().classList.add("bg-dark");
-//        row.getElement().classList.add("text-light");
-    },
 });
 
 var jobStartDate=moment().subtract(14, 'days'), jobEndDate=moment();
@@ -386,27 +376,25 @@ function initDepositJob(){
 
     $('#filter-deposit-job').on('input', function(){
         var val=$(this).val();
-        gridDepositJobs.filter(val);
+        if(!val || val.toString().length===0){
+            gridDepositJobs.clearFilter();
+            return
+        }
+
+        //Filter all the fields which match the input
+        gridDepositJobs.setFilter(function(data, param){
+            param=param.toString().toUpperCase();
+            content=JSON.stringify(data).toUpperCase();
+            return content.includes(param);
+        }, val);
     });
     
     fetchHttp(PATH_DEPOSIT_JOBS_ACTIVE_GET, null, function(rsp){
         gridDepositJobs.replaceData(rsp);
     });
-//    gridDepositJobs.replaceData(PATH_DEPOSIT_JOBS_ACTIVE_GET);
 
     $('#deposit-job-details input').prop('disabled', true);
     $('#deposit-job-details select').prop('disabled', true);
-
-    $.contextMenu({
-        selector: '#grid-deposit-jobs .ag-row', 
-        trigger: 'right',
-        callback: function(key, options) {
-            var rowId=$(this).attr('row-id');
-            var rowNode = gridDepositJobs.grid.gridOptions.api.getRowNode(rowId);
-            handleDepositJobActive(key, rowNode);
-        },
-        items: contextMenuItemsDepositJobsActive,
-    });
 }
 
 
