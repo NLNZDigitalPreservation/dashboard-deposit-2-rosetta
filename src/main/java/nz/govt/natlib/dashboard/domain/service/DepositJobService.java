@@ -508,11 +508,14 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             Cell cId = rowExcel.createCell(colNum++, CellType.NUMERIC);
             cId.setCellValue(job.getId());
 
+            Cell cProducer = rowExcel.createCell(colNum++, CellType.STRING);
             Cell cFlow = rowExcel.createCell(colNum++, CellType.STRING);
             EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
             if (flowSetting != null) {
-                cFlow.setCellValue(flowSetting.getMaterialFlowId() + "-" + flowSetting.getMaterialFlowName());
+                cProducer.setCellValue(flowSetting.getProducerName());
+                cFlow.setCellValue(flowSetting.getMaterialFlowName());
             } else {
+                cProducer.setCellValue("Unknown Producer");
                 cFlow.setCellValue("Unknown Material Flow");
             }
 
@@ -522,8 +525,11 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             Cell cSubFolder = rowExcel.createCell(colNum++, CellType.STRING);
             cSubFolder.setCellValue(job.getInjectionPath());
 
-            Cell cStatus = rowExcel.createCell(colNum++, CellType.STRING);
-            cStatus.setCellValue(job.getStage() + "-" + job.getState());
+            Cell cStage = rowExcel.createCell(colNum++, CellType.STRING);
+            cStage.setCellValue(job.getStage().name());
+
+            Cell cState = rowExcel.createCell(colNum++, CellType.STRING);
+            cState.setCellValue(job.getState().name());
 
             Cell cInitialTime = rowExcel.createCell(colNum++, CellType.STRING);
             cInitialTime.setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getInitialTime()));

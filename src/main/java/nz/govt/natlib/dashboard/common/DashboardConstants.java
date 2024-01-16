@@ -12,12 +12,13 @@ public class DashboardConstants {
     public static final String PATH_RAW_PRODUCERS = PATH_ROOT + "/raw/producers";
     public static final String PATH_RAW_MATERIAL_FLOWS = PATH_ROOT + "/raw/materialflows";
 
-
     public static final String PATH_SETTING_DEPOSIT_ACCOUNT = PATH_ROOT + "/setting/deposit-account";
     public static final String PATH_SETTING_DEPOSIT_ACCOUNT_ALL_GET = PATH_SETTING_DEPOSIT_ACCOUNT + "/all/get";
     public static final String PATH_SETTING_DEPOSIT_ACCOUNT_DETAIL = PATH_SETTING_DEPOSIT_ACCOUNT + "/detail";
     public static final String PATH_SETTING_DEPOSIT_ACCOUNT_SAVE = PATH_SETTING_DEPOSIT_ACCOUNT + "/save";
     public static final String PATH_SETTING_DEPOSIT_ACCOUNT_DELETE = PATH_SETTING_DEPOSIT_ACCOUNT + "/delete";
+
+    public static final String PATH_SETTING_DEPOSIT_ACCOUNT_REFRESH = PATH_SETTING_DEPOSIT_ACCOUNT + "/refresh";
 
     public static final String PATH_SETTING_FLOW = PATH_ROOT + "/setting/flow";
     public static final String PATH_SETTING_FLOW_ALL_GET = PATH_SETTING_FLOW + "/all/get";

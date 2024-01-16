@@ -98,4 +98,28 @@ public class DepositAccountSettingService {
         rstVal.setRspBody(producer);
         return rstVal;
     }
+
+    public RestResponseCommand refreshDepositAccountSetting(Long id) {
+        RestResponseCommand retVal = new RestResponseCommand();
+
+        EntityDepositAccountSetting depositAccountSetting = repoDepositAccount.getById(id);
+        if (depositAccountSetting == null) {
+            retVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+            retVal.setRspMsg("Unknown deposit account, id=" + id);
+            return retVal;
+        }
+
+        try {
+            List<DtoProducersRsp.Producer> producers = rosettaWebService.getProducers(depositAccountSetting);
+            depositAccountSetting.setProducers(producers);
+            repoDepositAccount.save(depositAccountSetting);
+            retVal.setRspBody(depositAccountSetting);
+        } catch (Exception e) {
+            retVal.setRspCode(RestResponseCommand.RSP_SYSTEM_ERROR);
+            retVal.setRspMsg(e.getMessage());
+            return retVal;
+        }
+
+        return retVal;
+    }
 }

@@ -58,6 +58,23 @@ $('#filter-materialflow').on('input', function(){
     gridMaterialFlows.setQuickFilter(val);
 });
 
+//Refresh the deposit account: getting the related producers
+function refreshTheDepositAccount(){
+    var depositAccountId=$('#flow-settings select[name="depositAccount"] option:selected').val();
+    if(!depositAccountId){
+        alert('Please select a Deposit Account');
+        return;
+    }
+
+    $('.spinner-container').css('visibility','visible');
+    fetchHttp(PATH_SETTING_DEPOSIT_ACCOUNT_REFRESH+'?id='+depositAccountId, null, function(depositAccount){
+         fetchHttp(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId, null, function(dataset){
+            gridProducers.setGridOption('rowData', dataset);
+            gridProducers.redrawRows(true);
+        });
+        $('.spinner-container').css('visibility','hidden');
+    });
+}
 
 class FlowSetting extends BasicSettings{
     getPanelTitle(item){

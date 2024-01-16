@@ -1,6 +1,6 @@
 var contextMenuDepositJobsActive = [
     {
-        label:"<i class='bi bi-info-circle'>&nbsp;</i> Detail",
+        label:"<i class='bi bi-info-circle text-success'>&nbsp;</i> Detail",
         action:function(e, row){
             setValueDepositJobActive(row.getData());
             modalDepositJobDetails.show();
@@ -8,33 +8,33 @@ var contextMenuDepositJobsActive = [
     },
     {separator:true},
     {
-        label:"<i class='bi bi-arrow-clockwise'>&nbsp;</i> Retry",
+        label:"<i class='bi bi-arrow-clockwise text-success'>&nbsp;</i> Retry",
         action:function(e, row){
             handleDepositJobActive("retry",row);
         }
     },
     {
-        label:"<i class='bi bi-x-circle'>&nbsp;</i> Cancel",
+        label:"<i class='bi bi-x-circle text-success'>&nbsp;</i> Cancel",
         action:function(e, row){
             handleDepositJobActive("cancel",row);
         }
     },
     {separator:true},
     {
-        label:"<i class='bi bi-pause-circle'>&nbsp;</i> Pause",
+        label:"<i class='bi bi-pause-circle text-success'>&nbsp;</i> Pause",
         action:function(e, row){
             handleDepositJobActive("pause",row);
         }
     },
     {
-        label:"<i class='bi bi-play-circle'>&nbsp;</i> Resume",
+        label:"<i class='bi bi-play-circle text-success'>&nbsp;</i> Resume",
         action:function(e, row){
             handleDepositJobActive("resume",row);
         }
     },
     {separator:true},
     {
-        label:"<i class='bi bi-stop-circle'>&nbsp;</i> Terminate and Purge",
+        label:"<i class='bi bi-stop-circle text-success'>&nbsp;</i> Terminate and Purge",
         action:function(e, row){
             handleDepositJobActive("terminate",row);
         }
@@ -46,10 +46,8 @@ const gridDepositJobsColumnsActive=[
         cell.getRow().toggleSelect();
     }},
     {title: "ID", field: "id", width: 90},
-    {title: "Flow", field: "materialName", width: 350, formatter: function(cell){
-        var data=cell.getRow().getData();
-        return data.appliedFlowSetting.materialFlowName;
-    }},
+    {title: "Producer Name", field: "producerName", width: 350},
+    {title: "Materialflow Name", field: "materialName", width: 350},
     {title: "JobTitle", field: "injectionTitle", width: 485},
     {title: "Stage", field: "stage", width: 120},
     {title: "State", field: "state", width: 120},
@@ -78,8 +76,10 @@ function formatDatasets(dataNodes){
         return [];
     }
 
-    for (var node in dataNodes){
-        node["materialName"]=node.appliedFlowSetting;
+    for (var i=0; i<dataNodes.length; i++){
+        var node=dataNodes[i];
+        node["producerName"]=node.appliedFlowSetting.producerName;
+        node["materialName"]=node.appliedFlowSetting.materialFlowName;
     }
 
     return dataNodes;
@@ -222,36 +222,6 @@ function handleDepositJobActive(action, selectedRow){
     });
 }
 
-function searchDepositJob(){
-    var req={
-        dtStart: moment(jobStartDate).valueOf(),
-        dtEnd: moment(jobEndDate).valueOf()
-    };
-
-    var flowIds=[];
-    $('#search-select-material-flow input:checked').each(function(){
-        flowIds.push($(this).attr('flowId'));
-    });
-    req['flowIds']=flowIds;
-
-    var stages=[];
-    $('#search-select-stages input:checked').each(function(){
-        stages.push($(this).attr('name'));
-    });
-    req['stages']=stages;
-
-    var states=[];
-    $('#search-select-states input:checked').each(function(){
-        states.push($(this).attr('name'));
-    });
-    req['states']=states;
-
-    fetchHttp(PATH_DEPOSIT_JOBS_SEARCH, req, function(rsp){
-        gridDepositJobs.setRowData(rsp);
-        modalDepositJobSearch.hide();
-    });
-}
-
 function submitNewDepositJob(){
     var req={};
     req['flowId']=$('#new-job-select-material-flow option:selected').attr('value');
@@ -340,15 +310,15 @@ function setValueDepositJobActive(data){
 }
 
 const modalDepositJobDetails = new bootstrap.Modal(document.getElementById('deposit-job-details'), {keyboard: false});
-const modalDepositJobSearch = new bootstrap.Modal(document.getElementById('deposit-job-details'), {keyboard: false});
 const modalDepositJobManualNew = new bootstrap.Modal(document.getElementById('deposit-job-details'), {keyboard: false});
+const modalDepositJobSearch = new bootstrap.Modal(document.getElementById('search-deposit-job'), {keyboard: false});
 
 const gridDepositJobs=new Tabulator('#grid-deposit-jobs', {
 //    height: "100%",
     index:"id",
     data:[],
     layout: 'fitDataStretch',
-    groupBy: 'stage',
+//    groupBy: ['producerName', 'materialName'],
     rowContextMenu: contextMenuDepositJobsActive, //add context menu to rows
     columns: gridDepositJobsColumnsActive,
 });
@@ -390,17 +360,75 @@ function initDepositJob(){
     });
     
     fetchHttp(PATH_DEPOSIT_JOBS_ACTIVE_GET, null, function(rsp){
-        gridDepositJobs.replaceData(rsp);
+        var datasets=formatDatasets(rsp);
+        gridDepositJobs.replaceData(datasets);
     });
 
     $('#deposit-job-details input').prop('disabled', true);
     $('#deposit-job-details select').prop('disabled', true);
 }
 
+function searchDepositJob(){
+    var req={
+        dtStart: moment(jobStartDate).valueOf(),
+        dtEnd: moment(jobEndDate).valueOf()
+    };
+
+    var flowIds=[];
+    $('#search-select-material-flow input:checked').each(function(){
+        flowIds.push($(this).attr('flowId'));
+    });
+    req['flowIds']=flowIds;
+
+    var stages=[];
+    $('#search-select-stages input:checked').each(function(){
+        stages.push($(this).attr('name'));
+    });
+    req['stages']=stages;
+
+    var states=[];
+    $('#search-select-states input:checked').each(function(){
+        states.push($(this).attr('name'));
+    });
+    req['states']=states;
+
+    fetchHttp(PATH_DEPOSIT_JOBS_SEARCH, req, function(rsp){
+        var datasets=formatDatasets(rsp);
+        gridDepositJobs.replaceData(datasets);
+        modalDepositJobSearch.hide();
+    });
+}
+
+function groupByDepositJobs(){
+    var producerName=$('#flexCheckProducerName').is(':checked');
+    var materialFlowName=$('#flexCheckMaterialFlowName').is(':checked');
+    var stage=$('#flexCheckStage').is(':checked');
+    var state=$('#flexCheckState').is(':checked');
+
+    var groupByFields=[];
+    if(producerName){
+        groupByFields.push('producerName');
+    }
+    if(materialFlowName){
+        groupByFields.push('materialName');
+    }
+    if(stage){
+        groupByFields.push('stage');
+    }
+    if(state){
+        groupByFields.push('state');
+    }
+
+    if(groupByFields.length===0){
+        gridDepositJobs.setGroupBy(false);
+    }else{
+        gridDepositJobs.setGroupBy(groupByFields);
+    }
+}
 
 function exportSelectedJobs(){
-    var selectedRows=gridDepositJobs.getSelectedRows();
-    if(!selectedRows){
+    var selectedRows=gridDepositJobs.getSelectedData();
+    if(!selectedRows || selectedRows.length===0){
         toastr.warning("Please select some jobs!");
         return;
     }
