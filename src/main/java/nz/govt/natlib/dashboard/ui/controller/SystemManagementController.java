@@ -24,11 +24,11 @@ public class SystemManagementController {
         String reqAddress = req.getRemoteAddr();
         if (!reqAddress.equals("127.0.0.1") && !reqAddress.equals("0:0:0:0:0:0:0:1") && !reqAddress.equals("localhost")) {
             rsp.getWriter().write("You can only shutdown the service from local machine.");
-            return "YYou can only shutdown the service from local machine.";
+            return "You can only shutdown the service from local machine.";
         }
         log.info("Received [shutdown] command {}", req.getParameter("Referer"));
         log.info("Dashboard is going to exit.");
-        timerScheduledExecutors.close();
+        timerScheduledExecutors.stopTimer();
         return "The system resources held by Dashboard were released.";
     }
 }

@@ -205,4 +205,22 @@ public class BasicTester {
         }
         return null;
     }
+  
+    public void addDepositDoneFile() {
+        try {
+            FileUtils.write(new File(new File(scanRootPath, subFolderName), "done"), "");
+        } catch (IOException e) {
+            e.printStackTrace();
+            assert false;
+        }
+    }
+
+    public void clearJobs() {
+        try {
+            FileUtils.deleteDirectory(new File(storagePath,"jobs"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            assert false;
+        }
+    }
 }

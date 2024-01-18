@@ -1,6 +1,7 @@
 package nz.govt.natlib.dashboard.domain.repo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.govt.natlib.dashboard.common.metadata.EnumEntityKey;
 import nz.govt.natlib.dashboard.domain.entity.EntityCommon;
@@ -35,18 +36,18 @@ public abstract class RepoAbstract {
         try {
             json = objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Failed to convert object to json", e);
         }
 
         return json;
     }
 
     public Object json2Object(String json, Class<?> clazz) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
             return objectMapper.readValue(json, clazz);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to convert json to object", e);
         }
         return null;
     }
@@ -57,7 +58,7 @@ public abstract class RepoAbstract {
 
     public String read(File fullPath) {
         if (fullPath == null || !fullPath.isFile() || !fullPath.exists()) {
-            log.error("Invalid input parameter, fullPath: {}", fullPath);
+            log.warn("Invalid input parameter, fullPath: {}", fullPath);
             return null;
         }
         try {
@@ -74,7 +75,7 @@ public abstract class RepoAbstract {
 
     public boolean save(File fullPath, Object obj) {
         if (fullPath == null || obj == null) {
-            log.error("Invalie input parameter");
+            log.error("Invalid input parameter");
             return false;
         }
 

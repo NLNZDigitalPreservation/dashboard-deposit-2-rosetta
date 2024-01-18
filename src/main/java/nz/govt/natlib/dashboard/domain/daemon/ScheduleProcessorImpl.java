@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -33,18 +34,26 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             InjectionFileStat stat = new InjectionFileStat();
             List<UnionFile> injectionDirs = injectionPathScanClient.listRootDir();
             for (UnionFile injectionDir : injectionDirs) {
-                if (!injectionDir.isPath()) {
-                    log.info("Skip the path which is not a subfolder: {}", injectionDir.getAbsolutePath());
-                    continue;
-                }
-
-                File depositDoneFile = new File(injectionDir.getAbsolutePath(), "done");
-                if (injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
-                    log.debug("Skip the subfolder {}, it had been deposited, 'done' file found.", injectionDir.getAbsolutePath());
-                    continue;
-                }
-
                 File injectionPath = injectionDir.getAbsolutePath();
+                String subFolderFullPath = injectionPath.getAbsolutePath();
+                if (this.processingJobs.containsKey(subFolderFullPath)) {
+                    log.debug("Ignore the [processing] subfolder: {}", subFolderFullPath);
+                    continue;
+                }
+
+                if (!injectionDir.isPath()) {
+                    log.debug("Skip the path which is not a subfolder: {}", injectionDir.getAbsolutePath());
+                    continue;
+                }
+
+                File depositDoneFile = new File(injectionPath, "done");
+                if (injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
+                    log.debug("Ignore the subfolder {}, it had been deposited, 'done' file found.", injectionDir.getAbsolutePath());
+                    this.processingJobs.put(subFolderFullPath, Boolean.TRUE);
+                    continue;
+                }
+
+                //Ignore the jobs not in the INITIAL stage
                 EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), injectionPath.getName());
                 //Initial job
                 if (job == null) {
@@ -52,29 +61,31 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                     log.info("Created a new job: {} {}", job.getId(), job.getInjectionTitle());
                 }
 
-
-                //Ignore the jobs not in the INITIAL stage
-                if (job.getStage() != EnumDepositJobStage.INGEST || job.getState() != EnumDepositJobState.RUNNING) {
-                    log.debug("Skip unprepared job for: {} --> {} at status [{}] [{}]", flowSetting.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
+                if (job.getState() == EnumDepositJobState.PAUSED || job.getState() == EnumDepositJobState.CANCELED) {
+                    log.debug("Ignore the subfolder, it's paused or cancelled: {}, status [{}] [{}]", subFolderFullPath, job.getStage(), job.getState());
                     continue;
                 }
 
-                stat.stat(injectionPathScanClient, new UnionPath(injectionPath, flowSetting.getStreamLocation()));
-                job = depositJobService.jobUpdateFilesStat(job, stat.getFileCount(), stat.getFileSize());
-
-                File doneFile = new File(injectionPath, flowSetting.getInjectionCompleteFileName());
-                if (!injectionPathScanClient.exists(UnionPath.of(doneFile))) {
-                    log.debug("{} file does not exist in: {}", flowSetting.getInjectionCompleteFileName(), injectionPath.getAbsolutePath());
+                if (job.getStage() != EnumDepositJobStage.INGEST) {
+                    log.debug("Ignore the subfolder, it's ingested: {}, status [{}] [{}]", subFolderFullPath, job.getStage(), job.getState());
+                    this.processingJobs.put(subFolderFullPath, Boolean.TRUE);
                     continue;
                 }
 
-                job = depositJobService.jobScanComplete(job);
+                //Ignore the unprepared subfolders
+                File predepositDoneFile = new File(injectionPath, flowSetting.getInjectionCompleteFileName());
+                if (!injectionPathScanClient.exists(UnionPath.of(predepositDoneFile))) {
+                    log.debug("Ignore the subfolder {}, {} file does not exist", subFolderFullPath, flowSetting.getInjectionCompleteFileName());
+                    continue;
+                }
 
                 //Flush the file stat
                 stat.stat(injectionPathScanClient, new UnionPath(injectionPath, flowSetting.getStreamLocation()));
                 job = depositJobService.jobUpdateFilesStat(job, stat.getFileCount(), stat.getFileSize());
+                job = depositJobService.jobScanComplete(job);
 
-                log.debug("Initialed new job : {}", job.getId());
+                log.info("Ingested new job : {}", job.getId());
+                this.processingJobs.put(subFolderFullPath, Boolean.TRUE);
             }
             injectionDirs.clear();
         }
@@ -111,7 +122,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     @Override
     public void handlePollingStatus(EntityDepositAccountSetting depositAccount,EntityDepositJob job) {
         if (job.getStage() != EnumDepositJobStage.DEPOSIT || job.getState() != EnumDepositJobState.RUNNING) {
-            log.debug("Skip polling. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
+            log.debug("Ignore polling. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
             return;
         }
         SipStatusInfo sipStatusInfo;
@@ -119,8 +130,9 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             log.info("Update polling, before. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
             sipStatusInfo = rosettaWebService.getSIPStatusInfo(depositAccount,job.getSipID());
             log.info("Update polling. jobId: {}, jobName: {}, SIPStatusInfo: {}, {}", job.getId(), job.getInjectionTitle(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
+
             job = depositJobService.jobUpdateStatus(job, sipStatusInfo);
-            log.info("Update polling, after. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
+            log.debug("Polling, after. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
         } catch (Exception e) {
             log.error("Failed to scan deposit job status", e);
         }
@@ -132,7 +144,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.INITIALED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.RUNNING)) {
-            depositJobService.jobFinalizeStart(job);
+            job = depositJobService.jobFinalizeStart(job);
 
             File depositDoneFile = new File(job.getInjectionPath(), "done");
             if (!depositDoneFile.getParentFile().exists()) {
@@ -141,33 +153,53 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             }
 
             if (!injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
+                log.warn("The succeed finished job: {} has no [done] file: {}", job.getId(), depositDoneFile.getAbsolutePath());
                 if (!depositDoneFile.createNewFile()) {
                     log.error("Failed to create file: {}", depositDoneFile.getAbsolutePath());
                     return;
                 }
             }
-            depositJobService.jobFinalizeEnd(job, EnumDepositJobState.SUCCEED);
-            log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
-        }
-
-        if ((job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.SUCCEED) ||
-                (job.getStage() == EnumDepositJobStage.FINISHED && job.getState() == EnumDepositJobState.SUCCEED)) {
 
             // Backup the actual contents
             this.backupActualContents(flowSetting, job);
 
             // Delete the actual contents
             this.deleteActualContents(flowSetting, injectionPathScanClient, job);
+
+            job = depositJobService.jobFinalizeEnd(job, EnumDepositJobState.SUCCEED);
+            log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
+        } else if (job.getState() == EnumDepositJobState.CANCELED && job.getStage() != EnumDepositJobStage.FINISHED) {
+            LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxActiveDays());
+            LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
+            if (jobLatestUpdateTime.isBefore(deadlineTime)) {
+                // Backup the actual contents
+                this.backupActualContents(flowSetting, job);
+
+                // Delete the actual contents
+                this.deleteActualContents(flowSetting, injectionPathScanClient, job);
+
+                depositJobService.jobUpdateStatus(job, EnumDepositJobStage.FINISHED, job.getState());
+
+                log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
+            }
         }
     }
 
     @Override
     public void handleHistoryPruning(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
+        if (job.getStage() != EnumDepositJobStage.FINISHED) {
+            log.debug("Ignore pruning the history job: {} {}", job.getId(), job.getStage());
+            return;
+        }
+
         //Remove canceled and expired job
         LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
         LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
         if (jobLatestUpdateTime.isBefore(deadlineTime)) {
-            repoDepositJob.deleteById(job.getId());
+            repoDepositJob.moveToHistory(job.getId());
+            log.info("Pruned the history job: {}", job.getId());
+        } else {
+            log.debug("Ignore pruning the history job: {} {}", job.getId(), jobLatestUpdateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         }
     }
 

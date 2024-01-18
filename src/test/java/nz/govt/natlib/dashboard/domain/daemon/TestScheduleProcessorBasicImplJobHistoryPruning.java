@@ -1,5 +1,7 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
+import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
+import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 
@@ -34,8 +36,9 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
 
         //Pruning
         LocalDateTime ldt = LocalDateTime.now();
-        ldt = ldt.minusYears(5);
         job.setLatestTime(DashboardHelper.getLocalMilliSeconds(ldt));
+        job.setStage(EnumDepositJobStage.FINISHED);
+        job.setState(EnumDepositJobState.SUCCEED);
         repoDepositJob.save(job);
 
         testInstance.handleHistoryPruning(flowSetting, injectionPathScanClient, job);
@@ -43,7 +46,7 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
         job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
 
         //Do nothing because it isn't expired
-        assert job == null;
+        assert job != null;
     }
 
     @Test
@@ -56,6 +59,8 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
         long oldMilliSeconds = DashboardHelper.getLocalMilliSeconds(oldTime);
         job.setInitialTime(oldMilliSeconds);
         job.setLatestTime(oldMilliSeconds);
+        job.setStage(EnumDepositJobStage.FINISHED);
+        job.setState(EnumDepositJobState.SUCCEED);
 
         //Added to history
         repoDepositJob.save(job);

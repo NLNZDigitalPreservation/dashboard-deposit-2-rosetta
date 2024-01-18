@@ -19,11 +19,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class ScheduleProcessorBasic {
+    protected static final Logger log = LoggerFactory.getLogger(ScheduleProcessorBasic.class);
+
     protected static final String BACKUP_COMPLETED_FILE = "BACKUP-COMPLETED";
     @Autowired
     protected RosettaWebService rosettaWebService;
@@ -40,32 +44,43 @@ public abstract class ScheduleProcessorBasic {
     @Autowired
     protected RepoGlobalSetting repoGlobalSetting;
 
-    protected static final Logger log = LoggerFactory.getLogger(ScheduleProcessorBasic.class);
+    //Cache the processed sub folders
+    protected Map<String, Boolean> processingJobs = Collections.synchronizedMap(new HashMap<>());
 
-    public void handle() throws Exception {
+    public void scan() throws Exception {
         log.debug("On timer heartbeat.");
 
-        try {
-            EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
-            if (globalSetting != null && globalSetting.isPaused()) {
-                try {
-                    LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                    LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                    LocalDateTime ldtNowDatetime = LocalDateTime.now();
-                    if (ldtNowDatetime.isAfter(ldtPausedStartTime) && ldtNowDatetime.isBefore(ldtPausedEndTime)) {
-                        log.debug("Skip the paused timeslot.");
-                        return;
-                    }
-                } catch (Exception e) {
-                    log.error("Failed to parse the datetime fields", e);
+        EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
+        if (globalSetting != null && globalSetting.isPaused()) {
+            try {
+                LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                LocalDateTime ldtNowDatetime = LocalDateTime.now();
+                if (ldtNowDatetime.isAfter(ldtPausedStartTime) && ldtNowDatetime.isBefore(ldtPausedEndTime)) {
+                    log.debug("Skip the paused timeslot.");
+                    return;
                 }
+            } catch (Exception e) {
+                log.error("Failed to parse the datetime fields", e);
             }
-        } catch (Exception e) {
-            log.error("Failed to parse the global settings", e);
         }
-
+        
         //To initial jobs
         handleIngest();
+    }
+
+    public void pipeline() throws Exception {
+        log.debug("On timer heartbeat: pipeline.");
+        EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
+        if (globalSetting != null && globalSetting.isPaused()) {
+            LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            LocalDateTime ldtNowDatetime = LocalDateTime.now();
+            if (ldtNowDatetime.isAfter(ldtPausedStartTime) && ldtNowDatetime.isBefore(ldtPausedEndTime)) {
+                log.debug("Skip the paused timeslot.");
+                return;
+            }
+        }
 
         List<EntityDepositJob> allJobs = repoDepositJob.getAll();
         if (allJobs == null) {

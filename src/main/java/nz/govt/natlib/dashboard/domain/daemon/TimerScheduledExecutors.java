@@ -1,6 +1,5 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
-import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoGlobalSetting;
 import org.slf4j.Logger;
@@ -9,21 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class TimerScheduledExecutors {
     private static final Logger log = LoggerFactory.getLogger(TimerScheduledExecutors.class);
 
-    private final ScheduledThreadPoolExecutor _schedule_executor = new ScheduledThreadPoolExecutor(256);
     @Autowired
     protected RepoGlobalSetting repoGlobalSetting;
     @Autowired
     protected ScheduleProcessorBasic scheduleProcessor;
 
-    private ScheduledFuture<?> futureScheduleProcessor;
+    private boolean isRunning = true;
 
     @PostConstruct
     public void init() throws InterruptedException {
@@ -31,39 +27,64 @@ public class TimerScheduledExecutors {
         scheduleProcessor();
     }
 
-    public void scheduleProcessor() {
-        long delays = 60;
-        TimeUnit delayUnit = TimeUnit.SECONDS;
+    private void fixedDelay() throws InterruptedException {
+        long delays;
+        TimeUnit delayUnit;
 
         EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
         if (globalSetting == null) {
+            delays = 60;
+            delayUnit = TimeUnit.SECONDS;
             log.warn("The global setting is null.");
         } else {
             delays = globalSetting.getDelays();
             delayUnit = globalSetting.getDelayTimeUnit();
         }
-        Runnable handler = () -> {
-            try {
-                scheduleProcessor.handle();
-            } catch (Throwable e) {
-                log.error("Failed to execute processor", e);
-                log.error("Failed to execute processor: {}", e.getMessage());
+
+        delayUnit.sleep(delays);
+    }
+
+    public void scheduleProcessor() {
+        Runnable scan = () -> {
+            while (true) {
+                try {
+                    if (isRunning) {
+                        scheduleProcessor.scan();
+                    }
+                    fixedDelay();
+                } catch (Throwable e) {
+                    log.error("Failed to execute scan", e);
+                    log.error("Failed to execute scan: {}", e.getMessage());
+                }
             }
         };
-        this.futureScheduleProcessor = _schedule_executor.scheduleWithFixedDelay(handler, delays, delays, delayUnit);
+        Thread scanProcessor = new Thread(scan);
+        scanProcessor.setName("scan timer");
+        scanProcessor.start();
+
+        Runnable pipeline = () -> {
+            while (true) {
+                try {
+                    if (isRunning) {
+                        scheduleProcessor.pipeline();
+                    }
+                    fixedDelay();
+                } catch (Throwable e) {
+                    log.error("Failed to execute pipeline", e);
+                    log.error("Failed to execute pipeline: {}", e.getMessage());
+                }
+            }
+        };
+        Thread pipelineProcessor = new Thread(pipeline);
+        pipelineProcessor.setName("pipeline timer");
+        pipelineProcessor.start();
     }
 
-    public void close() {
-        if (this.futureScheduleProcessor != null) {
-            this.futureScheduleProcessor.cancel(true);
-        }
-        _schedule_executor.shutdownNow();
+    public void startTimer() {
+        isRunning = true;
     }
 
-    public void rescheduleProcessor() {
-        if (this.futureScheduleProcessor != null) {
-            this.futureScheduleProcessor.cancel(true);
-        }
-        this.scheduleProcessor();
+    public void stopTimer() {
+        isRunning = false;
     }
 }
