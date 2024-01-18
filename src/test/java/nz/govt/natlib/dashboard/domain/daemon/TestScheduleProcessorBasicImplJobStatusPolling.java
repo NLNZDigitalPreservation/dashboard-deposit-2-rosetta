@@ -1,10 +1,8 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
-import com.exlibris.dps.SipStatusInfo;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
-import nz.govt.natlib.ndha.common.exlibris.ResultOfDeposit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,8 +30,11 @@ public class TestScheduleProcessorBasicImplJobStatusPolling extends ScheduleProc
         //Deposit job
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         EntityDepositJob job = jobs.get(0);
-        when(rosettaWebService.deposit(any(), any(), any(), any(), any(), any())).thenReturn(new ResultOfDeposit(true, "OK", sipId));
-        scheduleProcessor.handleDeposit(flowSetting, injectionPathScanClient, job);
+
+        String depositResponse = this.readResourceFile("data/deposit-inprogress.json");
+        when(restApi.fetch(any(), any(), any(), any())).thenReturn(depositResponse);
+
+        scheduleProcessor.handleDeposit(depositAccount, flowSetting, injectionPathScanClient, job);
     }
 
     @Test
@@ -43,13 +44,10 @@ public class TestScheduleProcessorBasicImplJobStatusPolling extends ScheduleProc
         job.setState(EnumDepositJobState.RUNNING);
         repoDepositJob.save(job);
 
-        SipStatusInfo sipStatusInfo = new SipStatusInfo();
-        sipStatusInfo.setModule("HUB");
-        sipStatusInfo.setStage("RUNNING");
-        sipStatusInfo.setStatus("SUCCEED");
-        when(rosettaWebService.getSIPStatusInfo(sipId)).thenReturn(sipStatusInfo);
+        String depositResponse = this.readResourceFile("data/sipstatusinfo-ongoing.json");
+        when(restApi.fetch(any(), any(), any(), any())).thenReturn(depositResponse);
 
-        testInstance.handlePollingStatus(job);
+        testInstance.handlePollingStatus(depositAccount, job);
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
@@ -70,13 +68,10 @@ public class TestScheduleProcessorBasicImplJobStatusPolling extends ScheduleProc
         job.setState(EnumDepositJobState.RUNNING);
         repoDepositJob.save(job);
 
-        SipStatusInfo sipStatusInfo = new SipStatusInfo();
-        sipStatusInfo.setModule("HUB");
-        sipStatusInfo.setStage("Finished");
-        sipStatusInfo.setStatus("SUCCEED");
-        when(rosettaWebService.getSIPStatusInfo(sipId)).thenReturn(sipStatusInfo);
+        String depositResponse = this.readResourceFile("data/sipstatusinfo-succeed.json");
+        when(restApi.fetch(any(), any(), any(), any())).thenReturn(depositResponse);
 
-        testInstance.handlePollingStatus(job);
+        testInstance.handlePollingStatus(depositAccount, job);
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;
@@ -97,13 +92,10 @@ public class TestScheduleProcessorBasicImplJobStatusPolling extends ScheduleProc
         job.setState(EnumDepositJobState.RUNNING);
         repoDepositJob.save(job);
 
-        SipStatusInfo sipStatusInfo = new SipStatusInfo();
-        sipStatusInfo.setModule("HUB");
-        sipStatusInfo.setStage("Finished");
-        sipStatusInfo.setStatus("ERROR");
-        when(rosettaWebService.getSIPStatusInfo(sipId)).thenReturn(sipStatusInfo);
+        String depositResponse = this.readResourceFile("data/sipstatusinfo-failed.json");
+        when(restApi.fetch(any(), any(), any(), any())).thenReturn(depositResponse);
 
-        testInstance.handlePollingStatus(job);
+        testInstance.handlePollingStatus(depositAccount, job);
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         assert jobs != null;

@@ -5,6 +5,7 @@ import nz.govt.natlib.dashboard.common.injection.InjectionPathScan;
 import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
+import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
@@ -46,19 +47,24 @@ public abstract class ScheduleProcessorBasic {
     //Cache the processed sub folders
     protected Map<String, Boolean> processingJobs = Collections.synchronizedMap(new HashMap<>());
 
-    public void scan() {
-        log.debug("On timer heartbeat: scan.");
+    public void scan() throws Exception {
+        log.debug("On timer heartbeat.");
+
         EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
         if (globalSetting != null && globalSetting.isPaused()) {
-            LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            LocalDateTime ldtNowDatetime = LocalDateTime.now();
-            if (ldtNowDatetime.isAfter(ldtPausedStartTime) && ldtNowDatetime.isBefore(ldtPausedEndTime)) {
-                log.debug("Skip the paused timeslot.");
-                return;
+            try {
+                LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                LocalDateTime ldtNowDatetime = LocalDateTime.now();
+                if (ldtNowDatetime.isAfter(ldtPausedStartTime) && ldtNowDatetime.isBefore(ldtPausedEndTime)) {
+                    log.debug("Skip the paused timeslot.");
+                    return;
+                }
+            } catch (Exception e) {
+                log.error("Failed to parse the datetime fields", e);
             }
         }
-
+        
         //To initial jobs
         handleIngest();
     }
@@ -89,6 +95,13 @@ public abstract class ScheduleProcessorBasic {
                     log.warn("Disabled Material Flow: {} {}", flowSetting.getId(), flowSetting.getMaterialFlowId());
                     continue;
                 }
+
+                EntityDepositAccountSetting depositAccount = repoDepositAccount.getById(flowSetting.getDepositAccountId());
+                if (depositAccount == null) {
+                    log.error("The related deposit account does not exist: {}", flowSetting.getDepositAccountId());
+                    continue;
+                }
+
                 InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
 
                 long countRunning = jobs.stream().filter(job -> job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.RUNNING).count();
@@ -104,14 +117,19 @@ public abstract class ScheduleProcessorBasic {
                         continue;
                     }
 
+                    if (!injectionPathScanClient.exists(job.getInjectionPath())) {
+                        log.error("The original directory does not exist: {}", job.getInjectionPath());
+                        continue;
+                    }
+
                     //Only launch the deposit task when Rosetta is idle
                     if (countRunning < maxConcurrencyJobs) {
-                        if (handleDeposit(flowSetting, injectionPathScanClient, job)) {
+                        if (handleDeposit(depositAccount, flowSetting, injectionPathScanClient, job)) {
                             countRunning++; //To be sure Rosetta not over load.
                         }
                     }
 
-                    handlePollingStatus(job);
+                    handlePollingStatus(depositAccount, job);
 
                     handleFinalize(flowSetting, injectionPathScanClient, job);
 
@@ -133,9 +151,9 @@ public abstract class ScheduleProcessorBasic {
 
     abstract public void handleIngest();
 
-    abstract public boolean handleDeposit(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job);
+    abstract public boolean handleDeposit(EntityDepositAccountSetting depositAccount, EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job);
 
-    abstract public void handlePollingStatus(EntityDepositJob job);
+    abstract public void handlePollingStatus(EntityDepositAccountSetting depositAccount, EntityDepositJob job);
 
     abstract public void handleFinalize(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) throws IOException;
 

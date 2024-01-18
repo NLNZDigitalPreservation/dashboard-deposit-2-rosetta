@@ -1,17 +1,13 @@
 package nz.govt.natlib.dashboard.domain.service;
 
-import com.exlibris.dps.SipStatusInfo;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.injection.*;
-import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
-import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
+import nz.govt.natlib.dashboard.common.metadata.*;
 import nz.govt.natlib.dashboard.domain.entity.*;
 import nz.govt.natlib.dashboard.domain.repo.*;
 import nz.govt.natlib.dashboard.ui.command.DepositJobSearchCommand;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
-import nz.govt.natlib.dashboard.common.metadata.MetsHandler;
-import nz.govt.natlib.dashboard.common.metadata.MetsXmlProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -516,11 +512,14 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             Cell cId = rowExcel.createCell(colNum++, CellType.NUMERIC);
             cId.setCellValue(job.getId());
 
+            Cell cProducer = rowExcel.createCell(colNum++, CellType.STRING);
             Cell cFlow = rowExcel.createCell(colNum++, CellType.STRING);
             EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
             if (flowSetting != null) {
-                cFlow.setCellValue(flowSetting.getMaterialFlowId() + "-" + flowSetting.getMaterialFlowName());
+                cProducer.setCellValue(flowSetting.getProducerName());
+                cFlow.setCellValue(flowSetting.getMaterialFlowName());
             } else {
+                cProducer.setCellValue("Unknown Producer");
                 cFlow.setCellValue("Unknown Material Flow");
             }
 
@@ -530,8 +529,11 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             Cell cSubFolder = rowExcel.createCell(colNum++, CellType.STRING);
             cSubFolder.setCellValue(job.getInjectionPath());
 
-            Cell cStatus = rowExcel.createCell(colNum++, CellType.STRING);
-            cStatus.setCellValue(job.getStage() + "-" + job.getState());
+            Cell cStage = rowExcel.createCell(colNum++, CellType.STRING);
+            cStage.setCellValue(job.getStage().name());
+
+            Cell cState = rowExcel.createCell(colNum++, CellType.STRING);
+            cState.setCellValue(job.getState().name());
 
             Cell cInitialTime = rowExcel.createCell(colNum++, CellType.STRING);
             cInitialTime.setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getInitialTime()));

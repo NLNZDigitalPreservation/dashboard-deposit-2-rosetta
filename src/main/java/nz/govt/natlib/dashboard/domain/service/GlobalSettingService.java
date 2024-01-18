@@ -27,14 +27,29 @@ public class GlobalSettingService {
         RestResponseCommand rstVal = new RestResponseCommand();
         EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
         LocalDateTime ldtNowDatetime = LocalDateTime.now();
-        String strNowDatetime = ldtNowDatetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 19);
         if (globalSetting == null) {
             globalSetting = new EntityGlobalSetting();
             globalSetting.setId(UNIQUE_GLOBAL_SETTING_ID);
-            globalSetting.setPausedStartTime(strNowDatetime);
-            globalSetting.setPausedEndTime(strNowDatetime);
+            globalSetting.setPausedStartTime(ldtNowDatetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
+            LocalDateTime ldtPausedEndTime = ldtNowDatetime.plusDays(1);
+            globalSetting.setPausedEndTime(ldtPausedEndTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
         } else {
-            LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            try {
+                LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            } catch (Exception e) {
+                log.warn("Failed to parse pausedStartTime: {}", globalSetting.getPausedStartTime(), e);
+                globalSetting.setPausedStartTime(ldtNowDatetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
+            }
+
+            LocalDateTime ldtPausedEndTime;
+            try {
+                ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            } catch (Exception e) {
+                log.warn("Failed to parse pausedEndTime: {}", globalSetting.getPausedEndTime(), e);
+                ldtPausedEndTime = ldtNowDatetime.plusDays(1);
+                globalSetting.setPausedEndTime(ldtPausedEndTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
+            }
+
             if (ldtPausedEndTime.isBefore(ldtNowDatetime)) {
                 globalSetting.setPaused(false);
                 //globalSetting.setPausedStartTime(strNowDatetime);

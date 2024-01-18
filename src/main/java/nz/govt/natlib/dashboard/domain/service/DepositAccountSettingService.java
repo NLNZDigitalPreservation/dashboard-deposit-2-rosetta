@@ -2,6 +2,7 @@ package nz.govt.natlib.dashboard.domain.service;
 
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.core.dto.DtoProducersRsp;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositAccount;
@@ -52,7 +53,11 @@ public class DepositAccountSettingService {
         }
         rosettaWebService.logout(pdsHandle);
 
+        List<DtoProducersRsp.Producer> producers = rosettaWebService.getProducers(producer);
+        producer.setProducers(producers);
+
         repoDepositAccount.save(producer);
+        producers.clear();
         return rstVal;
     }
 
@@ -92,5 +97,29 @@ public class DepositAccountSettingService {
 
         rstVal.setRspBody(producer);
         return rstVal;
+    }
+
+    public RestResponseCommand refreshDepositAccountSetting(Long id) {
+        RestResponseCommand retVal = new RestResponseCommand();
+
+        EntityDepositAccountSetting depositAccountSetting = repoDepositAccount.getById(id);
+        if (depositAccountSetting == null) {
+            retVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+            retVal.setRspMsg("Unknown deposit account, id=" + id);
+            return retVal;
+        }
+
+        try {
+            List<DtoProducersRsp.Producer> producers = rosettaWebService.getProducers(depositAccountSetting);
+            depositAccountSetting.setProducers(producers);
+            repoDepositAccount.save(depositAccountSetting);
+            retVal.setRspBody(depositAccountSetting);
+        } catch (Exception e) {
+            retVal.setRspCode(RestResponseCommand.RSP_SYSTEM_ERROR);
+            retVal.setRspMsg(e.getMessage());
+            return retVal;
+        }
+
+        return retVal;
     }
 }

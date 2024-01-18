@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 
 import java.io.IOException;
 
+
 public class ScheduleProcessorTester extends BasicTester {
     protected static final boolean flowEnable = true;
 
@@ -18,9 +19,11 @@ public class ScheduleProcessorTester extends BasicTester {
     protected static final EntityFlowSetting flowSetting = new EntityFlowSetting();
     protected static InjectionPathScan injectionPathScanClient;
 
+
     @BeforeAll
     public static void init() throws IOException {
         BasicTester.init();
+
 
         //Initial flowSetting
 
