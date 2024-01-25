@@ -181,46 +181,48 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
 
         //Backup actual contents, delete actual contents and archive finished jobs
         if (job.getStage() != EnumDepositJobStage.FINISHED) {
-            // Backup the actual contents
-            if (!job.isBackupCompleted()) {
-                if (this.backupActualContents(flowSetting, job)) {
-                    depositJobService.jobCompletedBackup(job);
-                    log.info("Backed up the actual content of job: {}", job.getId());
-                } else {
-                    log.error("Failed to backup job: {}", job.getId());
-                    return;
-                }
-            }
-
-            // Delete the actual contents
-            String strDeletionOption = flowSetting.getActualContentDeleteOptions();
-            EnumActualContentDeletionOptions deletionOptions;
-            if (StringUtils.isEmpty(strDeletionOption)) {
-                deletionOptions = EnumActualContentDeletionOptions.notDelete;
+            return;
+        }
+        // Backup the actual contents
+        if (!job.isBackupCompleted()) {
+            if (this.backupActualContents(flowSetting, job)) {
+                depositJobService.jobCompletedBackup(job);
+                log.info("Backed up the actual content of job: {}", job.getId());
             } else {
-                deletionOptions = EnumActualContentDeletionOptions.valueOf(strDeletionOption);
-            }
-
-            if (deletionOptions != EnumActualContentDeletionOptions.notDelete && !job.isActualContentDeleted()) {
-                if (this.deleteActualContents(flowSetting, injectionPathScanClient, job)) {
-                    depositJobService.jobDeletedActualContent(job);
-                    log.info("Deleted the actual content of job: {}", job.getId());
-                } else {
-                    log.error("Failed to delete actual contents: {}", job.getId());
-                    return;
-                }
-            }
-
-            //Remove canceled and expired job
-            LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
-            LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
-            if (jobLatestUpdateTime.isBefore(deadlineTime)) {
-                repoDepositJob.moveToHistory(job.getId());
-                log.info("Pruned the history job: {}", job.getId());
-            } else {
-                log.debug("Ignore pruning the history job: {} {}", job.getId(), jobLatestUpdateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                log.error("Failed to backup job: {}", job.getId());
+                return;
             }
         }
+
+        // Delete the actual contents
+        String strDeletionOption = flowSetting.getActualContentDeleteOptions();
+        EnumActualContentDeletionOptions deletionOptions;
+        if (StringUtils.isEmpty(strDeletionOption)) {
+            deletionOptions = EnumActualContentDeletionOptions.notDelete;
+        } else {
+            deletionOptions = EnumActualContentDeletionOptions.valueOf(strDeletionOption);
+        }
+
+        if (deletionOptions != EnumActualContentDeletionOptions.notDelete && !job.isActualContentDeleted()) {
+            if (this.deleteActualContents(flowSetting, injectionPathScanClient, job)) {
+                depositJobService.jobDeletedActualContent(job);
+                log.info("Deleted the actual content of job: {}", job.getId());
+            } else {
+                log.error("Failed to delete actual contents: {}", job.getId());
+                return;
+            }
+        }
+
+        //Remove canceled and expired job
+        LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
+        LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
+        if (jobLatestUpdateTime.isBefore(deadlineTime)) {
+            repoDepositJob.moveToHistory(job.getId());
+            log.info("Pruned the history job: {}", job.getId());
+        } else {
+            log.debug("Ignore pruning the history job: {} {}", job.getId(), jobLatestUpdateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        }
+
     }
 
     @Override

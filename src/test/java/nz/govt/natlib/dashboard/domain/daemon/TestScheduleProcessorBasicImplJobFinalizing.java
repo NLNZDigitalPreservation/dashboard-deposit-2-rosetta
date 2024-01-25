@@ -60,6 +60,33 @@ public class TestScheduleProcessorBasicImplJobFinalizing extends ScheduleProcess
     }
 
     @Test
+    public void testFinalizeCancelledSuccess() throws Exception {
+        EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        assert job != null;
+
+        job.setStage(EnumDepositJobStage.DEPOSIT);
+        job.setState(EnumDepositJobState.CANCELED);
+        LocalDateTime ldt = LocalDateTime.now();
+        ldt = ldt.minusDays(1000);
+        job.setLatestTime(DashboardHelper.getLocalMilliSeconds(ldt));
+        repoDepositJob.save(job);
+
+        //Finalizing
+        testInstance.handleFinalize(flowSetting, injectionPathScanClient, job);
+
+        assert job.getStage() == EnumDepositJobStage.FINISHED;
+        assert job.getState() == EnumDepositJobState.CANCELED;
+
+
+        ldt = ldt.minusDays(1000);
+        job.setLatestTime(DashboardHelper.getLocalMilliSeconds(ldt));
+        //Finalizing
+        testInstance.handleFinalize(flowSetting, injectionPathScanClient, job);
+        EntityDepositJob jobAfterFinalized = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        assert jobAfterFinalized == null;
+    }
+
+    @Test
     public void testFinalizeCancelledExpired() throws Exception {
         EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;
