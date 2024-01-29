@@ -175,7 +175,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
 
                 job = depositJobService.jobUpdateStatus(job, EnumDepositJobStage.FINISHED, job.getState());
 
-                log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
+                log.info("Finalized job: {} {}", job.getId(), job.getInjectionTitle());
             }
         }
 

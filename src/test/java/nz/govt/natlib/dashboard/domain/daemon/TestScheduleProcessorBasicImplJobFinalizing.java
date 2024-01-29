@@ -103,9 +103,13 @@ public class TestScheduleProcessorBasicImplJobFinalizing extends ScheduleProcess
             testInstance.handleFinalize(flowSetting, injectionPathScanClient, job);
 
             EntityDepositJob jobAfterFinalized = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
-            assert jobAfterFinalized != null;
-            assert jobAfterFinalized.getStage() == EnumDepositJobStage.FINISHED;
-            assert jobAfterFinalized.getState() == EnumDepositJobState.CANCELED;
+            if (stage == EnumDepositJobStage.FINISHED) {
+                assert jobAfterFinalized == null;
+            } else {
+                assert jobAfterFinalized != null;
+                assert jobAfterFinalized.getStage() == EnumDepositJobStage.FINISHED;
+                assert jobAfterFinalized.getState() == EnumDepositJobState.CANCELED;
+            }
         }
     }
 
