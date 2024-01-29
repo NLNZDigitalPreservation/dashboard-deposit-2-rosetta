@@ -68,26 +68,21 @@
           </div>
           <!-- /.card-header -->
           <div class="modal-body">
+              <div class="alert alert-warning" role="alert">
+                  <i class="bi bi-exclamation-triangle-fill"></i>&nbsp; Please note that the following steps will be executed alongside the redepositing operation:
+                  <br/>
+                  1. The done file inside the sub folder will be deleted.
+                  <br/>
+                  2. The running job relevant to this sub folder will be removed.
+              </div>
+
               <div class="input-group mb-3">
                   <span class="input-group-text">Sub Folder</span>
                   <input id="subFolderRedepositJob" type="text" class="form-control" placeholder="The full directory of the sub folder" aria-label="Sub Folder">
                   <button class="btn btn-primary" type="button" onclick="redepositJob();">Redeposit</button>
               </div>
-<!--              <div class="input-group mb-3">-->
-<!--                  <span class="input-group-text">Status</span>-->
-<!--                  <textarea id="fiJobInspectStatus" class="form-control" aria-label="Job Status" rows="6"></textarea>-->
-<!--              </div>-->
-<!--              <div class="form-check">-->
-<!--                <input class="form-check-input" type="checkbox" value="" id="forcedReplaceExistingJob">-->
-<!--                <label class="form-check-label" for="forcedReplaceExistingJob">-->
-<!--                  Force to delete the existing job.-->
-<!--                </label>-->
-<!--              </div>-->
+
           </div> <!-- End of card body -->
-<!--          <div class="modal-footer">-->
-<!--              <button type="button" class="btn btn-primary" onclick="fixJobDeposit();" name="save"><i class="fas fa-save"></i>Fix</button>-->
-<!--              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
-<!--          </div>-->
       </div>
     </div>
     <!-- modal-dialog -->
