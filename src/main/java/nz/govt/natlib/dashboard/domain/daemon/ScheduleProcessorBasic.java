@@ -170,4 +170,8 @@ public abstract class ScheduleProcessorBasic {
     public void setRepoGlobalSetting(RepoGlobalSetting repoGlobalSetting) {
         this.repoGlobalSetting = repoGlobalSetting;
     }
+
+    public void removeProcessingJob(String name){
+        this.processingJobs.remove(name);
+    }
 }
