@@ -172,7 +172,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             log.info("Finalized job: {} {}", job.getId(), job.getInjectionTitle());
         }
 
-        log.info("{} {} {}", job.getId(), job.getStage(), job.getState());
+        // log.info("{} {} {}", job.getId(), job.getStage(), job.getState());
 
         //Skip unfinished jobs
         if (job.getStage() != EnumDepositJobStage.FINISHED) {
@@ -346,7 +346,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             }
         }
 
-        log.info("{}, deletion options: {}, isDeleteActualContent: {}", job.getId(), deletionOptions.name(), isDeleteActualContent);
+        // log.info("{}, deletion options: {}, isDeleteActualContent: {}", job.getId(), deletionOptions.name(), isDeleteActualContent);
         if (isDeleteActualContent) {
             File ingestPath = new File(job.getInjectionPath());
             boolean ret = InjectionUtils.deleteFiles(injectionPathScanClient, ingestPath);
