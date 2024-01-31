@@ -258,14 +258,14 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
 
     public void jobCompletedBackup(EntityDepositJob job) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
-        job.setLatestTime(nowDatetime);
+//        job.setLatestTime(nowDatetime);
         job.setBackupCompleted(true);
         repoJob.save(job);
     }
 
     public void jobDeletedActualContent(EntityDepositJob job) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
-        job.setLatestTime(nowDatetime);
+//        job.setLatestTime(nowDatetime);
         job.setActualContentDeleted(true);
         repoJob.save(job);
     }

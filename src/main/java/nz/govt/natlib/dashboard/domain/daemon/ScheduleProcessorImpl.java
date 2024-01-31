@@ -156,7 +156,6 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.INITIALED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.RUNNING)) {
-//            job = depositJobService.jobFinalizeStart(job);
 
             File depositDoneFile = new File(job.getInjectionPath(), "done");
             if (!injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
@@ -169,52 +168,31 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             job = depositJobService.jobFinalizeEnd(job, EnumDepositJobState.SUCCEED);
             log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
         } else if (job.getState() == EnumDepositJobState.CANCELED && job.getStage() != EnumDepositJobStage.FINISHED) {
-            LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxActiveDays());
-            LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
-            if (jobLatestUpdateTime.isBefore(deadlineTime)) {
-
-                job = depositJobService.jobUpdateStatus(job, EnumDepositJobStage.FINISHED, job.getState());
-
-                log.info("Finalized job: {} {}", job.getId(), job.getInjectionTitle());
-            }
+            job = depositJobService.jobUpdateStatus(job, EnumDepositJobStage.FINISHED, job.getState());
+            log.info("Finalized job: {} {}", job.getId(), job.getInjectionTitle());
         }
 
-        //Backup actual contents, delete actual contents and archive finished jobs
+        log.info("{} {} {}", job.getId(), job.getStage(), job.getState());
+
+        //Skip unfinished jobs
         if (job.getStage() != EnumDepositJobStage.FINISHED) {
             return;
         }
+
         // Backup the actual contents
+        this.tryToBackupActualContents(flowSetting, job);
         if (!job.isBackupCompleted()) {
-            if (this.backupActualContents(flowSetting, job)) {
-                depositJobService.jobCompletedBackup(job);
-                log.info("Backed up the actual content of job: {}", job.getId());
-            } else {
-                log.error("Failed to backup job: {}", job.getId());
-                return;
-            }
+            return;
         }
 
         // Delete the actual contents
-        String strDeletionOption = flowSetting.getActualContentDeleteOptions();
-        EnumActualContentDeletionOptions deletionOptions;
-        if (StringUtils.isEmpty(strDeletionOption)) {
-            deletionOptions = EnumActualContentDeletionOptions.notDelete;
-        } else {
-            deletionOptions = EnumActualContentDeletionOptions.valueOf(strDeletionOption);
-        }
-
-        if (deletionOptions != EnumActualContentDeletionOptions.notDelete && !job.isActualContentDeleted()) {
-            if (this.deleteActualContents(flowSetting, injectionPathScanClient, job)) {
-                depositJobService.jobDeletedActualContent(job);
-                log.info("Deleted the actual content of job: {}", job.getId());
-            } else {
-                log.error("Failed to delete actual contents: {}", job.getId());
-                return;
-            }
+        this.tryToDeleteActualContents(flowSetting, injectionPathScanClient, job);
+        if (!job.isActualContentDeleted()) {
+            return;
         }
 
         //Remove canceled and expired job
-        LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxSaveDays());
+        LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxActiveDays());
         LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
         if (jobLatestUpdateTime.isBefore(deadlineTime)) {
             repoDepositJob.moveToHistory(job.getId());
@@ -222,7 +200,6 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         } else {
             log.debug("Ignore pruning the history job: {} {}", job.getId(), jobLatestUpdateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         }
-
     }
 
     @Override
@@ -251,21 +228,23 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         return existingSubFolders > 0;
     }
 
-    private boolean backupActualContents(EntityFlowSetting flowSetting, EntityDepositJob job) {
-        if (StringUtils.isEmpty(flowSetting.getActualContentBackupOptions()) ||
-                StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "notBackup")) {
-            return true;
-        }
-
+    private void tryToBackupActualContents(EntityFlowSetting flowSetting, EntityDepositJob job) {
         if (job.isBackupCompleted()) {
             log.debug("Skip completed backup: {}", job.getInjectionTitle());
-            return true;
+            return;
+        }
+
+        if (StringUtils.isEmpty(flowSetting.getActualContentBackupOptions()) ||
+                StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "notBackup")) {
+            this.depositJobService.jobCompletedBackup(job);
+            return;
         }
 
         String subFolders = flowSetting.getBackupSubFolders();
         if (StringUtils.isEmpty(subFolders) || (!isSubFoldersExisting(subFolders, job))) {
             log.info("Sub folders are empty. flow setting: {}", flowSetting.getMaterialFlowName());
-            return true;
+            this.depositJobService.jobCompletedBackup(job);
+            return;
         }
 
         File targetDirectory = new File(flowSetting.getBackupPath(), job.getInjectionTitle());
@@ -276,14 +255,14 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             }
         } catch (IOException e) {
             log.error("Failed to clear the existing directory: {}", targetDirectory.getAbsolutePath(), e);
-            return false;
+            return;
         }
 
         if (!targetDirectory.exists()) {
             boolean ret = targetDirectory.mkdirs();
             if (!ret) {
                 log.error("Failed to create backup directory: {}", targetDirectory.getAbsolutePath());
-                return false;
+                return;
             } else {
                 log.debug("Created the backup directory: {}", targetDirectory.getAbsolutePath());
             }
@@ -292,7 +271,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         File[] existingFiles = targetDirectory.listFiles();
         if (existingFiles != null && existingFiles.length > 0) {
             log.error("The backup target folder is not empty: {}", targetDirectory);
-            return false;
+            return;
         }
 
         // Backup the sidecar file
@@ -305,7 +284,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                     boolean ret = destSubFolder.mkdirs();
                     if (!ret) {
                         log.error("Failed to create sub folder: {}", destSubFolder.getAbsolutePath());
-                        return false;
+                        return;
                     } else {
                         log.debug("Created the sub folder: {}", destSubFolder.getAbsolutePath());
                     }
@@ -314,7 +293,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                         log.debug("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), destSubFolder.getAbsolutePath());
                     } catch (IOException e) {
                         log.error("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), destSubFolder.getAbsolutePath());
-                        return false;
+                        return;
                     }
                 }
             }
@@ -327,18 +306,18 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                         log.debug("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), targetDirectory.getAbsolutePath());
                     } catch (IOException e) {
                         log.error("Failed to copy file: {} -> {}", srcSubFolder.getAbsolutePath(), targetDirectory.getAbsolutePath());
-                        return false;
+                        return;
                     }
                 }
             }
         }
 
-        return true;
+        this.depositJobService.jobCompletedBackup(job);
     }
 
-    private boolean deleteActualContents(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
+    private void tryToDeleteActualContents(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
         if (job.isActualContentDeleted()) {
-            return true;
+            return;
         }
 
         String strDeletionOption = flowSetting.getActualContentDeleteOptions();
@@ -347,6 +326,13 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             deletionOptions = EnumActualContentDeletionOptions.notDelete;
         } else {
             deletionOptions = EnumActualContentDeletionOptions.valueOf(strDeletionOption);
+        }
+
+        //Ignoring
+        if (deletionOptions == EnumActualContentDeletionOptions.notDelete) {
+            log.info("Do not need to delete, {}, {}", job.getId(), deletionOptions);
+            this.depositJobService.jobDeletedActualContent(job);
+            return;
         }
 
         boolean isDeleteActualContent = false;
@@ -360,12 +346,14 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             }
         }
 
-        log.info("Deletion options: {}, isDeleteActualContent: {}", deletionOptions.name(), isDeleteActualContent);
+        log.info("{}, deletion options: {}, isDeleteActualContent: {}", job.getId(), deletionOptions.name(), isDeleteActualContent);
         if (isDeleteActualContent) {
             File ingestPath = new File(job.getInjectionPath());
-
-            return InjectionUtils.deleteFiles(injectionPathScanClient, ingestPath);
+            boolean ret = InjectionUtils.deleteFiles(injectionPathScanClient, ingestPath);
+            if (ret) {
+                this.depositJobService.jobDeletedActualContent(job);
+            }
+            log.info("{}, deleted: {}", job.getId(), ret);
         }
-        return true;
     }
 }

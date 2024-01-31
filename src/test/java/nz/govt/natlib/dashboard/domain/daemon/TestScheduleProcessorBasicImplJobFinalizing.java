@@ -51,9 +51,6 @@ public class TestScheduleProcessorBasicImplJobFinalizing extends ScheduleProcess
                         || (stage == EnumDepositJobStage.FINALIZE && state == EnumDepositJobState.RUNNING)) {
                     assert jobAfterFinalized.getStage() == EnumDepositJobStage.FINISHED;
                     assert jobAfterFinalized.getState() == EnumDepositJobState.SUCCEED;
-                } else {
-                    assert jobAfterFinalized.getStage() == stage;
-                    assert jobAfterFinalized.getState() == state;
                 }
             }
         }
@@ -129,7 +126,7 @@ public class TestScheduleProcessorBasicImplJobFinalizing extends ScheduleProcess
 
             EntityDepositJob jobAfterFinalized = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
             assert jobAfterFinalized != null;
-            assert jobAfterFinalized.getStage() == stage;
+            assert jobAfterFinalized.getStage() == EnumDepositJobStage.FINISHED;
             assert jobAfterFinalized.getState() == EnumDepositJobState.CANCELED;
         }
     }

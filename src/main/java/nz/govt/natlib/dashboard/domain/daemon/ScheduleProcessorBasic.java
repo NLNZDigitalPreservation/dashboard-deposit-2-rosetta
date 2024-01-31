@@ -46,17 +46,21 @@ public abstract class ScheduleProcessorBasic {
     //Cache the processed sub folders
     protected Map<String, Boolean> processingJobs = Collections.synchronizedMap(new HashMap<>());
 
-    public void scan() {
-        log.debug("On timer heartbeat: scan.");
+    private boolean isGlobalPaused(){
         EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
         if (globalSetting != null && globalSetting.isPaused()) {
             LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             LocalDateTime ldtNowDatetime = LocalDateTime.now();
-            if (ldtNowDatetime.isAfter(ldtPausedStartTime) && ldtNowDatetime.isBefore(ldtPausedEndTime)) {
-                log.debug("Skip the paused timeslot.");
-                return;
-            }
+            return ldtNowDatetime.isAfter(ldtPausedStartTime) && ldtNowDatetime.isBefore(ldtPausedEndTime);
+        }
+        return false;
+    }
+    public void scan() {
+        log.debug("On timer heartbeat: scan.");
+        if (this.isGlobalPaused()) {
+            log.info("Skip the paused timeslot.");
+            return;
         }
 
         //To initial jobs
@@ -65,15 +69,9 @@ public abstract class ScheduleProcessorBasic {
 
     public void pipeline() throws Exception {
         log.debug("On timer heartbeat: pipeline.");
-        EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
-        if (globalSetting != null && globalSetting.isPaused()) {
-            LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            LocalDateTime ldtNowDatetime = LocalDateTime.now();
-            if (ldtNowDatetime.isAfter(ldtPausedStartTime) && ldtNowDatetime.isBefore(ldtPausedEndTime)) {
-                log.debug("Skip the paused timeslot.");
-                return;
-            }
+        if (this.isGlobalPaused()) {
+            log.info("Skip the paused timeslot.");
+            return;
         }
 
         List<EntityDepositJob> allJobs = repoDepositJob.getAll();
