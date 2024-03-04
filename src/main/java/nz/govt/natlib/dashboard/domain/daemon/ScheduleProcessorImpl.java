@@ -30,6 +30,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                 log.warn("Disabled Material Flow: {} {}", flowSetting.getId(), flowSetting.getMaterialFlowId());
                 continue;
             }
+
             //Initial the scanClient in each loop just in case the RootPath is changed
             InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
 
@@ -151,7 +152,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     }
 
     @Override
-    public void handleFinalize(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) throws IOException {
+    public void handleFinalize(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
         //Finalize success jobs
         if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.INITIALED) ||
@@ -160,7 +161,12 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             File depositDoneFile = new File(job.getInjectionPath(), "done");
             if (!injectionPathScanClient.exists(depositDoneFile.getAbsolutePath())) {
                 log.warn("The succeed finished job: {} has no [done] file: {}", job.getId(), depositDoneFile.getAbsolutePath());
-                if (!depositDoneFile.createNewFile()) {
+                try {
+                    if (!depositDoneFile.createNewFile()) {
+                        log.error("Failed to create file: {}, {}", job.getId(), depositDoneFile.getAbsolutePath());
+                        return;
+                    }
+                } catch (Exception e) {
                     log.error("Failed to create file: {}, {}", job.getId(), depositDoneFile.getAbsolutePath());
                     return;
                 }
@@ -275,9 +281,10 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         }
 
         // Backup the sidecar file
-        String[] subFolderAry = (String[]) subFolders.lines().toArray();
+        Object[] subFolderAry = subFolders.lines().toArray();
         if (StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "backupSubFolder")) {
-            for (String subFolder : subFolderAry) {
+            for (Object obj : subFolderAry) {
+                String subFolder = (String) obj;
                 File srcSubFolder = new File(job.getInjectionPath(), subFolder);
                 if (srcSubFolder.exists()) {
                     File destSubFolder = new File(targetDirectory, subFolder);
@@ -298,7 +305,8 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                 }
             }
         } else if (StringUtils.equalsIgnoreCase(flowSetting.getActualContentBackupOptions(), "backupContentsWithoutSubFolderName")) {
-            for (String subFolder : subFolderAry) {
+            for (Object obj : subFolderAry) {
+                String subFolder = (String) obj;
                 File srcSubFolder = new File(job.getInjectionPath(), subFolder);
                 if (srcSubFolder.exists()) {
                     try {

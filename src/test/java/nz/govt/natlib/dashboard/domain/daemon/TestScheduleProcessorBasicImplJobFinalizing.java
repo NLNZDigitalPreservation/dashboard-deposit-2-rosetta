@@ -131,6 +131,16 @@ public class TestScheduleProcessorBasicImplJobFinalizing extends ScheduleProcess
         }
     }
 
+    @Test
+    public void testStringToLines() {
+        String subFolders = "Sidecar files";
+        subFolders.lines().forEach(System.out::println);
+        Object[] subFolderAry=subFolders.lines().toArray();
+//        String[] subFolderAry = (String[]) subFolders.lines().toArray();
+        assert subFolderAry.length > 0;
+    }
+
+
     @AfterEach
     public void clear() {
         clearSubFolders();
