@@ -38,7 +38,7 @@ import java.util.Map;
 @EnableWebSecurity
 public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Logger log = LoggerFactory.getLogger(MainSecurityConfig.class);
-    private final String SESSION_LOCK = "lock";
+    private static final String SESSION_LOCK = "lock";
 
     @Value("${Rosetta.PDSUrl}")
     private String pdsUrl;
