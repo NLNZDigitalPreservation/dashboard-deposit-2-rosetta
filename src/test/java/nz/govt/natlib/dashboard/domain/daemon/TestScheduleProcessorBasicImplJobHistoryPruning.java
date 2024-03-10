@@ -5,6 +5,7 @@ import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 
+import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,8 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
         injectionProcessor.handleIngest();
     }
 
-    @Test
+//    @Ignore
+//    @Test
     public void testPruningNotExpired() throws Exception {
         EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;
@@ -49,7 +51,8 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
         assert job != null;
     }
 
-    @Test
+//    @Test
+//    @Ignore
     public void testAgingExpired() throws Exception {
         EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;

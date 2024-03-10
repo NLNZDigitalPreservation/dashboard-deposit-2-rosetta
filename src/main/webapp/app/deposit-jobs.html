@@ -50,52 +50,39 @@
               </div>
           </div> <!-- End of card body -->
           <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button type="button" class="btn btn-primary" onclick="searchDepoitJob();" name="search"><i class="fas fa-search"></i> Search</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
       </div>
     </div>
     <!-- modal-dialog -->
 </div>     <!-- modal -->
 
-<div class="modal fade" id="new-manual-deposit-job" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="redeposit-job" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-              <h3 class="modal-title">New Deposit</h3>
+              <h3 class="modal-title">Redeposit Job</h3>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               <!-- /.card-tools -->
           </div>
           <!-- /.card-header -->
           <div class="modal-body">
-              <div class="row">
-                  <div class="col-md-2"><label>Material Flow</label></div>
-                  <div class="col-md-10">
-                    <select class="form-select" placeholder="Material Flow" style="width: 100%;" id="new-job-select-material-flow">
-                      <#list flowSettings as flow>
-                        <option value="${flow.getId()}">${flow.getMaterialFlowName()}</option>
-                      </#list>
-                    </select>
-                  </div>
-              </div>
-              <br/>
-              <div class="row">
-                  <div class="col-md-2"><label>NFS Directory</label></div>
-                  <div class="col-md-10"><input type="text" class="form-control" placeholder="NFS Directory" id="input-nfs-directory"></div>
+              <div class="alert alert-warning" role="alert">
+                  <i class="bi bi-exclamation-triangle-fill"></i>&nbsp; Please note that the following steps will be executed alongside the redepositing operation:
+                  <br/>
+                  1. The done file inside the sub folder will be deleted.
+                  <br/>
+                  2. The running job relevant to this sub folder will be removed.
               </div>
 
-              <br/>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="forcedReplaceExistingJob">
-                <label class="form-check-label" for="forcedReplaceExistingJob">
-                  Force to replace existing job.
-                </label>
+              <div class="input-group mb-3">
+                  <span class="input-group-text">Sub Folder</span>
+                  <input id="subFolderRedepositJob" type="text" class="form-control" placeholder="The full directory of the sub folder" aria-label="Sub Folder">
+                  <button class="btn btn-primary" type="button" onclick="redepositJob();">Redeposit</button>
               </div>
+
           </div> <!-- End of card body -->
-          <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" onclick="submitNewDepositJob();" name="save"><i class="fas fa-save"></i> Submit</button>
-          </div>
       </div>
     </div>
     <!-- modal-dialog -->
@@ -193,8 +180,8 @@
           </div> <!-- End of card body -->
 
           <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
       </div>
     </div>

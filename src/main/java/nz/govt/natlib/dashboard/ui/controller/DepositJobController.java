@@ -107,4 +107,11 @@ public class DepositJobController {
     public void exportDepositJobs(@RequestBody List<Long> cmd, HttpServletRequest req, HttpServletResponse rsp) throws IOException {
         depositJobService.exportData(cmd, req, rsp);
     }
+
+    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_REDEPOSIT, method = {RequestMethod.POST, RequestMethod.GET})
+    public RestResponseCommand redepositJob(@RequestParam String subFolder) throws IOException {
+        RestResponseCommand ret = depositJobService.redepositJob(subFolder);
+        ret.setRspBody(ret.getRspCode() + ": " + ret.getRspMsg());
+        return ret;
+    }
 }

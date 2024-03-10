@@ -6,12 +6,14 @@ import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.injection.*;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
+import nz.govt.natlib.dashboard.domain.daemon.ScheduleProcessorBasic;
 import nz.govt.natlib.dashboard.domain.entity.*;
 import nz.govt.natlib.dashboard.domain.repo.*;
 import nz.govt.natlib.dashboard.ui.command.DepositJobSearchCommand;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import nz.govt.natlib.dashboard.common.metadata.MetsHandler;
 import nz.govt.natlib.dashboard.common.metadata.MetsXmlProperties;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -44,6 +46,9 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     private RepoDepositJob repoJob;
     @Autowired
     private RepoFlowSetting repoFlowSetting;
+
+    @Autowired
+    private ScheduleProcessorBasic scheduleProcessor;
 
     public EntityDepositJob jobInitial(String injectionPath, String injectionTitle, EntityFlowSetting flowSetting) {
         EntityDepositJob job = new EntityDepositJob();
@@ -233,14 +238,14 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         repoJob.save(job);
     }
 
-    public EntityDepositJob jobFinalizeStart(EntityDepositJob job) {
-        long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
-        job.setLatestTime(nowDatetime);
-        job.setStage(EnumDepositJobStage.FINALIZE);
-        job.setState(EnumDepositJobState.RUNNING);
-        repoJob.save(job);
-        return job;
-    }
+//    public EntityDepositJob jobFinalizeStart(EntityDepositJob job) {
+//        long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
+//        job.setLatestTime(nowDatetime);
+//        job.setStage(EnumDepositJobStage.FINALIZE);
+//        job.setState(EnumDepositJobState.RUNNING);
+//        repoJob.save(job);
+//        return job;
+//    }
 
     public EntityDepositJob jobFinalizeEnd(EntityDepositJob job, EnumDepositJobState state) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
@@ -253,14 +258,14 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
 
     public void jobCompletedBackup(EntityDepositJob job) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
-        job.setLatestTime(nowDatetime);
+//        job.setLatestTime(nowDatetime);
         job.setBackupCompleted(true);
         repoJob.save(job);
     }
 
     public void jobDeletedActualContent(EntityDepositJob job) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
-        job.setLatestTime(nowDatetime);
+//        job.setLatestTime(nowDatetime);
         job.setActualContentDeleted(true);
         repoJob.save(job);
     }
@@ -569,5 +574,45 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         rsp.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         workbook.write(rsp.getOutputStream());
         workbook.close();
+    }
+
+    public RestResponseCommand redepositJob(String subFolder) {
+        RestResponseCommand ret=new RestResponseCommand();
+        File subFolderDirectory=new File(subFolder);
+        if(!subFolderDirectory.exists()){
+            ret.setRspCode(RestResponseCommand.RSP_USER_OTHER_ERROR);
+            ret.setRspMsg("The input sub folder: "+ subFolder + " does not exist");
+            return ret;
+        }
+
+        if(!subFolderDirectory.isDirectory()){
+            ret.setRspCode(RestResponseCommand.RSP_USER_OTHER_ERROR);
+            ret.setRspMsg("The input sub folder : "+ subFolder + "is not a directory");
+            return ret;
+        }
+
+        File doneFile=new File(subFolderDirectory,"done");
+        if (doneFile.exists()) {
+            boolean retDoneDelete=doneFile.delete();
+            if (!retDoneDelete){
+                log.error("Failed to delete the done file: {}",doneFile);
+                ret.setRspCode(RestResponseCommand.RSP_SYSTEM_ERROR);
+                ret.setRspMsg("Failed to delete the done file: " + doneFile.getAbsolutePath());
+                return ret;
+            }
+            log.info("Deleted the done file: {}",doneFile);
+        }
+
+        List<EntityDepositJob> allJobs = repoJob.getAll();
+        for (EntityDepositJob job:allJobs){
+            if(job.getInjectionPath().equalsIgnoreCase(subFolderDirectory.getAbsolutePath())){
+                repoJob.moveToHistory(job.getId());
+                log.info("Released the job and moved it to history: {}",job.getId());
+                break;
+            }
+        }
+
+        scheduleProcessor.removeProcessingJob(subFolderDirectory.getAbsolutePath());
+        return ret;
     }
 }
