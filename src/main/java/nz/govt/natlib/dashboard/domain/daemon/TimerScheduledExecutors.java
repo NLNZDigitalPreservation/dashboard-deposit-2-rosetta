@@ -54,7 +54,7 @@ public class TimerScheduledExecutors {
                     fixedDelay();
                 } catch (Throwable e) {
                     log.error("Failed to execute scan", e);
-                    log.error("Failed to execute scan: {}", e.getMessage());
+                    e.printStackTrace();
                 }
             }
         };
@@ -71,7 +71,7 @@ public class TimerScheduledExecutors {
                     fixedDelay();
                 } catch (Throwable e) {
                     log.error("Failed to execute pipeline", e);
-                    log.error("Failed to execute pipeline: {}", e.getMessage());
+                    e.printStackTrace();
                 }
             }
         };

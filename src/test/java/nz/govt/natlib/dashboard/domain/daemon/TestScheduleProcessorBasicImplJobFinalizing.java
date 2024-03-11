@@ -51,12 +51,36 @@ public class TestScheduleProcessorBasicImplJobFinalizing extends ScheduleProcess
                         || (stage == EnumDepositJobStage.FINALIZE && state == EnumDepositJobState.RUNNING)) {
                     assert jobAfterFinalized.getStage() == EnumDepositJobStage.FINISHED;
                     assert jobAfterFinalized.getState() == EnumDepositJobState.SUCCEED;
-                } else {
-                    assert jobAfterFinalized.getStage() == stage;
-                    assert jobAfterFinalized.getState() == state;
                 }
             }
         }
+    }
+
+    @Test
+    public void testFinalizeCancelledSuccess() throws Exception {
+        EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        assert job != null;
+
+        job.setStage(EnumDepositJobStage.DEPOSIT);
+        job.setState(EnumDepositJobState.CANCELED);
+        LocalDateTime ldt = LocalDateTime.now();
+        ldt = ldt.minusDays(1000);
+        job.setLatestTime(DashboardHelper.getLocalMilliSeconds(ldt));
+        repoDepositJob.save(job);
+
+        //Finalizing
+        testInstance.handleFinalize(flowSetting, injectionPathScanClient, job);
+
+        assert job.getStage() == EnumDepositJobStage.FINISHED;
+        assert job.getState() == EnumDepositJobState.CANCELED;
+
+
+        ldt = ldt.minusDays(1000);
+        job.setLatestTime(DashboardHelper.getLocalMilliSeconds(ldt));
+        //Finalizing
+        testInstance.handleFinalize(flowSetting, injectionPathScanClient, job);
+        EntityDepositJob jobAfterFinalized = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
+        assert jobAfterFinalized == null;
     }
 
     @Test
@@ -76,9 +100,13 @@ public class TestScheduleProcessorBasicImplJobFinalizing extends ScheduleProcess
             testInstance.handleFinalize(flowSetting, injectionPathScanClient, job);
 
             EntityDepositJob jobAfterFinalized = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
-            assert jobAfterFinalized != null;
-            assert jobAfterFinalized.getStage() == EnumDepositJobStage.FINISHED;
-            assert jobAfterFinalized.getState() == EnumDepositJobState.CANCELED;
+            if (stage == EnumDepositJobStage.FINISHED) {
+                assert jobAfterFinalized == null;
+            } else {
+                assert jobAfterFinalized != null;
+                assert jobAfterFinalized.getStage() == EnumDepositJobStage.FINISHED;
+                assert jobAfterFinalized.getState() == EnumDepositJobState.CANCELED;
+            }
         }
     }
 
@@ -98,10 +126,20 @@ public class TestScheduleProcessorBasicImplJobFinalizing extends ScheduleProcess
 
             EntityDepositJob jobAfterFinalized = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
             assert jobAfterFinalized != null;
-            assert jobAfterFinalized.getStage() == stage;
+            assert jobAfterFinalized.getStage() == EnumDepositJobStage.FINISHED;
             assert jobAfterFinalized.getState() == EnumDepositJobState.CANCELED;
         }
     }
+
+    @Test
+    public void testStringToLines() {
+        String subFolders = "Sidecar files";
+        subFolders.lines().forEach(System.out::println);
+        Object[] subFolderAry=subFolders.lines().toArray();
+//        String[] subFolderAry = (String[]) subFolders.lines().toArray();
+        assert subFolderAry.length > 0;
+    }
+
 
     @AfterEach
     public void clear() {

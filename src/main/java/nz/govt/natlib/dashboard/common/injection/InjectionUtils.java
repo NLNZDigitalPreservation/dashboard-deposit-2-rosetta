@@ -95,4 +95,10 @@ public class InjectionUtils implements InterfaceFlowSetting {
     public static InjectionPathScan createPathScanClient(String rootPath) {
         return new InjectionPathScanNFS(rootPath);
     }
+
+    public static void main(String[] args) {
+        InjectionPathScan client = new InjectionPathScanNFS("C:\\workspace\\diagnose\\dashboard\\magazine");
+        boolean ret = deleteFiles(client, new File("C:\\workspace\\diagnose\\dashboard\\magazine\\tobedeleted"));
+        System.out.println("ret=" + ret);
+    }
 }

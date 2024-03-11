@@ -454,3 +454,16 @@ function exportSelectedJobs(){
         }
     });
 }
+
+const modalRedepositJob = new bootstrap.Modal(document.getElementById('redeposit-job'), {keyboard: false});
+function showModalRedepositJob(){
+    modalRedepositJob.show();
+}
+
+function redepositJob(){
+    var subFolder=$("#subFolderRedepositJob").val();
+    fetchHttp(PATH_DEPOSIT_JOBS_REDEPOSIT+"?subFolder="+subFolder, null, function(rsp){
+        modalRedepositJob.hide();
+        toastr.info("Succeed to redeposit the job. The sub-folder will be scanned automatically.")
+    });
+}

@@ -72,8 +72,9 @@ test {
 //    standardInput = System.in
 //}
 
+
 group = 'deposit-dashboard'
-version = '1.2.6.3'
+version = '1.2.6.4'
 description = 'Dashboard Tool'
 sourceCompatibility = '1.11'
 targetCompatibility = '1.11'
