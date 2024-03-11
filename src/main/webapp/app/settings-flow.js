@@ -1,56 +1,79 @@
-var mapMaterialFlows={};
-function combineProducers(items){
-  var html='';
-  for(var i=0; i<items.length; i++){
-    var item=items[i];
-    html+='<option value="' + item.id + '">' + item.id + '-' + item.name + '</option>';
+//Producer selector
+const gridProducers=agGrid.createGrid(document.querySelector('#dropdown-grid-producers'),  {
+      columnDefs: [
+          {headerName:"ProducerID", field:"id", width:250},
+          {headerName:"Name", field:"name", width:1000},
+          {headerName:"Active", field:"active", width:100, pinned: 'right' },
+      ],
+      rowSelection: 'single',
+      onSelectionChanged: onSelectionChangedProducer,
+      rowData: []
+});
 
-    var flowHtml=combineMaterialFlows(item.materialFlows);
-    mapMaterialFlows[item.id]=flowHtml;
-  }
-  return html;
+function onSelectionChangedProducer(){
+    const selectedRows = gridProducers.getSelectedRows();
+    console.log(selectedRows);
+    if(!selectedRows || selectedRows.length < 1){
+        return;
+    }
+    var selNode=selectedRows[0];
+    var depositAccountId=$('#flow-settings select[name="depositAccount"]').val();
+    fetchHttp(PATH_RAW_MATERIAL_FLOWS+'?depositAccountId=' + depositAccountId+'&producerId='+selNode['id'], null, function(dataset){
+        gridMaterialFlows.setGridOption('rowData', dataset);
+        gridMaterialFlows.redrawRows(true);
+    });
+
+    $('#input-producer').val(selNode['id'] + ' | ' + selNode['name']);
+    $('#input-materialflow').val('');
 }
 
-function combineMaterialFlows(items){
-  var html='';
-  for(var i=0; i<items.length; i++){
-    var item=items[i];
-    html+='<option value="' + item.id + '">' + item.id + '-' + item.name + '</option>';
-  }
-  return html;
+$('#filter-producer').on('input', function(){
+    var val=$(this).val();
+    gridProducers.setQuickFilter(val);
+});
+
+//Material flow selector
+const gridMaterialFlows=agGrid.createGrid(document.querySelector('#dropdown-grid-materialflows'),  {
+      columnDefs: [
+          {headerName:"MaterialFlowID", field:"id", width:250},
+          {headerName:"Name", field:"name", width:1000},
+      ],
+      rowSelection: 'single',
+      onSelectionChanged: onSelectionChangedMaterialFlow,
+      rowData: []
+});
+
+function onSelectionChangedMaterialFlow(){
+    const selectedRows = gridMaterialFlows.getSelectedRows();
+    console.log(selectedRows);
+    if(!selectedRows || selectedRows.length < 1){
+        return;
+    }
+    var selNode=selectedRows[0];
+    $('#input-materialflow').val(selNode['id'] + ' | ' + selNode['name']);
 }
 
-function initProducerMaterialflowSelector(data){
-  var html=combineProducers(data);
-  $('#flow-settings select[name="producer"]').html(html);
-  $('#flow-settings select[name="producer"]').val(null);
-  $('#flow-settings select[name="materialFlow"]').html('');
-  $('#flow-settings select[name="materialFlow"]').val(null);
-  /**
-  var selectedId=$('#flow-settings select[name="producer"] option:selected').val();
-  if(selectedId!=null){
-    $('#flow-settings select[name="materialFlow"]').html(mapMaterialFlows[selectedId]);
-  }else{
-    $('#flow-settings select[name="materialFlow"]').html('');
-  }
-  */
+$('#filter-materialflow').on('input', function(){
+    var val=$(this).val();
+    gridMaterialFlows.setQuickFilter(val);
+});
 
+//Refresh the deposit account: getting the related producers
+function refreshTheDepositAccount(){
+    var depositAccountId=$('#flow-settings select[name="depositAccount"] option:selected').val();
+    if(!depositAccountId){
+        alert('Please select a Deposit Account');
+        return;
+    }
 
-  $('#flow-settings select[name="producer"]').change(function() {
-    var selectedId=$('#flow-settings select[name="producer"] option:selected').val();
-    var flows=mapMaterialFlows[selectedId];
-
-    console.log(flows);
-
-    $('#flow-settings select[name="materialFlow"]').html(flows);
-    $('#flow-settings select[name="materialFlow"]').val(null);
-  });
-}
-
-//
-function set_flow_dropdown_box(producerId){
-    var flows=mapMaterialFlows[producerId];
-    $('#flow-settings select[name="materialFlow"]').html(flows);
+    $('.spinner-container').css('visibility','visible');
+    fetchHttp(PATH_SETTING_DEPOSIT_ACCOUNT_REFRESH+'?id='+depositAccountId, null, function(depositAccount){
+         fetchHttp(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId, null, function(dataset){
+            gridProducers.setGridOption('rowData', dataset);
+            gridProducers.redrawRows(true);
+        });
+        $('.spinner-container').css('visibility','hidden');
+    });
 }
 
 class FlowSetting extends BasicSettings{
@@ -82,8 +105,13 @@ class FlowSetting extends BasicSettings{
         });
 
         $('#flow-settings select[name="depositAccount"]').change(function() {
-            var selectedId=$(this).val();
-            fetchHttp(PATH_RAW_PRODUCER_MATERIAL_FLOW+'?depositAccountId='+selectedId, null, initProducerMaterialflowSelector);
+            $('#input-producer').val('');
+            $('#input-materialflow').val('');
+            var depositAccountId=$(this).val();
+            fetchHttp(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId, null, function(dataset){
+                gridProducers.setGridOption('rowData', dataset);
+                gridProducers.redrawRows(true);
+            });
         });
     }
 
@@ -117,10 +145,17 @@ class FlowSetting extends BasicSettings{
         data['id']=$('#flow-settings input[name="id"]').val();
         data['enabled']=$('#flow-settings input[name="enabled"]').is(':checked');
         data['depositAccountId']=$('#flow-settings select[name="depositAccount"] option:selected').val();
-        data['producerId']=$('#flow-settings select[name="producer"] option:selected').attr('value');
-        data['producerName']=$('#flow-settings select[name="producer"] option:selected').text();
-        data['materialFlowId']=$('#flow-settings select[name="materialFlow"] option:selected').attr('value');
-        data['materialFlowName']=$('#flow-settings select[name="materialFlow"] option:selected').text();
+        var producerItems=$('#flow-settings input[name="producer"]').val().split('|');
+        if(producerItems.length==2){
+            data['producerId']=producerItems[0].trim();
+            data['producerName']=$('#flow-settings input[name="producer"]').val();
+        }
+        var materialFlowItems=$('#flow-settings input[name="materialFlow"]').val().split('|');
+        if(materialFlowItems.length==2){
+            data['materialFlowId']=materialFlowItems[0].trim();
+            data['materialFlowName']=$('#flow-settings input[name="materialFlow"]').val();
+        }
+
         data['rootPath']=$('#flow-settings input[name="rootPath"]').val();
 
         // Advanced settings
@@ -152,20 +187,18 @@ class FlowSetting extends BasicSettings{
 
     setValueOfDropdownBox(data){
         if(data['id'] === null){
-            $('#flow-settings select[name="depositAccount"]').val(null);
-            $('#flow-settings select[name="producer"]').val(null);
-            $('#flow-settings select[name="materialFlow"]').val(null);
+            $('#flow-settings select[name="depositAccount"]').val('');
+            $('#flow-settings input[name="producer"]').val('');
+            $('#flow-settings input[name="materialFlow"]').val('');
         }else{
             $('#flow-settings select[name="depositAccount"]').val(data['depositAccountId']);
-            fetchHttp(PATH_RAW_PRODUCER_MATERIAL_FLOW+'?depositAccountId='+data['depositAccountId'], null, function(producerDataset){
-                var htmlProducers=combineProducers(producerDataset);
-                $('#flow-settings select[name="producer"]').html(htmlProducers);
-                $('#flow-settings select[name="producer"]').val(data['producerId']);
-
-                var htmlFlows=mapMaterialFlows[data['producerId']];
-                $('#flow-settings select[name="materialFlow"]').html(htmlFlows);
-                $('#flow-settings select[name="materialFlow"]').val(data['materialFlowId']);
+            var depositAccountId=data['depositAccountId'];
+            fetchHttp(PATH_RAW_PRODUCERS+'?depositAccountId=' + depositAccountId, null, function(dataset){
+                gridProducers.setGridOption('rowData', dataset);
+                gridProducers.redrawRows(true);
             });
+            $('#flow-settings input[name="producer"]').val(data['producerId'] + ' | ' + data['producerName']);
+            $('#flow-settings input[name="materialFlow"]').val(data['materialFlowId'] + ' | ' + data['materialFlowName']);
         }
     }
 

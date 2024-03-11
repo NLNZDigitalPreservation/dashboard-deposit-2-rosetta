@@ -5,7 +5,6 @@ import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.exception.InvalidParameterException;
 import nz.govt.natlib.dashboard.common.exception.NullParameterException;
 import nz.govt.natlib.dashboard.common.exception.WebServiceException;
-import nz.govt.natlib.dashboard.domain.daemon.TimerScheduledExecutors;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
@@ -69,11 +68,11 @@ public class FlowSettingService {
 
         //Verify ProduceId and MaterialFlowId
         try {
-            if (!rosettaWebService.isValidProducer(depositAccount.getDepositUserName(), flowSetting.getProducerId())) {
+            if (!rosettaWebService.isValidProducer(depositAccount, flowSetting.getProducerId())) {
                 throw new InvalidParameterException("Invalid producerId");
             }
 
-            if (!rosettaWebService.isValidMaterialFlow(flowSetting.getProducerId(), flowSetting.getMaterialFlowId())) {
+            if (!rosettaWebService.isValidMaterialFlow(depositAccount,flowSetting.getProducerId(), flowSetting.getMaterialFlowId())) {
                 throw new InvalidParameterException("Invalid materialFlowId");
             }
         } catch (Exception e) {

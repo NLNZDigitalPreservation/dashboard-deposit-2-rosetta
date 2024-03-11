@@ -43,9 +43,9 @@ public class CustomizedPdsClient {
         } else {
             StringBuffer dataUrl = new StringBuffer();
             dataUrl.append("func=login");
-            dataUrl.append("&institute=").append(URLEncoder.encode(institution,"UTF-8"));
-            dataUrl.append("&bor_id=").append(URLEncoder.encode(user,"UTF-8"));
-            dataUrl.append("&bor_verification=").append(URLEncoder.encode(password,"UTF-8"));
+            dataUrl.append("&institute=").append(URLEncoder.encode(institution, "UTF-8"));
+            dataUrl.append("&bor_id=").append(URLEncoder.encode(user, "UTF-8"));
+            dataUrl.append("&bor_verification=").append(URLEncoder.encode(password, "UTF-8"));
             URL url = new URL(this.baseUrl);
             StringBuffer content = this.getUrlContent(url, dataUrl);
             return this.extractPdsHandle(content.toString());
@@ -63,19 +63,21 @@ public class CustomizedPdsClient {
     }
 
     private StringBuffer getUrlContent(URL url, StringBuffer dataUrl) throws Exception {
-        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setDoOutput(true);
         conn.setDoInput(true);
+
         OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
         wr.write(dataUrl.toString());
         wr.flush();
         wr.close();
+
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF8"));
         StringBuffer content = new StringBuffer();
 
         String line;
-        while((line = bufferedReader.readLine()) != null) {
+        while ((line = bufferedReader.readLine()) != null) {
             content.append(line);
         }
 
@@ -94,7 +96,7 @@ public class CustomizedPdsClient {
             if (!Character.isDigit(content.charAt(0))) {
                 throw new Exception("Failed to authenticate user.");
             } else {
-                for(int i = 0; Character.isDigit(content.charAt(i)); ++i) {
+                for (int i = 0; Character.isDigit(content.charAt(i)); ++i) {
                     pdsHandle.append(content.charAt(i));
                 }
 
