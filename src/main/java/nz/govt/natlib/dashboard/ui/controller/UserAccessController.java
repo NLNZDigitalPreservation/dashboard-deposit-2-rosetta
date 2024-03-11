@@ -14,6 +14,7 @@ import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
@@ -35,6 +36,8 @@ public class UserAccessController {
     private RosettaWebService rosettaWebService;
     @Autowired
     private WhitelistSettingService whitelistService;
+    @Value("${TestEnabled}")
+    private boolean isTestMode;
 
     @RequestMapping(path = DashboardConstants.PATH_USER_LOGIN_API, method = {RequestMethod.GET, RequestMethod.POST})
     public RestResponseCommand login(@RequestBody UserAccessReqCommand cmd, HttpServletRequest req, HttpServletResponse rsp) throws Exception {
@@ -58,21 +61,23 @@ public class UserAccessController {
             return rstVal;
         }
 
-        if (!DashboardHelper.isNull(pdsUserInfo.getUserName())) {
-            //To initial the system: save the current user as the first admin user.
-            if (whitelistService.isEmptyWhiteList()) {
-                EntityWhitelistSetting whitelist = new EntityWhitelistSetting();
-                whitelist.setWhiteUserName(pdsUserInfo.getUserName());
-                whitelist.setWhiteUserRole(EnumUserRole.admin.name());
-                whitelistService.saveWhitelistSetting(whitelist);
-            } else if (!whitelistService.isInWhiteList(pdsUserInfo)) {
-                rstVal.setRspCode(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
+        if (!isTestMode) {
+            if (!DashboardHelper.isNull(pdsUserInfo.getUserName())) {
+                //To initial the system: save the current user as the first admin user.
+                if (whitelistService.isEmptyWhiteList()) {
+                    EntityWhitelistSetting whitelist = new EntityWhitelistSetting();
+                    whitelist.setWhiteUserName(pdsUserInfo.getUserName());
+                    whitelist.setWhiteUserRole(EnumUserRole.admin.name());
+                    whitelistService.saveWhitelistSetting(whitelist);
+                } else if (!whitelistService.isInWhiteList(pdsUserInfo)) {
+                    rstVal.setRspCode(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
+                    return rstVal;
+                }
+            } else {
+                rstVal.setRspBody(RestResponseCommand.RSP_LOGIN_ERROR);
+                rstVal.setRspMsg("Failed to authenticate the credential.");
                 return rstVal;
             }
-        } else {
-            rstVal.setRspBody(RestResponseCommand.RSP_LOGIN_ERROR);
-            rstVal.setRspMsg("Failed to authenticate the credential.");
-            return rstVal;
         }
 
         pdsUserInfo.setPid(pdsHandle);

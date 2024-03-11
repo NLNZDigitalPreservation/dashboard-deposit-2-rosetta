@@ -87,6 +87,7 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private static final Map<String, HttpSession> sessions = new HashMap<>();
+    private static final String SESSION_LOCK = "session-lock";
 
     @Bean
     public HttpSessionListener httpSessionListener() {

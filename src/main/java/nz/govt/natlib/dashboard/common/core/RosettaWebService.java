@@ -1,31 +1,193 @@
 package nz.govt.natlib.dashboard.common.core;
 
-import com.exlibris.dps.SipStatusInfo;
 import com.exlibris.dps.sdk.pds.PdsUserInfo;
-import nz.govt.natlib.ndha.common.exlibris.MaterialFlow;
-import nz.govt.natlib.ndha.common.exlibris.Producer;
-import nz.govt.natlib.ndha.common.exlibris.ResultOfDeposit;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import nz.govt.natlib.dashboard.common.core.dto.*;
+import nz.govt.natlib.dashboard.common.metadata.ResultOfDeposit;
+import nz.govt.natlib.dashboard.common.metadata.SipStatusInfo;
+import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
+import nz.govt.natlib.dashboard.util.CustomizedPdsClient;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.lang.Exception;
+import java.util.ArrayList;
 import java.util.List;
 
-public interface RosettaWebService {
-    String login(String institution, String username, String password) throws Exception;
+public class RosettaWebService {
+    private static final Logger log = LoggerFactory.getLogger(RosettaWebService.class);
+    private RosettaRestApi restApi;
+    private CustomizedPdsClient pdsClient;
 
-    String logout(String pdsHandle) throws Exception;
+    public RosettaWebService(String pdsUrl, String rosettaRestApiUrl,boolean isTestMode) {
+        this.restApi = new RosettaRestApi(rosettaRestApiUrl);
+        this.pdsClient = CustomizedPdsClient.getInstance();
+        this.pdsClient.init(pdsUrl, isTestMode);
+    }
 
-    PdsUserInfo getPdsUserByPdsHandle(String pdsHandle) throws Exception;
+    public String login(String institution, String username, String password) throws Exception {
+        try {
+            return pdsClient.login(institution, username, password);
+        } catch (Exception e) {
+            String err = String.format("Login failed: institution=%s, username=%s, password=********, %s", institution, username, e.getMessage());
+            System.out.println(err);
+            throw e;
+        }
+    }
 
-    String getInternalUserIdByExternalId(String userName);
+    public String logout(String pdsHandle) throws Exception {
+        try {
+            return pdsClient.logout(pdsHandle);
+        } catch (Exception e) {
+            String err = String.format("Logout failed: pdsHandle=%s: %s", pdsHandle, e.getMessage());
+            System.out.println(err);
+            throw e;
+        }
+    }
 
-    List<Producer> getProducers(String depositUserName) throws Exception;
+    public PdsUserInfo getPdsUserByPdsHandle(String pdsHandle) throws Exception {
+        try {
+            return pdsClient.getPdsUserByPdsHandle(pdsHandle);
+        } catch (Exception e) {
+            String err = String.format("Get PdsUserByPdsHandle failed: pdsHandle=%s: %s", pdsHandle, e.getMessage());
+            System.out.println(err);
+            throw e;
+        }
+    }
 
-    boolean isValidProducer(String depositUserName, String producerId) throws Exception;
 
-    List<MaterialFlow> getMaterialFlows(String producerID) throws Exception;
+    private Object jsonToObject(String json, Class<?> valueType) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
 
-    boolean isValidMaterialFlow(String producerId, String materialFlowId) throws Exception;
+        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    ResultOfDeposit deposit(String injectionRootDirectory, String pdsHandle, String depositUserInstitution, String depositUserProducerId, String materialFlowID, String depositSetID) throws Exception;
+        try {
+            return objectMapper.readValue(json, valueType);
+        } catch (IOException e) {
+            log.error("Failed to convert json to object", e);
+        }
 
-    SipStatusInfo getSIPStatusInfo(String sipId) throws Exception;
+        return null;
+    }
+
+    public List<DtoProducersRsp.Producer> getProducers(EntityDepositAccountSetting depositAccount) throws Exception {
+        List<DtoProducersRsp.Producer> producers = new ArrayList<>();
+        int offset = 0;
+        while (true) {
+            String ret = this.restApi.fetch(depositAccount, "GET", "/producers?limit=100&offset=" + offset, null);
+            DtoProducersRsp rsp = (DtoProducersRsp) this.jsonToObject(ret, DtoProducersRsp.class);
+            log.debug("Got producers, offset={}", offset);
+            if (rsp != null && rsp.getTotal_record_count() > 0 && rsp.getProducer() != null) {
+                producers.addAll(rsp.getProducer());
+                offset += 1; //offset means next datasets
+            } else {
+                break;
+            }
+        }
+        log.debug("{} producers with account: {}", producers.size(), depositAccount);
+        return producers;
+    }
+
+    public String getProducerProfileId(EntityDepositAccountSetting depositAccount, String producerId) throws Exception {
+        String ret = this.restApi.fetch(depositAccount, "GET", "/producers/" + producerId, null);
+        DtoProducerDetailRsp rsp = (DtoProducerDetailRsp) this.jsonToObject(ret, DtoProducerDetailRsp.class);
+        if (rsp != null && rsp.getProfile() != null) {
+            return rsp.getProfile().getId();
+        } else {
+            return null;
+        }
+    }
+
+    public boolean isValidProducer(EntityDepositAccountSetting depositAccount, String producerId) throws Exception {
+        String profileId = this.getProducerProfileId(depositAccount, producerId);
+        return !StringUtils.isEmpty(profileId);
+    }
+
+    public List<DtoMaterialFlowRsp.MaterialFlow> getMaterialFlows(EntityDepositAccountSetting depositAccount, String producerId) throws Exception {
+        List<DtoMaterialFlowRsp.MaterialFlow> materialFlows = new ArrayList<>();
+
+        String profileId = this.getProducerProfileId(depositAccount, producerId);
+        if (StringUtils.isEmpty(profileId)) {
+            log.error("Can not find the producer profile with the producer id: {}", producerId);
+            return materialFlows;
+        }
+
+        int offset = 0;
+        while (true) {
+            String ret = this.restApi.fetch(depositAccount, "GET", "/producers/producer-profiles/" + profileId + "/material-flows?limit=100&offset=" + offset, null);
+            DtoMaterialFlowRsp rsp = (DtoMaterialFlowRsp) this.jsonToObject(ret, DtoMaterialFlowRsp.class);
+            if (rsp != null && rsp.getTotal_record_count() > 0 && rsp.getProfile_material_flow() != null) {
+                materialFlows.addAll(rsp.getProfile_material_flow());
+                offset +=1;
+            } else {
+                break;
+            }
+        }
+        return materialFlows;
+    }
+
+    public boolean isValidMaterialFlow(EntityDepositAccountSetting depositAccount, String producerId, String materialFlowId) throws Exception {
+        List<DtoMaterialFlowRsp.MaterialFlow> materialFlows = getMaterialFlows(depositAccount, producerId);
+        for (DtoMaterialFlowRsp.MaterialFlow materialFlow : materialFlows) {
+            if (materialFlow.getId().equals(materialFlowId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ResultOfDeposit deposit(EntityDepositAccountSetting depositAccount, String injectionRootDirectory, String depositUserProducerId, String materialFlowID) throws Exception {
+        try {
+            if (!isValidProducer(depositAccount, depositUserProducerId)) {
+                log.warn("Invalid producer: {}", depositUserProducerId);
+            }
+
+            if (!isValidMaterialFlow(depositAccount, depositUserProducerId, materialFlowID)) {
+                log.warn("Invalid material flow: {}", materialFlowID);
+            }
+
+            DtoDepositReq reqBody = new DtoDepositReq();
+            reqBody.setSubdirectory(injectionRootDirectory);
+            reqBody.setProducer(new DtoDepositReq.Producer(depositUserProducerId));
+            reqBody.setMaterial_flow(new DtoDepositReq.MaterialFlow(materialFlowID));
+
+            String rsp = this.restApi.fetch(depositAccount, "POST", "/deposits", reqBody);
+            DtoDepositRsp ret = (DtoDepositRsp) this.jsonToObject(rsp, DtoDepositRsp.class);
+
+            boolean result = false;
+            String sipId = "", sipReason = "";
+            if (ret != null) {
+                if (!StringUtils.equalsIgnoreCase(ret.getStatus(), "Rejected") && !StringUtils.equalsIgnoreCase(ret.getStatus(), "Declined")) {
+                    result = !StringUtils.isEmpty(ret.getSip_id());
+                }
+
+                sipId = ret.getSip_id();
+                sipReason = ret.getSip_reason();
+            }
+
+            return ResultOfDeposit.create(result, sipId, sipReason);
+        } catch (Exception e) {
+            log.error("Deposit failed: {} {} {} {}", depositAccount, injectionRootDirectory, depositUserProducerId, materialFlowID);
+            throw e;
+        }
+    }
+
+    public SipStatusInfo getSIPStatusInfo(EntityDepositAccountSetting depositAccount, String sipId) throws Exception {
+        String rsp = this.restApi.fetch(depositAccount, "POST", "/sips/" + sipId, null);
+        return (SipStatusInfo) this.jsonToObject(rsp, SipStatusInfo.class);
+    }
+
+    public void setRestApi(RosettaRestApi restApi) {
+        this.restApi = restApi;
+    }
+
+    public void setPdsClient(CustomizedPdsClient pdsClient) {
+        this.pdsClient = pdsClient;
+    }
 }

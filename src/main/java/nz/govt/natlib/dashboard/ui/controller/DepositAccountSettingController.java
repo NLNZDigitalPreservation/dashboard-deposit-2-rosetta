@@ -1,11 +1,16 @@
 package nz.govt.natlib.dashboard.ui.controller;
 
+import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.service.DepositAccountSettingService;
+import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class DepositAccountSettingController {
@@ -37,5 +42,10 @@ public class DepositAccountSettingController {
     @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_DELETE, method = {RequestMethod.POST, RequestMethod.GET})
     public RestResponseCommand deleteProducerSetting(@RequestParam("id") Long id) {
         return depositAccountSettingService.deleteDepositAccountSetting(id);
+    }
+
+    @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_REFRESH, method = {RequestMethod.POST, RequestMethod.GET})
+    public RestResponseCommand refreshSetting(@RequestParam("id") Long id) throws Exception {
+        return depositAccountSettingService.refreshDepositAccountSetting(id);
     }
 }
