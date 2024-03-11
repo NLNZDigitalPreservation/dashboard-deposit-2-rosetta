@@ -29,7 +29,7 @@ public class TestRosettaRestApi {
     private static final String PDSUrl = "https://slbpdstest.natlib.govt.nz/pds?";
     private static final String RestApiUrl = "https://wlguatdpsilb.natlib.govt.nz/rest/v0";
 
-    private static final RosettaWebService restApi = new RosettaWebService(PDSUrl, RestApiUrl);
+    private static final RosettaWebService restApi = new RosettaWebService(PDSUrl, RestApiUrl, true);
 
     private static final String _PRODUCER_AGENT_ID = "NLNZ";
     private static final String INSTITUTION = "INS00";

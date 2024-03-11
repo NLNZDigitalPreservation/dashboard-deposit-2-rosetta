@@ -56,7 +56,7 @@ public class BasicTester {
     protected static RepoGlobalSetting repoGlobalSetting;
     protected static DepositJobService depositJobService;
 
-    protected static RosettaWebService rosettaWebService = new RosettaWebService("http://localhost", "http://localhost");
+    protected static RosettaWebService rosettaWebService = new RosettaWebService("http://localhost", "http://localhost", true);
 
     public static void init() throws IOException {
         depositAccount.setDepositUserInstitute(INSTITUTION);
@@ -205,7 +205,7 @@ public class BasicTester {
         }
         return null;
     }
-  
+
     public void addDepositDoneFile() {
         try {
             FileUtils.write(new File(new File(scanRootPath, subFolderName), "done"), "");
@@ -217,7 +217,7 @@ public class BasicTester {
 
     public void clearJobs() {
         try {
-            FileUtils.deleteDirectory(new File(storagePath,"jobs"));
+            FileUtils.deleteDirectory(new File(storagePath, "jobs"));
         } catch (IOException e) {
             e.printStackTrace();
             assert false;
