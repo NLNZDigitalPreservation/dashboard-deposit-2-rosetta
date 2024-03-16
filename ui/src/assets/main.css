@@ -1,9 +1,9 @@
 @import './base.css';
 
 #app {
-  max-width: 1280px;
+  min-width: 100vw;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0rem;
   font-weight: normal;
 }
 
@@ -21,7 +21,7 @@ a,
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1920px) {
   body {
     display: flex;
     place-items: center;
