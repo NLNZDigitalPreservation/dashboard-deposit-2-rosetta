@@ -112,7 +112,8 @@ import VirtualScroller from 'primevue/virtualscroller';
 
 import './assets/main.css';
 // import 'primevue/resources/themes/saga-blue/theme.css';
-import "primevue/resources/themes/aura-light-green/theme.css";
+// import "primevue/resources/themes/bootstrap4-dark-purple/theme.css";
+import "primevue/resources/themes/aura-dark-lime/theme.css";
 import 'primevue/resources/primevue.min.css';
 import 'primeicons/primeicons.css';          
 

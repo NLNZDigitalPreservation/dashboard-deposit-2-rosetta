@@ -1,32 +1,68 @@
-<script setup>
+
+<script setup lang="ts">
+import { ref } from "vue";
+
+
+const menu = ref();
+const items = ref([
+    {
+        label: 'Deposit Account Settings'          
+    },
+    {
+        label: 'Material Flow Settings'
+    },
+    {
+        label: 'User White List'
+    },
+    {
+        separator: true
+    },
+    {
+        label: 'Global Settings'
+    },
+    {
+        separator: true
+    },
+    {
+        label: 'Sign out'
+    }
+]);
+
+const toggle = (event:any) => {
+    menu.value.toggle(event);
+};
+
 </script>
 
 <template>
-    <div class="card">
-        <Toolbar style="padding: 5px; background: linear-gradient(to right, #212529, #212529, #32CD32, #212529);">
-            <template #start>
-                <div id="toolkit-container-left" class="flex align-items-center gap-2">
-                    <Avatar image="/natlib-logo-orange.png" style="width: 32px; height: 32px;" />
-                    <InputText placeholder="Filter" type="text" class="w-8rem sm:w-auto" />
-                    <Button icon="pi pi-search" label="&nbsp;&nbsp;Search" />
-                    <Button icon="pi pi-refresh" label="&nbsp;&nbsp;Reload" />
-                    <Button icon="pi pi-download" label="&nbsp;&nbsp;Export Selected Jobs" />
-                    <Button icon="pi pi-file-edit" label="&nbsp;&nbsp;Redeposit" />
-                </div>
-            </template>
+    <Toolbar style="border: 0; border-radius:0; padding: 5px 0 0 0; ">
+        <template #start>
+            <Avatar image="/natlib-logo-orange.png" style="margin-bottom: 5px; margin-left: 1em;" />
+            <h2 style="color: white; margin-bottom: 8px; margin-left: 1em; margin-right: 1em;">Deposit Dashboard</h2>
+            
+            <div id="toolkit-container-left" class="toolkit-container flex align-items-center gap-2">
+                
+                <!-- <Image src="/natlib-logo-orange.png" alt="Image" width="35", height="35" viewBox="0 0 35 40" /> -->
+                <InputText placeholder="Filter" type="text" class="w-8rem sm:w-auto" />
+                <Button icon="pi pi-search" label="&nbsp;&nbsp;Search" />
+                <Button icon="pi pi-refresh" label="&nbsp;&nbsp;Reload" />
+                <Button icon="pi pi-download" label="&nbsp;&nbsp;Export Selected Jobs" />
+                <Button icon="pi pi-file-edit" label="&nbsp;&nbsp;Redeposit" />
+            </div>
+        </template>
 
-            <template #end>
-                <div class="flex align-items-center gap-2">
-                    <Button label="Share" severity="contrast" size="small" />
-                    <Avatar image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" style="width: 32px; height: 32px" />
-                </div>
-            </template>
-        </Toolbar>
-    </div>
+        <template #end>
+            <div class="toolkit-container flex align-items-center gap-2">
+                <Button type="button" icon="pi pi-cog" label="&nbsp;&nbsp;Settings" @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" link />
+                <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+            </div>
+            <!-- <SettingsMenuItem></SettingsMenuItem> -->
+        </template>
+    </Toolbar>
 </template>
 
 <style scoped>
-    #toolkit-container-left > * {    
+    .toolkit-container > * {    
         margin-bottom: 8px;
         margin-left: 1em;
     }
