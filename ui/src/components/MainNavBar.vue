@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import { ref } from "vue";
 
@@ -41,8 +40,6 @@ const toggle = (event:any) => {
             <h2 style="color: white; margin-bottom: 8px; margin-left: 1em; margin-right: 1em;">Deposit Dashboard</h2>
             
             <div id="toolkit-container-left" class="toolkit-container flex align-items-center gap-2">
-                
-                <!-- <Image src="/natlib-logo-orange.png" alt="Image" width="35", height="35" viewBox="0 0 35 40" /> -->
                 <InputText placeholder="Filter" type="text" class="w-8rem sm:w-auto" />
                 <Button icon="pi pi-search" label="&nbsp;&nbsp;Search" />
                 <Button icon="pi pi-refresh" label="&nbsp;&nbsp;Reload" />
@@ -54,9 +51,17 @@ const toggle = (event:any) => {
         <template #end>
             <div class="toolkit-container flex align-items-center gap-2">
                 <Button type="button" icon="pi pi-cog" label="&nbsp;&nbsp;Settings" @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" link />
-                <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+                <Menu ref="menu" id="overlay_menu" :model="items" :popup="true">
+                    <template #item="{ item, props }">
+                        <a v-ripple class="flex align-items-center" v-bind="props.action">
+                            <span :class="item.icon" />
+                            <span class="ml-2">{{ item.label }}</span>
+                            <Badge v-if="item.badge" class="ml-auto" :value="item.badge" />
+                            <span v-if="item.shortcut" class="ml-auto border-1 surface-border border-round surface-100 text-xs p-1">{{ item.shortcut }}</span>
+                        </a>
+                    </template>
+                </Menu>
             </div>
-            <!-- <SettingsMenuItem></SettingsMenuItem> -->
         </template>
     </Toolbar>
 </template>
@@ -70,5 +75,4 @@ const toggle = (event:any) => {
     .p-button-icon::after {
         content: "&nbsp;";
     }
-
 </style>
