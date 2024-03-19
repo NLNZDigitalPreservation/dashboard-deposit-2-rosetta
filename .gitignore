@@ -18,3 +18,7 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 /node_modules/
+
+/ui/.node/
+/ui/build/
+/ui/dist/
