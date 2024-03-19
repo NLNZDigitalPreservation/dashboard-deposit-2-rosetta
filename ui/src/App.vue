@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import DepositJobsSearchDialog from './views/DepositJobsSearchDialog.vue';
-import {status} from "./exchange.ts";
+import {status} from "./exchange";
 
 const menu = ref();
 const items = ref([
@@ -83,4 +83,4 @@ let depositJobsSearchDialogVisible=false;
     .p-button-icon::after {
         content: "&nbsp;";
     }
-</style>./views/DataExchange./exchange
+</style>

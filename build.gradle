@@ -59,6 +59,10 @@ dependencies {
     implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
 //    implementation 'com.h2database:h2:1.4.199'
     implementation 'commons-io:commons-io:2.4'
+
+    implementation 'org.webjars:webjars-locator:0.30'
+    implementation 'org.dashboard:dashboard-ui:2.0.0-SNAPSHOT'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'junit:junit:4.13.1'
 }

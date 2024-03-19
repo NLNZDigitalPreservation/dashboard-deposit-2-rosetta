@@ -58,16 +58,8 @@
     </ul>
 
     <ul class="navbar-nav" id="control-right">
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-gear"></i>Settings</a>
-        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="dropdown01">
-          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal-producer-settings">Producer Settings</a></li>
-          <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal-flow-settings">Materialflow Settings</a></li>
-          <li><a class="dropdown-item" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">User White List</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <!-- <li><a class="dropdown-item" href="#" onclick="signOut();"><i class="bi bi-power"></i> Sign out</a></li> -->
-          <li><a class="dropdown-item" href="./auth/logout.json" style="color:red;"><i class="bi bi-power"></i>Sign out: ${userName}</a></li>
-        </ul>
+      <li class="nav-item">
+        <a class="nav-link" href="@{/webjars/index.html}" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-gear"></i>Settings</a>
       </li>
     </ul>
 </nav>

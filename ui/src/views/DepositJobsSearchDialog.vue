@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { reactive } from 'vue';
-import {status} from "../exchange.ts";
+import {status} from "../exchange";
 
 const props = defineProps(["visible"]);
 let isVisible=props.visible;
@@ -41,4 +41,4 @@ let isVisible=props.visible;
             <Button type="button" label="Save" @click="status.visible = false"></Button>
         </div>
     </Dialog>
-</template>./DataExchange.js
+</template>
