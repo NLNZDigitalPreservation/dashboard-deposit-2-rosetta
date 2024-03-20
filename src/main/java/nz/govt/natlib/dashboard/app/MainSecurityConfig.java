@@ -66,7 +66,7 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests()
                 .anyRequest().permitAll();
-        http.addFilterBefore(httpAccessManagementFilter(), AnonymousAuthenticationFilter.class);
+//        http.addFilterBefore(httpAccessManagementFilter(), AnonymousAuthenticationFilter.class);
         http.headers().frameOptions().sameOrigin();
     }
 

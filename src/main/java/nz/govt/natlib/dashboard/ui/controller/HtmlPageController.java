@@ -30,7 +30,7 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-@RestController
+//@RestController
 public class HtmlPageController {
     private static final Logger log = LoggerFactory.getLogger(HtmlPageController.class);
     @Autowired

@@ -22,7 +22,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@RestController
+//@RestController
 public class UserAccessController {
     private static final Logger log = LoggerFactory.getLogger(UserAccessController.class);
 

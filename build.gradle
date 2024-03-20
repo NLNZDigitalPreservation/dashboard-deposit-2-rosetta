@@ -61,7 +61,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.4'
 
     implementation 'org.webjars:webjars-locator:0.30'
-    implementation 'org.dashboard:dashboard-ui:2.0.0-SNAPSHOT'
+    implementation 'org.webjars:dashboard-ui:2.0.0-SNAPSHOT'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'junit:junit:4.13.1'
