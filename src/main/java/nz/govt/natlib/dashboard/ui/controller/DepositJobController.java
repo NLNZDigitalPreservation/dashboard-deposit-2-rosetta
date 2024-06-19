@@ -30,6 +30,11 @@ public class DepositJobController {
     @Autowired
     private RepoDepositJob repoDepositJob;
 
+    @RequestMapping(path = DashboardConstants.PATH_JOBS_ACTIVE_LIST, method = {RequestMethod.POST, RequestMethod.GET})
+    public List<EntityDepositJob> listActiveJobs() {
+        return repoDepositJob.getAll();
+    }
+
     @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_ACTIVE_GET, method = {RequestMethod.POST, RequestMethod.GET})
     public RestResponseCommand retrieveActiveDepositJobs() {
         log.info("Retrieve all active jobs.");

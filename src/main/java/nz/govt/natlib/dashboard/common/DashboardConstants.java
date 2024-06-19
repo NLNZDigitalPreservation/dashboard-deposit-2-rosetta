@@ -45,6 +45,7 @@ public class DashboardConstants {
     public static final String PATH_DEPOSIT_JOBS_NEW = PATH_DEPOSIT_JOBS + "/new";
     public static final String PATH_DEPOSIT_JOBS_SEARCH = PATH_DEPOSIT_JOBS + "/search";
     public static final String PATH_DEPOSIT_JOBS_EXPORT_DATA = PATH_DEPOSIT_JOBS + "/export-data";
+    public static final String PATH_JOBS_ACTIVE_LIST = PATH_DEPOSIT_JOBS + "/jobs/active/list";
 
     public static final String PATH_DEPOSIT_JOBS_REDEPOSIT = PATH_DEPOSIT_JOBS + "/redeposit";
 
