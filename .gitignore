@@ -5,6 +5,9 @@
 /apps/libs/
 /.idea/
 
+/ui/dist/
+/ui/node_modules/
+
 # Ignore Gradle GUI config
 gradle-app.setting
 
