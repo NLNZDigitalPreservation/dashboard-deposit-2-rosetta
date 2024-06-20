@@ -6,7 +6,7 @@
         </router-link>
 
         <IconField iconPosition="left" class="mr-2">
-            <InputText type="text" placeholder="Filter" />
+            <InputText v-model="keywords" type="text" placeholder="Filter" />
             <InputIcon class="pi pi-filter" />
         </IconField>
 
@@ -30,6 +30,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useUserProfileStore } from '@/stores/users';
 import DepositJobList from './DepositJobList.vue';
+import {depositJobList, keywords} from '@/stores/depositjob';
 
 const topbarMenuActive = ref(false);
 const topbarMenuClasses = computed(() => {

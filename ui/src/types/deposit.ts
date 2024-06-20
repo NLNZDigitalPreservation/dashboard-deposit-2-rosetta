@@ -47,3 +47,10 @@ interface DepositJob {
     appliedFlowSetting: MaterialFlow,
 }
 
+interface JobQueryCondition {
+    startTime: number,
+    endTime: number,
+    materialFlows: number[],
+    stages: string[],
+    states: string[],
+}
