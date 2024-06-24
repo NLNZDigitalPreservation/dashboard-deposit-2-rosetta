@@ -86,17 +86,30 @@ const calcProgressPercent = (data: any) => {
   return Math.round(percent);
 };
 
+const isIncludes=(fieldValue:any, keywords:string)=>{
+  if(!fieldValue){
+    return false;
+  }
+  if(typeof fieldValue === 'number'){
+    return fieldValue.toString().includes(keywords);
+  }else if (typeof fieldValue === 'string'){
+    return fieldValue.toLowerCase().includes(keywords);
+  }else{
+    return false;
+  }
+}
+
 const jobFilter = (job: any, keywords: string) => {
   if (
-    job.id.toString().includes(keywords) ||
-    job.materialFlowName.toLowerCase().includes(keywords) ||
-    job.injectionTitle.toLowerCase().includes(keywords) ||
-    job.stage.toLowerCase().includes(keywords) ||
-    job.state.toLowerCase().includes(keywords) ||
-    job.sipID.toLowerCase().includes(keywords) ||
-    job.sipModule.toLowerCase().includes(keywords) ||
-    job.sipStage.toLowerCase().includes(keywords) ||
-    job.sipStatus.toLowerCase().includes(keywords) 
+    isIncludes(job.id, keywords) ||
+    isIncludes(job.materialFlowName, keywords) ||
+    isIncludes(job.injectionTitle, keywords) ||
+    isIncludes(job.stage, keywords) ||
+    isIncludes(job.state, keywords) ||
+    isIncludes(job.sipID, keywords) ||
+    isIncludes(job.sipModule, keywords) ||
+    isIncludes(job.sipStage, keywords) ||
+    isIncludes(job.sipStatus, keywords) 
   ) {
     return true;
   }
