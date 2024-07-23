@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from "vue";
+import { useToast } from 'primevue/usetoast';
 import { FilterMatchMode, FilterOperator } from "primevue/api";
 import { MaterialFlow, DepositJob } from "@/types/deposit";
 import { useJobListDTO, keywords } from "@/stores/depositjob";
@@ -12,15 +13,46 @@ watch(keywords, async (newValue, oldValue) => {
   jobList.filter(keywords.value);
 });
 
+const updateFirst = (firstRow: number) => {
+  // console.log("first row="+firstRow);
+};
+
+const updateRows = (rows: number) => {
+  // console.log("rows="+rows);
+};
+
+// const page = (event: any) => {
+//   console.log("pages event=" + event);
+// };
+
+// const sort = (event: any) => {
+//   console.log("sort event=" + event);
+// };
+
 onMounted(() => {
-    jobList.fetchAllData();
+  jobList.fetchAllData();
 });
+
+const cm = ref();
+const toast = useToast();
+const selectedContextRow = ref();
+const contextMenuModel = ref([
+    {label: 'View', icon: 'pi pi-fw pi-search', command: () => viewProduct(selectedContextRow)},
+    {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => deleteProduct(selectedContextRow)}
+]);
+const onRowContextMenu = (event:any) => {
+    cm.value.show(event.originalEvent);
+};
+
 </script>
 <template>
+  <ContextMenu ref="cm" :model="contextMenuModel" @hide="selectedContextRow = null" />
   <DataTable
     v-model:expandedRowGroups="expandedRowGroups"
     :value="jobList.listJobsFiltered"
     v-model:selection="selectedJobs"
+    contextMenu v-model:contextMenuSelection="selectedContextRow"
+    @rowContextmenu="onRowContextMenu"
     dataKey="id"
     size="small"
     rowGroupMode="subheader"
@@ -30,10 +62,14 @@ onMounted(() => {
     :sortOrder="1"
     paginator
     :rows="50"
-    :rowsPerPageOptions="[15, 30, 50, 100, 200]"
+    :rowsPerPageOptions="[20, 50, 100, 200]"
     scrollable
     scrollHeight="100%"
     showGridlines
+    stripedRows
+    resizableColumns
+    columnResizeMode="expand"    
+    @sort="sort"
   >
     <Column
       field="materialFlowName"
@@ -44,15 +80,13 @@ onMounted(() => {
     <Column
       selectionMode="multiple"
       headerStyle="width: 3rem"
-      frozen
       class="font-bold"
     ></Column>
-    <Column field="id" header="ID" frozen sortable></Column>
+    <Column field="id" header="ID" sortable></Column>
     <Column
       field="injectionTitle"
       header="JobTitle"
       style="min-width: 400px"
-      frozen
       sortable
     ></Column>
     <Column field="stage" header="Stage" sortable></Column>
@@ -103,6 +137,15 @@ onMounted(() => {
       </div>
     </template>
   </DataTable>
+
+  <!-- <Paginator
+    :rows="3"
+    :totalRecords="120"
+    :rowsPerPageOptions="[3, 15, 30, 50, 100, 200]"
+    @update:first="updateFirst"
+    @update:rows="updateRows"
+    @page="page"
+  /> -->
 </template>
 
 <style>
