@@ -1,20 +1,47 @@
 import { ref } from "vue";
+import { useDialog } from 'primevue/usedialog';
+import DepositJobDetailDialog from '@/components/jobs/DepositJobDetailDialog.vue';
 
 export const selectedContextJob = ref();
 export const contextMenuModel = ref([
-    {label: 'Detail', icon: 'pi pi-fw pi-info-circle', command: () => viewProduct(selectedContextJob)},
+    {label: 'Detail', icon: 'pi pi-fw pi-info-circle', command: () => viewJob(selectedContextJob)},
     {separator: true},
-    {label: 'Retry', icon: 'pi pi-fw pi-refresh', command: () => deleteProduct(selectedContextJob)},
-    {label: 'Cancel', icon: 'pi pi-fw pi-times-circle', command: () => deleteProduct(selectedContextJob)},
+    {label: 'Retry', icon: 'pi pi-fw pi-refresh', command: () => editJob('retry', selectedContextJob)},
+    {label: 'Cancel', icon: 'pi pi-fw pi-times-circle', command: () => editJob('cancel', selectedContextJob)},
     {separator: true},
-    {label: 'Pause', icon: 'pi pi-fw pi-pause-circle', command: () => deleteProduct(selectedContextJob)},
-    {label: 'Resume', icon: 'pi pi-fw pi-play-circle', command: () => deleteProduct(selectedContextJob)},
+    {label: 'Pause', icon: 'pi pi-fw pi-pause-circle', command: () => editJob('pause', selectedContextJob)},
+    {label: 'Resume', icon: 'pi pi-fw pi-play-circle', command: () => editJob('resume', selectedContextJob)},
     {separator: true},
-    {label: 'Terminate and Purge', icon: 'pi pi-fw pi-stop-circle', command: () => deleteProduct(selectedContextJob)},
+    {label: 'Terminate and Purge', icon: 'pi pi-fw pi-stop-circle', command: () => editJob('terminate', selectedContextJob)},
 ]);
 
+const viewJob=(rowData:any)=>{
+    if(!rowData){
+        console.log("There is no row selected.");
+        return;
+    }
 
-function getErrorMessageForAction(action, rowData){
+    const dialog=useDialog();
+    const dialogRef = dialog.open(DepositJobDetailDialog, {
+        props: {
+            header: 'Deposit Job',
+            closable: true,
+            style: {
+                width: '75rem',
+            },
+            modal: true,
+        },
+        data: {
+            job: rowData,
+        }
+    });
+}
+
+const editJob=(action:string, rowData:any)=>{
+    console.log(action);
+}
+
+const getErrorMessageForAction = (action:string, rowData:any) => {
     action=action.toUpperCase();
     var stage=rowData.stage, state=rowData.state;
     switch(action){
@@ -33,7 +60,7 @@ function getErrorMessageForAction(action, rowData){
     }
 }
 
-function isRowDataValidForAction(action, rowData){
+const isRowDataValidForAction = (action:string, rowData:any) => {
     action=action.toUpperCase();
     var stage=rowData.stage, state=rowData.state;
     switch(action){
@@ -52,9 +79,7 @@ function isRowDataValidForAction(action, rowData){
     }
 }
 
-var gReqNodes;
-var gAction;
-function handleDepositJobActive(action, selectedRow){
+const handleDepositJobActive = (action:string, selectedRow:any) => {
     var selectedRows=gridDepositJobs.getSelectedData();
     if(selectedRows.length===0 && selectedRow && selectedRow.getData()){
         selectedRows=[selectedRow.getData()];
