@@ -4,6 +4,9 @@ import { useToast } from 'primevue/usetoast';
 import { FilterMatchMode, FilterOperator } from "primevue/api";
 import { MaterialFlow, DepositJob } from "@/types/deposit";
 import { useJobListDTO, keywords } from "@/stores/depositjob";
+import {useContextMenu} from "@/stores/depositjobContextMenu";
+
+const cm=useContextMenu();
 
 const jobList = useJobListDTO();
 const selectedJobs = ref([]);
@@ -13,45 +16,24 @@ watch(keywords, async (newValue, oldValue) => {
   jobList.filter(keywords.value);
 });
 
-const updateFirst = (firstRow: number) => {
-  // console.log("first row="+firstRow);
-};
-
-const updateRows = (rows: number) => {
-  // console.log("rows="+rows);
-};
-
-// const page = (event: any) => {
-//   console.log("pages event=" + event);
-// };
-
-// const sort = (event: any) => {
-//   console.log("sort event=" + event);
-// };
-
 onMounted(() => {
   jobList.fetchAllData();
 });
 
-const cm = ref();
+const rowContextMenu = ref();
 const toast = useToast();
-const selectedContextRow = ref();
-const contextMenuModel = ref([
-    {label: 'View', icon: 'pi pi-fw pi-search', command: () => viewProduct(selectedContextRow)},
-    {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => deleteProduct(selectedContextRow)}
-]);
-const onRowContextMenu = (event:any) => {
-    cm.value.show(event.originalEvent);
-};
 
+const onRowContextMenu = (event:any) => {
+  rowContextMenu.value.show(event.originalEvent);
+};
 </script>
 <template>
-  <ContextMenu ref="cm" :model="contextMenuModel" @hide="selectedContextRow = null" />
+  <ContextMenu ref="rowContextMenu" :model="cm.contextMenuModel" @hide="cm.selectedContextRow = null" />
   <DataTable
     v-model:expandedRowGroups="expandedRowGroups"
     :value="jobList.listJobsFiltered"
     v-model:selection="selectedJobs"
-    contextMenu v-model:contextMenuSelection="selectedContextRow"
+    contextMenu v-model:contextMenuSelection="cm.selectedContextRow"
     @rowContextmenu="onRowContextMenu"
     dataKey="id"
     size="small"
@@ -69,7 +51,6 @@ const onRowContextMenu = (event:any) => {
     stripedRows
     resizableColumns
     columnResizeMode="expand"    
-    @sort="sort"
   >
     <Column
       field="materialFlowName"
@@ -86,7 +67,7 @@ const onRowContextMenu = (event:any) => {
     <Column
       field="injectionTitle"
       header="JobTitle"
-      style="min-width: 400px"
+      style="min-width: 400px;"
       sortable
     ></Column>
     <Column field="stage" header="Stage" sortable></Column>
@@ -159,5 +140,11 @@ const onRowContextMenu = (event:any) => {
 
 .abnormal-progressbar .p-progressbar-value {
   background: gray;
+}
+
+.p-datatable-tbody tr td{
+  /* font-size: 0.85rem; */
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 </style>

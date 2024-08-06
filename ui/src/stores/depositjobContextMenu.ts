@@ -1,27 +1,35 @@
 import { ref } from "vue";
 import { useDialog } from 'primevue/usedialog';
+import { defineStore } from "pinia";
+
 import DepositJobDetailDialog from '@/components/jobs/DepositJobDetailDialog.vue';
 
-export const selectedContextJob = ref();
-export const contextMenuModel = ref([
-    {label: 'Detail', icon: 'pi pi-fw pi-info-circle', command: () => viewJob(selectedContextJob)},
-    {separator: true},
-    {label: 'Retry', icon: 'pi pi-fw pi-refresh', command: () => editJob('retry', selectedContextJob)},
-    {label: 'Cancel', icon: 'pi pi-fw pi-times-circle', command: () => editJob('cancel', selectedContextJob)},
-    {separator: true},
-    {label: 'Pause', icon: 'pi pi-fw pi-pause-circle', command: () => editJob('pause', selectedContextJob)},
-    {label: 'Resume', icon: 'pi pi-fw pi-play-circle', command: () => editJob('resume', selectedContextJob)},
-    {separator: true},
-    {label: 'Terminate and Purge', icon: 'pi pi-fw pi-stop-circle', command: () => editJob('terminate', selectedContextJob)},
-]);
+export const useContextMenu=defineStore('ContextMenu', ()=>{
+    const dialog=useDialog();
+    const selectedContextRow = ref();
+    const contextMenuModel = ref([
+        {label: 'Detail', icon: 'pi pi-fw pi-info-circle', command: () => viewJob(dialog, selectedContextRow)},
+        {separator: true},
+        {label: 'Retry', icon: 'pi pi-fw pi-refresh', command: () => editJob('retry', selectedContextRow)},
+        {label: 'Cancel', icon: 'pi pi-fw pi-times-circle', command: () => editJob('cancel', selectedContextRow)},
+        {separator: true},
+        {label: 'Pause', icon: 'pi pi-fw pi-pause-circle', command: () => editJob('pause', selectedContextRow)},
+        {label: 'Resume', icon: 'pi pi-fw pi-play-circle', command: () => editJob('resume', selectedContextRow)},
+        {separator: true},
+        {label: 'Terminate and Purge', icon: 'pi pi-fw pi-stop-circle', command: () => editJob('terminate', selectedContextRow)},
+    ]);
 
-const viewJob=(rowData:any)=>{
+
+
+    return {selectedContextRow, contextMenuModel}
+});
+
+const viewJob=(dialog:any, rowData:any)=>{
     if(!rowData){
         console.log("There is no row selected.");
         return;
     }
 
-    const dialog=useDialog();
     const dialogRef = dialog.open(DepositJobDetailDialog, {
         props: {
             header: 'Deposit Job',
@@ -32,7 +40,7 @@ const viewJob=(rowData:any)=>{
             modal: true,
         },
         data: {
-            job: rowData,
+            job: rowData.value,
         }
     });
 }
