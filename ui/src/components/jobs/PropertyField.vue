@@ -1,8 +1,10 @@
 <template>
-    <div class="grid grid-cols-12 gap-2">
-        <label for="name3" class="flex items-center col-span-12 mb-2 md:col-span-3 md:mb-0">{{ title }}:</label>
-        <div class="col-span-12 md:col-span-9">
-            <label> {{ value }}</label>
+    <div class="grid mb-2 mt-2">
+        <div class="col-3" style="padding: 0.5rem; text-align: left;">
+            <label>{{ title }}:</label>
+        </div>
+        <div class="col-9"  style="padding: 0.5rem; background: black;">
+             <p>{{ value }}</p>
         </div>
     </div>
 </template>
@@ -15,5 +17,20 @@ defineProps<{
 </script>
 
 <style>
+label{
+    width: 100%;
+    display: inline-block;
+    position: relative;
+    text-align: left;
+    margin-right: 0;
+}
+
+p{
+    width: 100%;
+    display: inline-block;
+    position: relative;
+    text-align: left;
+    margin-right: 0;
+}
 
 </style>

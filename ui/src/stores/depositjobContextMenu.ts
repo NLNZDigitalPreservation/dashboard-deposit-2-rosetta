@@ -1,8 +1,9 @@
-import { ref } from "vue";
+import { ref, markRaw } from "vue";
 import { useDialog } from 'primevue/usedialog';
 import { defineStore } from "pinia";
 
 import DepositJobDetailDialog from '@/components/jobs/DepositJobDetailDialog.vue';
+import DepositJobDetailDialogFooter from '@/components/jobs/DepositJobDetailDialogFooter.vue';
 
 export const useContextMenu=defineStore('ContextMenu', ()=>{
     const dialog=useDialog();
@@ -41,7 +42,10 @@ const viewJob=(dialog:any, rowData:any)=>{
         },
         data: {
             job: rowData.value,
-        }
+        },
+        templates: {
+            footer: markRaw(DepositJobDetailDialogFooter)
+        },
     });
 }
 

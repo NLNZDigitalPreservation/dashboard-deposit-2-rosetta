@@ -15,7 +15,7 @@ const onChangeTheme = (theme: string, mode: any) => {
 };
 
 onMounted(() => {
-  onChangeTheme("aura-dark-lime","dark");
+  onChangeTheme("aura-dark-cyan","dark");
 });
 </script>
 

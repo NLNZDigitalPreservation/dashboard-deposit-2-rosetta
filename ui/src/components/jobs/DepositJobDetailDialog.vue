@@ -1,83 +1,162 @@
 <script setup lang="ts">
 import { ref, reactive, inject, onMounted} from 'vue';
-import PropertyField from './PropertyField.vue';
+import {formatContentLength} from '@/utils/helper';
 
 const dialogRef:any = inject('dialogRef');
-
-// const job=reactive({
-//     id: 0,
-//     injectionTitle: "",
-//     injectionPath: "",
-//     materialFlowName: "",
-//     initialTime: "",
-//     latestTime: "",
-//     fileCount: 0,
-//     fileSize: 0,
-//     stage: "",
-//     state: "",
-//     depositStartTime: "",
-//     depositEndTime: "",
-//     sipID: "",
-//     sipModule: "",
-//     sipStage: "",
-//     sipStatus: "",
-//     resultMessage: "",
-// });
-const job=ref();
-job.value={};
+const params = dialogRef.value.data;
+const job = params.job;
+const formatedFileSize=ref();
+formatedFileSize.value=formatContentLength(job.fileSize);
 
 const auditMessage=reactive ({
     content: "OK",
     severity: "success"
 });
 
-
-onMounted(() => {
-    const params = dialogRef.value.data; // {user: 'primetime'}
-    const data=params.job;
-    if(!data){
-        console.log("No job data transfered to the details page");
-        return;
-    }
-
-    // job.id=data.id;
-    // job.injectionTitle=data.injectionTitle;
-    // job.injectionPath=data.injectionPath;
-    // job.materialFlowName=data.materialFlowName;
-    // job.initialTime=data.initialTime;
-    // job.latestTime=data.latestTime;
-    // job.fileCount=data.fileCount;
-    // job.fileSize=data.fileSize;
-    // job.stage=data.stage;
-    // job.state=data.state;
-    // job.depositStartTime=data.depositStartTime;
-    // job.depositEndTime=data.depositEndTime;
-    // job.sipID=data.sipID;
-    // job.sipModule=data.sipModule;
-    // job.sipStage=data.sipStage;
-    // job.sipStatus=data.sipStatus;
-    // job.resultMessage=data.resultMessage;
-
-    job.value=data;
+const ingestProgress=reactive({
+    value: 0,
+    label: "",
 });
 
+const depositProgress=reactive({
+    value: 0,
+    label: "",
+});
+
+const finalizeProgress=reactive({
+    value: 0,
+    label: "",
+});
+
+const getProgressBarStateStyle = (stage:string, state:string)=>{
+    let value=0;
+    if(state === 'INITIALED'){
+        value=10;
+    }else if (state === 'RUNNING' || state === 'PAUSED'){
+        value=60;
+    }else if (state === 'SUCCEED' || state === 'FAILED' || state === 'CANCELED'){
+        value=100;
+    }
+    return {
+        value: value,
+        label: stage + '(' + state + ')',
+    }
+}
+
+const setIngestProgressBar = (stage:string, state:string)=>{
+    const progress=getProgressBarStateStyle(stage, state);
+    ingestProgress.value=progress.value;
+    ingestProgress.label=progress.label;
+}
+
+const setDepositProgressBar = (stage:string, state:string)=>{
+    const progress=getProgressBarStateStyle(stage, state);
+    depositProgress.value=progress.value;
+    depositProgress.label=progress.label;
+}
+
+const setFinalizeProgressBar = (stage:string, state:string)=>{
+    const progress=getProgressBarStateStyle(stage, state);
+    finalizeProgress.value=progress.value;
+    finalizeProgress.label=progress.label;
+}
+
+if(job.stage === 'INGEST'){
+    setIngestProgressBar(job.stage, job.state);
+    setDepositProgressBar('DEPOSIT', '...');
+    setFinalizeProgressBar('FINALIZE', '...');
+}else if(job.stage === 'DEPOSIT'){
+    setIngestProgressBar('INGEST', 'SUCCEED');
+    setDepositProgressBar(job.stage, job.state);
+    setFinalizeProgressBar('FINALIZE', '...');
+}else{
+    setIngestProgressBar('INGEST', 'SUCCEED');
+    setDepositProgressBar('DEPOSIT', 'SUCCEED');
+    setFinalizeProgressBar(job.stage, job.state);
+}
 </script>
 
 <template>
     <div>
         <Message :severity="auditMessage.severity" :closable="false">{{ auditMessage.content }}</Message>
-
-        <Fieldset class="flex flex-col" legend="Basic Properties">
-            <PropertyField title="Job Title" :value="job.injectionTitle"></PropertyField>
+        <Fieldset legend="Basic Properties">
+            <InputGroup class="mt-2 mb-2">
+                <InputGroupAddon>Job Title</InputGroupAddon>
+                <InputText v-model="job.injectionTitle" disabled="true"/>
+            </InputGroup>
+            <InputGroup class="mt-2 mb-2">
+                <InputGroupAddon>Original Path</InputGroupAddon>
+                <InputText v-model="job.injectionPath" disabled="true"/>
+            </InputGroup>
+            <InputGroup class="mt-2 mb-2">
+                <InputGroupAddon>Material Flow</InputGroupAddon>
+                <InputText v-model="job.appliedFlowSetting.materialFlowName" disabled="true"/>
+            </InputGroup>
+            <InputGroup class="mt-2 mb-2">
+                <InputGroupAddon>Initial Time</InputGroupAddon>
+                <InputText v-model="job.initialTime" disabled="true"/>
+                <InputGroupAddon>Latest Update Time</InputGroupAddon>
+                <InputText v-model="job.latestTime" disabled="true"/>
+            </InputGroup>
+            <InputGroup class="mt-2 mb-2">
+                <InputGroupAddon>File Count</InputGroupAddon>
+                <InputText v-model="job.fileCount" disabled="true"/>
+                <InputGroupAddon>File Size</InputGroupAddon>
+                <InputText v-model="formatedFileSize" disabled="true"/>
+            </InputGroup>
+            <InputGroup class="mt-2 mb-2">
+                <InputGroupAddon>Current Stage</InputGroupAddon>
+                <InputText v-model="job.stage" disabled="true"/>
+                <InputGroupAddon>Current State</InputGroupAddon>
+                <InputText v-model="job.state" disabled="true"/>
+            </InputGroup>
+            <InputGroup class="mt-2 mb-2">
+                <InputGroupAddon>Backup Completed Flag</InputGroupAddon>
+                <InputText v-model="job.backupCompleted" disabled="true"/>
+                <InputGroupAddon>Actual Content Deleted Flag</InputGroupAddon>
+                <InputText v-model="job.actualContentDeleted" disabled="true"/>
+            </InputGroup>
+            <InputGroup class="mt-2 mb-2">
+                <ProgressBar class="mr-1" :value="ingestProgress.value">{{ ingestProgress.label }}</ProgressBar>
+                <ProgressBar :value="depositProgress.value">{{ depositProgress.label }}</ProgressBar>
+                <ProgressBar class="ml-1" :value="finalizeProgress.value">{{ finalizeProgress.label }}</ProgressBar>
+            </InputGroup>
         </Fieldset>
 
         <Fieldset legend="SIP Properties">
-            
+            <InputGroup class="mt-2 mb-2">
+                <InputGroupAddon>Deposit Start Time</InputGroupAddon>
+                <InputText v-model="job.depositStartTime" disabled="true"/>
+                <InputGroupAddon>Deposit End Time</InputGroupAddon>
+                <InputText v-model="job.depositEndTime" disabled="true"/>
+            </InputGroup>
+            <InputGroup class="mt-2 mb-2">
+                <InputGroupAddon>SIP ID</InputGroupAddon>
+                <InputText v-model="job.sipID" disabled="true"/>
+                <InputGroupAddon>SIP Result</InputGroupAddon>
+                <InputText v-model="job.resultMessage" disabled="true"/>
+            </InputGroup>
+            <InputGroup class="mt-2 mb-2">
+                <InputGroupAddon>SIP Module</InputGroupAddon>
+                <InputText v-model="job.sipModule" disabled="true"/>
+                <InputGroupAddon>SIP Stage</InputGroupAddon>
+                <InputText v-model="job.sipStage" disabled="true"/>
+                <InputGroupAddon>SIP Status</InputGroupAddon>
+                <InputText v-model="job.sipStatus" disabled="true"/>
+            </InputGroup>
         </Fieldset>
     </div>  
 </template>
 
 
 <style scoped>
+input:disabled{background-color:rgb(15, 6, 6);}
+
+.p-progressbar {
+    border: 0 none;
+    width: 33.333%;
+    height: 1.75rem;
+    border-radius: 0px;
+}
 
 </style>
