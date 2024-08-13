@@ -1,17 +1,24 @@
 <script setup lang="ts">
-import { ref, reactive, inject, onMounted} from 'vue';
+import { ref, reactive, inject} from 'vue';
 import {formatContentLength} from '@/utils/helper';
 
 const dialogRef:any = inject('dialogRef');
 const params = dialogRef.value.data;
-const job = params.job;
+const job = params.data;
 const formatedFileSize=ref();
 formatedFileSize.value=formatContentLength(job.fileSize);
 
 const auditMessage=reactive ({
+    isActive: false,
     content: "OK",
-    severity: "success"
 });
+
+if((job.resultMessage && job.resultMessage !== "") || job.state==='FAILED'){
+    auditMessage.isActive=true;
+    auditMessage.content=job.resultMessage;
+}else{
+    auditMessage.isActive=false;
+}
 
 const ingestProgress=reactive({
     value: 0,
@@ -77,75 +84,73 @@ if(job.stage === 'INGEST'){
 </script>
 
 <template>
-    <div>
-        <Message :severity="auditMessage.severity" :closable="false">{{ auditMessage.content }}</Message>
-        <Fieldset legend="Basic Properties">
-            <InputGroup class="mt-2 mb-2">
-                <InputGroupAddon>Job Title</InputGroupAddon>
-                <InputText v-model="job.injectionTitle" disabled="true"/>
-            </InputGroup>
-            <InputGroup class="mt-2 mb-2">
-                <InputGroupAddon>Original Path</InputGroupAddon>
-                <InputText v-model="job.injectionPath" disabled="true"/>
-            </InputGroup>
-            <InputGroup class="mt-2 mb-2">
-                <InputGroupAddon>Material Flow</InputGroupAddon>
-                <InputText v-model="job.appliedFlowSetting.materialFlowName" disabled="true"/>
-            </InputGroup>
-            <InputGroup class="mt-2 mb-2">
-                <InputGroupAddon>Initial Time</InputGroupAddon>
-                <InputText v-model="job.initialTime" disabled="true"/>
-                <InputGroupAddon>Latest Update Time</InputGroupAddon>
-                <InputText v-model="job.latestTime" disabled="true"/>
-            </InputGroup>
-            <InputGroup class="mt-2 mb-2">
-                <InputGroupAddon>File Count</InputGroupAddon>
-                <InputText v-model="job.fileCount" disabled="true"/>
-                <InputGroupAddon>File Size</InputGroupAddon>
-                <InputText v-model="formatedFileSize" disabled="true"/>
-            </InputGroup>
-            <InputGroup class="mt-2 mb-2">
-                <InputGroupAddon>Current Stage</InputGroupAddon>
-                <InputText v-model="job.stage" disabled="true"/>
-                <InputGroupAddon>Current State</InputGroupAddon>
-                <InputText v-model="job.state" disabled="true"/>
-            </InputGroup>
-            <InputGroup class="mt-2 mb-2">
-                <InputGroupAddon>Backup Completed Flag</InputGroupAddon>
-                <InputText v-model="job.backupCompleted" disabled="true"/>
-                <InputGroupAddon>Actual Content Deleted Flag</InputGroupAddon>
-                <InputText v-model="job.actualContentDeleted" disabled="true"/>
-            </InputGroup>
-            <InputGroup class="mt-2 mb-2">
-                <ProgressBar class="mr-1" :value="ingestProgress.value">{{ ingestProgress.label }}</ProgressBar>
-                <ProgressBar :value="depositProgress.value">{{ depositProgress.label }}</ProgressBar>
-                <ProgressBar class="ml-1" :value="finalizeProgress.value">{{ finalizeProgress.label }}</ProgressBar>
-            </InputGroup>
-        </Fieldset>
+    <Message v-if="auditMessage.isActive" severity="warn" :closable="false">{{ auditMessage.content }}</Message>
+    <Fieldset legend="Basic Properties">
+        <InputGroup class="mt-2 mb-2">
+            <InputGroupAddon>Job Title</InputGroupAddon>
+            <InputText v-model="job.injectionTitle" disabled="true"/>
+        </InputGroup>
+        <InputGroup class="mt-2 mb-2">
+            <InputGroupAddon>Original Path</InputGroupAddon>
+            <InputText v-model="job.injectionPath" disabled="true"/>
+        </InputGroup>
+        <InputGroup class="mt-2 mb-2">
+            <InputGroupAddon>Material Flow</InputGroupAddon>
+            <InputText v-model="job.appliedFlowSetting.materialFlowName" disabled="true"/>
+        </InputGroup>
+        <InputGroup class="mt-2 mb-2">
+            <InputGroupAddon>Initial Time</InputGroupAddon>
+            <InputText v-model="job.initialTime" disabled="true"/>
+            <InputGroupAddon>Latest Update Time</InputGroupAddon>
+            <InputText v-model="job.latestTime" disabled="true"/>
+        </InputGroup>
+        <InputGroup class="mt-2 mb-2">
+            <InputGroupAddon>File Count</InputGroupAddon>
+            <InputText v-model="job.fileCount" disabled="true"/>
+            <InputGroupAddon>File Size</InputGroupAddon>
+            <InputText v-model="formatedFileSize" disabled="true"/>
+        </InputGroup>
+        <InputGroup class="mt-2 mb-2">
+            <InputGroupAddon>Current Stage</InputGroupAddon>
+            <InputText v-model="job.stage" disabled="true"/>
+            <InputGroupAddon>Current State</InputGroupAddon>
+            <InputText v-model="job.state" disabled="true"/>
+        </InputGroup>
+        <InputGroup class="mt-2 mb-2">
+            <InputGroupAddon>Backup Completed Flag</InputGroupAddon>
+            <InputText v-model="job.backupCompleted" disabled="true"/>
+            <InputGroupAddon>Actual Content Deleted Flag</InputGroupAddon>
+            <InputText v-model="job.actualContentDeleted" disabled="true"/>
+        </InputGroup>
+        <InputGroup class="mt-2 mb-2">
+            <ProgressBar class="mr-1" :value="ingestProgress.value">{{ ingestProgress.label }}</ProgressBar>
+            <ProgressBar :value="depositProgress.value">{{ depositProgress.label }}</ProgressBar>
+            <ProgressBar class="ml-1" :value="finalizeProgress.value">{{ finalizeProgress.label }}</ProgressBar>
+        </InputGroup>
+    </Fieldset>
 
-        <Fieldset legend="SIP Properties">
-            <InputGroup class="mt-2 mb-2">
-                <InputGroupAddon>Deposit Start Time</InputGroupAddon>
-                <InputText v-model="job.depositStartTime" disabled="true"/>
-                <InputGroupAddon>Deposit End Time</InputGroupAddon>
-                <InputText v-model="job.depositEndTime" disabled="true"/>
-            </InputGroup>
-            <InputGroup class="mt-2 mb-2">
-                <InputGroupAddon>SIP ID</InputGroupAddon>
-                <InputText v-model="job.sipID" disabled="true"/>
-                <InputGroupAddon>SIP Result</InputGroupAddon>
-                <InputText v-model="job.resultMessage" disabled="true"/>
-            </InputGroup>
-            <InputGroup class="mt-2 mb-2">
-                <InputGroupAddon>SIP Module</InputGroupAddon>
-                <InputText v-model="job.sipModule" disabled="true"/>
-                <InputGroupAddon>SIP Stage</InputGroupAddon>
-                <InputText v-model="job.sipStage" disabled="true"/>
-                <InputGroupAddon>SIP Status</InputGroupAddon>
-                <InputText v-model="job.sipStatus" disabled="true"/>
-            </InputGroup>
-        </Fieldset>
-    </div>  
+    <Fieldset legend="SIP Properties">
+        <InputGroup class="mt-2 mb-2">
+            <InputGroupAddon>Deposit Start Time</InputGroupAddon>
+            <InputText v-model="job.depositStartTime" disabled="true"/>
+            <InputGroupAddon>Deposit End Time</InputGroupAddon>
+            <InputText v-model="job.depositEndTime" disabled="true"/>
+        </InputGroup>
+        <InputGroup class="mt-2 mb-2">
+            <InputGroupAddon>SIP ID</InputGroupAddon>
+            <InputText v-model="job.sipID" disabled="true"/>
+            <InputGroupAddon>SIP Result</InputGroupAddon>
+            <InputText v-model="job.resultMessage" disabled="true"/>
+        </InputGroup>
+        <InputGroup class="mt-2 mb-2">
+            <InputGroupAddon>SIP Module</InputGroupAddon>
+            <InputText v-model="job.sipModule" disabled="true"/>
+            <InputGroupAddon>SIP Stage</InputGroupAddon>
+            <InputText v-model="job.sipStage" disabled="true"/>
+            <InputGroupAddon>SIP Status</InputGroupAddon>
+            <InputText v-model="job.sipStatus" disabled="true"/>
+        </InputGroup>
+    </Fieldset>
 </template>
 
 
@@ -158,5 +163,4 @@ input:disabled{background-color:rgb(15, 6, 6);}
     height: 1.75rem;
     border-radius: 0px;
 }
-
 </style>

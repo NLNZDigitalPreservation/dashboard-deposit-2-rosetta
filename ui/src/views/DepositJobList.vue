@@ -9,7 +9,6 @@ import {useContextMenu} from "@/stores/depositjobContextMenu";
 const cm=useContextMenu();
 
 const jobList = useJobListDTO();
-const selectedJobs = ref([]);
 const expandedRowGroups = ref([]);
 
 watch(keywords, async (newValue, oldValue) => {
@@ -30,9 +29,10 @@ const onRowContextMenu = (event:any) => {
 <template>
   <ContextMenu ref="rowContextMenu" :model="cm.contextMenuModel" @hide="cm.selectedContextRow = null" />
   <DataTable
+    id="main-table"
     v-model:expandedRowGroups="expandedRowGroups"
     :value="jobList.listJobsFiltered"
-    v-model:selection="selectedJobs"
+    v-model:selection="jobList.selectedJobs"
     contextMenu v-model:contextMenuSelection="cm.selectedContextRow"
     @rowContextmenu="onRowContextMenu"
     dataKey="id"
@@ -118,31 +118,18 @@ const onRowContextMenu = (event:any) => {
       </div>
     </template>
   </DataTable>
-
-  <!-- <Paginator
-    :rows="3"
-    :totalRecords="120"
-    :rowsPerPageOptions="[3, 15, 30, 50, 100, 200]"
-    @update:first="updateFirst"
-    @update:rows="updateRows"
-    @page="page"
-  /> -->
 </template>
 
 <style>
-.p-datatable-wrapper {
+#main-table .p-datatable-wrapper {
   height: calc(100vh - 135px);
 }
 
-/* tbody{
-    font-size: 1rem;
-} */
-
-.abnormal-progressbar .p-progressbar-value {
+#main-table .abnormal-progressbar .p-progressbar-value {
   background: gray;
 }
 
-.p-datatable-tbody tr td{
+#main-table .p-datatable-tbody tr td{
   /* font-size: 0.85rem; */
   padding-top: 10px;
   padding-bottom: 10px;

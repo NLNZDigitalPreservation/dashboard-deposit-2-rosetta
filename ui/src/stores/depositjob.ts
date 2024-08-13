@@ -118,6 +118,7 @@ const jobFilter = (job: any, keywords: string) => {
 export const useJobListDTO = defineStore("JobListDTO", () => {
   const listJobs = ref([]);
   const listJobsFiltered = ref();
+  const selectedJobs = ref([]);
   const rest: UseFetchApis = useFetch();
 
   const fetchAllData = () => {
@@ -155,5 +156,5 @@ export const useJobListDTO = defineStore("JobListDTO", () => {
   };
   
 
-  return { listJobsFiltered, fetchAllData, filter };
+  return {selectedJobs, listJobsFiltered, fetchAllData, filter };
 });
