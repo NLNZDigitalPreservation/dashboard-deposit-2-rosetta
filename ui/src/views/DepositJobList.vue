@@ -3,7 +3,8 @@ import { ref, watch, computed, onMounted } from "vue";
 import { useToast } from 'primevue/usetoast';
 import { FilterMatchMode, FilterOperator } from "primevue/api";
 import { MaterialFlow, DepositJob } from "@/types/deposit";
-import { useJobListDTO, keywords } from "@/stores/depositjob";
+import {formatContentLength} from '@/utils/helper';
+import {formatDatetimeFromEpochMilliSeconds, getProgressBarClass, useJobListDTO, keywords } from "@/stores/depositjob";
 import {useContextMenu} from "@/stores/depositjobContextMenu";
 
 const cm=useContextMenu();
@@ -15,16 +16,14 @@ watch(keywords, async (newValue, oldValue) => {
   jobList.filter(keywords.value);
 });
 
-onMounted(() => {
-  jobList.fetchAllData();
-});
-
 const rowContextMenu = ref();
 const toast = useToast();
 
 const onRowContextMenu = (event:any) => {
   rowContextMenu.value.show(event.originalEvent);
 };
+
+jobList.fetchAllData();
 </script>
 <template>
   <ContextMenu ref="rowContextMenu" :model="cm.contextMenuModel" @hide="cm.selectedContextRow = null" />
@@ -77,35 +76,55 @@ const onRowContextMenu = (event:any) => {
       header="JobInitialTime"
       style="min-width: 200px"
       sortable
-    ></Column>
+    >
+      <template #body="{ data }">
+        {{ formatDatetimeFromEpochMilliSeconds(data.initialTime) }}
+      </template>
+    </Column>
     <Column
       field="latestTime"
       header="LatestUpdateTime"
       style="min-width: 200px"
       sortable
-    ></Column>
+    >
+      <template #body="{ data }">
+        {{ formatDatetimeFromEpochMilliSeconds(data.latestTime) }}
+      </template>
+    </Column>
     <Column field="progress" header="Progress" sortable>
       <template #body="{ data }">
         <ProgressBar
           :value="data.progress"
-          v-bind:class="data.progressClassName"
+          v-bind:class="getProgressBarClass(data)"
         ></ProgressBar>
       </template>
     </Column>
     <Column field="fileCount" header="NumOfFiles" sortable></Column>
-    <Column field="fileSize" header="SizeOfFiles" sortable></Column>
+    <Column field="fileSize" header="SizeOfFiles" sortable>
+      <template #body="{ data }">
+        {{ formatContentLength(data.fileSize) }}
+      </template>
+    </Column>
     <Column
       field="depositStartTime"
       header="DepositStartTime"
       style="min-width: 200px"
       sortable
-    ></Column>
+    >
+      <template #body="{ data }">
+        {{ formatDatetimeFromEpochMilliSeconds(data.depositStartTime) }}
+      </template>
+    </Column>
     <Column
       field="depositEndTime"
       header="DepositEndTime"
       style="min-width: 200px"
       sortable
-    ></Column>
+    >
+      <template #body="{ data }">
+        {{ formatDatetimeFromEpochMilliSeconds(data.depositEndTime) }}
+      </template>
+    </Column>
     <Column field="sipID" header="SipId" sortable></Column>
     <Column field="sipModule" header="SipModule" sortable></Column>
     <Column field="sipStage" header="SipStage" sortable></Column>

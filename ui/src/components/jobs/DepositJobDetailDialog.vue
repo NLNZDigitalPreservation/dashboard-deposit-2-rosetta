@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { ref, reactive, inject} from 'vue';
 import {formatContentLength} from '@/utils/helper';
+import {formatDatetimeFromEpochMilliSeconds} from "@/stores/depositjob";
 
 const dialogRef:any = inject('dialogRef');
 const params = dialogRef.value.data;
-const job = params.data;
+const job =Object.assign({}, params.data);
+job.initialTime=formatDatetimeFromEpochMilliSeconds(job.initialTime);
+job.latestTime=formatDatetimeFromEpochMilliSeconds(job.latestTime);
+job.depositStartTime=formatDatetimeFromEpochMilliSeconds(job.depositStartTime);
+job.depositEndTime=formatDatetimeFromEpochMilliSeconds(job.depositEndTime);
 const formatedFileSize=ref();
 formatedFileSize.value=formatContentLength(job.fileSize);
 
@@ -81,6 +86,10 @@ if(job.stage === 'INGEST'){
     setDepositProgressBar('DEPOSIT', 'SUCCEED');
     setFinalizeProgressBar(job.stage, job.state);
 }
+
+const closeDialog = (event:any) => {
+    dialogRef.value.close(event);
+};
 </script>
 
 <template>
@@ -151,6 +160,13 @@ if(job.stage === 'INGEST'){
             <InputText v-model="job.sipStatus" disabled="true"/>
         </InputGroup>
     </Fieldset>
+
+    <Divider />
+
+    <div class="flex justify-center flex-wrap gap-4 mt-4" style="justify-content: flex-end;">
+        <Button type="button" label="OK" @click="closeDialog({ buttonType: 'Confirm' })" autofocus></Button>
+        <Button type="button" label="Close" @click="closeDialog({ buttonType: 'Cancel' })" severity="secondary"></Button>
+    </div>
 </template>
 
 

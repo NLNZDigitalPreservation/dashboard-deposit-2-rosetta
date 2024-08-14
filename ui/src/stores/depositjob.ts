@@ -128,13 +128,6 @@ export const useJobListDTO = defineStore("JobListDTO", () => {
         listJobs.value = data.map((e: any) => ({
           ...e,
           progress: calcProgressPercent(e),
-          progressClassName: getProgressBarClass(e),
-          initialTime: formatDatetimeFromEpochMilliSeconds(e.initialTime),
-          latestTime: formatDatetimeFromEpochMilliSeconds(e.latestTime),
-          depositStartTime: formatDatetimeFromEpochMilliSeconds(
-            e.depositStartTime
-          ),
-          depositEndTime: formatDatetimeFromEpochMilliSeconds(e.depositEndTime),
           materialFlowName: formatMaterialFlowGroup(e),
         }));
         filter(keywords.value);
