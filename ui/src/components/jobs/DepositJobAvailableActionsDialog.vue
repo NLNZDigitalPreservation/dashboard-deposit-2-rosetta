@@ -3,7 +3,9 @@ import { ref, reactive, inject} from 'vue';
 
 const dialogRef:any = inject('dialogRef');
 const params = dialogRef.value.data;
-const action:string = params.data.toUpperCase();
+const action:string = params.action.toUpperCase();
+const errMsg=ref(params.errMsg);
+const needConfirm=ref(params.needConfirm);
 
 const STAGES:any=["INGEST","DEPOSIT","FINALIZE","FINISHED"];
 const STATES:any=["INITIALED","RUNNING","PAUSED", "SUCCEED","FAILED","CANCELED"];
@@ -69,17 +71,15 @@ for(let state of STATES){
 }
 
 const tableData=ref(availableActioTableData);
-const warnMessage=ref(action);
 
 const closeDialog = (event:any)=>{
+    dialogRef.value.close(event);
 }
 
 </script>
 
 <template>
-    <Message severity="warn" :closable="false">
-        The selected jobs are NOT allowed to apply the {{ warnMessage }} action. The available status for {{ warnMessage }} are shown below:
-    </Message>
+    <Message severity="warn" :closable="false"> {{ errMsg }} </Message>
     <DataTable :value="tableData" size="small" showGridlines>
         <Column field="NAME" header="State\Stage"></Column>
         <Column field="INGEST" header="INGEST">
@@ -110,15 +110,9 @@ const closeDialog = (event:any)=>{
 
     <Divider />
 
-    <!-- <Toolbar style="border: 0; padding: 5px;">
-        <template #end> 
-            <Button label="OK"></Button>
-            <Button label="Cancel"</Button>
-        </template>
-    </Toolbar> -->
     <div class="flex justify-center flex-wrap gap-4 mt-4" style="justify-content: flex-end;">
-        <Button type="button" label="OK" @click="closeDialog({ buttonType: 'Confirm' })" autofocus></Button>
-        <Button type="button" label="Close" @click="closeDialog({ buttonType: 'Cancel' })" severity="secondary"></Button>
+        <Button v-if="needConfirm" type="button" label="Confirm" @click="closeDialog({ buttonType: 'confirm' })" autofocus></Button>
+        <Button type="button" label="Close" @click="closeDialog({ buttonType: 'cancel' })" severity="secondary"></Button>
     </div>
 
 </template>

@@ -31,7 +31,7 @@ export const formatDatetimeFromEpochMilliSeconds = (epochMilliSecond: any) => {
   return date.toLocaleString();
 };
 
-const formatMaterialFlowGroup = (data: any) => {
+export const formatMaterialFlowGroup = (data: any) => {
   if (
     !data ||
     !data.appliedFlowSetting ||
@@ -43,7 +43,7 @@ const formatMaterialFlowGroup = (data: any) => {
   return data.appliedFlowSetting.materialFlowName;
 };
 
-const getProgressBarClass = (data: any) => {
+export const getProgressBarClass = (data: any) => {
   if (data.stage === "FINISHED" && data.state === "CANCELED") {
     return "abnormal-progressbar";
   } else {
@@ -51,7 +51,7 @@ const getProgressBarClass = (data: any) => {
   }
 };
 
-const calcProgressPercent = (data: any) => {
+export const calcProgressPercent = (data: any) => {
   const stage = data.stage;
   const state = data.state;
 

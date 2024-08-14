@@ -42,7 +42,7 @@ onMounted(() => {
 
 .p-dialog-content {
   padding: 0px 12px 12px 12px;
-  border: 1px solid;
+  border: 5px solid;
   border-color: rgb(59, 73, 73);
   border-top-right-radius: 12px;
   border-top-left-radius: 12px;
