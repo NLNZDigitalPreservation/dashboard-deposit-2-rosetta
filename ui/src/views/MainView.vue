@@ -1,9 +1,12 @@
 <template>
+    <!-- <AppTopbar></AppTopbar> -->
     <div class="layout-topbar">
-        <router-link to="/" class="layout-topbar-logo">
-            <img src="@/assets/natlib-logo-red.png" alt="logo" />
-            <span class="mb-2" v-badge="'PRD'">Deposit Dashboard</span>
-        </router-link>
+        <div class="layout-topbar-logo-container">
+            <router-link to="/" class="layout-topbar-logo">
+                <img src="@/assets/natlib-logo-red.png" width="50" height="50" alt="logo" />
+                <OverlayBadge value="PRD"> Deposit Dashboard </OverlayBadge>
+            </router-link>
+        </div>
 
         <IconField iconPosition="left" class="mr-2">
             <InputText v-model="keywords" type="text" placeholder="Filter" />
@@ -15,9 +18,27 @@
         <Button label="Export Selected Jobs" icon="pi pi-download" class="mr-2"></Button>
         <Button label="Redeposit" icon="pi pi-pen-to-square" class="mr-2"></Button>
 
-        <div class="layout-topbar-menu" :class="topbarMenuClasses">
-            <Menu ref="menu" :model="settingsMenuItems" :popup="true" />
-            <Button type="button" label="Settings" icon="pi pi-chevron-down" iconPos="right" @click="toggleMenu" class="mr-2"/>
+        <div class="layout-topbar-actions">
+            <div class="layout-config-menu">
+                <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
+                    <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
+                </button>
+                <div class="relative">
+                    <button
+                        v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'animate-scalein', leaveToClass: 'hidden', leaveActiveClass: 'animate-fadeout', hideOnOutsideClick: true }"
+                        type="button"
+                        class="layout-topbar-action layout-topbar-action-highlight"
+                    >
+                        <i class="pi pi-palette"></i>
+                    </button>
+                    <AppConfigurator />
+                </div>
+            </div>
+
+            <div class="layout-topbar-menu" :class="topbarMenuClasses">
+                <Menu ref="menu" :model="settingsMenuItems" :popup="true" />
+                <Button type="button" raised rounded icon="pi pi-cog" severity="contrast" @click="toggleMenu" class="mr-2" />
+            </div>
         </div>
     </div>
     <!-- <Divider /> -->
@@ -27,10 +48,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import AppConfigurator from '@/layout/AppConfigurator.vue';
+import { useLayout } from '@/layout/composables/layout';
+import { keywords } from '@/stores/depositjob';
 import { useUserProfileStore } from '@/stores/users';
+import Menu from 'primevue/menu';
+import { computed, ref } from 'vue';
 import DepositJobList from './DepositJobList.vue';
-import {depositJobList, keywords} from '@/stores/depositjob';
+
+const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 
 const topbarMenuActive = ref(false);
 const topbarMenuClasses = computed(() => {
@@ -38,7 +64,8 @@ const topbarMenuClasses = computed(() => {
         'layout-topbar-menu-mobile-active': topbarMenuActive.value
     };
 });
-
+/*  */
+const menu = ref();
 const settingsMenuItems = ref([
     {
         label: 'Deposit Account Settings',
@@ -68,27 +95,25 @@ const settingsMenuItems = ref([
     }
 ]);
 
-const menu = ref(null);
-const toggleMenu = (event:any) => {
+const toggleMenu = (event: any) => {
     menu.value.toggle(event);
 };
 
-
 const token = useUserProfileStore();
-const logout = ()=>{
+const logout = () => {
     token.clear();
-}
-
+};
 </script>
 <style scoped>
-button{
+button {
     font-size: 1rem;
 }
-.main-table{
+.main-table {
     position: absolute;
-    top: 80px;
-    height: calc(100vh - 80px);
+    top: 55px;
+    height: calc(100vh - 60px);
     width: 100vw;
     overflow: hidden;
+    border-top: 1px solid;
 }
 </style>

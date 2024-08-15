@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { FilterMatchMode, FilterOperator } from "primevue/api";
+import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
 import { type UseFetchApis, useFetch } from "@/utils/rest.api";
 
 export const depositJobList = ref([]);
@@ -31,7 +31,7 @@ export const formatDatetimeFromEpochMilliSeconds = (epochMilliSecond: any) => {
   return date.toLocaleString();
 };
 
-const formatMaterialFlowGroup = (data: any) => {
+export const formatMaterialFlowGroup = (data: any) => {
   if (
     !data ||
     !data.appliedFlowSetting ||
@@ -43,7 +43,7 @@ const formatMaterialFlowGroup = (data: any) => {
   return data.appliedFlowSetting.materialFlowName;
 };
 
-const getProgressBarClass = (data: any) => {
+export const getProgressBarClass = (data: any) => {
   if (data.stage === "FINISHED" && data.state === "CANCELED") {
     return "abnormal-progressbar";
   } else {
@@ -51,7 +51,7 @@ const getProgressBarClass = (data: any) => {
   }
 };
 
-const calcProgressPercent = (data: any) => {
+export const calcProgressPercent = (data: any) => {
   const stage = data.stage;
   const state = data.state;
 
@@ -118,6 +118,7 @@ const jobFilter = (job: any, keywords: string) => {
 export const useJobListDTO = defineStore("JobListDTO", () => {
   const listJobs = ref([]);
   const listJobsFiltered = ref();
+  const selectedJobs = ref([]);
   const rest: UseFetchApis = useFetch();
 
   const fetchAllData = () => {
@@ -127,13 +128,6 @@ export const useJobListDTO = defineStore("JobListDTO", () => {
         listJobs.value = data.map((e: any) => ({
           ...e,
           progress: calcProgressPercent(e),
-          progressClassName: getProgressBarClass(e),
-          initialTime: formatDatetimeFromEpochMilliSeconds(e.initialTime),
-          latestTime: formatDatetimeFromEpochMilliSeconds(e.latestTime),
-          depositStartTime: formatDatetimeFromEpochMilliSeconds(
-            e.depositStartTime
-          ),
-          depositEndTime: formatDatetimeFromEpochMilliSeconds(e.depositEndTime),
           materialFlowName: formatMaterialFlowGroup(e),
         }));
         filter(keywords.value);
@@ -155,5 +149,5 @@ export const useJobListDTO = defineStore("JobListDTO", () => {
   };
   
 
-  return { listJobsFiltered, fetchAllData, filter };
+  return {selectedJobs, listJobsFiltered, fetchAllData, filter };
 });

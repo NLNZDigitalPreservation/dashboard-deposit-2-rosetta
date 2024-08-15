@@ -48,3 +48,16 @@ export const camelCaseToTitleCase = (s: string) => {
     const result = s.replace(/([A-Z])/g, ' $1');
     return result.charAt(0).toUpperCase() + result.slice(1);
 }
+
+const K=1024, M=K*1024, G=M*1024;
+export const formatContentLength = (l:number) => {
+  if(l>G){
+    return Math.round(l/G)+'GB';
+  }else if(l>M){
+    return Math.round(l/M)+'MB';
+  }else if(l>K){
+    return Math.round(l/K)+'KB';
+  }else{
+    return l+'B';
+  }
+}
