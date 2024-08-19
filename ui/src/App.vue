@@ -15,7 +15,7 @@ import MainView from '@/views/MainView.vue';
     width: 100vw;
     overflow: hidden;
 }
-.p-dialog {
+/* .p-dialog {
     border: 0;
 }
 .p-dialog-header {
@@ -31,5 +31,5 @@ import MainView from '@/views/MainView.vue';
     border-top-left-radius: 12px;
     border-bottom-right-radius: 12px;
     border-bottom-left-radius: 12px;
-}
+} */
 </style>

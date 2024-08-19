@@ -1,6 +1,5 @@
 <template>
-    <!-- <AppTopbar></AppTopbar> -->
-    <div class="layout-topbar">
+    <div class="layout-topbar" style="position: relative">
         <div class="layout-topbar-logo-container">
             <router-link to="/" class="layout-topbar-logo">
                 <img src="@/assets/natlib-logo-red.png" width="50" height="50" alt="logo" />
@@ -8,12 +7,19 @@
             </router-link>
         </div>
 
-        <IconField iconPosition="left" class="mr-2">
-            <InputText v-model="keywords" type="text" placeholder="Filter" />
+        <!-- <IconField class="mr-2">
             <InputIcon class="pi pi-filter" />
+            <InputText v-model="keywords" type="text" placeholder="Filter" />
+        </IconField> -->
+        <IconField>
+            <InputGroup>
+                <InputText placeholder="Filter" style="max-width: 15rem" />
+                <Button icon="pi pi-filter" label="Advanced" @click="topbarActions.openSearchDialog" />
+            </InputGroup>
         </IconField>
+        <div style="width: 1rem"></div>
 
-        <Button label="Search" icon="pi pi-search" class="mr-2"></Button>
+        <!-- <Button label="Search" icon="pi pi-search" class="mr-2" @click="topbarActions.openSearchDialog"></Button> -->
         <Button label="Reload" icon="pi pi-refresh" class="mr-2"></Button>
         <Button label="Export Selected Jobs" icon="pi pi-download" class="mr-2"></Button>
         <Button label="Redeposit" icon="pi pi-pen-to-square" class="mr-2"></Button>
@@ -41,20 +47,16 @@
             </div>
         </div>
     </div>
-    <!-- <Divider /> -->
-    <div class="main-table">
-        <DepositJobList></DepositJobList>
-    </div>
+    <router-view />
 </template>
 
 <script setup lang="ts">
 import AppConfigurator from '@/layout/AppConfigurator.vue';
 import { useLayout } from '@/layout/composables/layout';
-import { keywords } from '@/stores/depositjob';
+import { useTopbarActions } from '@/stores/depositjobTopbarActions';
 import { useUserProfileStore } from '@/stores/users';
 import Menu from 'primevue/menu';
 import { computed, ref } from 'vue';
-import DepositJobList from './DepositJobList.vue';
 
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 
@@ -103,17 +105,7 @@ const token = useUserProfileStore();
 const logout = () => {
     token.clear();
 };
+
+const topbarActions = useTopbarActions();
 </script>
-<style scoped>
-button {
-    font-size: 1rem;
-}
-.main-table {
-    position: absolute;
-    top: 55px;
-    height: calc(100vh - 60px);
-    width: 100vw;
-    overflow: hidden;
-    border-top: 1px solid;
-}
-</style>
+<style></style>
