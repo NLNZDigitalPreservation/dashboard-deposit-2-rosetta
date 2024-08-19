@@ -11,6 +11,8 @@ import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositAccount;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositJob;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
+import nz.govt.natlib.dashboard.exceptions.NotFoundException;
+import nz.govt.natlib.dashboard.exceptions.SystemErrorException;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -72,7 +74,7 @@ public class FlowSettingService {
                 throw new InvalidParameterException("Invalid producerId");
             }
 
-            if (!rosettaWebService.isValidMaterialFlow(depositAccount,flowSetting.getProducerId(), flowSetting.getMaterialFlowId())) {
+            if (!rosettaWebService.isValidMaterialFlow(depositAccount, flowSetting.getProducerId(), flowSetting.getMaterialFlowId())) {
                 throw new InvalidParameterException("Invalid materialFlowId");
             }
         } catch (Exception e) {
@@ -105,27 +107,6 @@ public class FlowSettingService {
         }
     }
 
-    public RestResponseCommand getAllFlowSettings() {
-        RestResponseCommand retVal = new RestResponseCommand();
-        List<EntityFlowSetting> allFlowSettings = repoFlowSetting.getAll();
-        retVal.setRspBody(allFlowSettings);
-        allFlowSettings.clear();
-        return retVal;
-    }
-
-    public RestResponseCommand getFlowSettingDetail(Long id) {
-        RestResponseCommand retVal = new RestResponseCommand();
-
-        EntityFlowSetting flowSetting = repoFlowSetting.getById(id);
-        if (flowSetting == null) {
-            retVal.setRspCode(RestResponseCommand.RSP_USER_QUERY_ERROR);
-            retVal.setRspMsg("Could not find flowSetting with id: " + id);
-            return retVal;
-        }
-
-        retVal.setRspBody(flowSetting);
-        return retVal;
-    }
 
     public EntityFlowSetting saveFlowSetting(EntityFlowSetting flowSetting) throws InvalidParameterException, WebServiceException, NullParameterException {
         //Validating input parameters
@@ -134,21 +115,19 @@ public class FlowSettingService {
         return flowSetting;
     }
 
-    public RestResponseCommand deleteFlowSetting(Long id) {
-        RestResponseCommand retVal = getFlowSettingDetail(id);
+    public EntityFlowSetting deleteFlowSetting(Long id) throws NotFoundException, SystemErrorException {
+        EntityFlowSetting flowSetting = repoFlowSetting.getById(id);
+        if (flowSetting == null) {
+            throw new NotFoundException("Not able to find material flow: " + id);
+        }
 
         List<EntityDepositJob> jobs = repoDepositJob.getByFlowId(id);
-        if (jobs.size() > 0) {
-            retVal.setRspCode(RestResponseCommand.RSP_USER_OTHER_ERROR);
-            retVal.setRspMsg("The flow is referenced by deposit jobs, can not be deleted");
-            return retVal;
+        if (!jobs.isEmpty()) {
+            throw new SystemErrorException("The flow is referenced by deposit jobs, can not be deleted: " + RestResponseCommand.RSP_USER_OTHER_ERROR);
         }
 
-        EntityFlowSetting flowSetting = repoFlowSetting.getById(id);
-        if (flowSetting != null) {
-            repoFlowSetting.deleteById(id);
-        }
+        repoFlowSetting.deleteById(id);
 
-        return retVal;
+        return flowSetting;
     }
 }
