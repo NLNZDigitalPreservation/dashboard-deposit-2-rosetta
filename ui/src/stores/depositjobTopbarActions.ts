@@ -1,3 +1,4 @@
+import DepositJobRedeposit from '@/components/jobs/DepositJobRedeposit.vue';
 import DepositJobSearchDialog from '@/components/jobs/DepositJobSearchDialog.vue';
 import { useJobListDTO } from '@/stores/depositjob';
 import { type UseFetchApis, useFetch } from '@/utils/rest.api';
@@ -23,14 +24,30 @@ export const useTopbarActions = defineStore('TopbarActions', () => {
                     width: '75rem'
                 },
                 modal: true
-            },
-            onClose: (options: any) => {
-                if (options.data.buttonType === 'confirm') {
-                    onSearch(options.data);
-                }
             }
         });
     };
 
-    return { openSearchDialog };
+    const onReload = () => {
+        jobList.fetchAllData();
+    };
+
+    const onExportSelectedJobs = () => {
+        jobList.exportSelectedJobs();
+    };
+
+    const openRedepositDialog = () => {
+        const dialogRef = dialog.open(DepositJobRedeposit, {
+            props: {
+                header: 'Redepoit Job',
+                closable: true,
+                style: {
+                    width: '75rem'
+                },
+                modal: true
+            }
+        });
+    };
+
+    return { openSearchDialog, onReload, onExportSelectedJobs, openRedepositDialog };
 });

@@ -1,7 +1,7 @@
-import { ref, reactive } from 'vue'
-import { useDialog } from 'primevue/usedialog';
 import LoginDialog from '@/components/LoginDialog.vue';
 import { useUserProfileStore } from '@/stores/users';
+import { useDialog } from 'primevue/usedialog';
+import { reactive, ref } from 'vue';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
 
@@ -13,13 +13,13 @@ export const isAuthenticating = reactive({
 
 export interface UseFetchApis {
     // methods
-    get: (path: string) => any
-    post: (path: string, payload: any) => any
-    put: (path: string, payload: any) => any
-    delete: (path: string, payload: any) => any
-    patch: (path: string, payload: any) => any
-    head: (path: string) => any
-    options: (path: string, payload: any) => any
+    get: (path: string) => any;
+    post: (path: string, payload: any) => any;
+    put: (path: string, payload: any) => any;
+    delete: (path: string, payload: any) => any;
+    patch: (path: string, payload: any) => any;
+    head: (path: string) => any;
+    options: (path: string, payload: any) => any;
 }
 
 // by convention, composable function names start with "use"
@@ -31,15 +31,15 @@ export function useFetch() {
     async function openLoginDialog(dialog: any) {
         const userProfile = useUserProfileStore();
         const last_token = userProfile.token;
-        await sleep(Math.floor((Math.random() * 100) + 1));
+        await sleep(Math.floor(Math.random() * 100 + 1));
 
         if (isAuthenticating.value) {
-            console.log("The login window is opened");
+            console.log('The login window is opened');
             return;
         }
 
         if (last_token !== userProfile.token) {
-            console.log("The token was updated.");
+            console.log('The token was updated.');
             isAuthenticating.value = false;
             return;
         }
@@ -51,7 +51,7 @@ export function useFetch() {
                 header: 'Please login',
                 closable: false,
                 style: {
-                    width: '350px',
+                    width: '350px'
                 },
                 modal: true
             },
@@ -72,8 +72,8 @@ export function useFetch() {
         delete: setMethod('DELETE'),
         patch: setMethod('PATCH'),
         head: setMethod('HEAD'),
-        options: setMethod('OPTIONS'),
-    }
+        options: setMethod('OPTIONS')
+    };
 
     function setMethod(methodValue: HttpMethod) {
         return async (path: string, payload: any = null) => {
@@ -94,18 +94,18 @@ export function useFetch() {
 
                 const reqOptions: RequestInit = {
                     method: methodValue,
-                    credentials: "same-origin",
+                    credentials: 'same-origin',
                     redirect: 'error',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': userProfile.token,
+                        Authorization: userProfile.token
                     }
-                }
+                };
                 if (payload) {
                     reqOptions.body = JSON.stringify(payload);
                 }
 
-                ret = await fetch('/deposit-dashboard' + path, reqOptions).then(async rsp => {
+                ret = await fetch('/deposit-dashboard' + path, reqOptions).then(async (rsp) => {
                     // console.log(rsp);
                     if (rsp.status == 401) {
                         return null;
@@ -115,21 +115,26 @@ export function useFetch() {
 
                     if (rsp.ok) {
                         try {
-                            const text = await rsp.text();
-                            const data = JSON.parse(text);
-                            return data;
+                            if (path.includes('export-data')) {
+                                const data = await rsp.blob();
+                                return data;
+                            } else {
+                                const text = await rsp.text();
+                                const data = JSON.parse(text);
+                                return data;
+                            }
                         } catch {
-                            return "Success";
+                            return 'Success';
                         }
-                    } else {                    
-                        let errorMessage
-                        const error = await rsp.json()
+                    } else {
+                        let errorMessage;
+                        const error = await rsp.json();
                         if (!error || error.length === 0) {
-                            errorMessage = "Unknown error."
+                            errorMessage = 'Unknown error.';
                         } else {
-                            errorMessage = error.Error
+                            errorMessage = error.Error;
                         }
-                        throw new Error(rsp.status + " : " + errorMessage);
+                        throw new Error(rsp.status + ' : ' + errorMessage);
                     }
                 });
 
@@ -138,7 +143,7 @@ export function useFetch() {
                 }
             }
             return ret;
-        }
+        };
     }
 
     // expose managed state as return value

@@ -13,16 +13,16 @@
         </IconField> -->
         <IconField>
             <InputGroup>
-                <InputText placeholder="Filter" style="max-width: 15rem" />
+                <InputText placeholder="Filter" style="max-width: 20rem" />
                 <Button icon="pi pi-filter" label="Advanced" @click="topbarActions.openSearchDialog" />
             </InputGroup>
         </IconField>
         <div style="width: 1rem"></div>
 
         <!-- <Button label="Search" icon="pi pi-search" class="mr-2" @click="topbarActions.openSearchDialog"></Button> -->
-        <Button label="Reload" icon="pi pi-refresh" class="mr-2"></Button>
-        <Button label="Export Selected Jobs" icon="pi pi-download" class="mr-2"></Button>
-        <Button label="Redeposit" icon="pi pi-pen-to-square" class="mr-2"></Button>
+        <Button @click="topbarActions.onReload()" label="Reload" icon="pi pi-refresh" class="mr-2"></Button>
+        <Button @click="topbarActions.onExportSelectedJobs()" label="Export Selected Jobs" icon="pi pi-download" class="mr-2"></Button>
+        <Button @click="topbarActions.openRedepositDialog()" label="Redeposit" icon="pi pi-pen-to-square" class="mr-2"></Button>
 
         <div class="layout-topbar-actions">
             <div class="layout-config-menu">
@@ -53,12 +53,15 @@
 <script setup lang="ts">
 import AppConfigurator from '@/layout/AppConfigurator.vue';
 import { useLayout } from '@/layout/composables/layout';
+import { useJobListDTO } from '@/stores/depositjob';
 import { useTopbarActions } from '@/stores/depositjobTopbarActions';
 import { useUserProfileStore } from '@/stores/users';
 import Menu from 'primevue/menu';
 import { computed, ref } from 'vue';
 
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
+
+const jobList = useJobListDTO();
 
 const topbarMenuActive = ref(false);
 const topbarMenuClasses = computed(() => {
