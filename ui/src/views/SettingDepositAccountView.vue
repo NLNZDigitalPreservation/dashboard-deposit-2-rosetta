@@ -27,6 +27,7 @@ const initialData = {
     auditMsg: 'OK'
 };
 const selectedRow = ref(initialData);
+const metaKey = ref(true);
 
 const onRowSelect = (event: any) => {
     selectedRow.value = event.data;
@@ -34,11 +35,17 @@ const onRowSelect = (event: any) => {
 </script>
 
 <template>
-    <Splitter style="width: 100%; height: 100%">
-        <SplitterPanel class="flex items-center justify-center" :size="65" :minSize="10">
-            <Card style="width: 25rem; overflow: hidden">
-                <template #title>Deposit Account: {{ selectedRow.id }}</template>
-                <template #content>
+    <Divider style="border-width: 3px; padding: 0; margin: 0" />
+    <Fluid>
+        <div class="flex flex-col md:flex-row">
+            <div class="md:w-2/3" style="height: calc(100vh - 75px)">
+                <Toolbar>
+                    <template #start> Deposit Account: {{ selectedRow.id }} </template>
+                    <template #center> </template>
+                    <template #end> <Button label="Save" icon="pi pi-save" class="w-full" raised /></template>
+                </Toolbar>
+
+                <div class="p-2" style="overflow-y: auto">
                     <Fieldset legend="Settings">
                         <InputGroup class="mt-2 mb-2">
                             <InputGroupAddon>Institute</InputGroupAddon>
@@ -53,38 +60,34 @@ const onRowSelect = (event: any) => {
                             <Password v-model="selectedRow.depositUserPassword" :feedback="false" />
                         </InputGroup>
                     </Fieldset>
+
                     <Fieldset legend="Health Audit">
                         <Message v-if="selectedRow.auditRst" severity="success" :closable="false">{{ selectedRow.auditMsg }}</Message>
                         <Message v-if="!selectedRow.auditRst" severity="warn" :closable="false">{{ selectedRow.auditMsg }}</Message>
                     </Fieldset>
-                </template>
-                <template #footer>
-                    <div class="flex gap-4 mt-1">
-                        <Button label="Save" class="w-full" raised />
-                    </div>
-                </template>
-            </Card>
-        </SplitterPanel>
-        <SplitterPanel class="flex items-center justify-center" :size="35">
-            <DataTable v-model:selection="depositAccount.selectedRow" :value="depositAccount.data" dataKey="id" @rowSelect="onRowSelect" tableStyle="width:100%">
-                <template #header>
-                    <div class="flex flex-wrap items-center justify-between gap-2">
-                        <Button label="New" icon="pi pi-plus" raised />
-                        <Button label="Delete" icon="pi pi-delete" raised />
-                    </div>
-                </template>
-                <Column selectionMode="single" headerStyle="width: 3rem"></Column>
-                <Column field="id" header="ID"></Column>
-                <Column field="depositUserInstitute" header="Institute"></Column>
-                <Column field="depositUserName" header="User Name"></Column>
-                <Column field="auditRst" header="Audit Result">
-                    <template #body="slotProps">
-                        {{ slotProps.data.auditRst + ':' + slotProps.data.auditMsg }}
+                </div>
+            </div>
+            <Divider layout="vertical" style="border-width: 3px" />
+            <div class="md:w-1/3" style="height: calc(100vh - 75px)">
+                <Toolbar>
+                    <template #start> <Button label="New" icon="pi pi-plus" raised /></template>
+                    <template #center> </template>
+                    <template #end> <Button label="Delete" icon="pi pi-trash" raised /></template>
+                </Toolbar>
+
+                <DataTable v-model:selection="depositAccount.selectedRow" :value="depositAccount.data" selectionMode="single" :metaKeySelection="metaKey" dataKey="id" @rowSelect="onRowSelect" tableStyle="width:100%" showGridlines>
+                    <template #header>
+                        <div class="flex flex-wrap items-center justify-between gap-2"></div>
                     </template>
-                </Column>
-            </DataTable>
-        </SplitterPanel>
-    </Splitter>
+                    <Column selectionMode="single" headerStyle="width: 3rem"></Column>
+                    <Column field="id" header="ID"></Column>
+                    <Column field="depositUserInstitute" header="Institute"></Column>
+                    <Column field="depositUserName" header="User Name"></Column>
+                    <Column field="auditMsg" header="Audit Result"> </Column>
+                </DataTable>
+            </div>
+        </div>
+    </Fluid>
 </template>
 
 <style scoped></style>
