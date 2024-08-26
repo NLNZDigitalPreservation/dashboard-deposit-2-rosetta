@@ -10,6 +10,11 @@ export const routes = {
                     path: '',
                     name: 'home',
                     component: () => import('@/views/DepositJobListView.vue')
+                },
+                {
+                    path: '/setting/deposit-account',
+                    name: 'deposit-account',
+                    component: () => import('@/views/SettingDepositAccountView.vue')
                 }
             ]
         }

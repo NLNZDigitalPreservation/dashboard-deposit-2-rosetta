@@ -26,12 +26,8 @@ public class DepositAccountSettingService {
     @Autowired
     private RepoFlowSetting repoFlowSetting;
 
-    public RestResponseCommand getAllDepositAccountSettings() {
-        RestResponseCommand rstVal = new RestResponseCommand();
-        List<EntityDepositAccountSetting> data = repoDepositAccount.getAll();
-        rstVal.setRspBody(data);
-        data.clear();
-        return rstVal;
+    public List<EntityDepositAccountSetting> getAllDepositAccountSettings() {
+        return repoDepositAccount.getAll();
     }
 
     public RestResponseCommand saveDepositAccountSetting(EntityDepositAccountSetting producer) throws Exception {

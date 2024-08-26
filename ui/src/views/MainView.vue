@@ -58,7 +58,9 @@ import { useTopbarActions } from '@/stores/depositjobTopbarActions';
 import { useUserProfileStore } from '@/stores/users';
 import Menu from 'primevue/menu';
 import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 
 const jobList = useJobListDTO();
@@ -74,7 +76,10 @@ const menu = ref();
 const settingsMenuItems = ref([
     {
         label: 'Deposit Account Settings',
-        icon: 'pi pi-users'
+        icon: 'pi pi-users',
+        command: () => {
+            router.push('/setting/deposit-account');
+        }
     },
     {
         label: 'Material Flow Settings',

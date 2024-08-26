@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @RestController
 public class DepositAccountSettingController {
@@ -18,7 +19,7 @@ public class DepositAccountSettingController {
     private DepositAccountSettingService depositAccountSettingService;
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_ALL_GET, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand getAllProducerSettings() {
+    public List<EntityDepositAccountSetting> getAllProducerSettings() {
         return depositAccountSettingService.getAllDepositAccountSettings();
     }
 
