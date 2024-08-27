@@ -12,4 +12,8 @@ public class SystemErrorException extends RuntimeException {
     public SystemErrorException(String msg) {
         super(msg);
     }
+
+    public SystemErrorException(int code, String msg) {
+        super(code + ": " + msg);
+    }
 }

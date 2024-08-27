@@ -7,6 +7,8 @@ import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositAccount;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
+import nz.govt.natlib.dashboard.exceptions.BadRequestException;
+import nz.govt.natlib.dashboard.exceptions.SystemErrorException;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -30,79 +32,60 @@ public class DepositAccountSettingService {
         return repoDepositAccount.getAll();
     }
 
-    public RestResponseCommand saveDepositAccountSetting(EntityDepositAccountSetting producer) throws Exception {
-        //Validate the producer
-        DashboardHelper.assertNotNull("Producer", producer);
-        DashboardHelper.assertNotNull("DepositUserInstitute", producer.getDepositUserInstitute());
-        DashboardHelper.assertNotNull("DepositUserName", producer.getDepositUserName());
-        DashboardHelper.assertNotNull("DepositUserPassword", producer.getDepositUserPassword());
-//        rosettaWebService.login(producer.getDepositUserInstitute(), producer.getDepositUserName(), producer.getDepositUserPassword());
+    public void saveDepositAccountSetting(EntityDepositAccountSetting account) throws Exception {
+        //Validate the account
+        DashboardHelper.assertNotNull("Producer", account);
+        DashboardHelper.assertNotNull("DepositUserInstitute", account.getDepositUserInstitute());
+        DashboardHelper.assertNotNull("DepositUserName", account.getDepositUserName());
+        DashboardHelper.assertNotNull("DepositUserPassword", account.getDepositUserPassword());
+//        rosettaWebService.login(account.getDepositUserInstitute(), account.getDepositUserName(), account.getDepositUserPassword());
 
-        RestResponseCommand rstVal = new RestResponseCommand();
-        String pdsHandle = rosettaWebService.login(producer.getDepositUserInstitute(), producer.getDepositUserName(), producer.getDepositUserPassword());
+        String pdsHandle = rosettaWebService.login(account.getDepositUserInstitute(), account.getDepositUserName(), account.getDepositUserPassword());
         if (StringUtils.isEmpty(pdsHandle)) {
             String err_msg = "Invalid deposit username or password";
             log.error(err_msg);
-            rstVal.setRspCode(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
-            rstVal.setRspMsg(err_msg);
-            return rstVal;
+            throw new BadRequestException(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE, err_msg);
         }
-        rosettaWebService.logout(pdsHandle);
-
-        List<DtoProducersRsp.Producer> producers = rosettaWebService.getProducers(producer);
-        producer.setProducers(producers);
-
-        repoDepositAccount.save(producer);
-        producers.clear();
-        return rstVal;
+        repoDepositAccount.save(account);
     }
 
-    public RestResponseCommand deleteDepositAccountSetting(Long id) {
-        RestResponseCommand retVal = new RestResponseCommand();
+    public void deleteDepositAccountSetting(Long id) {
         List<EntityFlowSetting> flowSettings = repoFlowSetting.getAll();
         for (EntityFlowSetting flowSetting : flowSettings) {
             if (flowSetting.getDepositAccountId() == id.longValue()) {
-                retVal.setRspCode(RestResponseCommand.RSP_USER_OTHER_ERROR);
-                retVal.setRspMsg("The flow is referenced by material flows, can not be deleted");
-                return retVal;
+                throw new BadRequestException(RestResponseCommand.RSP_USER_OTHER_ERROR, "The flow is referenced by material flows, can not be deleted");
             }
         }
         repoDepositAccount.deleteById(id);
-        return retVal;
     }
 
-    public RestResponseCommand getDepositAccountDetail(Long id) throws Exception {
-        RestResponseCommand rstVal = new RestResponseCommand();
-        EntityDepositAccountSetting producer = repoDepositAccount.getById(id);
+    public EntityDepositAccountSetting getDepositAccountDetail(Long id) throws Exception {
+        EntityDepositAccountSetting account = repoDepositAccount.getById(id);
         String pdsHandle = null;
 
         try {
-            pdsHandle = rosettaWebService.login(producer.getDepositUserInstitute(), producer.getDepositUserName(), producer.getDepositUserPassword());
+            pdsHandle = rosettaWebService.login(account.getDepositUserInstitute(), account.getDepositUserName(), account.getDepositUserPassword());
             if (StringUtils.isEmpty(pdsHandle)) {
-                producer.setAuditRst(Boolean.FALSE);
-                producer.setAuditMsg("The credential message is not correct");
+                account.setAuditRst(Boolean.FALSE);
+                account.setAuditMsg("The credential message is not correct");
             }
         } catch (Exception e) {
-            producer.setAuditRst(Boolean.FALSE);
-            producer.setAuditMsg("The credential message is not correct:" + e.getMessage());
+            account.setAuditRst(Boolean.FALSE);
+            account.setAuditMsg("The credential message is not correct:" + e.getMessage());
         } finally {
             if (!StringUtils.isEmpty(pdsHandle)) {
                 rosettaWebService.logout(pdsHandle);
             }
         }
-
-        rstVal.setRspBody(producer);
-        return rstVal;
+        return account;
     }
 
-    public RestResponseCommand refreshDepositAccountSetting(Long id) {
+    public void refreshDepositAccountSetting(Long id) {
         RestResponseCommand retVal = new RestResponseCommand();
 
         EntityDepositAccountSetting depositAccountSetting = repoDepositAccount.getById(id);
         if (depositAccountSetting == null) {
-            retVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
-            retVal.setRspMsg("Unknown deposit account, id=" + id);
-            return retVal;
+            throw new BadRequestException(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS, "Unknown deposit account, id=" + id);
         }
 
         try {
@@ -111,11 +94,7 @@ public class DepositAccountSettingService {
             repoDepositAccount.save(depositAccountSetting);
             retVal.setRspBody(depositAccountSetting);
         } catch (Exception e) {
-            retVal.setRspCode(RestResponseCommand.RSP_SYSTEM_ERROR);
-            retVal.setRspMsg(e.getMessage());
-            return retVal;
+            throw new SystemErrorException(RestResponseCommand.RSP_SYSTEM_ERROR, e.getMessage());
         }
-
-        return retVal;
     }
 }

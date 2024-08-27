@@ -1,5 +1,6 @@
 <template>
-    <div class="layout-topbar" style="position: relative; background: linear-gradient(to right, #212529, #1d4ed8, #1d4ed8, #1d4ed8, #212529)">
+    <!-- <div class="layout-topbar" style="position: relative; background: linear-gradient(to right, #212529, #32cd32, #212529)"> -->
+    <div class="layout-topbar" style="position: relative">
         <div class="layout-topbar-logo-container">
             <router-link to="/" class="layout-topbar-logo">
                 <img src="@/assets/natlib-logo-red.png" width="50" height="50" alt="logo" />

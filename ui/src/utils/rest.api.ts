@@ -1,6 +1,7 @@
 import LoginDialog from '@/components/LoginDialog.vue';
 import { useUserProfileStore } from '@/stores/users';
 import { useDialog } from 'primevue/usedialog';
+import { useToast } from 'primevue/usetoast';
 import { reactive, ref } from 'vue';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
@@ -26,6 +27,7 @@ export interface UseFetchApis {
 export function useFetch() {
     // state encapsulated and managed by the composable
     const dialog = useDialog();
+    const toast = useToast();
 
     // a composable can update its managed state over time.
     async function openLoginDialog(dialog: any) {
@@ -128,13 +130,14 @@ export function useFetch() {
                         }
                     } else {
                         let errorMessage;
-                        const error = await rsp.json();
+                        const error = await rsp.text();
                         if (!error || error.length === 0) {
                             errorMessage = 'Unknown error.';
                         } else {
-                            errorMessage = error.Error;
+                            errorMessage = error;
                         }
-                        throw new Error(rsp.status + ' : ' + errorMessage);
+                        console.error(rsp.status + ' : ' + errorMessage);
+                        toast.add({ severity: 'error', summary: 'Error: ' + rsp.status, detail: errorMessage, life: 3000 });
                     }
                 });
 
