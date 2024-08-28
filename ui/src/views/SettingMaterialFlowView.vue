@@ -17,7 +17,7 @@ const initialData = {
     auditMsg: 'OK'
 };
 const selectedRow = ref(initialData);
-const metaKey = ref(false);
+const metaKey = ref(true);
 
 const onNew = () => {
     selectedRow.value = initialData;

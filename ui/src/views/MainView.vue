@@ -49,9 +49,12 @@
         </div>
     </div>
     <router-view />
+
+    <DepositAccountDrawer ref="drawerDepositAccount" />
 </template>
 
 <script setup lang="ts">
+import DepositAccountDrawer from '@/components/settings/DepositAccountDrawer.vue';
 import AppConfigurator from '@/layout/AppConfigurator.vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useJobListDTO } from '@/stores/depositjob';
@@ -73,22 +76,31 @@ const topbarMenuClasses = computed(() => {
     };
 });
 /*  */
+const drawerDepositAccount = ref();
+
 const menu = ref();
 const settingsMenuItems = ref([
     {
         label: 'Deposit Account Settings',
         icon: 'pi pi-users',
         command: () => {
-            router.push('/setting/deposit-account');
+            // router.push('/setting/deposit-account');
+            drawerDepositAccount.value.toggle();
         }
     },
     {
         label: 'Material Flow Settings',
-        icon: 'pi pi-objects-column'
+        icon: 'pi pi-objects-column',
+        command: () => {
+            router.push('/setting/material-flow');
+        }
     },
     {
         label: 'User White List',
-        icon: 'pi pi-list-check'
+        icon: 'pi pi-list-check',
+        command: () => {
+            router.push('/setting/white-list');
+        }
     },
     {
         separator: true

@@ -12,6 +12,7 @@ declare module 'vue' {
     AccordionHeader: typeof import('primevue/accordionheader')['default']
     AccordionPanel: typeof import('primevue/accordionpanel')['default']
     AutoComplete: typeof import('primevue/autocomplete')['default']
+    Avatar: typeof import('primevue/avatar')['default']
     Button: typeof import('primevue/button')['default']
     Card: typeof import('primevue/card')['default']
     Chart: typeof import('primevue/chart')['default']
@@ -19,10 +20,12 @@ declare module 'vue' {
     Chip: typeof import('primevue/chip')['default']
     ColorPicker: typeof import('primevue/colorpicker')['default']
     Column: typeof import('primevue/column')['default']
+    ConfirmDialog: typeof import('primevue/confirmdialog')['default']
     ConfirmPopup: typeof import('primevue/confirmpopup')['default']
     ContextMenu: typeof import('primevue/contextmenu')['default']
     DataTable: typeof import('primevue/datatable')['default']
     DatePicker: typeof import('primevue/datepicker')['default']
+    DepositAccountDrawer: typeof import('./src/components/settings/DepositAccountDrawer.vue')['default']
     DepositAccountList: typeof import('./src/components/settings/DepositAccountList.vue')['default']
     DepositAccountSetting: typeof import('./src/components/settings/DepositAccountSetting.vue')['default']
     DepositJobAvailableActionsDialog: typeof import('./src/components/jobs/DepositJobAvailableActionsDialog.vue')['default']
@@ -83,6 +86,7 @@ declare module 'vue' {
   }
   export interface ComponentCustomProperties {
     BadgeDirective: typeof import('primevue/badgedirective')['default']
+    Ripple: typeof import('primevue/ripple')['default']
     StyleClass: typeof import('primevue/styleclass')['default']
     Tooltip: typeof import('primevue/tooltip')['default']
   }

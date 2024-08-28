@@ -14,7 +14,13 @@ export const routes = {
                 {
                     path: '/setting/deposit-account',
                     name: 'deposit-account',
-                    component: () => import('@/views/SettingDepositAccountView.vue')
+                    component: () => import('@/components/settings/DepositAccountDrawer.vue')
+                    // component: () => import('@/views/SettingDepositAccountView.vue')
+                },
+                {
+                    path: '/setting/material-flow',
+                    name: 'material-flow',
+                    component: () => import('@/views/SettingMaterialFlowView.vue')
                 }
             ]
         }

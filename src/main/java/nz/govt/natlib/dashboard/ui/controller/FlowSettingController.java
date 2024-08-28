@@ -11,6 +11,7 @@ import nz.govt.natlib.dashboard.common.DashboardConstants;
 import nz.govt.natlib.dashboard.exceptions.NotFoundException;
 import nz.govt.natlib.dashboard.exceptions.SystemErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,17 +25,18 @@ public class FlowSettingController {
     private RepoFlowSetting repoFlowSetting;
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_FLOW_ALL_GET, method = {RequestMethod.POST, RequestMethod.GET})
-    public List<EntityFlowSetting> getAllFlowSettings() {
-        return repoFlowSetting.getAll();
+    public ResponseEntity<?> getAllFlowSettings() {
+        List<EntityFlowSetting> ret = repoFlowSetting.getAll();
+        return ResponseEntity.ok().body(ret);
     }
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_FLOW_DETAIL, method = {RequestMethod.POST, RequestMethod.GET})
-    public EntityFlowSetting getFlowSettingDetail(@RequestParam("id") Long id) {
-        EntityFlowSetting flowSetting = repoFlowSetting.getById(id);
-        if (flowSetting == null) {
-            throw new NotFoundException("Not able to find material flow: " + id);
+    public ResponseEntity<?> getFlowSettingDetail(@RequestParam("id") Long id) {
+        EntityFlowSetting ret = repoFlowSetting.getById(id);
+        if (ret == null) {
+            return ResponseEntity.badRequest().body("Not able to find material flow: " + id);
         }
-        return flowSetting;
+        return ResponseEntity.ok().body(ret);
     }
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_FLOW_SAVE, method = {RequestMethod.POST, RequestMethod.GET})
