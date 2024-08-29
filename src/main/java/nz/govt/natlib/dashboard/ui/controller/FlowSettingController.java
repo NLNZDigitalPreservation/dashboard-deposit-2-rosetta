@@ -8,8 +8,6 @@ import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
 import nz.govt.natlib.dashboard.domain.service.FlowSettingService;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
-import nz.govt.natlib.dashboard.exceptions.NotFoundException;
-import nz.govt.natlib.dashboard.exceptions.SystemErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,16 +38,22 @@ public class FlowSettingController {
     }
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_FLOW_SAVE, method = {RequestMethod.POST, RequestMethod.GET})
-    public EntityFlowSetting saveFlowSetting(@RequestBody EntityFlowSetting reqCmd) {
+    public ResponseEntity<?> saveFlowSetting(@RequestBody EntityFlowSetting reqCmd) {
         try {
-            return flowSettingService.saveFlowSetting(reqCmd);
+            EntityFlowSetting ret = flowSettingService.saveFlowSetting(reqCmd);
+            return ResponseEntity.ok().body(ret);
         } catch (NullParameterException | WebServiceException | InvalidParameterException e) {
-            throw new SystemErrorException(e.getMessage() + ": " + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+            return ResponseEntity.badRequest().body(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS + ": " + e.getMessage());
         }
     }
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_FLOW_DELETE, method = {RequestMethod.POST, RequestMethod.GET})
-    public EntityFlowSetting deleteFlowSetting(@RequestParam("id") Long id) {
-        return flowSettingService.deleteFlowSetting(id);
+    public ResponseEntity<?> deleteFlowSetting(@RequestParam("id") Long id) {
+        try {
+            EntityFlowSetting ret = flowSettingService.deleteFlowSetting(id);
+            return ResponseEntity.ok().body(ret);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

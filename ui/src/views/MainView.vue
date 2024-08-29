@@ -51,10 +51,12 @@
     <router-view />
 
     <DepositAccountDrawer ref="drawerDepositAccount" />
+    <MaterialFlowDrawer ref="drawerMaterialFlow" />
 </template>
 
 <script setup lang="ts">
 import DepositAccountDrawer from '@/components/settings/DepositAccountDrawer.vue';
+import MaterialFlowDrawer from '@/components/settings/MaterialFlowDrawer.vue';
 import AppConfigurator from '@/layout/AppConfigurator.vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useJobListDTO } from '@/stores/depositjob';
@@ -77,6 +79,7 @@ const topbarMenuClasses = computed(() => {
 });
 /*  */
 const drawerDepositAccount = ref();
+const drawerMaterialFlow = ref();
 
 const menu = ref();
 const settingsMenuItems = ref([
@@ -92,7 +95,7 @@ const settingsMenuItems = ref([
         label: 'Material Flow Settings',
         icon: 'pi pi-objects-column',
         command: () => {
-            router.push('/setting/material-flow');
+            drawerMaterialFlow.value.toggle();
         }
     },
     {

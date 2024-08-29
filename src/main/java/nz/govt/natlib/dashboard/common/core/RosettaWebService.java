@@ -23,7 +23,7 @@ public class RosettaWebService {
     private RosettaRestApi restApi;
     private CustomizedPdsClient pdsClient;
 
-    public RosettaWebService(String pdsUrl, String rosettaRestApiUrl,boolean isTestMode) {
+    public RosettaWebService(String pdsUrl, String rosettaRestApiUrl, boolean isTestMode) {
         this.restApi = new RosettaRestApi(rosettaRestApiUrl);
         this.pdsClient = CustomizedPdsClient.getInstance();
         this.pdsClient.init(pdsUrl, isTestMode);
@@ -76,6 +76,16 @@ public class RosettaWebService {
         return null;
     }
 
+    public String getProducers(EntityDepositAccountSetting depositAccount, int limit, int offset, String name) throws Exception {
+        String path;
+        if (StringUtils.isEmpty(name)) {
+            path = String.format("/producers?limit=%d&offset=%d", limit, offset);
+        } else {
+            path = String.format("/producers?limit=%d&offset=%d&name=%s", limit, offset, name);
+        }
+        return this.restApi.fetch(depositAccount, "GET", path, null);
+    }
+
     public List<DtoProducersRsp.Producer> getProducers(EntityDepositAccountSetting depositAccount) throws Exception {
         List<DtoProducersRsp.Producer> producers = new ArrayList<>();
         int offset = 0;
@@ -109,6 +119,16 @@ public class RosettaWebService {
         return !StringUtils.isEmpty(profileId);
     }
 
+    public String getMaterialFlows(EntityDepositAccountSetting depositAccount, String producerId, int limit, int offset, String name) throws Exception {
+        String path;
+        if (StringUtils.isEmpty(name)) {
+            path = String.format("/producers/producer-profiles/%s/material-flows?limit=%d&offset=%d", producerId, limit, offset);
+        } else {
+            path = String.format("/producers/producer-profiles/%s/material-flows?limit=%d&offset=%d&name=%s", producerId, limit, offset, name);
+        }
+        return this.restApi.fetch(depositAccount, "GET", path, null);
+    }
+
     public List<DtoMaterialFlowRsp.MaterialFlow> getMaterialFlows(EntityDepositAccountSetting depositAccount, String producerId) throws Exception {
         List<DtoMaterialFlowRsp.MaterialFlow> materialFlows = new ArrayList<>();
 
@@ -124,7 +144,7 @@ public class RosettaWebService {
             DtoMaterialFlowRsp rsp = (DtoMaterialFlowRsp) this.jsonToObject(ret, DtoMaterialFlowRsp.class);
             if (rsp != null && rsp.getTotal_record_count() > 0 && rsp.getProfile_material_flow() != null) {
                 materialFlows.addAll(rsp.getProfile_material_flow());
-                offset +=1;
+                offset += 1;
             } else {
                 break;
             }

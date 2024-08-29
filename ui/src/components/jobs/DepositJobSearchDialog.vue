@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useMaterialFlows } from '@/stores/materialflows';
+// import { useMaterialFlows } from '@/stores/materialflows';
+import { useSettingsMaterialFlowStore } from '@/stores/settings';
 import { inject, ref } from 'vue';
 // import { type UseFetchApis, useFetch } from "@/utils/rest.api";
 import { searchConditions, useJobListDTO } from '@/stores/depositjob';
@@ -10,8 +11,8 @@ const dialogRef: any = inject('dialogRef');
 // const params = dialogRef.value.data;
 // const formatedFileSize = ref();
 
-const materialflows = useMaterialFlows();
-materialflows.fetchAllData();
+const materialflows = useSettingsMaterialFlowStore();
+materialflows.queryAllRows();
 
 const stages = ref([
     { name: 'INGEST', code: 'INGEST' },
@@ -85,7 +86,7 @@ const onSearch = () => {
     </InputGroup>
 
     <div class="font-semibold">Material Flow</div>
-    <DataTable v-model:selection="searchConditions.selectedData" :value="materialflows.data" dataKey="id" scrollable scrollHeight="25rem" tableStyle="min-width: 60rem">
+    <DataTable v-model:selection="searchConditions.selectedData" :value="materialflows.dataList" dataKey="id" scrollable scrollHeight="25rem" tableStyle="min-width: 60rem">
         <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
         <Column field="id" header="ID"></Column>
         <Column field="materialFlowName" header="Material Flow"></Column>
