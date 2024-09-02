@@ -105,79 +105,6 @@ export const useSettingsMaterialFlowStore = defineStore('SettingsMaterialFlowSto
 
     const dataList = ref();
     const data = ref();
-    const selectedRow = ref();
-
-    const id = ref();
-    const enabled = ref();
-    const depositAccountId = ref();
-    const materialFlowId = ref();
-    const materialFlowName = ref();
-    const producerId = ref();
-    const producerName = ref();
-    const rootPath = ref();
-    const streamLocation = ref();
-    const injectionCompleteFileName = ref();
-    const maxActiveDays = ref();
-    const maxSaveDays = ref();
-    const delays = ref();
-    const delayUnit = ref();
-    const weeklyMaxConcurrency = ref();
-    const actualContentDeleteOptions = ref();
-    const backupEnabled = ref();
-    const actualContentBackupOptions = ref();
-    const backupPath = ref();
-    const backupSubFolders = ref();
-    const auditRst = ref();
-    const auditMsg = ref();
-    const init = () => {
-        id.value = undefined;
-        enabled.value = true;
-        depositAccountId.value = undefined;
-        materialFlowId.value = '';
-        materialFlowName.value = '';
-        producerId.value = '';
-        producerName.value = '';
-        rootPath.value = '';
-        streamLocation.value = 'content';
-        injectionCompleteFileName.value = 'ready-for-ingestion-FOLDER-COMPLETED';
-        maxActiveDays.value = 60;
-        maxSaveDays.value = 30;
-        delays.value = undefined;
-        delayUnit.value = undefined;
-        weeklyMaxConcurrency.value = [1, 1, 1, 1, 1, 1, 1];
-        actualContentDeleteOptions.value = 'notDelete';
-        backupEnabled.value = false;
-        actualContentBackupOptions.value = 'notBackup';
-        backupPath.value = '';
-        backupSubFolders.value = '';
-        auditRst.value = true;
-        auditMsg.value = 'OK';
-    };
-
-    const setData = (data: any) => {
-        id.value = data.id;
-        enabled.value = data.enabled;
-        depositAccountId.value = data.depositAccountId;
-        materialFlowId.value = data.materialFlowId;
-        materialFlowName.value = data.materialFlowName;
-        producerId.value = data.producerId;
-        producerName.value = data.producerName;
-        rootPath.value = data.rootPath;
-        streamLocation.value = data.streamLocation;
-        injectionCompleteFileName.value = data.injectionCompleteFileName;
-        maxActiveDays.value = data.maxActiveDays;
-        maxSaveDays.value = data.maxSaveDays;
-        delays.value = data.delays;
-        delayUnit.value = data.delayUnit;
-        weeklyMaxConcurrency.value = data.weeklyMaxConcurrency;
-        actualContentDeleteOptions.value = data.actualContentDeleteOptions;
-        backupEnabled.value = data.backupEnabled;
-        actualContentBackupOptions.value = data.actualContentBackupOptions;
-        backupPath.value = data.backupPath;
-        backupSubFolders.value = data.backupSubFolders;
-        auditRst.value = data.auditRst;
-        auditMsg.value = data.auditMsg;
-    };
 
     const queryAllRows = async () => {
         dataList.value = await rest.get('/restful/setting/flow/all/get');
@@ -223,32 +150,7 @@ export const useSettingsMaterialFlowStore = defineStore('SettingsMaterialFlowSto
         }
     };
 
-    const saveRow = async () => {
-        const rowData = {
-            id: id.value,
-            enabled: enabled.value,
-            depositAccountId: depositAccountId.value,
-            materialFlowId: materialFlowId.value,
-            materialFlowName: materialFlowName.value,
-            producerId: producerId.value,
-            producerName: producerName.value,
-            rootPath: rootPath.value,
-            streamLocation: streamLocation.value,
-            injectionCompleteFileName: injectionCompleteFileName.value,
-            maxActiveDays: maxActiveDays.value,
-            maxSaveDays: maxSaveDays.value,
-            delays: delays.value,
-            delayUnit: delayUnit.value,
-            weeklyMaxConcurrency: weeklyMaxConcurrency.value,
-            actualContentDeleteOptions: actualContentDeleteOptions.value,
-            backupEnabled: backupEnabled.value,
-            actualContentBackupOptions: actualContentBackupOptions.value,
-            backupPath: backupPath.value,
-            backupSubFolders: backupSubFolders.value,
-            auditRst: auditRst.value,
-            auditMsg: auditMsg.value
-        };
-
+    const saveRow = async (rowData: any) => {
         if (!rowData) {
             const error = 'The input param can not be null.';
             console.error(error);
@@ -264,37 +166,12 @@ export const useSettingsMaterialFlowStore = defineStore('SettingsMaterialFlowSto
     };
 
     return {
-        id,
-        enabled,
-        depositAccountId,
-        materialFlowId,
-        materialFlowName,
-        producerId,
-        producerName,
-        rootPath,
-        streamLocation,
-        injectionCompleteFileName,
-        maxActiveDays,
-        maxSaveDays,
-        delays,
-        delayUnit,
-        weeklyMaxConcurrency,
-        actualContentDeleteOptions,
-        backupEnabled,
-        actualContentBackupOptions,
-        backupPath,
-        backupSubFolders,
-        auditRst,
-        auditMsg,
-        init,
-        setData,
         queryAllRows,
         queryRow,
         deleteConfirm,
         deleteRow,
         saveRow,
         dataList,
-        data,
-        selectedRow
+        data
     };
 });

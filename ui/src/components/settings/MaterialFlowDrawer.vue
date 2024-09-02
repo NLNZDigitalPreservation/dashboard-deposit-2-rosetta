@@ -3,7 +3,7 @@
         <Toast />
         <ConfirmDialog></ConfirmDialog>
         <Drawer v-model:visible="visibleDrawerMaterialFlow" header="Material Flow Settings" class="!w-full md:!w-80 lg:!w-[50rem]" position="right">
-            <DataTable v-model:selection="flow.selectedRow" :value="flow.dataList" :metaKeySelection="metaKey" dataKey="id" tableStyle="width:100%" showGridlines sortField="id" :sortOrder="1">
+            <DataTable v-model:selection="selectedRow" :value="materialFlowStore.dataList" :metaKeySelection="metaKey" dataKey="id" tableStyle="width:100%" showGridlines sortField="id" :sortOrder="1">
                 <Column field="id" header="ID" sortable></Column>
                 <Column field="producerName" header="Producer" sortable></Column>
                 <Column field="materialFlowName" header="Material Flow" sortable></Column>
@@ -26,69 +26,49 @@
         <Dialog v-model:visible="visibleDialogMaterialFlow" modal header="Edit Profile" :style="{ width: '75rem' }">
             <template #header>
                 <div class="inline-flex items-center justify-center gap-2">
-                    <span class="font-bold whitespace-nowrap">Material Flow Setting: {{ flow.id }}</span>
+                    <span class="font-bold whitespace-nowrap">Material Flow Setting: {{ selectedRow.id }}</span>
                 </div>
             </template>
 
-            <!-- <IconField>
-                <InputText v-model="flow.id" />
-                <InputIcon class="pi pi-spin pi-spinner" />
-            </IconField> -->
-
             <Fieldset legend="Basic Settings">
-                <!-- <div class="grid grid-cols-12 gap-2 inline-flex items-center justify-content-center">
-                        <div class="col-span-12 md:col-span-2">
-                            <FlatInputGroup>
-                                <InputGroupAddon>ID</InputGroupAddon>
-                                <InputText v-model="flow.id" readonly />
-                            </FlatInputGroup>
-                        </div>
-
-                        <div class="col-span-12 md:col-span-10">
-                            <InputGroup class="mt-2 mb-2">
-                                <ToggleSwitch v-model="flow.enabled" inputId="enabledMaterialFlow" />
-                                <label for="enabledMaterialFlow" class="ml-2"> If enable depositing for this material flow. </label>
-                            </InputGroup>
-                        </div>
-                    </div> -->
                 <InputGroup class="mt-2 mb-2">
-                    <ToggleSwitch v-model="flow.enabled" inputId="enabledMaterialFlow" />
+                    <ToggleSwitch v-model="selectedRow.enabled" inputId="enabledMaterialFlow" />
                     <label for="enabledMaterialFlow" class="ml-2"> If enable depositing for this material flow. </label>
                 </InputGroup>
 
                 <IconInputGroup :label="'Deposit Account'" :icon="'pi pi-angle-down'">
-                    <InputText v-model="depositAccount" @click="opDepositAccount.toggle" readonly />
+                    <InputText v-model="depositAccount" @click="opDepositAccount.toggle" readonly style="padding-left: 3px" />
                 </IconInputGroup>
 
                 <FlatInputGroup>
                     <IconInputGroup label="Producer" icon="pi pi-angle-down">
-                        <InputText v-model="flow.producerName" @click="opDepositAccount.toggle" readonly />
+                        <InputText v-model="selectedRow.producerName" @click="opDepositAccount.toggle" readonly style="padding-left: 3px" />
                     </IconInputGroup>
                     <IconInputGroup label="Material Flow" icon="pi pi-angle-down">
-                        <InputText v-model="flow.materialFlowName" @click="opDepositAccount.toggle" readonly />
+                        <InputText v-model="selectedRow.materialFlowName" @click="opDepositAccount.toggle" readonly style="padding-left: 3px" />
                     </IconInputGroup>
                 </FlatInputGroup>
 
                 <FlatInputGroup>
                     <InputGroupAddon>Root Location</InputGroupAddon>
-                    <InputText v-model="flow.rootPath" />
+                    <InputText v-model="selectedRow.rootPath" />
                 </FlatInputGroup>
             </Fieldset>
 
             <Fieldset legend="Advanced Settings">
                 <FlatInputGroup>
                     <InputGroupAddon>Stream Path</InputGroupAddon>
-                    <InputText v-model="flow.streamLocation" />
+                    <InputText v-model="selectedRow.streamLocation" />
                 </FlatInputGroup>
                 <FlatInputGroup>
                     <InputGroupAddon>Ingestion Completed File Name </InputGroupAddon>
-                    <InputText v-model="flow.injectionCompleteFileName" />
+                    <InputText v-model="selectedRow.injectionCompleteFileName" />
                 </FlatInputGroup>
                 <FlatInputGroup>
                     <InputGroupAddon>Max Active Days </InputGroupAddon>
-                    <InputText v-model="flow.maxActiveDays" />
+                    <InputNumber v-model="selectedRow.maxActiveDays" mode="decimal" fluid />
                     <InputGroupAddon>Max Storage Days </InputGroupAddon>
-                    <InputText v-model="flow.maxSaveDays" />
+                    <InputNumber v-model="selectedRow.maxSaveDays" mode="decimal" fluid />
                 </FlatInputGroup>
                 <FlatInputGroup>
                     <InputGroupAddon>Max Threads: </InputGroupAddon>
@@ -109,25 +89,25 @@
                 </FlatInputGroup>
                 <FlatInputGroup>
                     <InputGroupAddon>Deletion Options For Actual Content </InputGroupAddon>
-                    <Select v-model="flow.actualContentDeleteOptions" :options="deletionOptions" optionLabel="name" optionValue="code" />
+                    <Select v-model="selectedRow.actualContentDeleteOptions" :options="deletionOptions" optionLabel="name" optionValue="code" />
                 </FlatInputGroup>
                 <FlatInputGroup>
                     <InputGroupAddon>Backup Options For Actual Content </InputGroupAddon>
-                    <Select v-model="flow.actualContentBackupOptions" :options="backupOptions" optionLabel="name" optionValue="code" />
+                    <Select v-model="selectedRow.actualContentBackupOptions" :options="backupOptions" optionLabel="name" optionValue="code" />
                 </FlatInputGroup>
                 <FlatInputGroup>
                     <InputGroupAddon>Backup Location </InputGroupAddon>
-                    <InputText v-model="flow.backupPath" />
+                    <InputText v-model="selectedRow.backupPath" />
                 </FlatInputGroup>
                 <FlatInputGroup>
                     <InputGroupAddon>Sub folders for backup </InputGroupAddon>
-                    <Textarea v-model="flow.backupSubFolders" rows="5" cols="120" />
+                    <Textarea v-model="selectedRow.backupSubFolders" rows="5" cols="120" />
                 </FlatInputGroup>
             </Fieldset>
 
             <Fieldset legend="Health Audit">
-                <Message v-if="flow.auditRst" severity="success" :closable="false">{{ flow.auditMsg }}</Message>
-                <Message v-if="!flow.auditRst" severity="warn" :closable="false">{{ flow.auditMsg }}</Message>
+                <Message v-if="selectedRow.auditRst" severity="success" :closable="false">{{ selectedRow.auditMsg }}</Message>
+                <Message v-if="!selectedRow.auditRst" severity="warn" :closable="false">{{ selectedRow.auditMsg }}</Message>
             </Fieldset>
 
             <template #footer>
@@ -145,6 +125,7 @@
 
 <script setup lang="ts">
 import { useSettingsDepositAccountStore, useSettingsMaterialFlowStore } from '@/stores/settings';
+import type { MaterialFlow } from '@/types/deposit';
 import { defineExpose, reactive, ref } from 'vue';
 import IconInputGroup from '../IconInputGroup.vue';
 
@@ -152,13 +133,37 @@ const visibleDialogMaterialFlow = ref(false);
 const opDepositAccount = ref();
 const opProducer = ref();
 const metaKey = ref(true);
-const selectOptions = ref();
+
+const initialData = {
+    id: undefined,
+    enabled: true,
+    depositAccountId: 0,
+    materialFlowId: '',
+    materialFlowName: '',
+    producerId: '',
+    producerName: '',
+    rootPath: '',
+    streamLocation: 'content',
+    injectionCompleteFileName: '',
+    maxActiveDays: 60,
+    maxSaveDays: 30,
+    delays: undefined,
+    delayUnit: undefined,
+    weeklyMaxConcurrency: [1, 1, 1, 1, 1, 1, 1],
+    actualContentDeleteOptions: 'notDelete',
+    backupEnabled: false,
+    actualContentBackupOptions: 'notBackup',
+    backupPath: '',
+    backupSubFolders: '',
+    auditRst: true,
+    auditMsg: 'OK'
+};
+const selectedRow = ref(Object.assign({}, initialData) as MaterialFlow);
 
 const depositAccountStore = useSettingsDepositAccountStore();
 
-const flow = useSettingsMaterialFlowStore();
-flow.init();
-flow.queryAllRows();
+const materialFlowStore = useSettingsMaterialFlowStore();
+materialFlowStore.queryAllRows();
 
 const depositAccount = ref();
 
@@ -188,27 +193,37 @@ const onDepositAccountSelected = (data: any) => {
     if (!data) {
         return;
     }
-    flow.depositAccountId = data.id;
+    selectedRow.value.depositAccountId = data.id;
     depositAccount.value = data.depositUserInstitute + ' | ' + data.depositUserName;
-    flow.producerId = '';
-    flow.producerName = '';
-    flow.materialFlowId = '';
-    flow.materialFlowName = '';
+    selectedRow.value.producerId = '';
+    selectedRow.value.producerName = '';
+    selectedRow.value.materialFlowId = '';
+    selectedRow.value.materialFlowName = '';
 };
 
 const onNew = () => {
-    flow.init();
+    selectedRow.value = Object.assign({}, initialData) as MaterialFlow;
     visibleDialogMaterialFlow.value = true;
 };
-const onDelete = (selectedData: any) => {
-    flow.deleteConfirm(selectedData);
+const onDelete = (selectedData: MaterialFlow) => {
+    materialFlowStore.deleteConfirm(selectedData);
 };
-const onEdit = (selectedData: any) => {
-    flow.setData(selectedData);
+const onEdit = async (selectedData: MaterialFlow) => {
+    selectedRow.value = selectedData;
+    weeklyThreads.mon = selectedData.weeklyMaxConcurrency[0];
+    weeklyThreads.tue = selectedData.weeklyMaxConcurrency[1];
+    weeklyThreads.wed = selectedData.weeklyMaxConcurrency[2];
+    weeklyThreads.thu = selectedData.weeklyMaxConcurrency[3];
+    weeklyThreads.fri = selectedData.weeklyMaxConcurrency[4];
+    weeklyThreads.sat = selectedData.weeklyMaxConcurrency[5];
+    weeklyThreads.sun = selectedData.weeklyMaxConcurrency[6];
+    const data = await depositAccountStore.queryRow(selectedData.depositAccountId);
+    depositAccount.value = data.depositUserInstitute + ' | ' + data.depositUserName;
     visibleDialogMaterialFlow.value = true;
 };
 const onSave = async () => {
-    const ret = await flow.saveRow();
+    selectedRow.value.weeklyMaxConcurrency = [weeklyThreads.mon, weeklyThreads.tue, weeklyThreads.wed, weeklyThreads.thu, weeklyThreads.fri, weeklyThreads.sat, weeklyThreads.sun];
+    const ret = await materialFlowStore.saveRow(selectedRow.value);
     if (ret) {
         visibleDialogMaterialFlow.value = false;
     }

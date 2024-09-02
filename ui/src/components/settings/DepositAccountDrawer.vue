@@ -3,7 +3,7 @@
         <Toast />
         <ConfirmDialog></ConfirmDialog>
         <Drawer v-model:visible="visibleDrawerDepositAccount" header="Deposit Accounts" class="!w-full md:!w-80 lg:!w-[50rem]" position="right">
-            <DataTable v-model:selection="depositAccount.selectedRow" :value="depositAccount.dataList" :metaKeySelection="metaKey" dataKey="id" @rowSelect="onRowSelect" tableStyle="width:100%" showGridlines sortField="id" :sortOrder="1">
+            <DataTable v-model:selection="depositAccountStore.selectedRow" :value="depositAccountStore.dataList" :metaKeySelection="metaKey" dataKey="id" @rowSelect="onRowSelect" tableStyle="width:100%" showGridlines sortField="id" :sortOrder="1">
                 <Column field="id" header="ID" sortable></Column>
                 <Column field="depositUserInstitute" header="Institute" sortable></Column>
                 <Column field="depositUserName" header="User Name" sortable></Column>
@@ -23,37 +23,35 @@
             </template>
         </Drawer>
 
-        <Dialog v-model:visible="visibleDialogDepositAccount" modal header="Edit Profile" :style="{ width: '45rem' }">
+        <Dialog v-model:visible="visibleDialogDepositAccount" modal header="Edit Profile" :style="{ width: '55rem' }">
             <template #header>
                 <div class="inline-flex items-center justify-center gap-2">
                     <span class="font-bold whitespace-nowrap">Deposit Account: {{ selectedRow.id }}</span>
                 </div>
             </template>
-            <Fluid>
-                <Fieldset legend="Settings">
-                    <InputGroup class="mt-2 mb-2">
-                        <InputGroupAddon>ID</InputGroupAddon>
-                        <InputText v-model="selectedRow.id" disabled="true" />
-                    </InputGroup>
-                    <InputGroup class="mt-2 mb-2">
-                        <InputGroupAddon>Institute</InputGroupAddon>
-                        <InputText v-model="selectedRow.depositUserInstitute" />
-                    </InputGroup>
-                    <InputGroup class="mt-2 mb-2">
-                        <InputGroupAddon>User Name</InputGroupAddon>
-                        <InputText v-model="selectedRow.depositUserName" />
-                    </InputGroup>
-                    <InputGroup class="mt-2 mb-2">
-                        <InputGroupAddon>Password</InputGroupAddon>
-                        <Password v-model="selectedRow.depositUserPassword" :feedback="false" />
-                    </InputGroup>
-                </Fieldset>
+            <Fieldset legend="Settings">
+                <FlatInputGroup class="mt-2 mb-2">
+                    <InputGroupAddon>ID</InputGroupAddon>
+                    <InputNumber v-model="selectedRow.id" readonly />
+                </FlatInputGroup>
+                <FlatInputGroup class="mt-2 mb-2">
+                    <InputGroupAddon>Institute</InputGroupAddon>
+                    <InputText v-model="selectedRow.depositUserInstitute" />
+                </FlatInputGroup>
+                <FlatInputGroup class="mt-2 mb-2">
+                    <InputGroupAddon>User Name</InputGroupAddon>
+                    <InputText v-model="selectedRow.depositUserName" />
+                </FlatInputGroup>
+                <FlatInputGroup class="mt-2 mb-2">
+                    <InputGroupAddon>Password</InputGroupAddon>
+                    <Password v-model="selectedRow.depositUserPassword" :feedback="false" />
+                </FlatInputGroup>
+            </Fieldset>
 
-                <Fieldset legend="Health Audit">
-                    <Message v-if="selectedRow.auditRst" severity="success" :closable="false">{{ selectedRow.auditMsg }}</Message>
-                    <Message v-if="!selectedRow.auditRst" severity="warn" :closable="false">{{ selectedRow.auditMsg }}</Message>
-                </Fieldset>
-            </Fluid>
+            <Fieldset legend="Health Audit">
+                <Message v-if="selectedRow.auditRst" severity="success" :closable="false">{{ selectedRow.auditMsg }}</Message>
+                <Message v-if="!selectedRow.auditRst" severity="warn" :closable="false">{{ selectedRow.auditMsg }}</Message>
+            </Fieldset>
             <template #footer>
                 <Button label="Save" @click="onSave()" autofocus />
                 <Button label="Cancel" outlined @click="visibleDialogDepositAccount = false" autofocus />
@@ -64,14 +62,15 @@
 
 <script setup lang="ts">
 import { useSettingsDepositAccountStore } from '@/stores/settings';
+import { type DepositAccount } from '@/types/deposit';
 import { defineExpose, ref } from 'vue';
 
 const visibleDialogDepositAccount = ref(false);
 
-const depositAccount = useSettingsDepositAccountStore();
-depositAccount.queryAllRows();
+const depositAccountStore = useSettingsDepositAccountStore();
+depositAccountStore.queryAllRows();
 
-const initialData = {
+const initialData: DepositAccount = {
     id: undefined,
     depositUserInstitute: '',
     depositUserName: '',
@@ -87,14 +86,15 @@ const onNew = () => {
     visibleDialogDepositAccount.value = true;
 };
 const onDelete = (selectedData: any) => {
-    depositAccount.deleteConfirm(selectedData);
+    depositAccountStore.deleteConfirm(selectedData);
 };
 const onEdit = (selectedData: any) => {
-    selectedRow.value = selectedData;
+    selectedRow.value = Object.assign({}, selectedData);
     visibleDialogDepositAccount.value = true;
 };
 const onSave = async () => {
-    const ret = await depositAccount.saveRow(selectedRow.value);
+    const obj = JSON.stringify(selectedRow.value);
+    const ret = await depositAccountStore.saveRow(selectedRow.value);
     if (ret) {
         visibleDialogDepositAccount.value = false;
     }

@@ -1,14 +1,20 @@
+interface DepositAccount {
+    id: number | undefined;
+    depositUserInstitute: string;
+    depositUserName: string;
+    depositUserPassword: string;
+    auditRst: boolean;
+    auditMsg: string;
+}
 interface MaterialFlow {
-    id: number;
+    id: number | undefined;
     actualContentBackupOptions: string;
     actualContentDeleteOptions: string;
-    auditMsg: string;
-    auditRst: boolean;
     backupEnabled: boolean;
     backupPath: string;
     backupSubFolders: string;
-    delayUnit: string;
-    delays: number;
+    delayUnit: string | undefined;
+    delays: number | undefined;
     depositAccountId: number;
     enabled: boolean;
     injectionCompleteFileName: string;
@@ -19,13 +25,15 @@ interface MaterialFlow {
     producerId: string;
     producerName: string;
     rootPath: string;
+    streamLocation: string;
+    weeklyMaxConcurrency: any;
+    auditMsg: string;
+    auditRst: boolean;
 }
 
 interface DepositJob {
     id: number;
     actualContentDeleted: boolean;
-    itMsg: string;
-    auditRst: boolean;
     backupCompleted: boolean;
     depositEndTime: number;
     depositSetId: string;
@@ -45,6 +53,8 @@ interface DepositJob {
     state: string;
     successful: boolean;
     appliedFlowSetting: MaterialFlow;
+    auditMsg: string;
+    auditRst: boolean;
 }
 
 interface JobQueryCondition {
@@ -54,3 +64,5 @@ interface JobQueryCondition {
     stages: string[];
     states: string[];
 }
+
+export type { DepositAccount, DepositJob, JobQueryCondition, MaterialFlow };
