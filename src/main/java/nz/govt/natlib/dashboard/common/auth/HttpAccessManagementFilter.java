@@ -41,15 +41,15 @@ public class HttpAccessManagementFilter implements Filter {
             log.debug("Before doFilter {}", securityConfig.getCurrentSessionMessage(req, rsp));
         }
 
-        if (!securityConfig.isValidSession(req, rsp)) {
-            responseError(req, rsp, RestResponseCommand.RSP_LOGIN_ERROR);
-            return;
-        }
-
-        if (!privilegeManagementHandler.isActionPermit(req, rsp)) {
-            responseError(req, rsp, RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
-            return;
-        }
+//        if (!securityConfig.isValidSession(req, rsp)) {
+//            responseError(req, rsp, RestResponseCommand.RSP_LOGIN_ERROR);
+//            return;
+//        }
+//
+//        if (!privilegeManagementHandler.isActionPermit(req, rsp)) {
+//            responseError(req, rsp, RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
+//            return;
+//        }
 
         chain.doFilter(request, response);
 

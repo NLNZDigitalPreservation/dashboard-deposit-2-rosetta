@@ -86,7 +86,15 @@ export const useSettingsDepositAccountStore = defineStore('SettingsDepositAccoun
         return ret;
     };
 
-    return { dataList, data, selectedRow, queryAllRows, queryRow, deleteConfirm, deleteRow, saveRow };
+    const depositAccountName = async (id: number) => {
+        const data: any = queryRow(id);
+        if (!data) {
+            return '';
+        }
+        return data.depositUserInstitute + ' | ' + data.depositUserName;
+    };
+
+    return { dataList, data, selectedRow, queryAllRows, queryRow, deleteConfirm, deleteRow, saveRow, depositAccountName };
 });
 
 export const useSettingsMaterialFlowStore = defineStore('SettingsMaterialFlowStore', () => {
@@ -215,7 +223,32 @@ export const useSettingsMaterialFlowStore = defineStore('SettingsMaterialFlowSto
         }
     };
 
-    const saveRow = async (rowData: any) => {
+    const saveRow = async () => {
+        const rowData = {
+            id: id.value,
+            enabled: enabled.value,
+            depositAccountId: depositAccountId.value,
+            materialFlowId: materialFlowId.value,
+            materialFlowName: materialFlowName.value,
+            producerId: producerId.value,
+            producerName: producerName.value,
+            rootPath: rootPath.value,
+            streamLocation: streamLocation.value,
+            injectionCompleteFileName: injectionCompleteFileName.value,
+            maxActiveDays: maxActiveDays.value,
+            maxSaveDays: maxSaveDays.value,
+            delays: delays.value,
+            delayUnit: delayUnit.value,
+            weeklyMaxConcurrency: weeklyMaxConcurrency.value,
+            actualContentDeleteOptions: actualContentDeleteOptions.value,
+            backupEnabled: backupEnabled.value,
+            actualContentBackupOptions: actualContentBackupOptions.value,
+            backupPath: backupPath.value,
+            backupSubFolders: backupSubFolders.value,
+            auditRst: auditRst.value,
+            auditMsg: auditMsg.value
+        };
+
         if (!rowData) {
             const error = 'The input param can not be null.';
             console.error(error);

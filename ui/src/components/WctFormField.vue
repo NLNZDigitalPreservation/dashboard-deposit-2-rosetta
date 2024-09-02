@@ -1,31 +1,25 @@
 <template>
     <div class="grid mb-4">
-        <div :class="checkbox ? 'col-4' : 'col-2'" style="padding: 0.5rem; text-align: left;">
-            <label>{{ label }}:</label>
+        <div class="col-2" style="padding: 0.5rem; text-align: right">
+            <label style="display: inline-block">{{ label }}:</label>
         </div>
-        <div :class="checkbox ? 'col' : 'col-10'"  style="padding: 0.5rem;">
+        <div class="col-10" style="padding: 0.5rem">
+            <IconField>
+                <InputText v-model="producer" />
+                <InputIcon class="pi pi-angle-down" />
+            </IconField>
             <slot></slot>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
+
 defineProps<{
-    label: string,
-    checkbox?: boolean
-}>()
+    label?: string;
+    checkbox?: boolean;
+}>();
+
+const producer = ref();
 </script>
-
-<style>
-.col-2, .col-10{
-    padding: 15px;
-}
-
-label{
-    width: 100%;
-    display: inline-block;
-    position: relative;
-    text-align: left;
-    margin-right: 0;
-}
-</style>
