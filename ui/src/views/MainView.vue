@@ -8,19 +8,21 @@
             </router-link>
         </div>
 
-        <!-- <IconField class="mr-2">
-            <InputIcon class="pi pi-filter" />
-            <InputText v-model="keywords" type="text" placeholder="Filter" />
-        </IconField> -->
-        <IconField>
+        <!-- <IconField>
             <InputGroup>
                 <InputText placeholder="Filter" style="max-width: 20rem" />
                 <Button icon="pi pi-filter" label="Advanced" @click="topbarActions.openSearchDialog" />
             </InputGroup>
-        </IconField>
+        </IconField> -->
+        <!-- <div class="p-iconfield p-inputgroup p-inputgroup-fluid mt-2 mb-2">
+            <InputText v-model="keywords" type="text" placeholder="Filter" />
+            <InputIcon class="pi pi-filter" style="margin-left: -15px" />
+
+            <Button icon="pi pi-search" label="Advanced" @click="topbarActions.openSearchDialog" />
+        </div> -->
         <div style="width: 1rem"></div>
 
-        <!-- <Button label="Search" icon="pi pi-search" class="mr-2" @click="topbarActions.openSearchDialog"></Button> -->
+        <Button label="Search" icon="pi pi-search" class="mr-2" @click="topbarActions.openSearchDialog"></Button>
         <Button @click="topbarActions.onReload()" label="Reload" icon="pi pi-refresh" class="mr-2"></Button>
         <Button @click="topbarActions.onExportSelectedJobs()" label="Export Selected Jobs" icon="pi pi-download" class="mr-2"></Button>
         <Button @click="topbarActions.openRedepositDialog()" label="Redeposit" icon="pi pi-pen-to-square" class="mr-2"></Button>
@@ -34,7 +36,7 @@
                     <button
                         v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'animate-scalein', leaveToClass: 'hidden', leaveActiveClass: 'animate-fadeout', hideOnOutsideClick: true }"
                         type="button"
-                        class="layout-topbar-action layout-topbar-action-highlight"
+                        class="layout-topbar-action"
                     >
                         <i class="pi pi-palette"></i>
                     </button>
@@ -42,13 +44,18 @@
                 </div>
             </div>
 
-            <div class="layout-topbar-menu" :class="topbarMenuClasses">
-                <Menu ref="menu" :model="settingsMenuItems" :popup="true" />
-                <Button type="button" raised rounded icon="pi pi-cog" severity="contrast" @click="toggleMenu" class="mr-2" />
-            </div>
+            <IconField class="mr-2">
+                <InputIcon class="pi pi-filter" />
+                <InputText v-model="keywords" type="text" placeholder="Filter" />
+            </IconField>
+            <Button type="button" raised icon="pi pi-cog" severity="contrast" @click="toggleMenu" class="mr-2" />
         </div>
     </div>
-    <router-view />
+    <Menu ref="menu" :model="settingsMenuItems" :popup="true" />
+
+    <div style="width: 100vw; height: calc(100vh - 60px)">
+        <router-view />
+    </div>
 
     <DepositAccountDrawer ref="drawerDepositAccount" />
     <MaterialFlowDrawer ref="drawerMaterialFlow" />
@@ -68,6 +75,8 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
+
+const keywords = ref();
 
 const jobList = useJobListDTO();
 

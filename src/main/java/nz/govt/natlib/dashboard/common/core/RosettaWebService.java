@@ -110,6 +110,7 @@ public class RosettaWebService {
         if (rsp != null && rsp.getProfile() != null) {
             return rsp.getProfile().getId();
         } else {
+            log.error("Can not find the producer profile with the producer id: {}", producerId);
             return null;
         }
     }
@@ -120,11 +121,16 @@ public class RosettaWebService {
     }
 
     public String getMaterialFlows(EntityDepositAccountSetting depositAccount, String producerId, int limit, int offset, String name) throws Exception {
+        String profileId = this.getProducerProfileId(depositAccount, producerId);
+        if (StringUtils.isEmpty(profileId)) {
+            return null;
+        }
+
         String path;
         if (StringUtils.isEmpty(name)) {
-            path = String.format("/producers/producer-profiles/%s/material-flows?limit=%d&offset=%d", producerId, limit, offset);
+            path = String.format("/producers/producer-profiles/%s/material-flows?limit=%d&offset=%d", profileId, limit, offset);
         } else {
-            path = String.format("/producers/producer-profiles/%s/material-flows?limit=%d&offset=%d&name=%s", producerId, limit, offset, name);
+            path = String.format("/producers/producer-profiles/%s/material-flows?limit=%d&offset=%d&name=%s", profileId, limit, offset, name);
         }
         return this.restApi.fetch(depositAccount, "GET", path, null);
     }
@@ -134,7 +140,6 @@ public class RosettaWebService {
 
         String profileId = this.getProducerProfileId(depositAccount, producerId);
         if (StringUtils.isEmpty(profileId)) {
-            log.error("Can not find the producer profile with the producer id: {}", producerId);
             return materialFlows;
         }
 

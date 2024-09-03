@@ -44,10 +44,11 @@ jobList.fetchAllData();
         sortField="materialFlowName"
         :sortOrder="1"
         paginator
+        :alwaysShowPaginator="true"
         :rows="50"
         :rowsPerPageOptions="[20, 50, 100, 200]"
         scrollable
-        scrollHeight="calc(100vh - 110px)"
+        scrollHeight="flex"
         showGridlines
         stripedRows
         resizableColumns

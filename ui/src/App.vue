@@ -3,16 +3,6 @@ import MainView from '@/views/MainView.vue';
 </script>
 
 <template>
-    <div class="app">
-        <MainView />
-        <DynamicDialog />
-    </div>
+    <MainView />
+    <DynamicDialog />
 </template>
-
-<style>
-.app {
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-}
-</style>

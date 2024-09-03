@@ -42,10 +42,10 @@
 
                 <FlatInputGroup>
                     <IconInputGroup label="Producer" icon="pi pi-angle-down">
-                        <InputText v-model="selectedRow.producerName" @click="opDepositAccount.toggle" readonly style="padding-left: 3px" />
+                        <InputText v-model="selectedRow.producerName" @click="opProducer.toggle" readonly style="padding-left: 3px" />
                     </IconInputGroup>
                     <IconInputGroup label="Material Flow" icon="pi pi-angle-down">
-                        <InputText v-model="selectedRow.materialFlowName" @click="opDepositAccount.toggle" readonly style="padding-left: 3px" />
+                        <InputText v-model="selectedRow.materialFlowName" @click="opMaterialFlow.toggle" readonly style="padding-left: 3px" />
                     </IconInputGroup>
                 </FlatInputGroup>
 
@@ -116,10 +116,16 @@
             </template>
         </Dialog>
         <Popover ref="opDepositAccount" appendTo="body" style="width: 60rem">
-            <RichSelectDepositAccount @onSelected="onDepositAccountSelected" />
+            <DepositAccountSelectForm @onSelected="onDepositAccountSelected" />
         </Popover>
 
-        <RichSelectProducer ref="opProducer" />
+        <Popover ref="opProducer" appendTo="body" style="width: 60rem">
+            <RawProducerSelectForm @onSelected="onProducerSelected" :account="selectedRow.depositAccountId" />
+        </Popover>
+
+        <Popover ref="opMaterialFlow" appendTo="body" style="width: 60rem">
+            <RawMaterialFlowSelectForm @onSelected="onMaterialFlowSelected" :account="selectedRow.depositAccountId" :producer="selectedRow.producerId" />
+        </Popover>
     </div>
 </template>
 
@@ -128,10 +134,15 @@ import { useSettingsDepositAccountStore, useSettingsMaterialFlowStore } from '@/
 import type { MaterialFlow } from '@/types/deposit';
 import { defineExpose, reactive, ref } from 'vue';
 import IconInputGroup from '../IconInputGroup.vue';
+import DepositAccountSelectForm from './DepositAccountSelectForm.vue';
+import RawMaterialFlowSelectForm from './RawMaterialFlowSelectForm.vue';
+import RawProducerSelectForm from './RawProducerSelectForm.vue';
 
 const visibleDialogMaterialFlow = ref(false);
 const opDepositAccount = ref();
 const opProducer = ref();
+const opMaterialFlow = ref();
+
 const metaKey = ref(true);
 
 const initialData = {
@@ -190,7 +201,7 @@ const backupOptions = ref([
 
 const onDepositAccountSelected = (data: any) => {
     opDepositAccount.value.hide();
-    if (!data) {
+    if (!data || selectedRow.value.depositAccountId == data.id) {
         return;
     }
     selectedRow.value.depositAccountId = data.id;
@@ -201,7 +212,28 @@ const onDepositAccountSelected = (data: any) => {
     selectedRow.value.materialFlowName = '';
 };
 
+const onProducerSelected = (data: any) => {
+    opProducer.value.hide();
+    if (!data || selectedRow.value.producerId == data.id) {
+        return;
+    }
+    selectedRow.value.producerId = data.id;
+    selectedRow.value.producerName = data.id + '-' + data.name;
+    selectedRow.value.materialFlowId = '';
+    selectedRow.value.materialFlowName = '';
+};
+
+const onMaterialFlowSelected = (data: any) => {
+    opMaterialFlow.value.hide();
+    if (!data || selectedRow.value.materialFlowId == data.id) {
+        return;
+    }
+    selectedRow.value.materialFlowId = data.id;
+    selectedRow.value.materialFlowName = data.id + '-' + data.name;
+};
+
 const onNew = () => {
+    depositAccount.value = '';
     selectedRow.value = Object.assign({}, initialData) as MaterialFlow;
     visibleDialogMaterialFlow.value = true;
 };
