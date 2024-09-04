@@ -1,18 +1,31 @@
 <script setup lang="ts">
-// import { useMaterialFlows } from '@/stores/materialflows';
-import { useSettingsMaterialFlowStore } from '@/stores/settings';
-import { inject, ref } from 'vue';
-// import { type UseFetchApis, useFetch } from "@/utils/rest.api";
 import { searchConditions, useJobListDTO } from '@/stores/depositjob';
+import { useSettingsMaterialFlowStore } from '@/stores/settings';
+import { computed, inject, ref } from 'vue';
+import MaterialFlowSelectGroup from './MaterialFlowSelectGroup.vue';
 
 const jobList = useJobListDTO();
 
 const dialogRef: any = inject('dialogRef');
-// const params = dialogRef.value.data;
-// const formatedFileSize = ref();
 
 const materialflows = useSettingsMaterialFlowStore();
 materialflows.queryAllRows();
+
+const mappedMaterialFlows = computed(() => {
+    const datamap = new Map();
+    for (let flow of materialflows.dataList) {
+        if (!datamap.has(flow.producerId)) {
+            datamap.set(flow.producerId, {
+                label: flow.producerName,
+                items: []
+            });
+        }
+        const flowGroup = datamap.get(flow.producerId);
+        flowGroup.items.push(flow);
+    }
+    const values = datamap.values();
+    return values;
+});
 
 const stages = ref([
     { name: 'INGEST', code: 'INGEST' },
@@ -84,16 +97,6 @@ const onSearch = () => {
         <InputGroupAddon>To</InputGroupAddon>
         <DatePicker v-model="searchConditions.toDate" />
     </InputGroup>
-
-    <div class="font-semibold">Material Flow</div>
-    <DataTable v-model:selection="searchConditions.selectedData" :value="materialflows.dataList" dataKey="id" scrollable scrollHeight="25rem" tableStyle="min-width: 60rem">
-        <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-        <Column field="id" header="ID"></Column>
-        <Column field="materialFlowName" header="Material Flow"></Column>
-        <Column field="producerName" header="Producer"></Column>
-        <Column field="enabled" header="Available"></Column>
-    </DataTable>
-
     <div class="flex flex-wrap gap-4">
         <div class="flex flex-col grow basis-0 gap-2">
             <label for="name2">Stage</label>
@@ -104,6 +107,19 @@ const onSearch = () => {
             <MultiSelect v-model="searchConditions.selectedStates" :options="states" optionLabel="name" placeholder="Select states" :filter="false"></MultiSelect>
         </div>
     </div>
+
+    <Fieldset legend="Material Flow">
+        <!-- <DataTable v-model:selection="searchConditions.selectedData" :value="materialflows.dataList" dataKey="id" scrollable scrollHeight="25rem" tableStyle="min-width: 60rem">
+            <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+            <Column field="id" header="ID"></Column>
+            <Column field="materialFlowName" header="Material Flow"></Column>
+            <Column field="producerName" header="Producer"></Column>
+            <Column field="enabled" header="Available"></Column>
+        </DataTable> -->
+        <div v-for="(flowGroup, producerId) in mappedMaterialFlows">
+            <MaterialFlowSelectGroup :flowGroup="flowGroup" />
+        </div>
+    </Fieldset>
 
     <Toolbar style="border: 0">
         <template #start>
