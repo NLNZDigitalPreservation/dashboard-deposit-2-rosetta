@@ -47,16 +47,18 @@ const onToggle = (event: any) => {
 </script>
 
 <template>
-    <div class="flex flex-col gap-1">
-        <div class="field font-semibold text-xl">
+    <div class="flex flex-col gap-1 ml-10">
+        <div class="field font-semibold text-l">
             <Checkbox @update:modelValue="onToggle" v-model="producerSelect" :inputId="flowGroup.label" name="Producer" :binary="true" :indeterminate="isIndeteminate" class="mb-1" />
-            <label :for="flowGroup.label" class="ml-2"> {{ flowGroup.label }} </label>
+            <label :for="flowGroup.label" class="ml-2">Producer: {{ flowGroup.label }} </label>
         </div>
 
         <div v-for="flow in flows" class="field ml-5">
             <Checkbox v-model="flow.isChecked" :inputId="flow.materialFlowId" name="MaterialFlow" :binary="true" />
-            <label :for="flow.materialFlowId" class="ml-2"> {{ flow.materialFlowName }} </label>
+            <label :for="flow.materialFlowId" class="ml-2">
+                {{ flow.materialFlowName }}
+                <span v-if="!flow.enabled" style="background-color: #f5edeb; color: #1a2551; border-radius: 6px; margin-left: 6px">Disabled</span>
+            </label>
         </div>
     </div>
-    <Divider />
 </template>

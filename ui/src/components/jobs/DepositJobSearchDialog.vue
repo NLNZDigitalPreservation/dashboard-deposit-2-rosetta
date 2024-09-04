@@ -87,6 +87,16 @@ const onSearch = () => {
     jobList.searchData(req);
     closeDialog();
 };
+
+const isIndeteminate = computed(() => {
+    return true;
+});
+const producersSelect = ref(false);
+const onToggle = (event: any) => {
+    // flows.value.forEach((item: any) => {
+    //     item.isChecked = event;
+    // });
+};
 </script>
 
 <template>
@@ -109,15 +119,18 @@ const onSearch = () => {
     </div>
 
     <Fieldset legend="Material Flow">
-        <!-- <DataTable v-model:selection="searchConditions.selectedData" :value="materialflows.dataList" dataKey="id" scrollable scrollHeight="25rem" tableStyle="min-width: 60rem">
-            <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-            <Column field="id" header="ID"></Column>
-            <Column field="materialFlowName" header="Material Flow"></Column>
-            <Column field="producerName" header="Producer"></Column>
-            <Column field="enabled" header="Available"></Column>
-        </DataTable> -->
+        <template #legend>
+            <div class="flex flex-col gap-1">
+                <div class="field font-semibold text-xl">
+                    <Checkbox @update:modelValue="onToggle" v-model="producersSelect" inputId="all-producers" name="Producers" :binary="true" :indeterminate="isIndeteminate" class="mb-1" />
+                    <label for="all-producers" class="ml-2"> All Producers </label>
+                </div>
+            </div>
+        </template>
+
         <div v-for="(flowGroup, producerId) in mappedMaterialFlows">
             <MaterialFlowSelectGroup :flowGroup="flowGroup" />
+            <Divider />
         </div>
     </Fieldset>
 
