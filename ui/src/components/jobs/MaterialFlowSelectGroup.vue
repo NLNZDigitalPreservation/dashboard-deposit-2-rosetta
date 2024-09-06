@@ -1,22 +1,27 @@
 <script setup lang="ts">
 import { computed, defineProps, ref } from 'vue';
 const props = defineProps<{
-    flowGroup?: any;
+    dataList?: any;
 }>();
 
-const producerSelect = ref(false);
-const flows = ref([] as any[]);
-const datesets = [];
-for (let flow of props.flowGroup.items) {
-    const item = Object.assign(
-        {
-            isChecked: false
-        },
-        flow
-    );
-    datesets.push(item);
+interface Producer {
+    id: string;
+    name: string;
+    isChecked: false;
 }
-flows.value = datesets;
+
+const selectedData = ref([]);
+const expandedRowGroups = ref([]);
+
+const datesets: any = {};
+for (let flow of props.dataList) {
+    datesets[flow.producerId] = {
+        isChecked: false,
+        isIndeteminate: false
+    };
+}
+const producerSelect = ref(datesets);
+
 // const isIndeteminate = ref(false);
 const isIndeteminate = computed(() => {
     let selectedNum = 0;
@@ -39,26 +44,54 @@ const isIndeteminate = computed(() => {
 
     return true;
 });
-const onToggle = (event: any) => {
-    flows.value.forEach((item: any) => {
-        item.isChecked = event;
-    });
+const onToggle = (isChecked: boolean, producerId: string) => {
+    const producer: any = producerSelect.value[producerId];
+    if (producer) {
+        producer.isChecked = isChecked;
+    }
+    if (isChecked) {
+    }
 };
 </script>
 
 <template>
-    <div class="flex flex-col gap-1 ml-10">
-        <div class="field font-semibold text-l">
-            <Checkbox @update:modelValue="onToggle" v-model="producerSelect" :inputId="flowGroup.label" name="Producer" :binary="true" :indeterminate="isIndeteminate" class="mb-1" />
-            <label :for="flowGroup.label" class="ml-2">Producer: {{ flowGroup.label }} </label>
-        </div>
+    <DataTable
+        v-model:expandedRowGroups="expandedRowGroups"
+        v-model:selection="selectedData"
+        :value="dataList"
+        dataKey="id"
+        rowGroupMode="rowspan"
+        groupRowsBy="producerName"
+        sortMode="single"
+        sortField="producerName"
+        :sortOrder="1"
+        showGridline
+        resizableColumns
+        columnResizeMode="expand"
+    >
+        <Column field="id" header="ID"></Column>
 
-        <div v-for="flow in flows" class="field ml-5">
-            <Checkbox v-model="flow.isChecked" :inputId="flow.materialFlowId" name="MaterialFlow" :binary="true" />
-            <label :for="flow.materialFlowId" class="ml-2">
-                {{ flow.materialFlowName }}
-                <span v-if="!flow.enabled" style="background-color: #f5edeb; color: #1a2551; border-radius: 6px; margin-left: 6px">Disabled</span>
-            </label>
-        </div>
-    </div>
+        <Column field="producerName" header="Producer">
+            <template #body="slotProps">
+                <div class="flex items-center gap-2">
+                    <Checkbox
+                        @update:modelValue="onToggle($event, slotProps.data.producerId)"
+                        v-model="producerSelect[slotProps.data.producerId].isChecked"
+                        :inputId="slotProps.data.producerName"
+                        name="Producer"
+                        :binary="true"
+                        :indeterminate="producerSelect[slotProps.data.producerId].isIndeteminate"
+                    />
+                    <label :for="slotProps.data.producerName" class="font-bold"> <i class="pi pi-list"></i> {{ slotProps.data.producerName }} </label>
+                </div>
+            </template>
+        </Column>
+        <Column selectionMode="multiple" headerStyle="width: 3rem;"></Column>
+        <Column field="materialFlowName" header="Material Flow">
+            <template #body="slotProps">
+                {{ slotProps.data.materialFlowName }}
+                <span v-if="!slotProps.data.enabled" style="background-color: #6c757d; color: #fff; border-radius: 6px; margin-left: 6px; font-size: 0.7rem; font-weight: lighter">Disabled</span>
+            </template>
+        </Column>
+    </DataTable>
 </template>

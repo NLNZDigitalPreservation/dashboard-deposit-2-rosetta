@@ -22,7 +22,8 @@
         </div> -->
         <div style="width: 1rem"></div>
 
-        <Button label="Search" icon="pi pi-search" class="mr-2" @click="topbarActions.openSearchDialog"></Button>
+        <!-- <Button label="Search" icon="pi pi-search" class="mr-2" @click="topbarActions.openSearchDialog"></Button> -->
+        <Button label="Search" icon="pi pi-search" class="mr-2" @click="dlgSearch.show()"></Button>
         <Button @click="topbarActions.onReload()" label="Reload" icon="pi pi-refresh" class="mr-2"></Button>
         <Button @click="topbarActions.onExportSelectedJobs()" label="Export Selected Jobs" icon="pi pi-download" class="mr-2"></Button>
         <Button @click="topbarActions.openRedepositDialog()" label="Redeposit" icon="pi pi-pen-to-square" class="mr-2"></Button>
@@ -57,11 +58,14 @@
         <router-view />
     </div>
 
+    <DepositJobSearchDialog ref="dlgSearch" />
+
     <DepositAccountDrawer ref="drawerDepositAccount" />
     <MaterialFlowDrawer ref="drawerMaterialFlow" />
 </template>
 
 <script setup lang="ts">
+import DepositJobSearchDialog from '@/components/jobs/DepositJobSearchDialog.vue';
 import DepositAccountDrawer from '@/components/settings/DepositAccountDrawer.vue';
 import MaterialFlowDrawer from '@/components/settings/MaterialFlowDrawer.vue';
 import AppConfigurator from '@/layout/AppConfigurator.vue';
@@ -87,6 +91,7 @@ const topbarMenuClasses = computed(() => {
     };
 });
 /*  */
+const dlgSearch = ref();
 const drawerDepositAccount = ref();
 const drawerMaterialFlow = ref();
 
