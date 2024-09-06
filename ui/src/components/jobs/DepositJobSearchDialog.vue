@@ -96,6 +96,11 @@ const show = () => {
     visible.value = true;
 };
 
+const onToggle = (event: any) => {
+    // flows.value.forEach((item: any) => {
+    //     item.isChecked = event;
+    // });
+};
 defineExpose({ show });
 </script>
 
@@ -120,7 +125,21 @@ defineExpose({ show });
         </div>
 
         <Fieldset legend="Material Flow">
-            <MaterialFlowSelectGroup :dataList="materialflows.dataList" />
+            <template #legend>
+                <div class="flex flex-col gap-1">
+                    <div class="field font-semibold text-xl">
+                        <Checkbox @update:modelValue="onToggle" v-model="producersSelect" inputId="all-producers" name="Producers" :binary="true" :indeterminate="isIndeteminate" class="mb-1" />
+                        <label for="all-producers" class="ml-2"> All Producers </label>
+                    </div>
+                </div>
+            </template>
+
+            <div style="height: 50rem">
+                <div v-for="(flowGroup, producerId) in mappedMaterialFlows">
+                    <MaterialFlowSelectGroup :flowGroup="flowGroup" />
+                    <Divider />
+                </div>
+            </div>
         </Fieldset>
 
         <template #footer>
