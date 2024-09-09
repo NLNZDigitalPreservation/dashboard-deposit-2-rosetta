@@ -1,31 +1,10 @@
 <script setup lang="ts">
 import { searchConditions, useJobListDTO } from '@/stores/depositjob';
-import { useSettingsMaterialFlowStore } from '@/stores/settings';
-import { computed, defineExpose, inject, ref } from 'vue';
+import { useMaterialFlowsStore } from '@/stores/materialflows';
+import { computed, ref } from 'vue';
 
 const visible = ref(false);
 const jobList = useJobListDTO();
-
-const dialogRef: any = inject('dialogRef');
-
-const materialflows = useSettingsMaterialFlowStore();
-materialflows.queryAllRows();
-
-const mappedMaterialFlows = computed(() => {
-    const datamap = new Map();
-    for (let flow of materialflows.dataList) {
-        if (!datamap.has(flow.producerId)) {
-            datamap.set(flow.producerId, {
-                label: flow.producerName,
-                items: []
-            });
-        }
-        const flowGroup = datamap.get(flow.producerId);
-        flowGroup.items.push(flow);
-    }
-    const values = datamap.values();
-    return values;
-});
 
 const stages = ref([
     { name: 'INGEST', code: 'INGEST' },
@@ -43,9 +22,8 @@ const states = ref([
     { name: 'CANCELED', code: 'CANCELED' }
 ]);
 
-const closeDialog = () => {
-    dialogRef.value.close();
-};
+const flowStore = useMaterialFlowsStore();
+flowStore.fetchAllData();
 
 const onReset = () => {
     searchConditions.fromDate = undefined;
@@ -72,10 +50,6 @@ const onSearch = () => {
         req.dtEnd = searchConditions.toDate.valueOf();
     }
 
-    searchConditions.selectedData.forEach((flow: any) => {
-        req.flowIds.push(flow.id);
-    });
-
     searchConditions.selectedStages.forEach((stage: any) => {
         req.stages.push(stage.code);
     });
@@ -84,23 +58,24 @@ const onSearch = () => {
         req.states.push(state.code);
     });
 
+    for (let flow in searchConditions.selectedData) {
+        if (!flow.startsWith('producer')) {
+            req.flowIds.push(flow);
+        }
+    }
     jobList.searchData(req);
-    closeDialog();
+    visible.value = false;
 };
 
 const isIndeteminate = computed(() => {
     return true;
 });
 const producersSelect = ref(false);
+
 const show = () => {
     visible.value = true;
 };
 
-const onToggle = (event: any) => {
-    // flows.value.forEach((item: any) => {
-    //     item.isChecked = event;
-    // });
-};
 defineExpose({ show });
 </script>
 
@@ -124,24 +99,15 @@ defineExpose({ show });
             </div>
         </div>
 
-        <Fieldset legend="Material Flow">
-            <template #legend>
-                <div class="flex flex-col gap-1">
-                    <div class="field font-semibold text-xl">
-                        <Checkbox @update:modelValue="onToggle" v-model="producersSelect" inputId="all-producers" name="Producers" :binary="true" :indeterminate="isIndeteminate" class="mb-1" />
-                        <label for="all-producers" class="ml-2"> All Producers </label>
-                    </div>
-                </div>
-            </template>
-
-            <div style="height: 50rem">
-                <div v-for="(flowGroup, producerId) in mappedMaterialFlows">
-                    <MaterialFlowSelectGroup :flowGroup="flowGroup" />
-                    <Divider />
-                </div>
-            </div>
+        <Fieldset legend="Material Flows">
+            <Tree v-model:selectionKeys="searchConditions.selectedData" :value="flowStore.treeData" selectionMode="checkbox" class="w-full" scrollHeight="flex">
+                <template #default="slotProps">
+                    <b v-if="slotProps.node.type == 'producer'">{{ slotProps.node.label }}</b>
+                    <span v-if="slotProps.node.type == 'materialflow'">{{ slotProps.node.label }}</span>
+                    <span v-if="slotProps.node.type == 'materialflow' && !slotProps.node.data.enabled">Disabled</span>
+                </template>
+            </Tree>
         </Fieldset>
-
         <template #footer>
             <Toolbar style="width: 100%; border: 0">
                 <template #start>
@@ -153,12 +119,10 @@ defineExpose({ show });
                 <template #end>
                     <div class="flex justify-center flex-wrap gap-4 mt-4" style="justify-content: flex-end">
                         <Button type="button" label="Search" @click="onSearch()" autofocus></Button>
-                        <Button type="button" label="Close" @click="closeDialog()" severity="secondary"></Button>
+                        <Button type="button" label="Close" @click="visible = false" severity="secondary"></Button>
                     </div>
                 </template>
             </Toolbar>
         </template>
     </Dialog>
 </template>
-
-<style scoped></style>
