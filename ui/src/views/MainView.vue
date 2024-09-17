@@ -62,12 +62,14 @@
 
     <DepositAccountDrawer ref="drawerDepositAccount" />
     <MaterialFlowDrawer ref="drawerMaterialFlow" />
+    <WhiteListDrawer ref="drawerWhiteList" />
 </template>
 
 <script setup lang="ts">
 import DepositJobSearchDialog from '@/components/jobs/DepositJobSearchDialog.vue';
 import DepositAccountDrawer from '@/components/settings/DepositAccountDrawer.vue';
 import MaterialFlowDrawer from '@/components/settings/MaterialFlowDrawer.vue';
+import WhiteListDrawer from '@/components/settings/WhiteListDrawer.vue';
 import AppConfigurator from '@/layout/AppConfigurator.vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useJobListDTO } from '@/stores/depositjob';
@@ -94,6 +96,7 @@ const topbarMenuClasses = computed(() => {
 const dlgSearch = ref();
 const drawerDepositAccount = ref();
 const drawerMaterialFlow = ref();
+const drawerWhiteList = ref();
 
 const menu = ref();
 const settingsMenuItems = ref([
@@ -116,7 +119,7 @@ const settingsMenuItems = ref([
         label: 'User White List',
         icon: 'pi pi-list-check',
         command: () => {
-            router.push('/setting/white-list');
+            drawerWhiteList.value.toggle();
         }
     },
     {

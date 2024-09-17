@@ -1,12 +1,66 @@
+<script setup lang="ts">
+import { useSettingsWhiteListStore } from '@/stores/settings';
+import { type DepositAccount } from '@/types/deposit';
+import { defineExpose, onMounted, ref } from 'vue';
+
+const visibleDialogWhiteList = ref(false);
+
+const whiteListStore = useSettingsWhiteListStore();
+whiteListStore.queryAllRows();
+
+const initialData: DepositAccount = {
+    id: undefined,
+    depositUserInstitute: '',
+    depositUserName: '',
+    depositUserPassword: '',
+    auditRst: true,
+    auditMsg: 'OK'
+};
+const selectedRow = ref(Object.assign({}, initialData));
+const metaKey = ref(true);
+
+const onNew = () => {
+    selectedRow.value = Object.assign({}, initialData);
+    visibleDialogWhiteList.value = true;
+};
+const onDelete = (selectedData: any) => {
+    whiteListStore.deleteConfirm(selectedData);
+};
+const onEdit = (selectedData: any) => {
+    selectedRow.value = Object.assign({}, selectedData);
+    visibleDialogWhiteList.value = true;
+};
+const onSave = async () => {
+    const obj = JSON.stringify(selectedRow.value);
+    const ret = await whiteListStore.saveRow(selectedRow.value);
+    if (ret) {
+        visibleDialogWhiteList.value = false;
+    }
+};
+const onRowSelect = (event: any) => {
+    selectedRow.value = event.data;
+};
+
+onMounted(() => {
+    whiteListStore.queryAllRows();
+});
+
+const visibleDrawerWhiteList = ref(false);
+const toggle = () => {
+    visibleDrawerWhiteList.value = !visibleDrawerWhiteList.value;
+};
+defineExpose({ toggle });
+</script>
+
 <template>
-    <div v-if="visibleDrawerDepositAccount">
+    <div v-if="visibleDrawerWhiteList">
         <Toast />
         <ConfirmDialog></ConfirmDialog>
-        <Drawer v-model:visible="visibleDrawerDepositAccount" header="Deposit Accounts" class="!w-full md:!w-80 lg:!w-[50rem]" position="right">
-            <DataTable v-model:selection="depositAccountStore.selectedRow" :value="depositAccountStore.dataList" :metaKeySelection="metaKey" dataKey="id" @rowSelect="onRowSelect" tableStyle="width:100%" showGridlines sortField="id" :sortOrder="1">
+        <Drawer v-model:visible="visibleDrawerWhiteList" header="Deposit Accounts" class="!w-full md:!w-80 lg:!w-[50rem]" position="right">
+            <DataTable v-model:selection="whiteListStore.selectedRow" :value="whiteListStore.dataList" :metaKeySelection="metaKey" dataKey="id" @rowSelect="onRowSelect" tableStyle="width:100%" showGridlines sortField="id" :sortOrder="1">
                 <Column field="id" header="ID" sortable></Column>
-                <Column field="depositUserInstitute" header="Institute" sortable></Column>
-                <Column field="depositUserName" header="User Name" sortable></Column>
+                <Column field="whiteUserName" header="User Name" sortable></Column>
+                <Column field="whiteUserRole" header="User Role" sortable></Column>
                 <Column field="id" header="Action" alignFrozen="right" style="width: 8rem">
                     <template #body="{ data }">
                         <Button icon="pi pi-pen-to-square" @click="onEdit(data)" text />
@@ -22,7 +76,7 @@
             </template>
         </Drawer>
 
-        <Dialog v-model:visible="visibleDialogDepositAccount" modal header="Edit Profile" :style="{ width: '55rem' }">
+        <Dialog v-model:visible="visibleDialogWhiteList" modal header="Edit Profile" :style="{ width: '55rem' }">
             <template #header>
                 <div class="inline-flex items-center justify-center gap-2">
                     <span class="font-bold whitespace-nowrap">Deposit Account: {{ selectedRow.id }}</span>
@@ -55,58 +109,8 @@
             </Fluid>
             <template #footer>
                 <Button label="Save" @click="onSave()" autofocus />
-                <Button label="Cancel" outlined @click="visibleDialogDepositAccount = false" autofocus />
+                <Button label="Cancel" outlined @click="visibleDialogWhiteList = false" autofocus />
             </template>
         </Dialog>
     </div>
 </template>
-
-<script setup lang="ts">
-import { useSettingsDepositAccountStore } from '@/stores/settings';
-import { type DepositAccount } from '@/types/deposit';
-import { defineExpose, ref } from 'vue';
-
-const visibleDialogDepositAccount = ref(false);
-
-const depositAccountStore = useSettingsDepositAccountStore();
-depositAccountStore.queryAllRows();
-
-const initialData: DepositAccount = {
-    id: undefined,
-    depositUserInstitute: '',
-    depositUserName: '',
-    depositUserPassword: '',
-    auditRst: true,
-    auditMsg: 'OK'
-};
-const selectedRow = ref(Object.assign({}, initialData));
-const metaKey = ref(true);
-
-const onNew = () => {
-    selectedRow.value = Object.assign({}, initialData);
-    visibleDialogDepositAccount.value = true;
-};
-const onDelete = (selectedData: any) => {
-    depositAccountStore.deleteConfirm(selectedData);
-};
-const onEdit = (selectedData: any) => {
-    selectedRow.value = Object.assign({}, selectedData);
-    visibleDialogDepositAccount.value = true;
-};
-const onSave = async () => {
-    const obj = JSON.stringify(selectedRow.value);
-    const ret = await depositAccountStore.saveRow(selectedRow.value);
-    if (ret) {
-        visibleDialogDepositAccount.value = false;
-    }
-};
-const onRowSelect = (event: any) => {
-    selectedRow.value = event.data;
-};
-
-const visibleDrawerDepositAccount = ref(false);
-const toggle = () => {
-    visibleDrawerDepositAccount.value = !visibleDrawerDepositAccount.value;
-};
-defineExpose({ toggle });
-</script>
