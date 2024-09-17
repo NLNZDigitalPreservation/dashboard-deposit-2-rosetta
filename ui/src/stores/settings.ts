@@ -1,4 +1,4 @@
-import { type UseFetchApis, useFetch } from '@/utils/rest.api';
+import { useFetch, type UseFetchApis } from '@/utils/rest.api';
 import { defineStore } from 'pinia';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
@@ -174,4 +174,76 @@ export const useSettingsMaterialFlowStore = defineStore('SettingsMaterialFlowSto
         dataList,
         data
     };
+});
+
+export const useSettingsWhiteListStore = defineStore('SettingsWhiteListStore', () => {
+    const toast = useToast();
+    const confirm = useConfirm();
+
+    const rest: UseFetchApis = useFetch();
+
+    const dataList = ref();
+    const data = ref();
+    const selectedRow = ref();
+
+    const queryAllRows = async () => {
+        dataList.value = await rest.get('/restful/setting/whitelist/all/get');
+        return dataList.value;
+    };
+
+    const queryRow = async (id: number) => {
+        data.value = await rest.get('/restful/setting/whitelist/detail?id=' + id);
+        return data.value;
+    };
+
+    const deleteConfirm = (rowData: any) => {
+        confirm.require({
+            message: 'Do you want to delete this record?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            rejectProps: {
+                label: 'Cancel',
+                severity: 'secondary',
+                outlined: true
+            },
+            acceptProps: {
+                label: 'Delete',
+                severity: 'danger'
+            },
+            accept: () => {
+                deleteRow(rowData);
+            },
+            reject: () => {}
+        });
+    };
+    const deleteRow = async (rowData: any) => {
+        if (!rowData) {
+            const error = 'The input param can not be null.';
+            console.error(error);
+            toast.add({ severity: 'error', summary: 'Error: ', detail: error, life: 3000 });
+            return;
+        }
+        const ret = await rest.delete('/restful/setting/whitelist/delete?id=' + rowData.id, undefined);
+        if (ret) {
+            toast.add({ severity: 'success', summary: 'Success: ', detail: 'Succeed to delete the white list item', life: 3000 });
+            queryAllRows();
+        }
+    };
+
+    const saveRow = async (rowData: any) => {
+        if (!rowData) {
+            const error = 'The input param can not be null.';
+            console.error(error);
+            toast.add({ severity: 'error', summary: 'Error: ', detail: error, life: 3000 });
+            return;
+        }
+        const ret = await rest.post('/restful/setting/whitelist/save', rowData);
+        if (ret) {
+            toast.add({ severity: 'success', summary: 'Success: ', detail: 'Succeed to save the white list item', life: 3000 });
+            queryAllRows();
+        }
+        return ret;
+    };
+
+    return { dataList, data, selectedRow, queryAllRows, queryRow, deleteConfirm, deleteRow, saveRow };
 });

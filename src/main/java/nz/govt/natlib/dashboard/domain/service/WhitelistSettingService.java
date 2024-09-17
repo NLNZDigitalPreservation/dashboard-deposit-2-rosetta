@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 @Service
@@ -24,62 +25,45 @@ public class WhitelistSettingService {
         return data.isEmpty();
     }
 
-    public RestResponseCommand getAllWhitelistSettings() {
-        RestResponseCommand rstVal = new RestResponseCommand();
+    public List<EntityWhitelistSetting> getAllWhitelistSettings() {
         List<EntityWhitelistSetting> data = repoWhiteList.getAll();
-        rstVal.setRspBody(data);
-        data.clear();
-        return rstVal;
+        return data;
     }
 
-    public RestResponseCommand saveWhitelistSetting(EntityWhitelistSetting whitelist, PdsUserInfo loginUserInfo) throws Exception {
-        RestResponseCommand rstVal = new RestResponseCommand();
+    public void saveWhitelistSetting(EntityWhitelistSetting whitelist, PdsUserInfo loginUserInfo) throws Exception {
         if (whitelist.getId() != null) {
             EntityWhitelistSetting toBeModifiedUser = repoWhiteList.getById(whitelist.getId());
             if (toBeModifiedUser != null && toBeModifiedUser.getWhiteUserName().equalsIgnoreCase(loginUserInfo.getUserName())) {
-                rstVal.setRspCode(RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
-                rstVal.setRspMsg("You could not change yourself.");
-                return rstVal;
+                throw new InvalidParameterException("You could not change yourself: "+RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);                
             }
         }
-        return saveWhitelistSetting(whitelist);
+        saveWhitelistSetting(whitelist);
     }
 
-    public RestResponseCommand saveWhitelistSetting(EntityWhitelistSetting whitelist) throws Exception {
+    public void saveWhitelistSetting(EntityWhitelistSetting whitelist) throws Exception {
         //Validate the producer
         DashboardHelper.assertNotNull("Whitelist", whitelist);
         DashboardHelper.assertNotNull("WhitelistUsername", whitelist.getWhiteUserName());
         DashboardHelper.assertNotNull("WhitelistRole", whitelist.getWhiteUserRole());
 
-        RestResponseCommand rstVal = new RestResponseCommand();
-
         EntityWhitelistSetting existingUser = repoWhiteList.getByUserName(whitelist.getWhiteUserName());
         if (existingUser != null && !existingUser.getId().equals(whitelist.getId())) {
-            rstVal.setRspCode(RestResponseCommand.RSP_PROCESS_SET_DUPLICATED);
-            rstVal.setRspMsg("The User exists in the white list.");
-            return rstVal;
+            throw new InvalidParameterException("The user exists in the white list: "+RestResponseCommand.RSP_PROCESS_SET_DUPLICATED);                
         }
 
         repoWhiteList.save(whitelist);
-        return rstVal;
     }
 
-    public RestResponseCommand deleteWhitelistSetting(Long id, PdsUserInfo loginUserInfo) {
-        RestResponseCommand rstVal = new RestResponseCommand();
+    public void deleteWhitelistSetting(Long id, PdsUserInfo loginUserInfo) {
         EntityWhitelistSetting toBeDeletedUser = repoWhiteList.getById(id);
         if (toBeDeletedUser != null && toBeDeletedUser.getWhiteUserName().equalsIgnoreCase(loginUserInfo.getUserName())) {
-            rstVal.setRspCode(RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
-            rstVal.setRspMsg("You could not delete yourself.");
-            return rstVal;
+            throw new InvalidParameterException("You could not delete yourself: "+RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
         }
         repoWhiteList.deleteById(id);
-        return rstVal;
     }
 
-    public RestResponseCommand getWhitelistDetail(Long id) {
-        RestResponseCommand rstVal = new RestResponseCommand();
-        rstVal.setRspBody(repoWhiteList.getById(id));
-        return rstVal;
+    public EntityWhitelistSetting getWhitelistDetail(Long id) {
+        return repoWhiteList.getById(id);
     }
 
     public boolean isInWhiteList(PdsUserInfo pdsUserInfo) {
@@ -98,14 +82,10 @@ public class WhitelistSettingService {
         return repoWhiteList.getByUserName(userName);
     }
 
-    public RestResponseCommand initialWhiteListSetting(PdsUserInfo pdsUserInfo) {
-        RestResponseCommand rstVal = new RestResponseCommand();
-
+    public EntityWhitelistSetting initialWhiteListSetting(PdsUserInfo pdsUserInfo) {
         EntityWhitelistSetting userInfo = getUserFromWhiteList(pdsUserInfo);
         if (!DashboardHelper.isNull(userInfo)) {
-            rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
-            rstVal.setRspMsg("The dashboard could not be duplicated initialed.");
-            return rstVal;
+            throw new InvalidParameterException("The dashboard could not be duplicated initialed:"+RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
         }
 
         userInfo = new EntityWhitelistSetting();
@@ -113,9 +93,6 @@ public class WhitelistSettingService {
         userInfo.setWhiteUserRole(EnumUserRole.admin.name());
 
         repoWhiteList.save(userInfo);
-
-        rstVal.setRspBody(userInfo);
-
-        return rstVal;
+        return userInfo;
     }
 }

@@ -93,6 +93,7 @@ declare module 'vue' {
     WctFormField: typeof import('./src/components/WctFormField.vue')['default']
     WctSearchField: typeof import('./src/components/WctSearchField.vue')['default']
     WctTabViewPanel: typeof import('./src/components/WctTabViewPanel.vue')['default']
+    WhiteListDrawer: typeof import('./src/components/settings/WhiteListDrawer.vue')['default']
   }
   export interface ComponentCustomProperties {
     BadgeDirective: typeof import('primevue/badgedirective')['default']
