@@ -7,8 +7,7 @@
                 <Column field="id" header="ID" sortable></Column>
                 <Column field="depositUserInstitute" header="Institute" sortable></Column>
                 <Column field="depositUserName" header="User Name" sortable></Column>
-                <Column field="auditMsg" header="Audit" sortable> </Column>
-                <Column field="id" header="Action" alignFrozen="right">
+                <Column field="id" header="Action" alignFrozen="right" style="width: 8rem">
                     <template #body="{ data }">
                         <Button icon="pi pi-pen-to-square" @click="onEdit(data)" text />
                         <Button icon="pi pi-trash" severity="danger" @click="onDelete(data)" text />
@@ -29,29 +28,31 @@
                     <span class="font-bold whitespace-nowrap">Deposit Account: {{ selectedRow.id }}</span>
                 </div>
             </template>
-            <Fieldset legend="Settings">
-                <FlatInputGroup class="mt-2 mb-2">
-                    <InputGroupAddon>ID</InputGroupAddon>
-                    <InputNumber v-model="selectedRow.id" readonly />
-                </FlatInputGroup>
-                <FlatInputGroup class="mt-2 mb-2">
-                    <InputGroupAddon>Institute</InputGroupAddon>
-                    <InputText v-model="selectedRow.depositUserInstitute" />
-                </FlatInputGroup>
-                <FlatInputGroup class="mt-2 mb-2">
-                    <InputGroupAddon>User Name</InputGroupAddon>
-                    <InputText v-model="selectedRow.depositUserName" />
-                </FlatInputGroup>
-                <FlatInputGroup class="mt-2 mb-2">
-                    <InputGroupAddon>Password</InputGroupAddon>
-                    <Password v-model="selectedRow.depositUserPassword" :feedback="false" />
-                </FlatInputGroup>
-            </Fieldset>
+            <Fluid>
+                <Fieldset legend="Settings">
+                    <FlatInputGroup class="mt-2 mb-2">
+                        <InputGroupAddon>ID</InputGroupAddon>
+                        <InputNumber v-model="selectedRow.id" readonly />
+                    </FlatInputGroup>
+                    <FlatInputGroup class="mt-2 mb-2">
+                        <InputGroupAddon>Institute</InputGroupAddon>
+                        <InputText v-model="selectedRow.depositUserInstitute" />
+                    </FlatInputGroup>
+                    <FlatInputGroup class="mt-2 mb-2">
+                        <InputGroupAddon>User Name</InputGroupAddon>
+                        <InputText v-model="selectedRow.depositUserName" />
+                    </FlatInputGroup>
+                    <FlatInputGroup class="mt-2 mb-2">
+                        <InputGroupAddon>Password</InputGroupAddon>
+                        <Password v-model="selectedRow.depositUserPassword" :feedback="false" />
+                    </FlatInputGroup>
+                </Fieldset>
 
-            <Fieldset legend="Health Audit">
-                <Message v-if="selectedRow.auditRst" severity="success" :closable="false">{{ selectedRow.auditMsg }}</Message>
-                <Message v-if="!selectedRow.auditRst" severity="warn" :closable="false">{{ selectedRow.auditMsg }}</Message>
-            </Fieldset>
+                <Fieldset legend="Health Audit">
+                    <Message v-if="selectedRow.auditRst" severity="success" :closable="false">{{ selectedRow.auditMsg }}</Message>
+                    <Message v-if="!selectedRow.auditRst" severity="warn" :closable="false">{{ selectedRow.auditMsg }}</Message>
+                </Fieldset>
+            </Fluid>
             <template #footer>
                 <Button label="Save" @click="onSave()" autofocus />
                 <Button label="Cancel" outlined @click="visibleDialogDepositAccount = false" autofocus />

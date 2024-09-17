@@ -104,7 +104,7 @@ defineExpose({ show });
                 <template #default="slotProps">
                     <b v-if="slotProps.node.type == 'producer'">{{ slotProps.node.label }}</b>
                     <span v-if="slotProps.node.type == 'materialflow'">{{ slotProps.node.label }}</span>
-                    <span v-if="slotProps.node.type == 'materialflow' && !slotProps.node.data.enabled">Disabled</span>
+                    <Badge v-if="slotProps.node.type == 'materialflow' && !slotProps.node.data.enabled" value="Disabled" severity="info" class="ml-4"></Badge>
                 </template>
             </Tree>
         </Fieldset>

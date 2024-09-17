@@ -24,7 +24,7 @@ const onRedeposit = () => {
         2. The running job relevant to this sub folder will be removed.
     </Message>
 
-    <InputGroup class="mt-2 mb-2">
+    <InputGroup class="mt-8 mb-2">
         <InputGroupAddon>Sub Folder</InputGroupAddon>
         <InputText placeholder="" v-model="jobList.subFolder" />
     </InputGroup>

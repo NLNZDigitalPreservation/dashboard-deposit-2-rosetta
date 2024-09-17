@@ -6,9 +6,14 @@
             <DataTable v-model:selection="selectedRow" :value="materialFlowStore.dataList" :metaKeySelection="metaKey" dataKey="id" tableStyle="width:100%" showGridlines sortField="id" :sortOrder="1">
                 <Column field="id" header="ID" sortable></Column>
                 <Column field="producerName" header="Producer" sortable></Column>
-                <Column field="materialFlowName" header="Material Flow" sortable></Column>
-                <Column field="auditMsg" header="Audit" sortable> </Column>
-                <Column field="id" header="Action" alignFrozen="right">
+                <Column field="materialFlowName" header="Material Flow" sortable>
+                    <template #body="slotProps">
+                        {{ slotProps.data.materialFlowName }}
+                        <!-- <span v-if="!slotProps.data.enabled" style="display: inline-block; background: #6c757d; color: white; padding: 0 5px; border: 0.1px solid; border-radius: 8px">Disabled</span> -->
+                        <Badge v-if="!slotProps.data.enabled" value="Disabled" severity="info"></Badge>
+                    </template>
+                </Column>
+                <Column field="id" header="Action" alignFrozen="right" style="width: 8rem">
                     <template #body="{ data }">
                         <Button icon="pi pi-pen-to-square" @click="onEdit(data)" text />
                         <Button icon="pi pi-trash" severity="danger" @click="onDelete(data)" text />
@@ -30,86 +35,87 @@
                 </div>
             </template>
 
-            <Fieldset legend="Basic Settings">
-                <InputGroup class="mt-2 mb-2">
-                    <ToggleSwitch v-model="selectedRow.enabled" inputId="enabledMaterialFlow" />
-                    <label for="enabledMaterialFlow" class="ml-2"> If enable depositing for this material flow. </label>
-                </InputGroup>
+            <Fluid>
+                <Fieldset legend="Basic Settings">
+                    <InputGroup class="mt-2 mb-2">
+                        <ToggleSwitch v-model="selectedRow.enabled" inputId="enabledMaterialFlow" />
+                        <label for="enabledMaterialFlow" class="ml-2"> If enable depositing for this material flow. </label>
+                    </InputGroup>
 
-                <IconInputGroup :label="'Deposit Account'" :icon="'pi pi-angle-down'">
-                    <InputText v-model="depositAccount" @click="opDepositAccount.toggle" readonly style="padding-left: 3px" />
-                </IconInputGroup>
-
-                <FlatInputGroup>
-                    <IconInputGroup label="Producer" icon="pi pi-angle-down">
-                        <InputText v-model="selectedRow.producerName" @click="opProducer.toggle" readonly style="padding-left: 3px" />
+                    <IconInputGroup :label="'Deposit Account'" :icon="'pi pi-angle-down'">
+                        <InputText v-model="depositAccount" @click="opDepositAccount.toggle" readonly style="padding-left: 3px" />
                     </IconInputGroup>
-                    <IconInputGroup label="Material Flow" icon="pi pi-angle-down">
-                        <InputText v-model="selectedRow.materialFlowName" @click="opMaterialFlow.toggle" readonly style="padding-left: 3px" />
-                    </IconInputGroup>
-                </FlatInputGroup>
 
-                <FlatInputGroup>
-                    <InputGroupAddon>Root Location</InputGroupAddon>
-                    <InputText v-model="selectedRow.rootPath" />
-                </FlatInputGroup>
-            </Fieldset>
+                    <FlatInputGroup>
+                        <IconInputGroup label="Producer" icon="pi pi-angle-down">
+                            <InputText v-model="selectedRow.producerName" @click="opProducer.toggle" readonly style="padding-left: 3px" />
+                        </IconInputGroup>
+                        <IconInputGroup label="Material Flow" icon="pi pi-angle-down">
+                            <InputText v-model="selectedRow.materialFlowName" @click="opMaterialFlow.toggle" readonly style="padding-left: 3px" />
+                        </IconInputGroup>
+                    </FlatInputGroup>
 
-            <Fieldset legend="Advanced Settings">
-                <FlatInputGroup>
-                    <InputGroupAddon>Stream Path</InputGroupAddon>
-                    <InputText v-model="selectedRow.streamLocation" />
-                </FlatInputGroup>
-                <FlatInputGroup>
-                    <InputGroupAddon>Ingestion Completed File Name </InputGroupAddon>
-                    <InputText v-model="selectedRow.injectionCompleteFileName" />
-                </FlatInputGroup>
-                <FlatInputGroup>
-                    <InputGroupAddon>Max Active Days </InputGroupAddon>
-                    <InputNumber v-model="selectedRow.maxActiveDays" mode="decimal" fluid />
-                    <InputGroupAddon>Max Storage Days </InputGroupAddon>
-                    <InputNumber v-model="selectedRow.maxSaveDays" mode="decimal" fluid />
-                </FlatInputGroup>
-                <FlatInputGroup>
-                    <InputGroupAddon>Max Threads: </InputGroupAddon>
-                    <InputGroupAddon>Mon</InputGroupAddon>
-                    <InputNumber v-model="weeklyThreads.mon" mode="decimal" :min="0" :max="128" fluid />
-                    <InputGroupAddon>Tue</InputGroupAddon>
-                    <InputNumber v-model="weeklyThreads.tue" mode="decimal" :min="0" :max="128" fluid />
-                    <InputGroupAddon>Wed</InputGroupAddon>
-                    <InputNumber v-model="weeklyThreads.wed" mode="decimal" :min="0" :max="128" fluid />
-                    <InputGroupAddon>Thu</InputGroupAddon>
-                    <InputNumber v-model="weeklyThreads.thu" mode="decimal" :min="0" :max="128" fluid />
-                    <InputGroupAddon>Fri</InputGroupAddon>
-                    <InputNumber v-model="weeklyThreads.fri" mode="decimal" :min="0" :max="128" fluid />
-                    <InputGroupAddon>Sat</InputGroupAddon>
-                    <InputNumber v-model="weeklyThreads.sat" mode="decimal" :min="0" :max="128" fluid />
-                    <InputGroupAddon>Sun</InputGroupAddon>
-                    <InputNumber v-model="weeklyThreads.sun" mode="decimal" :min="0" :max="128" fluid />
-                </FlatInputGroup>
-                <FlatInputGroup>
-                    <InputGroupAddon>Deletion Options For Actual Content </InputGroupAddon>
-                    <Select v-model="selectedRow.actualContentDeleteOptions" :options="deletionOptions" optionLabel="name" optionValue="code" />
-                </FlatInputGroup>
-                <FlatInputGroup>
-                    <InputGroupAddon>Backup Options For Actual Content </InputGroupAddon>
-                    <Select v-model="selectedRow.actualContentBackupOptions" :options="backupOptions" optionLabel="name" optionValue="code" />
-                </FlatInputGroup>
-                <FlatInputGroup>
-                    <InputGroupAddon>Backup Location </InputGroupAddon>
-                    <InputText v-model="selectedRow.backupPath" />
-                </FlatInputGroup>
-                <FlatInputGroup>
-                    <InputGroupAddon>Sub folders for backup </InputGroupAddon>
-                    <Textarea v-model="selectedRow.backupSubFolders" rows="5" cols="120" />
-                </FlatInputGroup>
-            </Fieldset>
+                    <FlatInputGroup>
+                        <InputGroupAddon>Root Location</InputGroupAddon>
+                        <InputText v-model="selectedRow.rootPath" />
+                    </FlatInputGroup>
+                </Fieldset>
 
-            <Fieldset legend="Health Audit">
-                <Message v-if="selectedRow.auditRst" severity="success" :closable="false">{{ selectedRow.auditMsg }}</Message>
-                <Message v-if="!selectedRow.auditRst" severity="warn" :closable="false">{{ selectedRow.auditMsg }}</Message>
-            </Fieldset>
+                <Fieldset legend="Advanced Settings">
+                    <FlatInputGroup>
+                        <InputGroupAddon>Stream Path</InputGroupAddon>
+                        <InputText v-model="selectedRow.streamLocation" />
+                    </FlatInputGroup>
+                    <FlatInputGroup>
+                        <InputGroupAddon>Ingestion Completed File Name </InputGroupAddon>
+                        <InputText v-model="selectedRow.injectionCompleteFileName" />
+                    </FlatInputGroup>
+                    <FlatInputGroup>
+                        <InputGroupAddon>Max Active Days </InputGroupAddon>
+                        <InputNumber v-model="selectedRow.maxActiveDays" mode="decimal" fluid />
+                        <InputGroupAddon>Max Storage Days </InputGroupAddon>
+                        <InputNumber v-model="selectedRow.maxSaveDays" mode="decimal" fluid />
+                    </FlatInputGroup>
+                    <FlatInputGroup>
+                        <InputGroupAddon>Max Threads: </InputGroupAddon>
+                        <InputGroupAddon>Mon</InputGroupAddon>
+                        <InputNumber v-model="weeklyThreads.mon" mode="decimal" :min="0" :max="128" fluid />
+                        <InputGroupAddon>Tue</InputGroupAddon>
+                        <InputNumber v-model="weeklyThreads.tue" mode="decimal" :min="0" :max="128" fluid />
+                        <InputGroupAddon>Wed</InputGroupAddon>
+                        <InputNumber v-model="weeklyThreads.wed" mode="decimal" :min="0" :max="128" fluid />
+                        <InputGroupAddon>Thu</InputGroupAddon>
+                        <InputNumber v-model="weeklyThreads.thu" mode="decimal" :min="0" :max="128" fluid />
+                        <InputGroupAddon>Fri</InputGroupAddon>
+                        <InputNumber v-model="weeklyThreads.fri" mode="decimal" :min="0" :max="128" fluid />
+                        <InputGroupAddon>Sat</InputGroupAddon>
+                        <InputNumber v-model="weeklyThreads.sat" mode="decimal" :min="0" :max="128" fluid />
+                        <InputGroupAddon>Sun</InputGroupAddon>
+                        <InputNumber v-model="weeklyThreads.sun" mode="decimal" :min="0" :max="128" fluid />
+                    </FlatInputGroup>
+                    <FlatInputGroup>
+                        <InputGroupAddon>Deletion Options For Actual Content </InputGroupAddon>
+                        <Select v-model="selectedRow.actualContentDeleteOptions" :options="deletionOptions" optionLabel="name" optionValue="code" />
+                    </FlatInputGroup>
+                    <FlatInputGroup>
+                        <InputGroupAddon>Backup Options For Actual Content </InputGroupAddon>
+                        <Select v-model="selectedRow.actualContentBackupOptions" :options="backupOptions" optionLabel="name" optionValue="code" />
+                    </FlatInputGroup>
+                    <FlatInputGroup>
+                        <InputGroupAddon>Backup Location </InputGroupAddon>
+                        <InputText v-model="selectedRow.backupPath" />
+                    </FlatInputGroup>
+                    <FlatInputGroup>
+                        <InputGroupAddon>Sub folders for backup </InputGroupAddon>
+                        <Textarea v-model="selectedRow.backupSubFolders" rows="5" cols="120" />
+                    </FlatInputGroup>
+                </Fieldset>
 
+                <Fieldset legend="Health Audit">
+                    <Message v-if="selectedRow.auditRst" severity="success" :closable="false">{{ selectedRow.auditMsg }}</Message>
+                    <Message v-if="!selectedRow.auditRst" severity="warn" :closable="false">{{ selectedRow.auditMsg }}</Message>
+                </Fieldset>
+            </Fluid>
             <template #footer>
                 <Button label="Save" @click="onSave()" autofocus />
                 <Button label="Cancel" outlined @click="visibleDialogMaterialFlow = false" autofocus />
