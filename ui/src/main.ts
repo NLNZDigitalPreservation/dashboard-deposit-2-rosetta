@@ -26,6 +26,11 @@ app.use(PrimeVue, {
             darkModeSelector: '.app-dark',
             cssLayer: false
         }
+    },
+    locale: {
+        accept: 'Aceptar',
+        reject: 'Rechazar'
+        //...
     }
 });
 app.use(ToastService);

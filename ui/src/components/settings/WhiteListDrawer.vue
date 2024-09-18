@@ -1,18 +1,23 @@
 <script setup lang="ts">
 import { useSettingsWhiteListStore } from '@/stores/settings';
-import { type DepositAccount } from '@/types/deposit';
+import { type WhiteListUser } from '@/types/deposit';
+import { getSelectOption } from '@/utils/helper';
 import { defineExpose, onMounted, ref } from 'vue';
 
+const userRoleOptions = ref([
+    { name: 'Admin', code: 'admin' },
+    { name: 'Normal', code: 'normal' }
+]);
+const selectedUserRole = ref({ name: 'Normal', code: 'normal' });
 const visibleDialogWhiteList = ref(false);
 
 const whiteListStore = useSettingsWhiteListStore();
-whiteListStore.queryAllRows();
+// whiteListStore.queryAllRows();
 
-const initialData: DepositAccount = {
+const initialData: WhiteListUser = {
     id: undefined,
-    depositUserInstitute: '',
-    depositUserName: '',
-    depositUserPassword: '',
+    whiteUserName: '',
+    whiteUserRole: 'normal',
     auditRst: true,
     auditMsg: 'OK'
 };
@@ -28,10 +33,11 @@ const onDelete = (selectedData: any) => {
 };
 const onEdit = (selectedData: any) => {
     selectedRow.value = Object.assign({}, selectedData);
+    selectedUserRole.value = getSelectOption(userRoleOptions.value, selectedRow.value.whiteUserRole);
     visibleDialogWhiteList.value = true;
 };
 const onSave = async () => {
-    const obj = JSON.stringify(selectedRow.value);
+    selectedRow.value.whiteUserRole = selectedUserRole.value.code;
     const ret = await whiteListStore.saveRow(selectedRow.value);
     if (ret) {
         visibleDialogWhiteList.value = false;
@@ -89,16 +95,12 @@ defineExpose({ toggle });
                         <InputNumber v-model="selectedRow.id" readonly />
                     </FlatInputGroup>
                     <FlatInputGroup class="mt-2 mb-2">
-                        <InputGroupAddon>Institute</InputGroupAddon>
-                        <InputText v-model="selectedRow.depositUserInstitute" />
-                    </FlatInputGroup>
-                    <FlatInputGroup class="mt-2 mb-2">
                         <InputGroupAddon>User Name</InputGroupAddon>
-                        <InputText v-model="selectedRow.depositUserName" />
+                        <InputText v-model="selectedRow.whiteUserName" />
                     </FlatInputGroup>
                     <FlatInputGroup class="mt-2 mb-2">
-                        <InputGroupAddon>Password</InputGroupAddon>
-                        <Password v-model="selectedRow.depositUserPassword" :feedback="false" />
+                        <InputGroupAddon>User Role</InputGroupAddon>
+                        <Select v-model="selectedUserRole" :options="userRoleOptions" optionLabel="name" placeholder="Select a role" />
                     </FlatInputGroup>
                 </Fieldset>
 

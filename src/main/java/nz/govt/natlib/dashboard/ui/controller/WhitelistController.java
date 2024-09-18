@@ -3,6 +3,7 @@ package nz.govt.natlib.dashboard.ui.controller;
 import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
 import nz.govt.natlib.dashboard.common.auth.PrivilegeManagementHandler;
+import nz.govt.natlib.dashboard.common.exception.InvalidParameterException;
 import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
 import nz.govt.natlib.dashboard.domain.service.WhitelistSettingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +46,11 @@ public class WhitelistController {
     public ResponseEntity<?> saveWhitelistSetting(@RequestBody EntityWhitelistSetting reqCmd, HttpServletRequest request, HttpServletResponse response) {
         try {
             PdsUserInfo loginUserInfo = privilegeManagementHandler.getPdsUserInfo(request, response);
+            if(loginUserInfo==null){
+                throw new InvalidParameterException("You must login");
+            }
             whitelistSettingService.saveWhitelistSetting(reqCmd, loginUserInfo);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body(true);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -57,7 +61,7 @@ public class WhitelistController {
         try {
             PdsUserInfo loginUserInfo = privilegeManagementHandler.getPdsUserInfo(request, response);
             whitelistSettingService.deleteWhitelistSetting(id, loginUserInfo);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body(true);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

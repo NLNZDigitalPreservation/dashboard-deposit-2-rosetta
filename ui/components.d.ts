@@ -43,6 +43,7 @@ declare module 'vue' {
     FloatingConfigurator: typeof import('./src/components/FloatingConfigurator.vue')['default']
     FloatLabel: typeof import('primevue/floatlabel')['default']
     Fluid: typeof import('primevue/fluid')['default']
+    GlobalSetting: typeof import('./src/components/settings/GlobalSetting.vue')['default']
     IconField: typeof import('primevue/iconfield')['default']
     IconInputGroup: typeof import('./src/components/IconInputGroup.vue')['default']
     InputGroup: typeof import('primevue/inputgroup')['default']

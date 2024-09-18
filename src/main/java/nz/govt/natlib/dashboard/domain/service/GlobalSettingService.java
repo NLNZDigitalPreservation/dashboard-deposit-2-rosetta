@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -20,11 +21,8 @@ public class GlobalSettingService {
     private static final long UNIQUE_GLOBAL_SETTING_ID = 0;
     @Autowired
     private RepoGlobalSetting repoGlobalSetting;
-    @Autowired
-    private TimerScheduledExecutors timerScheduledExecutors;
 
-    public RestResponseCommand getGlobalSetting() {
-        RestResponseCommand rstVal = new RestResponseCommand();
+    public EntityGlobalSetting getGlobalSetting() throws Exception {
         EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
         LocalDateTime ldtNowDatetime = LocalDateTime.now();
         if (globalSetting == null) {
@@ -56,37 +54,27 @@ public class GlobalSettingService {
                 //globalSetting.setPausedEndTime(strNowDatetime);
             }
         }
-        rstVal.setRspBody(globalSetting);
-        return rstVal;
+        return globalSetting;
     }
 
-    public RestResponseCommand saveGlobalSetting(EntityGlobalSetting globalSetting) {
-        RestResponseCommand rstVal = new RestResponseCommand();
+    public EntityGlobalSetting saveGlobalSetting(EntityGlobalSetting globalSetting) throws Exception {
         if (globalSetting.isPaused()) {
-            if (StringUtils.isEmpty(globalSetting.getPausedStartTime())) {
-                rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
-                rstVal.setRspMsg("The start time is empty.");
-                return rstVal;
+            if (StringUtils.isEmpty(globalSetting.getPausedStartTime())) {               
+                throw new InvalidParameterException("The start time is empty: "+RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             }
             if (StringUtils.isEmpty(globalSetting.getPausedEndTime())) {
-                rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
-                rstVal.setRspMsg("The end time is empty.");
-                return rstVal;
+                throw new InvalidParameterException("The end time is empty: "+RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             }
             LocalDateTime ldtNowDatetime = LocalDateTime.now();
             LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
             if (ldtPausedEndTime.isBefore(ldtNowDatetime)) {
-                rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
-                rstVal.setRspMsg("The end time must after now.");
-                return rstVal;
+                throw new InvalidParameterException("The end time must after now: "+RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             }
 
             if (ldtPausedEndTime.isBefore(ldtPausedStartTime)) {
-                rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
-                rstVal.setRspMsg("The end time must after the start time.");
-                return rstVal;
+                throw new InvalidParameterException("The end time must after start time: "+RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             }
         }
 
@@ -94,24 +82,16 @@ public class GlobalSettingService {
             DashboardHelper.assertNotNull("Delays", globalSetting.getDelays());
             DashboardHelper.assertNotNull("DelayUnit", globalSetting.getDelayUnit());
         } catch (Exception e) {
-            rstVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
-            rstVal.setRspMsg(e.getMessage());
-            return rstVal;
+            throw new InvalidParameterException(e.getMessage() + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
         }
 
         globalSetting.setId(UNIQUE_GLOBAL_SETTING_ID);
         repoGlobalSetting.save(globalSetting);
 
-        rstVal.setRspBody(globalSetting);
-
-        return rstVal;
+        return globalSetting;
     }
 
     public void setRepoGlobalSetting(RepoGlobalSetting repoGlobalSetting) {
         this.repoGlobalSetting = repoGlobalSetting;
-    }
-
-    public void setTimerScheduledExecutors(TimerScheduledExecutors timerScheduledExecutors) {
-        this.timerScheduledExecutors = timerScheduledExecutors;
     }
 }

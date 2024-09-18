@@ -1,3 +1,11 @@
+interface GlobalSetting {
+    id: number | undefined;
+    paused: boolean;
+    pausedStartTime: string;
+    pausedEndTime: string;
+    delays: number;
+    delayUnit: string;
+}
 interface DepositAccount {
     id: number | undefined;
     depositUserInstitute: string;
@@ -6,6 +14,15 @@ interface DepositAccount {
     auditRst: boolean;
     auditMsg: string;
 }
+
+interface WhiteListUser {
+    id: number | undefined;
+    whiteUserName: string;
+    whiteUserRole: string;
+    auditRst: boolean;
+    auditMsg: string;
+}
+
 interface MaterialFlow {
     id: number | undefined;
     actualContentBackupOptions: string;
@@ -65,4 +82,4 @@ interface JobQueryCondition {
     states: string[];
 }
 
-export type { DepositAccount, DepositJob, JobQueryCondition, MaterialFlow };
+export type { DepositAccount, DepositJob, GlobalSetting, JobQueryCondition, MaterialFlow, WhiteListUser };

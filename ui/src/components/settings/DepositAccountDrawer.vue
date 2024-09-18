@@ -64,12 +64,11 @@
 <script setup lang="ts">
 import { useSettingsDepositAccountStore } from '@/stores/settings';
 import { type DepositAccount } from '@/types/deposit';
-import { defineExpose, ref } from 'vue';
+import { defineExpose, onMounted, ref } from 'vue';
 
 const visibleDialogDepositAccount = ref(false);
 
 const depositAccountStore = useSettingsDepositAccountStore();
-depositAccountStore.queryAllRows();
 
 const initialData: DepositAccount = {
     id: undefined,
@@ -94,7 +93,6 @@ const onEdit = (selectedData: any) => {
     visibleDialogDepositAccount.value = true;
 };
 const onSave = async () => {
-    const obj = JSON.stringify(selectedRow.value);
     const ret = await depositAccountStore.saveRow(selectedRow.value);
     if (ret) {
         visibleDialogDepositAccount.value = false;
@@ -103,6 +101,10 @@ const onSave = async () => {
 const onRowSelect = (event: any) => {
     selectedRow.value = event.data;
 };
+
+onMounted(() => {
+    depositAccountStore.queryAllRows();
+});
 
 const visibleDrawerDepositAccount = ref(false);
 const toggle = () => {

@@ -247,3 +247,34 @@ export const useSettingsWhiteListStore = defineStore('SettingsWhiteListStore', (
 
     return { dataList, data, selectedRow, queryAllRows, queryRow, deleteConfirm, deleteRow, saveRow };
 });
+
+export const useSettingsGlobalStore = defineStore('SettingsGlobalStore', () => {
+    const toast = useToast();
+
+    const rest: UseFetchApis = useFetch();
+
+    const data = ref();
+    const selectedRow = ref();
+
+    const queryRow = async () => {
+        data.value = await rest.get('/restful/setting/global/get');
+        return data.value;
+    };
+
+    const saveRow = async (rowData: any) => {
+        if (!rowData) {
+            const error = 'The input param can not be null.';
+            console.error(error);
+            toast.add({ severity: 'error', summary: 'Error: ', detail: error, life: 3000 });
+            return;
+        }
+        const ret = await rest.post('/restful/setting/global/save', rowData);
+        if (ret) {
+            toast.add({ severity: 'success', summary: 'Success: ', detail: 'Succeed to save the global setting', life: 3000 });
+            queryRow();
+        }
+        return ret;
+    };
+
+    return { data, selectedRow, queryRow, saveRow };
+});

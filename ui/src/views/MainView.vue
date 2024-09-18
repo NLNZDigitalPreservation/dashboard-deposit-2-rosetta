@@ -68,6 +68,7 @@
 <script setup lang="ts">
 import DepositJobSearchDialog from '@/components/jobs/DepositJobSearchDialog.vue';
 import DepositAccountDrawer from '@/components/settings/DepositAccountDrawer.vue';
+import GlobalSetting from '@/components/settings/GlobalSetting.vue';
 import MaterialFlowDrawer from '@/components/settings/MaterialFlowDrawer.vue';
 import WhiteListDrawer from '@/components/settings/WhiteListDrawer.vue';
 import AppConfigurator from '@/layout/AppConfigurator.vue';
@@ -76,8 +77,10 @@ import { useJobListDTO } from '@/stores/depositjob';
 import { useTopbarActions } from '@/stores/depositjobTopbarActions';
 import { useUserProfileStore } from '@/stores/users';
 import Menu from 'primevue/menu';
+import { useDialog } from 'primevue/usedialog';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
+const dialog = useDialog();
 
 const router = useRouter();
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
@@ -127,7 +130,19 @@ const settingsMenuItems = ref([
     },
     {
         label: 'Global Setting',
-        icon: 'pi pi-globe'
+        icon: 'pi pi-globe',
+        command: () => {
+            const dialogRef = dialog.open(GlobalSetting, {
+                props: {
+                    header: 'Global Settings',
+                    closable: true,
+                    style: {
+                        width: '50rem'
+                    },
+                    modal: true
+                }
+            });
+        }
     },
     {
         separator: true

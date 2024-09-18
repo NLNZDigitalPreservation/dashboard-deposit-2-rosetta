@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static org.mockito.Mockito.mock;
 
 public class TestGlobalSettingService extends BasicTester {
     private static final GlobalSettingService testInstance = new GlobalSettingService();
@@ -23,8 +22,6 @@ public class TestGlobalSettingService extends BasicTester {
         BasicTester.initSubFolder();
 
         ReflectionTestUtils.setField(testInstance, "repoGlobalSetting", repoGlobalSetting);
-        TimerScheduledExecutors timerScheduledExecutors = mock(TimerScheduledExecutors.class);
-        ReflectionTestUtils.setField(testInstance, "timerScheduledExecutors", timerScheduledExecutors);
     }
 
     @Test
@@ -39,8 +36,12 @@ public class TestGlobalSettingService extends BasicTester {
             globalSetting.setPausedEndTime(ldtEndDatetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             globalSetting.setDelays(300L);
             globalSetting.setDelayUnit("S");
-            RestResponseCommand rsp = testInstance.saveGlobalSetting(globalSetting);
-            assert rsp.getRspCode() == RestResponseCommand.RSP_SUCCESS;
+            try{
+                // EntityGlobalSetting
+                testInstance.saveGlobalSetting(globalSetting);
+            }catch(Exception e){
+                assert(false);
+            }
         }
 
         //Valid global setting
@@ -53,8 +54,13 @@ public class TestGlobalSettingService extends BasicTester {
             globalSetting.setPausedEndTime(ldtEndDatetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             globalSetting.setDelays(300L);
             globalSetting.setDelayUnit("");
-            RestResponseCommand rsp = testInstance.saveGlobalSetting(globalSetting);
-            assert rsp.getRspCode() == RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS;
+            try{
+                // EntityGlobalSetting
+                testInstance.saveGlobalSetting(globalSetting);
+                assert(false);
+            }catch(Exception e){
+                assert(true);
+            }
         }
 
         //Valid global setting
@@ -67,8 +73,13 @@ public class TestGlobalSettingService extends BasicTester {
             globalSetting.setPausedEndTime(ldtEndDatetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             globalSetting.setDelays(300L);
             globalSetting.setDelayUnit("S");
-            RestResponseCommand rsp = testInstance.saveGlobalSetting(globalSetting);
-            assert rsp.getRspCode() == RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS;
+            try{
+                // EntityGlobalSetting
+                testInstance.saveGlobalSetting(globalSetting);
+                assert(false);
+            }catch(Exception e){
+                assert(true);
+            }
         }
 
         //Valid global setting
@@ -81,8 +92,13 @@ public class TestGlobalSettingService extends BasicTester {
             globalSetting.setPausedEndTime(ldtEndDatetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             globalSetting.setDelays(300L);
             globalSetting.setDelayUnit("S");
-            RestResponseCommand rsp = testInstance.saveGlobalSetting(globalSetting);
-            assert rsp.getRspCode() == RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS;
+            try{
+                // EntityGlobalSetting
+                testInstance.saveGlobalSetting(globalSetting);
+                assert(false);
+            }catch(Exception e){
+                assert(true);
+            }
         }
     }
 }

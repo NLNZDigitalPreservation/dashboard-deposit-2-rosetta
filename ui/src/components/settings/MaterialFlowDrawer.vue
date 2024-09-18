@@ -138,7 +138,7 @@
 <script setup lang="ts">
 import { useSettingsDepositAccountStore, useSettingsMaterialFlowStore } from '@/stores/settings';
 import type { MaterialFlow } from '@/types/deposit';
-import { defineExpose, reactive, ref } from 'vue';
+import { defineExpose, onMounted, reactive, ref } from 'vue';
 import IconInputGroup from '../IconInputGroup.vue';
 import DepositAccountSelectForm from './DepositAccountSelectForm.vue';
 import RawMaterialFlowSelectForm from './RawMaterialFlowSelectForm.vue';
@@ -180,7 +180,6 @@ const selectedRow = ref(Object.assign({}, initialData) as MaterialFlow);
 const depositAccountStore = useSettingsDepositAccountStore();
 
 const materialFlowStore = useSettingsMaterialFlowStore();
-materialFlowStore.queryAllRows();
 
 const depositAccount = ref();
 
@@ -266,7 +265,9 @@ const onSave = async () => {
         visibleDialogMaterialFlow.value = false;
     }
 };
-
+onMounted(() => {
+    materialFlowStore.queryAllRows();
+});
 const visibleDrawerMaterialFlow = ref(false);
 const toggle = () => {
     visibleDrawerMaterialFlow.value = !visibleDrawerMaterialFlow.value;
