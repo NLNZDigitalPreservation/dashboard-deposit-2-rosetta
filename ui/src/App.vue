@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import MainView from '@/views/MainView.vue';
+import LoginDialog from './components/LoginDialog.vue';
+import { useLoginStore } from './utils/rest.api';
+const loginStore = useLoginStore();
 </script>
 
 <template>
-    <MainView />
+    <router-view />
     <DynamicDialog />
+    <Drawer v-model:visible="loginStore.visibleLoginWindow" position="full">
+        <template #container="{ closeCallback }">
+            <LoginDialog />
+        </template>
+    </Drawer>
 </template>

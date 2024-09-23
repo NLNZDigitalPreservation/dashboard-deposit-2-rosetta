@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { useLoginStore } from '@/utils/rest.api';
+import { useTimeoutStore } from '@/utils/rest.api';
 import { ref } from 'vue';
 
-const loginStore = useLoginStore();
+const timeoutStore = useTimeoutStore();
 const username = ref('');
 const password = ref('');
 const checked = ref(false);
 
 const login = () => {
-    loginStore.authenticate(username.value, password.value);
+    timeoutStore.cancel();
 };
 </script>
 

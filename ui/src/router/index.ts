@@ -9,18 +9,12 @@ export const routes = {
                 {
                     path: '',
                     name: 'home',
-                    component: () => import('@/views/DepositJobListView.vue')
+                    component: () => import('@/views/MainView.vue')
                 },
                 {
-                    path: '/setting/deposit-account',
-                    name: 'deposit-account',
-                    component: () => import('@/components/settings/DepositAccountDrawer.vue')
-                    // component: () => import('@/views/SettingDepositAccountView.vue')
-                },
-                {
-                    path: '/setting/material-flow',
-                    name: 'material-flow',
-                    component: () => import('@/views/SettingMaterialFlowView.vue')
+                    path: '/login',
+                    name: 'login',
+                    component: () => import('@/views/LoginView.vue')
                 }
             ]
         }

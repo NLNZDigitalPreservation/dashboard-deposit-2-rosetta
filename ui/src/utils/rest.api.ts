@@ -1,15 +1,80 @@
-import LoginDialog from '@/components/LoginDialog.vue';
 import { useUserProfileStore } from '@/stores/users';
-import { useDialog } from 'primevue/usedialog';
+import { defineStore } from 'pinia';
 import { useToast } from 'primevue/usetoast';
-import { reactive, ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+// export const useTimeoutStore = defineStore('TimeoutStore', () => {
+//     const timeoutHandler = [] as any[];
+//     const sleep = (ms: number) =>
+//         new Promise((r) => {
+//             const handler = setTimeout(r, ms);
+//             timeoutHandler.push(handler);
+//             return handler;
+//         });
+//     const cancel = () => {
+//         while (timeoutHandler.length > 0) {
+//             const handler = timeoutHandler.pop();
+//             clearTimeout(handler);
+//             console.log('canceled a timer');
+//         }
+//     };
+//     return { sleep, cancel };
+// });
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-export const isAuthenticating = reactive({
-    value: false
+export const useLoginStore = defineStore('LoginStore', () => {
+    const toast = useToast();
+    const userProfile = useUserProfileStore();
+    const isAuthenticating = ref(false);
+    const startLogin = () => {
+        if (!isAuthenticating.value) {
+            isAuthenticating.value = true;
+        }
+    };
+
+    const authenticate = async (username: string, password: string) => {
+        const credentials = JSON.stringify({
+            username: username,
+            password: password
+        });
+        const rsp = await fetch('/auth/login.json', {
+            method: 'POST',
+            redirect: 'error',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: credentials
+        });
+
+        if (!rsp.ok) {
+            let status = rsp.status;
+            let statusText = rsp.statusText;
+            if (!statusText || statusText.length === 0) {
+                if (status === 401) {
+                    statusText = 'Unknown username or password, please try again.';
+                } else {
+                    statusText = 'Unknown error.';
+                }
+            }
+            toast.add({ severity: 'error', summary: 'Error: ' + status, detail: statusText, life: 30000 });
+            return;
+        }
+
+        const token = await rsp.json();
+        userProfile.setToken(username, token);
+
+        isAuthenticating.value = false;
+    };
+
+    const visibleLoginWindow = computed(() => {
+        return isAuthenticating.value;
+    });
+
+    return { startLogin, authenticate, visibleLoginWindow, isAuthenticating };
 });
 
 export interface UseFetchApis {
@@ -26,45 +91,8 @@ export interface UseFetchApis {
 // by convention, composable function names start with "use"
 export function useFetch() {
     // state encapsulated and managed by the composable
-    const dialog = useDialog();
+    // const dialog = useDialog();
     const toast = useToast();
-
-    // a composable can update its managed state over time.
-    async function openLoginDialog(dialog: any) {
-        const userProfile = useUserProfileStore();
-        const last_token = userProfile.token;
-        await sleep(Math.floor(Math.random() * 100 + 1));
-
-        if (isAuthenticating.value) {
-            console.log('The login window is opened');
-            return;
-        }
-
-        if (last_token !== userProfile.token) {
-            console.log('The token was updated.');
-            isAuthenticating.value = false;
-            return;
-        }
-
-        isAuthenticating.value = true;
-
-        const dialogRef = dialog.open(LoginDialog, {
-            props: {
-                header: 'Please login',
-                closable: false,
-                style: {
-                    width: '350px'
-                },
-                modal: true
-            },
-
-            onClose: (options: any) => {
-                //console.log(options);
-                // token.setToken(options.data);
-                isAuthenticating.value = false;
-            }
-        });
-    }
 
     const shell: UseFetchApis = {
         // method
@@ -79,18 +107,18 @@ export function useFetch() {
 
     function setMethod(methodValue: HttpMethod) {
         return async (path: string, payload: any = null) => {
+            const loginStore = useLoginStore();
             const userProfile = useUserProfileStore();
+            const router = useRouter();
 
             let ret = null;
 
             const isFinished = ref(false);
 
-            //isFinished.value=false;
-
             //Retry until it's finished. If the login session is expired, it can be run 2 rounds
             while (!isFinished.value) {
                 // Waiting until the authentication is finished
-                while (isAuthenticating.value) {
+                while (loginStore.isAuthenticating) {
                     await sleep(1000);
                 }
 
@@ -107,43 +135,28 @@ export function useFetch() {
                     reqOptions.body = JSON.stringify(payload);
                 }
 
-                ret = await fetch('/deposit-dashboard' + path, reqOptions).then(async (rsp) => {
-                    // console.log(rsp);
-                    if (rsp.status == 401) {
-                        return null;
-                    }
-
-                    isFinished.value = true;
-
-                    if (rsp.ok) {
-                        try {
-                            if (path.includes('export-data')) {
-                                const data = await rsp.blob();
-                                return data;
-                            } else {
-                                const text = await rsp.text();
-                                const data = JSON.parse(text);
-                                return data;
-                            }
-                        } catch {
-                            return 'Success';
-                        }
-                    } else {
-                        let errorMessage;
-                        const error = await rsp.text();
-                        if (!error || error.length === 0) {
-                            errorMessage = 'Unknown error.';
-                        } else {
-                            errorMessage = error;
-                        }
-                        console.error(rsp.status + ' : ' + errorMessage);
-                        toast.add({ severity: 'error', summary: 'Error: ' + rsp.status, detail: errorMessage, life: 3000 });
-                    }
-                });
-
-                if (!isFinished.value) {
-                    await openLoginDialog(dialog);
+                const rsp = await fetch('/deposit-dashboard' + path, reqOptions);
+                if (rsp.status === 401) {
+                    loginStore.startLogin();
+                    continue;
                 }
+
+                if (rsp.ok) {
+                    if (path.includes('export-data')) {
+                        ret = await rsp.blob();
+                    } else {
+                        ret = await rsp.json();
+                    }
+                } else {
+                    let error = await rsp.text();
+                    if (!error || error.length === 0) {
+                        error = 'Unknown error: ' + rsp.status;
+                    }
+                    console.error(rsp.status + ' : ' + error);
+                    toast.add({ severity: 'error', summary: 'Error: ' + rsp.status, detail: error, life: 30000 });
+                    ret = error;
+                }
+                isFinished.value = true;
             }
             return ret;
         };

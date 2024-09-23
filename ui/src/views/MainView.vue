@@ -55,7 +55,7 @@
     <Menu ref="menu" :model="settingsMenuItems" :popup="true" />
 
     <div style="width: 100vw; height: calc(100vh - 60px)">
-        <router-view />
+        <DepositJobListView />
     </div>
 
     <DepositJobSearchDialog ref="dlgSearch" />
@@ -76,10 +76,12 @@ import { useLayout } from '@/layout/composables/layout';
 import { useJobListDTO } from '@/stores/depositjob';
 import { useTopbarActions } from '@/stores/depositjobTopbarActions';
 import { useUserProfileStore } from '@/stores/users';
+import DepositJobListView from '@/views/DepositJobListView.vue';
 import Menu from 'primevue/menu';
 import { useDialog } from 'primevue/usedialog';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
+
 const dialog = useDialog();
 
 const router = useRouter();

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.govt.natlib.dashboard.app.MainSecurityConfig;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
+
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +14,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.http.HttpResponse;
 
 public class HttpAccessManagementFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(HttpAccessManagementFilter.class);
@@ -41,15 +44,17 @@ public class HttpAccessManagementFilter implements Filter {
             log.debug("Before doFilter {}", securityConfig.getCurrentSessionMessage(req, rsp));
         }
 
-//        if (!securityConfig.isValidSession(req, rsp)) {
-//            responseError(req, rsp, RestResponseCommand.RSP_LOGIN_ERROR);
-//            return;
-//        }
-//
-//        if (!privilegeManagementHandler.isActionPermit(req, rsp)) {
-//            responseError(req, rsp, RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
-//            return;
-//        }
+       if (!securityConfig.isValidSession(req, rsp)) {
+            //responseError(req, rsp, RestResponseCommand.RSP_LOGIN_ERROR);
+            rsp.sendError( HttpStatus.SC_UNAUTHORIZED);
+           return;
+       }
+
+       if (!privilegeManagementHandler.isActionPermit(req, rsp)) {
+           //responseError(req, rsp, RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
+           rsp.sendError( HttpStatus.SC_UNAUTHORIZED);
+           return;
+       }
 
         chain.doFilter(request, response);
 
