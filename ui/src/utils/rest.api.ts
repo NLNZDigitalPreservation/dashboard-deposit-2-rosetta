@@ -4,25 +4,8 @@ import { useToast } from 'primevue/usetoast';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-// export const useTimeoutStore = defineStore('TimeoutStore', () => {
-//     const timeoutHandler = [] as any[];
-//     const sleep = (ms: number) =>
-//         new Promise((r) => {
-//             const handler = setTimeout(r, ms);
-//             timeoutHandler.push(handler);
-//             return handler;
-//         });
-//     const cancel = () => {
-//         while (timeoutHandler.length > 0) {
-//             const handler = timeoutHandler.pop();
-//             clearTimeout(handler);
-//             console.log('canceled a timer');
-//         }
-//     };
-//     return { sleep, cancel };
-// });
-
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
+const RootContextPath = '/deposit-dashboard';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -36,16 +19,21 @@ export const useLoginStore = defineStore('LoginStore', () => {
         }
     };
 
+    const logout = () => {
+        userProfile.clear();
+        startLogin();
+    };
+
     const authenticate = async (username: string, password: string) => {
         const credentials = JSON.stringify({
             username: username,
             password: password
         });
-        const rsp = await fetch('/auth/login.json', {
+        const rsp = await fetch(RootContextPath + '/auth/login.json', {
             method: 'POST',
             redirect: 'error',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/json'
             },
             body: credentials
         });
@@ -64,7 +52,7 @@ export const useLoginStore = defineStore('LoginStore', () => {
             return;
         }
 
-        const token = await rsp.json();
+        const token = await rsp.text();
         userProfile.setToken(username, token);
 
         isAuthenticating.value = false;
@@ -74,7 +62,7 @@ export const useLoginStore = defineStore('LoginStore', () => {
         return isAuthenticating.value;
     });
 
-    return { startLogin, authenticate, visibleLoginWindow, isAuthenticating };
+    return { startLogin, authenticate, logout, visibleLoginWindow, isAuthenticating };
 });
 
 export interface UseFetchApis {
@@ -135,9 +123,14 @@ export function useFetch() {
                     reqOptions.body = JSON.stringify(payload);
                 }
 
-                const rsp = await fetch('/deposit-dashboard' + path, reqOptions);
+                const rsp = await fetch(RootContextPath + path, reqOptions);
                 if (rsp.status === 401) {
                     loginStore.startLogin();
+                    continue;
+                }
+
+                if (rsp.status === 502) {
+                    await sleep(3000);
                     continue;
                 }
 

@@ -1,6 +1,7 @@
 package nz.govt.natlib.dashboard.domain.service;
 
 import com.exlibris.dps.sdk.pds.PdsUserInfo;
+import nz.govt.natlib.dashboard.common.auth.Sessions;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.metadata.EnumUserRole;
 import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
@@ -20,6 +21,9 @@ public class WhitelistSettingService {
     @Autowired
     private RepoWhiteList repoWhiteList;
 
+    @Autowired
+    private Sessions sessions;
+
     public boolean isEmptyWhiteList() {
         List<EntityWhitelistSetting> data = repoWhiteList.getAll();
         return data.isEmpty();
@@ -30,11 +34,12 @@ public class WhitelistSettingService {
         return data;
     }
 
-    public void saveWhitelistSetting(EntityWhitelistSetting whitelist, PdsUserInfo loginUserInfo) throws Exception {
+    public void saveWhitelistSetting(EntityWhitelistSetting whitelist, String token) throws Exception {
         if (whitelist.getId() != null) {
+            String currentUsername=sessions.getUsername(token);
             EntityWhitelistSetting toBeModifiedUser = repoWhiteList.getById(whitelist.getId());
-            if (toBeModifiedUser != null && toBeModifiedUser.getWhiteUserName().equalsIgnoreCase(loginUserInfo.getUserName())) {
-                throw new InvalidParameterException("You could not change yourself: "+RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);                
+            if (toBeModifiedUser != null && toBeModifiedUser.getWhiteUserName().equalsIgnoreCase(currentUsername)) {
+                throw new InvalidParameterException("You could not change yourself: " + RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
             }
         }
         saveWhitelistSetting(whitelist);
@@ -48,19 +53,21 @@ public class WhitelistSettingService {
 
         EntityWhitelistSetting existingUser = repoWhiteList.getByUserName(whitelist.getWhiteUserName());
         if (existingUser != null && !existingUser.getId().equals(whitelist.getId())) {
-            throw new InvalidParameterException("The user exists in the white list: "+RestResponseCommand.RSP_PROCESS_SET_DUPLICATED);                
+            throw new InvalidParameterException("The user exists in the white list: " + RestResponseCommand.RSP_PROCESS_SET_DUPLICATED);
         }
 
         repoWhiteList.save(whitelist);
     }
 
-    public void deleteWhitelistSetting(Long id, PdsUserInfo loginUserInfo) {
+    public void deleteWhitelistSetting(Long id, String token) throws Exception {
+        String currentUsername=sessions.getUsername(token);
         EntityWhitelistSetting toBeDeletedUser = repoWhiteList.getById(id);
-        if (toBeDeletedUser != null && toBeDeletedUser.getWhiteUserName().equalsIgnoreCase(loginUserInfo.getUserName())) {
-            throw new InvalidParameterException("You could not delete yourself: "+RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
+        if (toBeDeletedUser != null && toBeDeletedUser.getWhiteUserName().equalsIgnoreCase(currentUsername)) {
+            throw new InvalidParameterException("You could not delete yourself: " + RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
         }
         repoWhiteList.deleteById(id);
     }
+
 
     public EntityWhitelistSetting getWhitelistDetail(Long id) {
         return repoWhiteList.getById(id);
@@ -71,21 +78,21 @@ public class WhitelistSettingService {
         return !DashboardHelper.isNull(user);
     }
 
-    private EntityWhitelistSetting getUserFromWhiteList(PdsUserInfo pdsUserInfo) {
+    public EntityWhitelistSetting getUserFromWhiteList(PdsUserInfo pdsUserInfo) {
         if (DashboardHelper.isNull(pdsUserInfo)) {
             return null;
         }
         return getUserFromWhiteList(pdsUserInfo.getUserName());
     }
 
-    private EntityWhitelistSetting getUserFromWhiteList(String userName) {
+    public EntityWhitelistSetting getUserFromWhiteList(String userName) {
         return repoWhiteList.getByUserName(userName);
     }
 
     public EntityWhitelistSetting initialWhiteListSetting(PdsUserInfo pdsUserInfo) {
         EntityWhitelistSetting userInfo = getUserFromWhiteList(pdsUserInfo);
         if (!DashboardHelper.isNull(userInfo)) {
-            throw new InvalidParameterException("The dashboard could not be duplicated initialed:"+RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+            throw new InvalidParameterException("The dashboard could not be duplicated initialed:" + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
         }
 
         userInfo = new EntityWhitelistSetting();

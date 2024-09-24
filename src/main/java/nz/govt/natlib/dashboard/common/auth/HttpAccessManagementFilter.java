@@ -2,10 +2,10 @@ package nz.govt.natlib.dashboard.common.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nz.govt.natlib.dashboard.app.MainSecurityConfig;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +14,10 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.http.HttpResponse;
 
 public class HttpAccessManagementFilter implements Filter {
     private static final Logger log = LoggerFactory.getLogger(HttpAccessManagementFilter.class);
-    private MainSecurityConfig securityConfig;
-    private PrivilegeManagementHandler privilegeManagementHandler;
+    private Sessions sessions;
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -40,46 +38,31 @@ public class HttpAccessManagementFilter implements Filter {
             return;
         }
 
-        if (log.isDebugEnabled()) { //The securityConfig.getCurrentSessionMessage(req, rsp) method will consume huge calculation resources, so only execute it when info is available
-            log.debug("Before doFilter {}", securityConfig.getCurrentSessionMessage(req, rsp));
+//        if (url.equalsIgnoreCase("/auth/login.json") || url.equalsIgnoreCase("/auth/logout.json")) {
+//            chain.doFilter(request, response);
+//            return;
+//        }
+
+        String token = req.getHeader("Authorization");
+        if (StringUtils.isEmpty(token)) {
+            rsp.sendError(HttpStatus.SC_UNAUTHORIZED);
+            return;
         }
 
-       if (!securityConfig.isValidSession(req, rsp)) {
-            //responseError(req, rsp, RestResponseCommand.RSP_LOGIN_ERROR);
-            rsp.sendError( HttpStatus.SC_UNAUTHORIZED);
-           return;
-       }
+        try {
+            String role = sessions.getRole(token);
+            String method = req.getMethod();
+            if (role.equalsIgnoreCase("normal") && (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT") || method.equalsIgnoreCase("DELETE"))) {
+                rsp.sendError(HttpStatus.SC_FORBIDDEN);
+                return;
+            }
+        } catch (Sessions.InvalidSessionException e) {
+            rsp.sendError(HttpStatus.SC_UNAUTHORIZED);
+            return;
+        }
 
-       if (!privilegeManagementHandler.isActionPermit(req, rsp)) {
-           //responseError(req, rsp, RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
-           rsp.sendError( HttpStatus.SC_UNAUTHORIZED);
-           return;
-       }
 
         chain.doFilter(request, response);
-
-        if (log.isDebugEnabled()) { //The securityConfig.getCurrentSessionMessage(req, rsp) method will consume huge calculation resources, so only execute it when info is available
-            log.debug("After doFilter {}", securityConfig.getCurrentSessionMessage(req, rsp));
-        } else {
-            String msg = String.format("%s %d", req.getRequestURI(), rsp.getStatus());
-            log.info(msg);
-        }
-    }
-
-    private void responseError(HttpServletRequest req, HttpServletResponse rsp, int response_code) throws IOException {
-        rsp.setContentType("application/json");
-
-        RestResponseCommand rst = new RestResponseCommand();
-        rst.setRspCode(response_code);
-
-        String json = "{}";
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            json = objectMapper.writeValueAsString(rst);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        rsp.getWriter().write(json);
     }
 
     @Override
@@ -87,19 +70,11 @@ public class HttpAccessManagementFilter implements Filter {
 
     }
 
-    public MainSecurityConfig getSecurityConfig() {
-        return securityConfig;
+    public Sessions getSessions() {
+        return sessions;
     }
 
-    public void setSecurityConfig(MainSecurityConfig securityConfig) {
-        this.securityConfig = securityConfig;
-    }
-
-    public PrivilegeManagementHandler getPrivilegeManagementHandler() {
-        return privilegeManagementHandler;
-    }
-
-    public void setPrivilegeManagementHandler(PrivilegeManagementHandler privilegeManagementHandler) {
-        this.privilegeManagementHandler = privilegeManagementHandler;
+    public void setSessions(Sessions sessions) {
+        this.sessions = sessions;
     }
 }

@@ -5,11 +5,15 @@ const loginStore = useLoginStore();
 </script>
 
 <template>
-    <router-view />
-    <DynamicDialog />
     <Drawer v-model:visible="loginStore.visibleLoginWindow" position="full">
         <template #container="{ closeCallback }">
             <LoginDialog />
         </template>
     </Drawer>
+
+    <div v-show="!loginStore.visibleLoginWindow">
+        <router-view />
+    </div>
+
+    <DynamicDialog />
 </template>
