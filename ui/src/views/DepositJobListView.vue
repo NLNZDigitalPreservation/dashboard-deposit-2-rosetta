@@ -3,17 +3,17 @@ import { useToast } from 'primevue/usetoast';
 import { ref, watch } from 'vue';
 // import { FilterMatchMode, FilterOperator } from "primevue/api";
 // import { MaterialFlow, DepositJob } from "@/types/deposit";
-import { formatDatetimeFromEpochMilliSeconds, getProgressBarClass, keywords, useJobListDTO } from '@/stores/depositjob';
+import { formatDatetimeFromEpochMilliSeconds, getProgressBarClass, keywords, useJobStore } from '@/stores/depositjob';
 import { useContextMenu } from '@/stores/depositjobContextMenu';
 import { formatContentLength } from '@/utils/helper';
 
 const cm = useContextMenu();
 
-const jobList = useJobListDTO();
+const jobStore = useJobStore();
 const expandedRowGroups = ref([]);
 
 watch(keywords, async (newValue, oldValue) => {
-    jobList.filter(keywords.value);
+    jobStore.filter(keywords.value);
 });
 
 const rowContextMenu = ref();
@@ -23,15 +23,15 @@ const onRowContextMenu = (event: any) => {
     rowContextMenu.value.show(event.originalEvent);
 };
 
-jobList.fetchAllData();
+jobStore.fetchAllData();
 </script>
 <template>
     <ContextMenu ref="rowContextMenu" :model="cm.contextMenuModel" @hide="cm.selectedContextRow = null" />
     <DataTable
         id="main-table"
         v-model:expandedRowGroups="expandedRowGroups"
-        :value="jobList.listJobsFiltered"
-        v-model:selection="jobList.selectedJobs"
+        :value="jobStore.listJobsFiltered"
+        v-model:selection="jobStore.selectedJobs"
         contextMenu
         v-model:contextMenuSelection="cm.selectedContextRow"
         @rowContextmenu="onRowContextMenu"

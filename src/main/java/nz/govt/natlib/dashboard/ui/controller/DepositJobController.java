@@ -2,7 +2,6 @@ package nz.govt.natlib.dashboard.ui.controller;
 
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
-import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoDepositJob;
 import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
 import nz.govt.natlib.dashboard.domain.service.DepositJobService;
@@ -12,6 +11,7 @@ import nz.govt.natlib.dashboard.ui.command.DepositJobSearchCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,45 +30,22 @@ public class DepositJobController {
     @Autowired
     private RepoDepositJob repoDepositJob;
 
-    @RequestMapping(path = DashboardConstants.PATH_JOBS_ACTIVE_LIST, method = {RequestMethod.POST, RequestMethod.GET})
-    public List<EntityDepositJob> listActiveJobs() {
-        return repoDepositJob.getAll();
+    @RequestMapping(path = DashboardConstants.PATH_JOBS_ACTIVE_LIST, method = {RequestMethod.GET})
+    public ResponseEntity<?> listActiveJobs() {
+        log.info("Retrieve job list");
+        List<EntityDepositJob> jobs = repoDepositJob.getAll();
+        return ResponseEntity.ok().body(jobs);
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_ACTIVE_GET, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand retrieveActiveDepositJobs() {
-        log.info("Retrieve all active jobs.");
-        RestResponseCommand rsp = new RestResponseCommand();
-        List<EntityDepositJob> listActiveJobs = repoDepositJob.getAll();
-        List<EntityFlowSetting> listFlowSettings = repoFlowSetting.getAll();
-//        Map<String, Object> mapPayload = new HashMap<>();
-//        mapPayload.put("groups", listFlowSettings);
-//        mapPayload.put("activeJobs", listActiveJobs);
-//        rsp.setRspBody(mapPayload);
-        rsp.setRspBody(listActiveJobs);
-        return rsp;
-    }
-
-    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_ALL_GET, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand retrieveAllDepositJobs() {
-        log.info("Retrieve all jobs");
-        RestResponseCommand rsp = new RestResponseCommand();
-        List<EntityDepositJob> listJobs = repoDepositJob.getAll();
-        rsp.setRspBody(listJobs);
-        return rsp;
-    }
-
-    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_DETAIL, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand retrieveDepositJobDetails(@RequestParam("jobId") Long jobId) {
+    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_DETAIL, method = {RequestMethod.GET})
+    public ResponseEntity<?> retrieveDepositJobDetails(@RequestParam("jobId") Long jobId) {
         log.info("Retrieve job details: {}", jobId);
-        RestResponseCommand rsp = new RestResponseCommand();
-        EntityDepositJob dto = repoDepositJob.getById(jobId);
-        rsp.setRspBody(dto);
-        return rsp;
+        EntityDepositJob job = repoDepositJob.getById(jobId);
+        return ResponseEntity.ok().body(job);
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_UPDATE, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand updateDepositJobs(@RequestParam("action") String action, @RequestBody List<EntityDepositJob> listJobs) {
+    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_UPDATE, method = {RequestMethod.POST})
+    public ResponseEntity<?> updateDepositJobs(@RequestParam("action") String action, @RequestBody List<EntityDepositJob> listJobs) {
         List<EntityDepositJob> retVal = new ArrayList<>();
         listJobs.forEach(job -> {
             log.info("{} {} {}", action, job.getId(), job.getInjectionTitle());
@@ -87,32 +64,39 @@ public class DepositJobController {
             retVal.add(updatedJob);
         });
 
-        RestResponseCommand rsp = new RestResponseCommand();
-        rsp.setRspBody(retVal);
-        retVal.clear();
-        return rsp;
+        return ResponseEntity.ok().body(retVal);
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_NEW, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand newDepositJobs(@RequestBody DepositJobManualAddCommand cmd) {
+    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_NEW, method = {RequestMethod.POST})
+    public ResponseEntity<?> newDepositJobs(@RequestBody DepositJobManualAddCommand cmd) {
         log.info("Received new deposit job request: {} {} {} {}", cmd.getFlowId(), cmd.getFlowName(), cmd.getNfsDirectory(), cmd.isForcedReplaceExistingJob());
-        return depositJobService.manuallySubmitDepositJob(cmd.getFlowId(), cmd.getNfsDirectory(), cmd.isForcedReplaceExistingJob());
+        RestResponseCommand retVal = depositJobService.manuallySubmitDepositJob(cmd.getFlowId(), cmd.getNfsDirectory(), cmd.isForcedReplaceExistingJob());
+        if (retVal.getRspCode() == RestResponseCommand.RSP_SUCCESS) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.internalServerError().body(retVal.getRspCode() + ": " + retVal.getRspMsg());
+        }
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_SEARCH, method = {RequestMethod.POST, RequestMethod.GET})
-    public List<EntityDepositJob> searchDepositJobs(@RequestBody DepositJobSearchCommand cmd) {
-        return depositJobService.searchDepositJobs(cmd);
+    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_SEARCH, method = {RequestMethod.GET})
+    public ResponseEntity<?> searchDepositJobs(@RequestBody DepositJobSearchCommand cmd) {
+        List<EntityDepositJob> jobs = depositJobService.searchDepositJobs(cmd);
+        return ResponseEntity.ok().body(jobs);
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_EXPORT_DATA, method = {RequestMethod.POST, RequestMethod.GET})
-    public void exportDepositJobs(@RequestBody List<Long> cmd, HttpServletRequest req, HttpServletResponse rsp) throws IOException {
+    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_EXPORT_DATA, method = {RequestMethod.GET})
+    public ResponseEntity<?> exportDepositJobs(@RequestBody List<Long> cmd, HttpServletRequest req, HttpServletResponse rsp) throws IOException {
         depositJobService.exportData(cmd, req, rsp);
+        return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_REDEPOSIT, method = {RequestMethod.POST, RequestMethod.GET})
-    public RestResponseCommand redepositJob(@RequestParam String subFolder) throws IOException {
-        RestResponseCommand ret = depositJobService.redepositJob(subFolder);
-        ret.setRspBody(ret.getRspCode() + ": " + ret.getRspMsg());
-        return ret;
+    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_REDEPOSIT, method = {RequestMethod.POST})
+    public ResponseEntity<?> redepositJob(@RequestParam String subFolder) throws IOException {
+        RestResponseCommand retVal = depositJobService.redepositJob(subFolder);
+        if (retVal.getRspCode() == RestResponseCommand.RSP_SUCCESS) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.internalServerError().body(retVal.getRspCode() + ": " + retVal.getRspMsg());
+        }
     }
 }

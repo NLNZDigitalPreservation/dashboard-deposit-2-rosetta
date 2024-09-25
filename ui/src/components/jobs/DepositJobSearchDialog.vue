@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { searchConditions, useJobListDTO } from '@/stores/depositjob';
+import { searchConditions, useJobStore } from '@/stores/depositjob';
 import { useMaterialFlowsStore } from '@/stores/materialflows';
 import { computed, ref } from 'vue';
 
 const visible = ref(false);
-const jobList = useJobListDTO();
+const jobList = useJobStore();
 
 const stages = ref([
     { name: 'INGEST', code: 'INGEST' },

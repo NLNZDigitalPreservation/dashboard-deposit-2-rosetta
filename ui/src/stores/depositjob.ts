@@ -120,7 +120,7 @@ const jobFilter = (job: any, keywords: string) => {
     }
 };
 
-export const useJobListDTO = defineStore('JobListDTO', () => {
+export const useJobStore = defineStore('JobStore', () => {
     const listJobs = ref([]);
     const listJobsFiltered = ref();
     const selectedJobs = ref([]);

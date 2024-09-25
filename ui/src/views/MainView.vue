@@ -6,7 +6,7 @@ import MaterialFlowDrawer from '@/components/settings/MaterialFlowDrawer.vue';
 import WhiteListDrawer from '@/components/settings/WhiteListDrawer.vue';
 import AppConfigurator from '@/layout/AppConfigurator.vue';
 import { useLayout } from '@/layout/composables/layout';
-import { useJobListDTO } from '@/stores/depositjob';
+import { useJobStore } from '@/stores/depositjob';
 import { useTopbarActions } from '@/stores/depositjobTopbarActions';
 import { useUserProfileStore } from '@/stores/users';
 import { useLoginStore } from '@/utils/rest.api';
@@ -23,7 +23,7 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 
 const keywords = ref();
 
-const jobList = useJobListDTO();
+const jobList = useJobStore();
 const loginStore = useLoginStore();
 const topbarMenuActive = ref(false);
 const topbarMenuClasses = computed(() => {
@@ -105,6 +105,7 @@ const topbarActions = useTopbarActions();
 </script>
 
 <template>
+    <Toast position="bottom-left"></Toast>
     <!-- <div class="layout-topbar" style="position: relative; background: linear-gradient(to right, #212529, #32cd32, #212529)"> -->
     <div class="layout-topbar" style="position: relative">
         <div class="layout-topbar-logo-container">

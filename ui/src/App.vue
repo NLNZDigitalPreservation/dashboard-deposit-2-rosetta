@@ -5,11 +5,7 @@ const loginStore = useLoginStore();
 </script>
 
 <template>
-    <Drawer v-model:visible="loginStore.visibleLoginWindow" position="full">
-        <template #container="{ closeCallback }">
-            <LoginDialog />
-        </template>
-    </Drawer>
+    <LoginDialog v-if="loginStore.visibleLoginWindow" id="login-dialog" />
 
     <div v-show="!loginStore.visibleLoginWindow">
         <router-view />
@@ -17,3 +13,10 @@ const loginStore = useLoginStore();
 
     <DynamicDialog />
 </template>
+
+<style>
+#login-dialog {
+    position: fixed;
+    z-index: 9999;
+}
+</style>

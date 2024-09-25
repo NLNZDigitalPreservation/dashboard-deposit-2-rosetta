@@ -1,18 +1,25 @@
 import { useUserProfileStore } from '@/stores/users';
 import { defineStore } from 'pinia';
 import { useToast } from 'primevue/usetoast';
-import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, reactive, ref } from 'vue';
+
+const RootContextPath = '/deposit-dashboard';
+const ToastLife = 10 * 1000;
+const RetryDelay = 3 * 1000;
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
-const RootContextPath = '/deposit-dashboard';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export const useLoginStore = defineStore('LoginStore', () => {
-    const toast = useToast();
+    const feedback = reactive({
+        ok: true,
+        title: '',
+        detail: ''
+    });
     const userProfile = useUserProfileStore();
     const isAuthenticating = ref(false);
+    const isInitialed = ref(false);
     const startLogin = () => {
         if (!isAuthenticating.value) {
             isAuthenticating.value = true;
@@ -25,6 +32,10 @@ export const useLoginStore = defineStore('LoginStore', () => {
     };
 
     const authenticate = async (username: string, password: string) => {
+        feedback.ok = true;
+        feedback.title = '';
+        feedback.detail = '';
+
         const credentials = JSON.stringify({
             username: username,
             password: password
@@ -36,7 +47,17 @@ export const useLoginStore = defineStore('LoginStore', () => {
                 'Content-Type': 'application/json'
             },
             body: credentials
+        }).catch((err: any) => {
+            feedback.ok = false;
+            feedback.title = 'Error';
+            feedback.detail = err.message;
         });
+
+        //Exception has happened
+        if (!rsp) {
+            console.log(feedback);
+            return;
+        }
 
         if (!rsp.ok) {
             let status = rsp.status;
@@ -48,7 +69,9 @@ export const useLoginStore = defineStore('LoginStore', () => {
                     statusText = 'Unknown error.';
                 }
             }
-            toast.add({ severity: 'error', summary: 'Error: ' + status, detail: statusText, life: 30000 });
+            feedback.ok = false;
+            feedback.title = 'Error: ' + status;
+            feedback.detail = statusText;
             return;
         }
 
@@ -56,13 +79,17 @@ export const useLoginStore = defineStore('LoginStore', () => {
         userProfile.setToken(username, token);
 
         isAuthenticating.value = false;
+        isInitialed.value = true;
     };
 
     const visibleLoginWindow = computed(() => {
+        if (!isInitialed.value) {
+            return true;
+        }
         return isAuthenticating.value;
     });
 
-    return { startLogin, authenticate, logout, visibleLoginWindow, isAuthenticating };
+    return { startLogin, authenticate, logout, visibleLoginWindow, isAuthenticating, isInitialed, feedback };
 });
 
 export interface UseFetchApis {
@@ -97,7 +124,6 @@ export function useFetch() {
         return async (path: string, payload: any = null) => {
             const loginStore = useLoginStore();
             const userProfile = useUserProfileStore();
-            const router = useRouter();
 
             let ret = null;
 
@@ -123,14 +149,28 @@ export function useFetch() {
                     reqOptions.body = JSON.stringify(payload);
                 }
 
-                const rsp = await fetch(RootContextPath + path, reqOptions);
+                const rsp = await fetch(RootContextPath + path, reqOptions).catch((err: any) => {
+                    toast.removeAllGroups();
+                    toast.add({ severity: 'warn', summary: 'Warning! ', detail: 'Exception happened: ' + err.message + '! Will retry in ' + RetryDelay / 1000 + ' seconds.', life: ToastLife });
+                });
+
+                //Exception has happened
+                if (!rsp) {
+                    await sleep(RetryDelay);
+                    continue;
+                }
+
+                //Need authentication, forward to login page
                 if (rsp.status === 401) {
                     loginStore.startLogin();
                     continue;
                 }
 
-                if (rsp.status === 502) {
-                    await sleep(3000);
+                //Upstream error
+                if (rsp.status >= 500 && rsp.status <= 599) {
+                    toast.removeAllGroups();
+                    toast.add({ severity: 'warn', summary: 'Warning!', detail: '[' + rsp.status + '] System Error! Will retry in ' + RetryDelay / 1000 + ' seconds.', life: ToastLife });
+                    await sleep(RetryDelay);
                     continue;
                 }
 
@@ -141,13 +181,17 @@ export function useFetch() {
                         ret = await rsp.json();
                     }
                 } else {
-                    let error = await rsp.text();
-                    if (!error || error.length === 0) {
-                        error = 'Unknown error: ' + rsp.status;
+                    let error = '';
+                    const e = await rsp.json();
+                    if (!e) {
+                        error = '[' + rsp.status + '] Unknown error. For path: ' + path;
+                    } else {
+                        error = '[' + rsp.status + '] ' + e.error + '. For path: ' + e.path;
                     }
-                    console.error(rsp.status + ' : ' + error);
-                    toast.add({ severity: 'error', summary: 'Error: ' + rsp.status, detail: error, life: 30000 });
-                    ret = error;
+                    console.error(error);
+                    toast.removeAllGroups();
+                    toast.add({ severity: 'error', summary: 'Error!', detail: error, life: ToastLife });
+                    ret = undefined;
                 }
                 isFinished.value = true;
             }

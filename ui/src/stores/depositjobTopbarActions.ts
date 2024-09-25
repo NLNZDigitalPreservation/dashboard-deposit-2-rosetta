@@ -1,6 +1,6 @@
 import DepositJobRedeposit from '@/components/jobs/DepositJobRedeposit.vue';
 import DepositJobSearchDialog from '@/components/jobs/DepositJobSearchDialog.vue';
-import { useJobListDTO } from '@/stores/depositjob';
+import { useJobStore } from '@/stores/depositjob';
 import { type UseFetchApis, useFetch } from '@/utils/rest.api';
 import { defineStore } from 'pinia';
 import { useDialog } from 'primevue/usedialog';
@@ -10,7 +10,7 @@ import { ref } from 'vue';
 export const useTopbarActions = defineStore('TopbarActions', () => {
     const toast = useToast();
     const dialog = useDialog();
-    const jobList = useJobListDTO();
+    const jobList = useJobStore();
     const rest: UseFetchApis = useFetch();
     const selectedContextRow = ref();
 

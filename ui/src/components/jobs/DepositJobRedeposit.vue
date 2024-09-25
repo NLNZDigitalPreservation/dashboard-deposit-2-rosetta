@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useJobListDTO } from '@/stores/depositjob';
+import { useJobStore } from '@/stores/depositjob';
 import { inject } from 'vue';
 
-const jobList = useJobListDTO();
+const jobList = useJobStore();
 
 const dialogRef: any = inject('dialogRef');
 const closeDialog = () => {

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useJobListDTO } from '@/stores/depositjob';
+import { useJobStore } from '@/stores/depositjob';
 import { useSettingsDepositAccountStore } from '@/stores/settings';
 import { ref } from 'vue';
 
 const depositAccount = useSettingsDepositAccountStore();
 depositAccount.queryAllRows();
 
-const jobList = useJobListDTO();
+const jobList = useJobStore();
 
 const initialData = {
     id: undefined,
