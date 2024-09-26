@@ -517,14 +517,18 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             Cell cId = rowExcel.createCell(colNum++, CellType.NUMERIC);
             cId.setCellValue(job.getId());
 
-            Cell cProducer = rowExcel.createCell(colNum++, CellType.STRING);
-            Cell cFlow = rowExcel.createCell(colNum++, CellType.STRING);
             EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
+            Cell cProducer = rowExcel.createCell(colNum++, CellType.STRING);
             if (flowSetting != null) {
                 cProducer.setCellValue(flowSetting.getProducerName());
-                cFlow.setCellValue(flowSetting.getMaterialFlowName());
             } else {
                 cProducer.setCellValue("Unknown Producer");
+            }
+
+            Cell cFlow = rowExcel.createCell(colNum++, CellType.STRING);
+            if (flowSetting != null) {
+                cFlow.setCellValue(flowSetting.getMaterialFlowName());
+            } else {
                 cFlow.setCellValue("Unknown Material Flow");
             }
 

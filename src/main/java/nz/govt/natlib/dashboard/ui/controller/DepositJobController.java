@@ -84,7 +84,7 @@ public class DepositJobController {
         return ResponseEntity.ok().body(jobs);
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_EXPORT_DATA, method = {RequestMethod.GET})
+    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_EXPORT_DATA, method = {RequestMethod.POST})
     public ResponseEntity<?> exportDepositJobs(@RequestBody List<Long> cmd, HttpServletRequest req, HttpServletResponse rsp) throws IOException {
         depositJobService.exportData(cmd, req, rsp);
         return ResponseEntity.ok().build();
