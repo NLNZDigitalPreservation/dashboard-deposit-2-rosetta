@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DepositJobListDataTable from '@/components/jobs/DepositJobListDataTable.vue';
 import DepositJobSearchDialog from '@/components/jobs/DepositJobSearchDialog.vue';
 import DepositAccountDrawer from '@/components/settings/DepositAccountDrawer.vue';
 import GlobalSetting from '@/components/settings/GlobalSetting.vue';
@@ -10,7 +11,6 @@ import { useJobStore } from '@/stores/depositjob';
 import { useTopbarActions } from '@/stores/depositjobTopbarActions';
 import { useUserProfileStore } from '@/stores/users';
 import { useLoginStore } from '@/utils/rest.api';
-import DepositJobListView from '@/views/DepositJobListView.vue';
 import Menu from 'primevue/menu';
 import { useDialog } from 'primevue/usedialog';
 import { computed, ref } from 'vue';
@@ -169,7 +169,7 @@ const topbarActions = useTopbarActions();
     </Menu>
 
     <div style="width: 100vw; height: calc(100vh - 60px)">
-        <DepositJobListView />
+        <DepositJobListDataTable />
     </div>
 
     <DepositJobSearchDialog ref="dlgSearch" />

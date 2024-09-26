@@ -100,15 +100,7 @@ defineExpose({ show });
         </div>
 
         <div class="mt-6 font-semibold">Material Flows</div>
-        <!-- <Fieldset legend="Material Flows">
-            <Tree v-model:selectionKeys="searchConditions.selectedData" :value="flowStore.treeData" selectionMode="checkbox" class="w-full" scrollHeight="flex">
-                <template #default="slotProps">
-                    <b v-if="slotProps.node.type == 'producer'">{{ slotProps.node.label }}</b>
-                    <span v-if="slotProps.node.type == 'materialflow'">{{ slotProps.node.label }}</span>
-                    <Badge v-if="slotProps.node.type == 'materialflow' && !slotProps.node.data.enabled" value="Disabled" severity="info" class="ml-4"></Badge>
-                </template>
-            </Tree>
-        </Fieldset> -->
+
         <div style="width: 100%; height: 25rem">
             <Tree v-model:selectionKeys="searchConditions.selectedData" :value="flowStore.treeData" selectionMode="checkbox" class="w-full" scrollHeight="flex">
                 <template #default="slotProps">

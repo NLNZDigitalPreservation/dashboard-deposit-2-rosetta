@@ -32,6 +32,8 @@ declare module 'vue' {
     DepositJobAvailableActionsDialog: typeof import('./src/components/jobs/DepositJobAvailableActionsDialog.vue')['default']
     DepositJobDetailDialog: typeof import('./src/components/jobs/DepositJobDetailDialog.vue')['default']
     DepositJobDetailDialogFooter: typeof import('./src/components/jobs/DepositJobDetailDialogFooter.vue')['default']
+    DepositJobListDataTable: typeof import('./src/components/jobs/DepositJobListDataTable.vue')['default']
+    DepositJobListView: typeof import('./src/components/jobs/DepositJobListView.vue')['default']
     DepositJobRedeposit: typeof import('./src/components/jobs/DepositJobRedeposit.vue')['default']
     DepositJobSearchDialog: typeof import('./src/components/jobs/DepositJobSearchDialog.vue')['default']
     Dialog: typeof import('primevue/dialog')['default']
