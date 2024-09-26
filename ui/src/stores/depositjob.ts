@@ -143,7 +143,7 @@ export const useJobStore = defineStore('JobStore', () => {
     };
 
     const searchData = (searchConditions: any) => {
-        rest.get('/restful/deposit-jobs/search', searchConditions)
+        rest.post('/restful/deposit-jobs/search', searchConditions)
             .then((data: any) => {
                 listJobs.value = data.map((e: any) => ({
                     ...e,

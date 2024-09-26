@@ -98,7 +98,7 @@ export const useLoginStore = defineStore('LoginStore', () => {
 
 export interface UseFetchApis {
     // methods
-    get: (path: string, payload: any) => any;
+    get: (path: string) => any;
     post: (path: string, payload: any) => any;
     put: (path: string, payload: any) => any;
     delete: (path: string, payload: any) => any;
@@ -140,31 +140,16 @@ export function useFetch() {
                     await sleep(1000);
                 }
 
-                let reqOptions: RequestInit;
-                //TO make the GET request to support payload in the body
-                if (methodValue === 'GET' && payload !== null) {
-                    reqOptions = {
-                        method: 'POST',
-                        credentials: 'same-origin',
-                        redirect: 'error',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-HTTP-Method-Override': 'GET',
-                            Authorization: userProfile.token
-                        }
-                    };
-                } else {
-                    reqOptions = {
-                        method: methodValue,
-                        credentials: 'same-origin',
-                        redirect: 'error',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: userProfile.token
-                        }
-                    };
-                }
-                if (payload !== null) {
+                const reqOptions: RequestInit = {
+                    method: methodValue,
+                    credentials: 'same-origin',
+                    redirect: 'error',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: userProfile.token
+                    }
+                };
+                if (payload !== null && payload !== undefined) {
                     reqOptions.body = JSON.stringify(payload);
                 }
 

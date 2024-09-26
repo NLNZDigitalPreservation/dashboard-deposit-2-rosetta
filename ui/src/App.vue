@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import { useThemeStore } from '@/utils/themes';
 import LoginDialog from './components/LoginDialog.vue';
 import { useLoginStore } from './utils/rest.api';
+
 const loginStore = useLoginStore();
+const themeStore = useThemeStore();
+
+themeStore.toggleTheme(true, 'lime');
 </script>
 
 <template>

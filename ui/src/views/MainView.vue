@@ -5,7 +5,6 @@ import DepositAccountDrawer from '@/components/settings/DepositAccountDrawer.vue
 import GlobalSetting from '@/components/settings/GlobalSetting.vue';
 import MaterialFlowDrawer from '@/components/settings/MaterialFlowDrawer.vue';
 import WhiteListDrawer from '@/components/settings/WhiteListDrawer.vue';
-import AppConfigurator from '@/layout/AppConfigurator.vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useJobStore } from '@/stores/depositjob';
 import { useTopbarActions } from '@/stores/depositjobTopbarActions';
@@ -115,43 +114,14 @@ const topbarActions = useTopbarActions();
             </router-link>
         </div>
 
-        <!-- <IconField>
-            <InputGroup>
-                <InputText placeholder="Filter" style="max-width: 20rem" />
-                <Button icon="pi pi-filter" label="Advanced" @click="topbarActions.openSearchDialog" />
-            </InputGroup>
-        </IconField> -->
-        <!-- <div class="p-iconfield p-inputgroup p-inputgroup-fluid mt-2 mb-2">
-            <InputText v-model="keywords" type="text" placeholder="Filter" />
-            <InputIcon class="pi pi-filter" style="margin-left: -15px" />
-
-            <Button icon="pi pi-search" label="Advanced" @click="topbarActions.openSearchDialog" />
-        </div> -->
         <div style="width: 1rem"></div>
 
-        <!-- <Button label="Search" icon="pi pi-search" class="mr-2" @click="topbarActions.openSearchDialog"></Button> -->
         <Button label="Search" icon="pi pi-search" class="mr-2" @click="dlgSearch.show()"></Button>
         <Button @click="topbarActions.onReload()" label="Reload" icon="pi pi-refresh" class="mr-2"></Button>
         <Button @click="topbarActions.onExportSelectedJobs()" label="Export Selected Jobs" icon="pi pi-download" class="mr-2"></Button>
         <Button @click="topbarActions.openRedepositDialog()" label="Redeposit" icon="pi pi-pen-to-square" class="mr-2"></Button>
 
         <div class="layout-topbar-actions">
-            <div class="layout-config-menu">
-                <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
-                    <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
-                </button>
-                <div class="relative">
-                    <button
-                        v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'animate-scalein', leaveToClass: 'hidden', leaveActiveClass: 'animate-fadeout', hideOnOutsideClick: true }"
-                        type="button"
-                        class="layout-topbar-action"
-                    >
-                        <i class="pi pi-palette"></i>
-                    </button>
-                    <AppConfigurator />
-                </div>
-            </div>
-
             <IconField class="mr-2">
                 <InputIcon class="pi pi-filter" />
                 <InputText v-model="keywords" type="text" placeholder="Filter" />
