@@ -4,7 +4,7 @@ import { useToast } from 'primevue/usetoast';
 import { computed, reactive, ref } from 'vue';
 
 const RootContextPath = '/deposit-dashboard';
-const ToastLife = 10 * 1000;
+const ToastLife = 30 * 1000;
 const RetryDelay = 3 * 1000;
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
@@ -17,6 +17,8 @@ export const useLoginStore = defineStore('LoginStore', () => {
         title: '',
         detail: ''
     });
+    const username = ref('');
+    const password = ref('');
     const userProfile = useUserProfileStore();
     const isAuthenticating = ref(false);
     const isInitialed = ref(false);
@@ -27,18 +29,20 @@ export const useLoginStore = defineStore('LoginStore', () => {
     };
 
     const logout = () => {
+        username.value = '';
+        password.value = '';
         userProfile.clear();
         startLogin();
     };
 
-    const authenticate = async (username: string, password: string) => {
+    const authenticate = async () => {
         feedback.ok = true;
         feedback.title = '';
         feedback.detail = '';
 
         const credentials = JSON.stringify({
-            username: username,
-            password: password
+            username: username.value,
+            password: password.value
         });
         const rsp = await fetch(RootContextPath + '/auth/login.json', {
             method: 'POST',
@@ -89,12 +93,12 @@ export const useLoginStore = defineStore('LoginStore', () => {
         return isAuthenticating.value;
     });
 
-    return { startLogin, authenticate, logout, visibleLoginWindow, isAuthenticating, isInitialed, feedback };
+    return { startLogin, authenticate, logout, visibleLoginWindow, isAuthenticating, isInitialed, feedback, username, password };
 });
 
 export interface UseFetchApis {
     // methods
-    get: (path: string) => any;
+    get: (path: string, payload: any) => any;
     post: (path: string, payload: any) => any;
     put: (path: string, payload: any) => any;
     delete: (path: string, payload: any) => any;
@@ -136,28 +140,44 @@ export function useFetch() {
                     await sleep(1000);
                 }
 
-                const reqOptions: RequestInit = {
-                    method: methodValue,
-                    credentials: 'same-origin',
-                    redirect: 'error',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: userProfile.token
-                    }
-                };
-                if (payload) {
+                let reqOptions: RequestInit;
+                //TO make the GET request to support payload in the body
+                if (methodValue === 'GET' && payload !== null) {
+                    reqOptions = {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        redirect: 'error',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-HTTP-Method-Override': 'GET',
+                            Authorization: userProfile.token
+                        }
+                    };
+                } else {
+                    reqOptions = {
+                        method: methodValue,
+                        credentials: 'same-origin',
+                        redirect: 'error',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: userProfile.token
+                        }
+                    };
+                }
+                if (payload !== null) {
                     reqOptions.body = JSON.stringify(payload);
                 }
 
                 const rsp = await fetch(RootContextPath + path, reqOptions).catch((err: any) => {
                     toast.removeAllGroups();
-                    toast.add({ severity: 'warn', summary: 'Warning! ', detail: 'Exception happened: ' + err.message + '! Will retry in ' + RetryDelay / 1000 + ' seconds.', life: ToastLife });
+                    toast.add({ severity: 'warn', summary: 'Warning! ', detail: err.message, life: ToastLife });
                 });
 
                 //Exception has happened
                 if (!rsp) {
-                    await sleep(RetryDelay);
-                    continue;
+                    // await sleep(RetryDelay);
+                    // continue;
+                    break;
                 }
 
                 //Need authentication, forward to login page

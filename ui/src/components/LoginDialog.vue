@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { useLoginStore } from '@/utils/rest.api';
-import { ref } from 'vue';
 
 const loginStore = useLoginStore();
-const username = ref('');
-const password = ref('');
-const checked = ref(false);
+
+// const checked = ref(false);
 
 const login = () => {
-    loginStore.authenticate(username.value, password.value);
+    loginStore.authenticate();
 };
 </script>
 
@@ -29,10 +27,10 @@ const login = () => {
 
                     <div>
                         <label for="username" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Username</label>
-                        <InputText id="username" type="text" placeholder="User name" class="w-full md:w-[30rem] mb-8" v-model="username" />
+                        <InputText v-model="loginStore.username" id="username" type="text" placeholder="User name" class="w-full md:w-[30rem] mb-8" autocomplete="off" />
 
                         <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                        <Password id="password1" v-model="password" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false" />
+                        <Password v-model="loginStore.password" id="password1" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false" autocomplete="off" />
 
                         <!-- <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                             <div class="flex items-center">

@@ -78,7 +78,7 @@ public class DepositJobController {
         }
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_SEARCH, method = {RequestMethod.GET})
+    @RequestMapping(path = DashboardConstants.PATH_DEPOSIT_JOBS_SEARCH, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<?> searchDepositJobs(@RequestBody DepositJobSearchCommand cmd) {
         List<EntityDepositJob> jobs = depositJobService.searchDepositJobs(cmd);
         return ResponseEntity.ok().body(jobs);

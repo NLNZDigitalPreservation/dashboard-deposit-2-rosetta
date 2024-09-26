@@ -38,11 +38,6 @@ public class HttpAccessManagementFilter implements Filter {
             return;
         }
 
-//        if (url.equalsIgnoreCase("/auth/login.json") || url.equalsIgnoreCase("/auth/logout.json")) {
-//            chain.doFilter(request, response);
-//            return;
-//        }
-
         String token = req.getHeader("Authorization");
         if (StringUtils.isEmpty(token)) {
             rsp.sendError(HttpStatus.SC_UNAUTHORIZED);
@@ -52,7 +47,7 @@ public class HttpAccessManagementFilter implements Filter {
         try {
             String role = sessions.getRole(token);
             String method = req.getMethod();
-            if (role.equalsIgnoreCase("normal") && (method.equalsIgnoreCase("POST") || method.equalsIgnoreCase("PUT") || method.equalsIgnoreCase("DELETE"))) {
+            if (!isPermit(role, method, url)) {
                 rsp.sendError(HttpStatus.SC_FORBIDDEN);
                 return;
             }
@@ -63,6 +58,17 @@ public class HttpAccessManagementFilter implements Filter {
 
 
         chain.doFilter(request, response);
+    }
+
+    public boolean isPermit(String role, String method, String url) {
+        if (role.equalsIgnoreCase("admin")) {
+            return true;
+        }
+
+        if (url.contains("/restful/deposit-jobs/search")) {
+            return true;
+        }
+        return !method.equalsIgnoreCase("POST") && !method.equalsIgnoreCase("PUT") && !method.equalsIgnoreCase("DELETE");
     }
 
     @Override

@@ -88,7 +88,7 @@ defineExpose({ show });
             <InputGroupAddon>To</InputGroupAddon>
             <DatePicker v-model="searchConditions.toDate" />
         </InputGroup>
-        <div class="flex flex-wrap gap-4">
+        <div class="flex flex-wrap gap-4 mt-6">
             <div class="flex flex-col grow basis-0 gap-2">
                 <label for="name2">Stage</label>
                 <MultiSelect v-model="searchConditions.selectedStages" :options="stages" optionLabel="name" placeholder="Select stages" :filter="false"></MultiSelect>
@@ -99,7 +99,8 @@ defineExpose({ show });
             </div>
         </div>
 
-        <Fieldset legend="Material Flows">
+        <div class="mt-6 font-semibold">Material Flows</div>
+        <!-- <Fieldset legend="Material Flows">
             <Tree v-model:selectionKeys="searchConditions.selectedData" :value="flowStore.treeData" selectionMode="checkbox" class="w-full" scrollHeight="flex">
                 <template #default="slotProps">
                     <b v-if="slotProps.node.type == 'producer'">{{ slotProps.node.label }}</b>
@@ -107,7 +108,16 @@ defineExpose({ show });
                     <Badge v-if="slotProps.node.type == 'materialflow' && !slotProps.node.data.enabled" value="Disabled" severity="info" class="ml-4"></Badge>
                 </template>
             </Tree>
-        </Fieldset>
+        </Fieldset> -->
+        <div style="width: 100%; height: 25rem">
+            <Tree v-model:selectionKeys="searchConditions.selectedData" :value="flowStore.treeData" selectionMode="checkbox" class="w-full" scrollHeight="flex">
+                <template #default="slotProps">
+                    <b v-if="slotProps.node.type == 'producer'">{{ slotProps.node.label }}</b>
+                    <span v-if="slotProps.node.type == 'materialflow'">{{ slotProps.node.label }}</span>
+                    <Badge v-if="slotProps.node.type == 'materialflow' && !slotProps.node.data.enabled" value="Disabled" severity="info" class="ml-4"></Badge>
+                </template>
+            </Tree>
+        </div>
         <template #footer>
             <Toolbar style="width: 100%; border: 0">
                 <template #start>
