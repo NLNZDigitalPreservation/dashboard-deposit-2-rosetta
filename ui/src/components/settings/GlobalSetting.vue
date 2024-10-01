@@ -32,14 +32,13 @@ const onSave = async () => {
     data.delays = delays.value;
     data.delayUnit = delayUnit.value;
     const ret = await globalStore.saveRow(Object.assign({}, data));
-    if (ret) {
+    if (ret !== undefined) {
         closeDialog();
     }
 };
 </script>
 
 <template>
-    <Toast />
     <Fieldset legend="Pause Settings">
         <InputGroup class="mt-2 mb-2">
             <ToggleSwitch v-model="paused" inputId="paused" />

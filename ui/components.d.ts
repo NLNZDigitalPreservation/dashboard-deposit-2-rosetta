@@ -28,6 +28,8 @@ declare module 'vue' {
     DataTable: typeof import('primevue/datatable')['default']
     DatePicker: typeof import('primevue/datepicker')['default']
     DepositAccountDrawer: typeof import('./src/components/settings/DepositAccountDrawer.vue')['default']
+    DepositAccountEditDialog: typeof import('./src/components/settings/DepositAccountEditDialog.vue')['default']
+    DepositAccountEditForm: typeof import('./src/components/settings/DepositAccountEditForm.vue')['default']
     DepositAccountSelectForm: typeof import('./src/components/settings/DepositAccountSelectForm.vue')['default']
     DepositJobAvailableActionsDialog: typeof import('./src/components/jobs/DepositJobAvailableActionsDialog.vue')['default']
     DepositJobDetailDialog: typeof import('./src/components/jobs/DepositJobDetailDialog.vue')['default']
@@ -57,6 +59,9 @@ declare module 'vue' {
     Listbox: typeof import('primevue/listbox')['default']
     LoginDialog: typeof import('./src/components/LoginDialog.vue')['default']
     MaterialFlowDrawer: typeof import('./src/components/settings/MaterialFlowDrawer.vue')['default']
+    MaterialFlowEditDialog: typeof import('./src/components/settings/MaterialFlowEditDialog.vue')['default']
+    MaterialFlowEditForm: typeof import('./src/components/settings/MaterialFlowEditForm.vue')['default']
+    MaterialFlowEditPanel: typeof import('./src/components/settings/MaterialFlowEditPanel.vue')['default']
     MaterialFlowSelectGroup: typeof import('./src/components/jobs/MaterialFlowSelectGroup.vue')['default']
     MaterialFlowSelectTree: typeof import('./src/components/jobs/MaterialFlowSelectTree.vue')['default']
     Menu: typeof import('primevue/menu')['default']
@@ -97,6 +102,7 @@ declare module 'vue' {
     WctSearchField: typeof import('./src/components/WctSearchField.vue')['default']
     WctTabViewPanel: typeof import('./src/components/WctTabViewPanel.vue')['default']
     WhiteListDrawer: typeof import('./src/components/settings/WhiteListDrawer.vue')['default']
+    WhiteListEditDialog: typeof import('./src/components/settings/WhiteListEditDialog.vue')['default']
   }
   export interface ComponentCustomProperties {
     BadgeDirective: typeof import('primevue/badgedirective')['default']
