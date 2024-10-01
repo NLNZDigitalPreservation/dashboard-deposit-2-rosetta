@@ -179,21 +179,35 @@ export function useFetch() {
                     continue;
                 }
 
+                // const headerNames = rsp.headers.keys();
+                // while (true) {
+                //     const headerName = headerNames.next();
+                //     if (headerName.done) {
+                //         break;
+                //     }
+                //     console.log(headerName.value);
+                // }
+
                 if (rsp.ok) {
-                    if (path.includes('export-data')) {
+                    const contentType = rsp.headers.get('content-type') || '';
+                    const contentLength = parseInt(rsp.headers.get('content-length') || '-1');
+
+                    if (contentType.length === 0 && contentLength <= 0) {
+                        ret = null;
+                    } else if (contentType.startsWith('application/json')) {
+                        ret = await rsp.json();
+                    } else if (contentType.startsWith('application') || contentType.startsWith('image') || contentType.startsWith('video') || contentType.startsWith('audio')) {
                         ret = await rsp.blob();
                     } else {
-                        ret = await rsp.json();
+                        ret = await rsp.text();
                     }
                 } else {
                     let error = '';
-                    const e = await rsp.json();
+                    let e = await rsp.text();
                     if (!e) {
-                        error = '[' + rsp.status + '] Unknown error. For path: ' + path;
-                    } else {
-                        error = '[' + rsp.status + '] ' + e.error + '. For path: ' + e.path;
+                        e = 'Unknown error';
                     }
-                    console.error(error);
+                    error = '[' + path + '] ' + e + ' StatusCode: ' + rsp.status;
                     toast.removeAllGroups();
                     toast.add({ severity: 'error', summary: 'Error!', detail: error, life: ToastLife });
                     ret = undefined;

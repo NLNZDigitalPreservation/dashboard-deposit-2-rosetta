@@ -1,7 +1,7 @@
+import { useToastStore } from '@/utils/helper';
 import { useFetch, type UseFetchApis } from '@/utils/rest.api';
 import { defineStore } from 'pinia';
 import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
 import { reactive, ref } from 'vue';
 
 export const globalSettings = reactive({
@@ -17,10 +17,9 @@ export const depositAccount = reactive({
     id: -1
 });
 
+const toast = useToastStore();
 export const useSettingsDepositAccountStore = defineStore('SettingsDepositAccountStore', () => {
-    const toast = useToast();
     const confirm = useConfirm();
-
     const rest: UseFetchApis = useFetch();
 
     const dataList = ref();
@@ -59,28 +58,24 @@ export const useSettingsDepositAccountStore = defineStore('SettingsDepositAccoun
     };
     const deleteRow = async (rowData: any) => {
         if (!rowData) {
-            const error = 'The input param can not be null.';
-            console.error(error);
-            toast.add({ severity: 'error', summary: 'Error: ', detail: error, life: 3000 });
+            toast.error('The input param can not be null.');
             return;
         }
         const ret = await rest.delete('/restful/setting/deposit-account/delete?id=' + rowData.id, undefined);
-        if (ret) {
-            toast.add({ severity: 'success', summary: 'Success: ', detail: 'Succeed to delete the deposit account', life: 3000 });
+        if (ret !== undefined) {
+            toast.success('Succeed to delete the deposit account');
             queryAllRows();
         }
     };
 
     const saveRow = async (rowData: any) => {
         if (!rowData) {
-            const error = 'The input param can not be null.';
-            console.error(error);
-            toast.add({ severity: 'error', summary: 'Error: ', detail: error, life: 3000 });
+            toast.error('The input param can not be null.');
             return;
         }
         const ret = await rest.post('/restful/setting/deposit-account/save', rowData);
-        if (ret) {
-            toast.add({ severity: 'success', summary: 'Success: ', detail: 'Succeed to save the deposit account', life: 3000 });
+        if (ret !== undefined) {
+            toast.success('Succeed to save the deposit account');
             queryAllRows();
         }
         return ret;
@@ -98,9 +93,7 @@ export const useSettingsDepositAccountStore = defineStore('SettingsDepositAccoun
 });
 
 export const useSettingsMaterialFlowStore = defineStore('SettingsMaterialFlowStore', () => {
-    const toast = useToast();
     const confirm = useConfirm();
-
     const rest: UseFetchApis = useFetch();
 
     const dataList = ref();
@@ -140,26 +133,24 @@ export const useSettingsMaterialFlowStore = defineStore('SettingsMaterialFlowSto
         if (!rowData) {
             const error = 'The input param can not be null.';
             console.error(error);
-            toast.add({ severity: 'error', summary: 'Error: ', detail: error, life: 3000 });
+            toast.error(error);
             return;
         }
         const ret = await rest.delete('/restful/setting/flow/delete?id=' + rowData.id, undefined);
-        if (ret) {
-            toast.add({ severity: 'success', summary: 'Success: ', detail: 'Succeed to delete the deposit account', life: 3000 });
+        if (ret !== undefined) {
+            toast.success('Succeed to delete the material flow');
             queryAllRows();
         }
     };
 
     const saveRow = async (rowData: any) => {
         if (!rowData) {
-            const error = 'The input param can not be null.';
-            console.error(error);
-            toast.add({ severity: 'error', summary: 'Error: ', detail: error, life: 3000 });
+            toast.error('The input param can not be null.');
             return;
         }
         const ret = await rest.post('/restful/setting/flow/save', rowData);
-        if (ret) {
-            toast.add({ severity: 'success', summary: 'Success: ', detail: 'Succeed to save the deposit account', life: 3000 });
+        if (ret !== undefined) {
+            toast.success('Succeed to SAVE the material flow');
             queryAllRows();
         }
         return ret;
@@ -177,7 +168,6 @@ export const useSettingsMaterialFlowStore = defineStore('SettingsMaterialFlowSto
 });
 
 export const useSettingsWhiteListStore = defineStore('SettingsWhiteListStore', () => {
-    const toast = useToast();
     const confirm = useConfirm();
 
     const rest: UseFetchApis = useFetch();
@@ -218,28 +208,24 @@ export const useSettingsWhiteListStore = defineStore('SettingsWhiteListStore', (
     };
     const deleteRow = async (rowData: any) => {
         if (!rowData) {
-            const error = 'The input param can not be null.';
-            console.error(error);
-            toast.add({ severity: 'error', summary: 'Error: ', detail: error, life: 3000 });
+            toast.error('The input param can not be null.');
             return;
         }
         const ret = await rest.delete('/restful/setting/whitelist/delete?id=' + rowData.id, undefined);
-        if (ret) {
-            toast.add({ severity: 'success', summary: 'Success: ', detail: 'Succeed to delete the white list item', life: 3000 });
+        if (ret !== undefined) {
+            toast.success('Succeed to delete the white list item');
             queryAllRows();
         }
     };
 
     const saveRow = async (rowData: any) => {
         if (!rowData) {
-            const error = 'The input param can not be null.';
-            console.error(error);
-            toast.add({ severity: 'error', summary: 'Error: ', detail: error, life: 3000 });
+            toast.error('The input param can not be null.');
             return;
         }
         const ret = await rest.post('/restful/setting/whitelist/save', rowData);
-        if (ret) {
-            toast.add({ severity: 'success', summary: 'Success: ', detail: 'Succeed to save the white list item', life: 3000 });
+        if (ret !== undefined) {
+            toast.success('Succeed to save the white list item');
             queryAllRows();
         }
         return ret;
@@ -249,8 +235,6 @@ export const useSettingsWhiteListStore = defineStore('SettingsWhiteListStore', (
 });
 
 export const useSettingsGlobalStore = defineStore('SettingsGlobalStore', () => {
-    const toast = useToast();
-
     const rest: UseFetchApis = useFetch();
 
     const data = ref();
@@ -263,14 +247,12 @@ export const useSettingsGlobalStore = defineStore('SettingsGlobalStore', () => {
 
     const saveRow = async (rowData: any) => {
         if (!rowData) {
-            const error = 'The input param can not be null.';
-            console.error(error);
-            toast.add({ severity: 'error', summary: 'Error: ', detail: error, life: 3000 });
+            toast.error('The input param can not be null.');
             return;
         }
         const ret = await rest.post('/restful/setting/global/save', rowData);
-        if (ret) {
-            toast.add({ severity: 'success', summary: 'Success: ', detail: 'Succeed to save the global setting', life: 3000 });
+        if (ret !== undefined) {
+            toast.success('Succeed to save the global setting');
             queryRow();
         }
         return ret;

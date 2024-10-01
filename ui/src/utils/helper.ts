@@ -1,4 +1,6 @@
 import { routes } from '@/router';
+import { defineStore } from 'pinia';
+import { useToast } from 'primevue/usetoast';
 
 export const formatDate = (timestamp: number) => {
     const value = new Date(timestamp);
@@ -79,6 +81,36 @@ export const dateTimeString2Object = (strDateTime: string) => {
     return d;
 };
 
-export const dataTimeObject2String = (objDateTime: Date) => {
-    return objDateTime.toISOString();
+export const padZero = (num: number | string, places: number) => {
+    return String(num).padStart(places, '0');
 };
+export const dataTimeObject2String = (objDateTime: Date) => {
+    const year = objDateTime.getFullYear();
+    const month = padZero(objDateTime.getMonth() + 1, 2);
+    const date = padZero(objDateTime.getDate(), 2);
+    const hours = padZero(objDateTime.getHours(), 2);
+    const minutes = padZero(objDateTime.getMinutes(), 2);
+    const seconds = padZero(objDateTime.getSeconds(), 2);
+
+    const ret = year + '-' + month + '-' + date + 'T' + hours + ':' + minutes + ':' + seconds;
+    return ret;
+};
+
+export const useToastStore = defineStore('ToastStore', () => {
+    const _toast = useToast();
+    const success = (msg: string) => {
+        _toast.add({ severity: 'success', summary: 'Success', detail: msg, life: 5000 });
+    };
+    const error = (msg: string) => {
+        console.error(msg);
+        _toast.add({ severity: 'error', summary: 'Error', detail: msg, life: 15000 });
+    };
+    const warn = (msg: string) => {
+        console.warn(msg);
+        _toast.add({ severity: 'warn', summary: 'Warning', detail: msg, life: 10000 });
+    };
+    const info = (msg: string) => {
+        _toast.add({ severity: 'info', summary: 'Info', detail: msg, life: 3000 });
+    };
+    return { success, error, warn, info };
+});
