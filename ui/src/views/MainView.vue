@@ -15,6 +15,10 @@ import { useDialog } from 'primevue/usedialog';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
+defineProps<{
+    envType?: string;
+}>();
+
 const dialog = useDialog();
 
 const router = useRouter();
@@ -110,7 +114,7 @@ const topbarActions = useTopbarActions();
         <div class="layout-topbar-logo-container">
             <router-link to="/" class="layout-topbar-logo">
                 <img src="@/assets/natlib-logo-red.png" width="50" height="50" alt="logo" />
-                <OverlayBadge value="PRD"> Deposit Dashboard </OverlayBadge>
+                <OverlayBadge :value="envType"> Deposit Dashboard </OverlayBadge>
             </router-link>
         </div>
 

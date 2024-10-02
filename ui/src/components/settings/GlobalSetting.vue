@@ -61,7 +61,7 @@ const onSave = async () => {
     <Toolbar style="border: 0">
         <template #end>
             <Button label="Save" class="mr-4" @click="onSave()" autofocus />
-            <Button label="Cancel" outlined @click="closeDialog()" autofocus />
+            <Button label="Close" outlined @click="closeDialog()" autofocus />
         </template>
     </Toolbar>
 </template>

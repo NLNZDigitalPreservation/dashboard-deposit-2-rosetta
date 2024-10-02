@@ -198,8 +198,8 @@ if (selectedRow.value.depositAccountId >= 0) {
     </div>
 
     <div class="flex justify-end mt-4 gap-4">
-        <Button label="Cancel" severity="secondary" @click="closeDialog()" />
         <Button label="Save" @click="onSave()" autofocus />
+        <Button label="Close" severity="secondary" @click="closeDialog()" />
     </div>
 
     <Popover ref="opDepositAccount" appendTo="body" style="width: 60rem">
