@@ -8,6 +8,8 @@
 /ui/dist/
 /ui/node_modules/
 
+/src/main/webapp
+
 # Ignore Gradle GUI config
 gradle-app.setting
 

@@ -67,28 +67,11 @@ test {
     useJUnitPlatform()
 }
 
-//bootRun {
-//    standardOutput = System.out
-//    standardInput = System.in
-//}
-
-
 group = 'deposit-dashboard'
-version = '1.2.6.4'
+version = '2.0.0-rc'
 description = 'Dashboard Tool'
 sourceCompatibility = '1.11'
 targetCompatibility = '1.11'
-//apply plugin: 'war'
-
-//For a Spring Boot War
-//bootWar {
-//    archiveFileName = 'deposit-dashboard-full.war'
-//}
-
-//For a plain war
-//war {
-//    archiveFileName = 'deposit-dashboard.war'
-//}
 
 tasks.register('sourcesJar', Jar) {
     archiveClassifier.set('sources')
@@ -100,53 +83,67 @@ tasks.register('testsJar', Jar) {
     from(sourceSets.test.output)
 }
 
-//war {
-//    includeEmptyDirs = false
-//}
-//build.dependsOn war
-
-
 tasks.register('cleanUI', Delete) {
-    group = "UIBuild"
+    group = "BuildUI"
     description = "Remove the dist folder and webapp folder"
     delete './ui/dist', './src/main/webapp/'
     followSymlinks = true
+    doLast {
+        println 'UI cleaning done!'
+    }
 }
 
 tasks.register('installUI', Exec) {
-    group = "UIBuild"
+    group = "BuildUI"
     description = "Install the dependencies for UI"
     workingDir './ui'
     commandLine 'npm', 'install'
+    doLast {
+        println 'UI installation done!'
+    }
 }
 
 tasks.register('buildUI', Exec) {
-    group = "UIBuild"
+    group = "BuildUI"
     description = "Run npm install and build-only"
     dependsOn tasks.installUI
     workingDir './ui'
     commandLine 'npm', 'run', 'build-only'
+    doLast {
+        println 'UI building done!'
+    }
 }
 
+
 tasks.register('copyUI', Copy) {
-    group = "UIBuild"
+    group = "BuildUI"
     description = "Copy the files from dist folder to webapp folder"
     dependsOn tasks.buildUI
     from './ui/dist'
     into './src/main/webapp'
+    doLast {
+        println 'UI copying done!'
+        println 'All UI tasks done!'
+    }
 }
 
-tasks.register('buildAll') {
+bootWar {
     dependsOn tasks.copyUI
-//    dependsOn tasks.build
-    doLast {
-        print 'All done!'
-    }
+}
+
+war {
+    dependsOn tasks.copyUI
+}
+
+bootRun {
+    dependsOn tasks.copyUI
 }
 
 clean {
     dependsOn tasks.cleanUI
 }
+
 build {
     dependsOn tasks.copyUI
 }
+
