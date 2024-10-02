@@ -27,7 +27,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-tomcat'
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation ('org.springframework:spring-context'){
+    implementation('org.springframework:spring-context') {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
 
@@ -90,12 +90,12 @@ targetCompatibility = '1.11'
 //    archiveFileName = 'deposit-dashboard.war'
 //}
 
-task sourcesJar(type: Jar) {
+tasks.register('sourcesJar', Jar) {
     archiveClassifier.set('sources')
     from(sourceSets.main.allJava)
 }
 
-task testsJar(type: Jar) {
+tasks.register('testsJar', Jar) {
     archiveClassifier.set('tests')
     from(sourceSets.test.output)
 }
@@ -105,3 +105,18 @@ task testsJar(type: Jar) {
 //}
 //build.dependsOn war
 
+tasks.register('deleteUIFiles', Delete) {
+    delete './ui/dist', './src/main/webapp/'
+    followSymlinks = true
+}
+
+tasks.register('buildUI', Exec) {
+    workingDir './ui'
+    commandLine 'npm', 'install'
+    commandLine 'npm', 'run', 'build-only'
+}
+
+tasks.register('copyUIFiles', Copy) {
+    from './ui/dist'
+    into './src/main/webapp'
+}
