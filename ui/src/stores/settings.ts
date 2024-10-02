@@ -17,8 +17,8 @@ export const depositAccount = reactive({
     id: -1
 });
 
-const toast = useToastStore();
 export const useSettingsDepositAccountStore = defineStore('SettingsDepositAccountStore', () => {
+    const toast = useToastStore();
     const confirm = useConfirm();
     const rest: UseFetchApis = useFetch();
 
@@ -93,6 +93,7 @@ export const useSettingsDepositAccountStore = defineStore('SettingsDepositAccoun
 });
 
 export const useSettingsMaterialFlowStore = defineStore('SettingsMaterialFlowStore', () => {
+    const toast = useToastStore();
     const confirm = useConfirm();
     const rest: UseFetchApis = useFetch();
 
@@ -168,6 +169,7 @@ export const useSettingsMaterialFlowStore = defineStore('SettingsMaterialFlowSto
 });
 
 export const useSettingsWhiteListStore = defineStore('SettingsWhiteListStore', () => {
+    const toast = useToastStore();
     const confirm = useConfirm();
 
     const rest: UseFetchApis = useFetch();
@@ -235,6 +237,7 @@ export const useSettingsWhiteListStore = defineStore('SettingsWhiteListStore', (
 });
 
 export const useSettingsGlobalStore = defineStore('SettingsGlobalStore', () => {
+    const toast = useToastStore();
     const rest: UseFetchApis = useFetch();
 
     const data = ref();

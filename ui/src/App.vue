@@ -1,20 +1,26 @@
 <script setup lang="ts">
 import { useThemeStore } from '@/utils/themes';
+import { onMounted } from 'vue';
 import LoginDialog from './components/LoginDialog.vue';
 import { useLoginStore } from './utils/rest.api';
-
+import MainView from './views/MainView.vue';
 const loginStore = useLoginStore();
 const themeStore = useThemeStore();
-
-themeStore.toggleTheme(true, 'lime');
+onMounted(() => {
+    themeStore.toggleTheme(true, 'lime');
+});
 </script>
 
 <template>
     <LoginDialog v-if="loginStore.visibleLoginWindow" id="login-dialog" />
 
     <div v-show="!loginStore.visibleLoginWindow">
-        <router-view />
+        <MainView />
     </div>
+
+    <!-- <div v-show="false">
+        <router-view />
+    </div> -->
 
     <DynamicDialog />
 </template>
