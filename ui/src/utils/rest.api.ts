@@ -4,7 +4,7 @@ import { useToast } from 'primevue/usetoast';
 import { computed, reactive, ref } from 'vue';
 
 const RootContextPath = '/deposit-dashboard';
-const ToastLife = 30 * 1000;
+const ToastLife = 6 * 1000;
 const RetryDelay = 3 * 1000;
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
