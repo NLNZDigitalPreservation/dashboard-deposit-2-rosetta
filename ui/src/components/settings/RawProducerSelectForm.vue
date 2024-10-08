@@ -19,6 +19,11 @@ const onRowSelect = (event: any) => {
 };
 
 const _search = () => {
+    if (!props.account || props.account < 0) {
+        console.error('Invalid account: ' + props.account);
+        return;
+    }
+
     const searchCondition = {
         depositAccountId: props.account,
         offset: page.value,
@@ -27,13 +32,20 @@ const _search = () => {
     };
 
     rest.post('/restful/raw/producers', searchCondition).then((rsp: any) => {
-        if (rsp && rsp.total_record_count) {
-            totalRecords.value = rsp.total_record_count;
+        if (!rsp) {
+            console.error('Can not get raw producers: ' + rsp);
+            return;
+        }
+
+        const datasets = JSON.parse(rsp);
+
+        if (datasets && datasets.total_record_count) {
+            totalRecords.value = datasets.total_record_count;
         } else {
             totalRecords.value = 0;
         }
-        if (rsp && rsp.producer) {
-            curPageRows.value = rsp.producer;
+        if (datasets && datasets.producer) {
+            curPageRows.value = datasets.producer;
         } else {
             curPageRows.value = [];
         }

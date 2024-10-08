@@ -38,14 +38,11 @@ themeStore.toggleTheme(darkMode, colorMode);
     <LoginDialog v-if="loginStore.visibleLoginWindow" id="login-dialog" />
 
     <div v-show="!loginStore.visibleLoginWindow">
-        <MainView :env-type="envType" />
+        <Suspense> <MainView :env-type="envType" /> </Suspense>
     </div>
-
-    <!-- <div v-show="false">
-        <router-view />
-    </div> -->
-
-    <DynamicDialog />
+    <Suspense>
+        <DynamicDialog />
+    </Suspense>
 </template>
 
 <style>

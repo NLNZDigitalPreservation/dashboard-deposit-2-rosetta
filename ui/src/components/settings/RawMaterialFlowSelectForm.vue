@@ -20,6 +20,16 @@ const onRowSelect = (event: any) => {
 };
 
 const _search = () => {
+    if (!props.account || props.account < 0) {
+        console.error('Invalid account: ' + props.account);
+        return;
+    }
+
+    if (!props.producer || props.producer.length == 0) {
+        console.error('Invalid producer: ' + props.producer);
+        return;
+    }
+
     const searchCondition = {
         depositAccountId: props.account,
         producerId: props.producer,
@@ -29,13 +39,20 @@ const _search = () => {
     };
 
     rest.post('/restful/raw/materialflows', searchCondition).then((rsp: any) => {
-        if (rsp && rsp.total_record_count) {
-            totalRecords.value = rsp.total_record_count;
+        if (!rsp) {
+            console.error('Can not get raw meterial flows: ' + rsp);
+            return;
+        }
+
+        const datasets = JSON.parse(rsp);
+
+        if (datasets && datasets.total_record_count) {
+            totalRecords.value = datasets.total_record_count;
         } else {
             totalRecords.value = 0;
         }
-        if (rsp && rsp.profile_material_flow) {
-            curPageRows.value = rsp.profile_material_flow;
+        if (datasets && datasets.profile_material_flow) {
+            curPageRows.value = datasets.profile_material_flow;
         } else {
             curPageRows.value = [];
         }

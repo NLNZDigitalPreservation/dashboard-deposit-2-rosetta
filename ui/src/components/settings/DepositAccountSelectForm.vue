@@ -7,11 +7,11 @@ const emit = defineEmits(['onSelected']);
 
 const rest: UseFetchApis = useFetch();
 const depositAccountStore = useSettingsDepositAccountStore();
-depositAccountStore.queryAllRows();
+const allAccounts = ref(await depositAccountStore.queryAllRows());
 
 const rows = ref(10);
 const first = ref(0);
-const totalRecords = ref(depositAccountStore.dataList.length);
+const totalRecords = ref(allAccounts.value.length);
 
 const onRowSelect = (event: any) => {
     emit('onSelected', event.data);
@@ -19,8 +19,8 @@ const onRowSelect = (event: any) => {
 
 const curPageRows = computed(() => {
     const dataset = [];
-    for (let idx = first.value; idx < first.value + rows.value && idx < depositAccountStore.dataList.length; idx++) {
-        dataset.push(depositAccountStore.dataList[idx]);
+    for (let idx = first.value; idx < first.value + rows.value && idx < allAccounts.value.length; idx++) {
+        dataset.push(allAccounts.value[idx]);
     }
     return dataset;
 });
