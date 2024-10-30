@@ -20,11 +20,13 @@ import java.util.List;
 
 public class RosettaWebService {
     private static final Logger log = LoggerFactory.getLogger(RosettaWebService.class);
-    private RosettaRestApi restApi;
+    private  RosettaRestApi dpsRestAPI;
+    private  RosettaRestApi sipRestAPI;
     private CustomizedPdsClient pdsClient;
 
-    public RosettaWebService(String pdsUrl, String rosettaRestApiUrl, boolean isTestMode) {
-        this.restApi = new RosettaRestApi(rosettaRestApiUrl);
+    public RosettaWebService(String pdsUrl, String restApiDpsUrl, String restApiSipUrl, boolean isTestMode) {
+        this.dpsRestAPI = new RosettaRestApi(restApiDpsUrl);
+        this.sipRestAPI = new RosettaRestApi(restApiSipUrl);
         this.pdsClient = CustomizedPdsClient.getInstance();
         this.pdsClient.init(pdsUrl, isTestMode);
     }
@@ -83,14 +85,14 @@ public class RosettaWebService {
         } else {
             path = String.format("/producers?limit=%d&offset=%d&name=%s", limit, offset, name);
         }
-        return this.restApi.fetch(depositAccount, "GET", path, null);
+        return this.dpsRestAPI.fetch(depositAccount, "GET", path, null);
     }
 
     public List<DtoProducersRsp.Producer> getProducers(EntityDepositAccountSetting depositAccount) throws Exception {
         List<DtoProducersRsp.Producer> producers = new ArrayList<>();
         int offset = 0;
         while (true) {
-            String ret = this.restApi.fetch(depositAccount, "GET", "/producers?limit=100&offset=" + offset, null);
+            String ret = this.dpsRestAPI.fetch(depositAccount, "GET", "/producers?limit=100&offset=" + offset, null);
             DtoProducersRsp rsp = (DtoProducersRsp) this.jsonToObject(ret, DtoProducersRsp.class);
             log.debug("Got producers, offset={}", offset);
             if (rsp != null && rsp.getTotal_record_count() > 0 && rsp.getProducer() != null) {
@@ -105,7 +107,7 @@ public class RosettaWebService {
     }
 
     public String getProducerProfileId(EntityDepositAccountSetting depositAccount, String producerId) throws Exception {
-        String ret = this.restApi.fetch(depositAccount, "GET", "/producers/" + producerId, null);
+        String ret = this.dpsRestAPI.fetch(depositAccount, "GET", "/producers/" + producerId, null);
         DtoProducerDetailRsp rsp = (DtoProducerDetailRsp) this.jsonToObject(ret, DtoProducerDetailRsp.class);
         if (rsp != null && rsp.getProfile() != null) {
             return rsp.getProfile().getId();
@@ -132,7 +134,7 @@ public class RosettaWebService {
         } else {
             path = String.format("/producers/producer-profiles/%s/material-flows?limit=%d&offset=%d&name=%s", profileId, limit, offset, name);
         }
-        return this.restApi.fetch(depositAccount, "GET", path, null);
+        return this.dpsRestAPI.fetch(depositAccount, "GET", path, null);
     }
 
     public List<DtoMaterialFlowRsp.MaterialFlow> getMaterialFlows(EntityDepositAccountSetting depositAccount, String producerId) throws Exception {
@@ -145,7 +147,7 @@ public class RosettaWebService {
 
         int offset = 0;
         while (true) {
-            String ret = this.restApi.fetch(depositAccount, "GET", "/producers/producer-profiles/" + profileId + "/material-flows?limit=100&offset=" + offset, null);
+            String ret = this.dpsRestAPI.fetch(depositAccount, "GET", "/producers/producer-profiles/" + profileId + "/material-flows?limit=100&offset=" + offset, null);
             DtoMaterialFlowRsp rsp = (DtoMaterialFlowRsp) this.jsonToObject(ret, DtoMaterialFlowRsp.class);
             if (rsp != null && rsp.getTotal_record_count() > 0 && rsp.getProfile_material_flow() != null) {
                 materialFlows.addAll(rsp.getProfile_material_flow());
@@ -182,7 +184,7 @@ public class RosettaWebService {
             reqBody.setProducer(new DtoDepositReq.Producer(depositUserProducerId));
             reqBody.setMaterial_flow(new DtoDepositReq.MaterialFlow(materialFlowID));
 
-            String rsp = this.restApi.fetch(depositAccount, "POST", "/deposits", reqBody);
+            String rsp = this.dpsRestAPI.fetch(depositAccount, "POST", "/deposits", reqBody);
             DtoDepositRsp ret = (DtoDepositRsp) this.jsonToObject(rsp, DtoDepositRsp.class);
 
             boolean result = false;
@@ -204,12 +206,16 @@ public class RosettaWebService {
     }
 
     public SipStatusInfo getSIPStatusInfo(EntityDepositAccountSetting depositAccount, String sipId) throws Exception {
-        String rsp = this.restApi.fetch(depositAccount, "POST", "/sips/" + sipId, null);
+        String rsp = this.sipRestAPI.fetch(depositAccount, "GET", "/sips/" + sipId, null);
         return (SipStatusInfo) this.jsonToObject(rsp, SipStatusInfo.class);
     }
 
-    public void setRestApi(RosettaRestApi restApi) {
-        this.restApi = restApi;
+    public void setDpsRestAPI(RosettaRestApi dpsRestAPI) {
+        this.dpsRestAPI = dpsRestAPI;
+    }
+
+    public void setSipRestAPI(RosettaRestApi sipRestAPI) {
+        this.sipRestAPI = sipRestAPI;
     }
 
     public void setPdsClient(CustomizedPdsClient pdsClient) {

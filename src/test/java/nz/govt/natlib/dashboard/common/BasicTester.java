@@ -56,7 +56,7 @@ public class BasicTester {
     protected static RepoGlobalSetting repoGlobalSetting;
     protected static DepositJobService depositJobService;
 
-    protected static RosettaWebService rosettaWebService = new RosettaWebService("http://localhost", "http://localhost", true);
+    protected static RosettaWebService rosettaWebService = new RosettaWebService("http://localhost", "http://localhost", "http://localhost", true);
 
     public static void init() throws IOException {
         depositAccount.setDepositUserInstitute(INSTITUTION);
@@ -65,7 +65,8 @@ public class BasicTester {
 
         restApi = mock(RosettaRestApi.class);
         pdsClient = mock(CustomizedPdsClient.class);
-        rosettaWebService.setRestApi(restApi);
+        rosettaWebService.setDpsRestAPI(restApi);
+        rosettaWebService.setSipRestAPI(restApi);
         rosettaWebService.setPdsClient(pdsClient);
 
         //Initial services

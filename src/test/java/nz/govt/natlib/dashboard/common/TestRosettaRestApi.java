@@ -27,9 +27,9 @@ import static org.mockito.Mockito.mock;
 
 public class TestRosettaRestApi {
     private static final String PDSUrl = "https://slbpdstest.natlib.govt.nz/pds?";
-    private static final String RestApiUrl = "https://wlguatdpsilb.natlib.govt.nz/rest/v0";
-
-    private static final RosettaWebService restApi = new RosettaWebService(PDSUrl, RestApiUrl, true);
+    private static final String RestApiDpsUrl = "https://wlguatdpsilb.natlib.govt.nz/rest/v0";
+    private static final String RestApiSipUrl = "https://wlguatoprilb.natlib.govt.nz/rest/v0";
+    private static final RosettaWebService restApi = new RosettaWebService(PDSUrl, RestApiDpsUrl, RestApiSipUrl, true);
 
     private static final String _PRODUCER_AGENT_ID = "NLNZ";
     private static final String INSTITUTION = "INS00";
@@ -85,7 +85,7 @@ public class TestRosettaRestApi {
 
     @Test
     public void testGetSipStatusInfo() throws Exception {
-        String sipId = "742449";
+        String sipId = "749344";
         try {
             SipStatusInfo sipStatusInfo = restApi.getSIPStatusInfo(depositAccount, sipId);
 //        assert sipStatusInfo != null;

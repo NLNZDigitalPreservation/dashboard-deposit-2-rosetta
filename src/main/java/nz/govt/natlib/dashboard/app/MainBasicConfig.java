@@ -23,9 +23,10 @@ public class MainBasicConfig {
     private String systemStoragePath;
     @Value("${Rosetta.PDSUrl}")
     private String pdsUrl;
-    @Value("${Rosetta.RestApiUrl}")
-    private String restApiUrl;
-
+    @Value("${Rosetta.RestApiDpsUrl}")
+    private String restApiDpsUrl;
+    @Value("${Rosetta.RestApiSipUrl}")
+    private String restApiSipUrl;
     @Value("${TestEnabled}")
     private boolean isTestMode;
 
@@ -33,7 +34,7 @@ public class MainBasicConfig {
     @Bean(BeanDefinition.SCOPE_SINGLETON)
     public RosettaWebService rosettaRestApi() throws Exception {
         log.info("Start to initial Rosetta Web Service");
-        RosettaWebService bean = new RosettaWebService(pdsUrl, restApiUrl, isTestMode);
+        RosettaWebService bean = new RosettaWebService(pdsUrl, restApiDpsUrl, restApiSipUrl, isTestMode);
 
         log.info("End to initial Rosetta Web Service");
         return bean;
