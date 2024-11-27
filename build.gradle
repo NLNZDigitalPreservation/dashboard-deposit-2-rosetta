@@ -68,7 +68,7 @@ test {
 }
 
 group = 'deposit-dashboard'
-version = '2.0.0-rc2'
+version = '2.0.0-rc3'
 description = 'Dashboard Tool'
 sourceCompatibility = '1.11'
 targetCompatibility = '1.11'
