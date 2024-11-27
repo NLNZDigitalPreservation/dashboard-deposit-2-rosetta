@@ -47,7 +47,7 @@ public class FlowSettingController {
         }
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_SETTING_FLOW_DELETE, method = {RequestMethod.POST, RequestMethod.GET})
+    @RequestMapping(path = DashboardConstants.PATH_SETTING_FLOW_DELETE, method = {RequestMethod.DELETE})
     public ResponseEntity<?> deleteFlowSetting(@RequestParam("id") Long id) {
         try {
             EntityFlowSetting ret = flowSettingService.deleteFlowSetting(id);
