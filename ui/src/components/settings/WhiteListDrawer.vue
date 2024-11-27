@@ -59,7 +59,7 @@ defineExpose({ toggle });
 </script>
 
 <template>
-    <ConfirmDialog></ConfirmDialog>
+    <!-- <ConfirmDialog></ConfirmDialog> -->
     <Drawer v-model:visible="visible" header="Deposit Accounts" class="!w-full md:!w-80 lg:!w-[50rem]" position="right">
         <DataTable v-model:selection="whiteListStore.selectedRow" :value="whiteListStore.dataList" :metaKeySelection="metaKey" dataKey="id" tableStyle="width:100%" showGridlines sortField="id" :sortOrder="1">
             <Column field="id" header="ID" sortable></Column>

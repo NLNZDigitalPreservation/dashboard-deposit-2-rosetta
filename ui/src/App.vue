@@ -43,6 +43,7 @@ themeStore.toggleTheme(darkMode, colorMode);
     <Suspense>
         <DynamicDialog />
     </Suspense>
+    <ConfirmDialog></ConfirmDialog>
 </template>
 
 <style>

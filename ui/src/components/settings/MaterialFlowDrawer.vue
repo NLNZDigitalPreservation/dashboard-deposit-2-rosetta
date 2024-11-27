@@ -73,7 +73,6 @@ defineExpose({ toggle });
 </script>
 
 <template>
-    <ConfirmDialog></ConfirmDialog>
     <Drawer v-model:visible="visible" header="Material Flow Settings" class="!w-full md:!w-80 lg:!w-[50rem]" position="right">
         <DataTable v-model:selection="selectedRow" :value="materialFlowStore.dataList" :metaKeySelection="metaKey" dataKey="id" tableStyle="width:100%" showGridlines sortField="id" :sortOrder="1">
             <Column field="id" header="ID" sortable></Column>
