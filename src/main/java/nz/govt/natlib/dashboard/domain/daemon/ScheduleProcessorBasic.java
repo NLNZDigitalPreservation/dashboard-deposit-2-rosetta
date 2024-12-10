@@ -47,7 +47,7 @@ public abstract class ScheduleProcessorBasic {
     //Cache the processed sub folders
     protected Map<String, Boolean> processingJobs = Collections.synchronizedMap(new HashMap<>());
 
-    private boolean isGlobalPaused(){
+    private boolean isGlobalPaused() {
         EntityGlobalSetting globalSetting = repoGlobalSetting.getGlobalSetting();
         if (globalSetting != null && globalSetting.isPaused()) {
             LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
@@ -57,14 +57,14 @@ public abstract class ScheduleProcessorBasic {
         }
         return false;
     }
-  
+
     public void scan() {
         log.debug("On timer heartbeat: scan.");
         if (this.isGlobalPaused()) {
             log.info("Skip the paused timeslot.");
             return;
         }
-        
+
         //To initial jobs
         handleIngest();
     }
@@ -72,7 +72,7 @@ public abstract class ScheduleProcessorBasic {
     public void pipeline() throws Exception {
         log.debug("On timer heartbeat: pipeline.");
         if (this.isGlobalPaused()) {
-            log.info("Skip the paused timeslot.");
+            log.info("Skip the paused timeslot in pipeline.");
             return;
         }
 
@@ -107,12 +107,18 @@ public abstract class ScheduleProcessorBasic {
 
                 for (EntityDepositJob job : jobs) {
                     if (job.getState() == EnumDepositJobState.PAUSED) {
-                        log.debug("Skip the Paused the job: {}", job.getId());
+                        log.debug("Skip the Paused job: {}", job.getId());
                         continue;
                     }
 
+                    boolean ret = handleInactivePruning(flowSetting, job);
+                    if (ret) {
+                        continue;
+                    }
+
+
                     if (!injectionPathScanClient.exists(job.getInjectionPath())) {
-                        log.error("The original directory does not exist: {}", job.getInjectionPath());
+                        log.info("The original directory does not exist: {} {}", job.getId(), job.getInjectionPath());
                         continue;
                     }
 
@@ -153,6 +159,8 @@ public abstract class ScheduleProcessorBasic {
 
     abstract public void handleHistoryPruning(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) throws IOException;
 
+    abstract public boolean handleInactivePruning(EntityFlowSetting flowSetting, EntityDepositJob job) throws IOException;
+
     abstract public void handleFlowSettingMissingJob(EntityDepositJob job) throws IOException;
 
     public void setRosettaWebService(RosettaWebService rosettaWebService) {
@@ -183,7 +191,7 @@ public abstract class ScheduleProcessorBasic {
         this.repoGlobalSetting = repoGlobalSetting;
     }
 
-    public void removeProcessingJob(String name){
+    public void removeProcessingJob(String name) {
         this.processingJobs.remove(name);
     }
 }

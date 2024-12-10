@@ -94,7 +94,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     }
 
     @Override
-    public boolean handleDeposit(EntityDepositAccountSetting depositAccount,EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
+    public boolean handleDeposit(EntityDepositAccountSetting depositAccount, EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
         if (!(job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.INITIALED)) {
             log.debug("Skip deposit job for: {} --> {} at status [{}] [{}]", flowSetting.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
             return false;
@@ -121,7 +121,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
     }
 
     @Override
-    public void handlePollingStatus(EntityDepositAccountSetting depositAccount,EntityDepositJob job) {
+    public void handlePollingStatus(EntityDepositAccountSetting depositAccount, EntityDepositJob job) {
         if (job.getStage() != EnumDepositJobStage.DEPOSIT || job.getState() != EnumDepositJobState.RUNNING) {
             log.debug("Ignore polling. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
             return;
@@ -129,7 +129,7 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         SipStatusInfo sipStatusInfo;
         try {
             log.info("Update polling, before. jobId: {}, jobName: {}, jobStage: {}, jobState: {}", job.getId(), job.getInjectionTitle(), job.getStage(), job.getState());
-            sipStatusInfo = rosettaWebService.getSIPStatusInfo(depositAccount,job.getSipID());
+            sipStatusInfo = rosettaWebService.getSIPStatusInfo(depositAccount, job.getSipID());
             log.info("Update polling. jobId: {}, jobName: {}, SIPStatusInfo: {}, {}", job.getId(), job.getInjectionTitle(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
 
             job = depositJobService.jobUpdateStatus(job, sipStatusInfo);
@@ -145,7 +145,6 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
         if ((job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.SUCCEED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.INITIALED) ||
                 (job.getStage() == EnumDepositJobStage.FINALIZE && job.getState() == EnumDepositJobState.RUNNING)) {
-
             File depositDoneFile = new File(job.getInjectionPath(), "done");
             if (!depositDoneFile.getParentFile().exists()) {
                 log.error("The original directory does not exist: {}", job.getInjectionPath());
@@ -160,21 +159,23 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
                         return;
                     }
                 } catch (Exception e) {
-                    log.error("Failed to create file: {}, {}", job.getId(), depositDoneFile.getAbsolutePath());
+                    log.error("Failed to create file: {}, {}", job.getId(), depositDoneFile.getAbsolutePath(), e);
                     return;
                 }
             }
             job = depositJobService.jobFinalizeEnd(job, EnumDepositJobState.SUCCEED);
-            log.info("Finalize job: {} {}", job.getId(), job.getInjectionTitle());
-        } else if (job.getState() == EnumDepositJobState.CANCELED && job.getStage() != EnumDepositJobStage.FINISHED) {
-            job = depositJobService.jobUpdateStatus(job, EnumDepositJobStage.FINISHED, job.getState());
-            log.info("Finalized job: {} {}", job.getId(), job.getInjectionTitle());
+            log.info("Finalized normal job: {} {}", job.getId(), job.getInjectionTitle());
+        } else if (job.getState() == EnumDepositJobState.CANCELED && job.getStage() != EnumDepositJobStage.FINALIZE && job.getStage() != EnumDepositJobStage.FINISHED) {
+            job = depositJobService.jobFinalizeEnd(job, job.getState());
+            log.info("Finalized cancelled job: {} {}", job.getId(), job.getInjectionTitle());
         }
 
-        // log.info("{} {} {}", job.getId(), job.getStage(), job.getState());
-
-        //Skip unfinished jobs
-        if (job.getStage() != EnumDepositJobStage.FINISHED) {
+        //Skip un-finalized jobs
+        if (job.getStage() == EnumDepositJobStage.FINALIZE && (job.getState() == EnumDepositJobState.SUCCEED || job.getState() == EnumDepositJobState.CANCELED)) {
+            //DO nothing
+            log.debug("Going to process finalized job: {} {} {}", job.getId(), job.getStage(), job.getState());
+        } else {
+            log.debug("Ignored un-finalize job: {} {} {}", job.getId(), job.getStage(), job.getState());
             return;
         }
 
@@ -190,20 +191,36 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             return;
         }
 
-        //Remove canceled and expired job
-        LocalDateTime deadlineTime = LocalDateTime.now().minusDays(flowSetting.getMaxActiveDays());
-        LocalDateTime jobLatestUpdateTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
-        if (jobLatestUpdateTime.isBefore(deadlineTime)) {
-            repoDepositJob.moveToHistory(job.getId());
-            log.info("Pruned the history job: {}", job.getId());
-        } else {
-            log.debug("Ignore pruning the history job: {} {}", job.getId(), jobLatestUpdateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        }
+        depositJobService.jobFinishedEnd(job, job.getState());
+        log.info("The job is finished: {} {}", job.getId(), job.getInjectionPath());
     }
 
     @Override
     public void handleHistoryPruning(EntityFlowSetting flowSetting, InjectionPathScan injectionPathScanClient, EntityDepositJob job) {
         //TODO
+    }
+
+    @Override
+    public boolean handleInactivePruning(EntityFlowSetting flowSetting, EntityDepositJob job) throws IOException {
+        if (job.getStage() == EnumDepositJobStage.FINISHED && (job.getState() == EnumDepositJobState.SUCCEED || job.getState() == EnumDepositJobState.CANCELED)) {
+            //DO nothing
+            log.debug("Try to prune inactive job: {} {} {}", job.getId(), job.getStage(), job.getState());
+        } else {
+            log.debug("Ignored pruning inactive job: {} {} {}", job.getId(), job.getStage(), job.getState());
+            return false;
+        }
+
+        LocalDateTime finishedTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getFinishedTime());
+        LocalDateTime deadlineTime = finishedTime.plusDays(flowSetting.getMaxActiveDays());
+        if (deadlineTime.isAfter(LocalDateTime.now())) {
+            log.debug("Ignore pruning the inactive job: {} {}", job.getId(), finishedTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            return false;
+        }
+
+        this.depositJobService.jobDelete(job);
+        log.info("Pruned the inactive job: {}", job.getId());
+
+        return true;
     }
 
     @Override

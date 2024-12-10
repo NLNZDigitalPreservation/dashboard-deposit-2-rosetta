@@ -9,6 +9,8 @@ public class EntityDepositJob extends EntityCommon {
     private Long latestTime;
     private Long depositStartTime;
     private Long depositEndTime;
+    private Long finalizedTime;
+    private Long finishedTime;
 
     private String injectionPath;
     private String injectionTitle;
@@ -65,6 +67,22 @@ public class EntityDepositJob extends EntityCommon {
 
     public void setDepositEndTime(Long depositEndTime) {
         this.depositEndTime = depositEndTime;
+    }
+
+    public Long getFinalizedTime() {
+        return finalizedTime;
+    }
+
+    public void setFinalizedTime(Long finalizedTime) {
+        this.finalizedTime = finalizedTime;
+    }
+
+    public Long getFinishedTime() {
+        return finishedTime;
+    }
+
+    public void setFinishedTime(Long finishedTime) {
+        this.finishedTime = finishedTime;
     }
 
     public String getInjectionPath() {
