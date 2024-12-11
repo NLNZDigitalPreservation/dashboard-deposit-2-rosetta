@@ -1,6 +1,7 @@
 package nz.govt.natlib.dashboard.ui.command;
 
-import com.exlibris.dps.sdk.pds.PdsUserInfo;
+
+import nz.govt.natlib.dashboard.common.metadata.PdsUserInfo;
 
 import java.util.List;
 

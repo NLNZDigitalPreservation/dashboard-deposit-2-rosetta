@@ -1,6 +1,6 @@
 package nz.govt.natlib.dashboard.domain.service;
 
-import com.exlibris.dps.sdk.pds.PdsUserInfo;
+import nz.govt.natlib.dashboard.common.metadata.PdsUserInfo;
 import nz.govt.natlib.dashboard.common.auth.Sessions;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.metadata.EnumUserRole;
@@ -36,7 +36,7 @@ public class WhitelistSettingService {
 
     public void saveWhitelistSetting(EntityWhitelistSetting whitelist, String token) throws Exception {
         if (whitelist.getId() != null) {
-            String currentUsername=sessions.getUsername(token);
+            String currentUsername = sessions.getUsername(token);
             EntityWhitelistSetting toBeModifiedUser = repoWhiteList.getById(whitelist.getId());
             if (toBeModifiedUser != null && toBeModifiedUser.getWhiteUserName().equalsIgnoreCase(currentUsername)) {
                 throw new InvalidParameterException("You could not change yourself: " + RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
@@ -60,7 +60,7 @@ public class WhitelistSettingService {
     }
 
     public void deleteWhitelistSetting(Long id, String token) throws Exception {
-        String currentUsername=sessions.getUsername(token);
+        String currentUsername = sessions.getUsername(token);
         EntityWhitelistSetting toBeDeletedUser = repoWhiteList.getById(id);
         if (toBeDeletedUser != null && toBeDeletedUser.getWhiteUserName().equalsIgnoreCase(currentUsername)) {
             throw new InvalidParameterException("You could not delete yourself: " + RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);

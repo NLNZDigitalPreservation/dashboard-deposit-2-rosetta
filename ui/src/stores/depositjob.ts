@@ -12,7 +12,8 @@ export const searchConditions = reactive({
     toDate: undefined as any,
     selectedData: [] as any[],
     selectedStages: [] as any[],
-    selectedStates: [] as any[]
+    selectedStates: [] as any[],
+    isIncludeDeactiveJobs: true
 });
 
 export const jobFilters = ref({

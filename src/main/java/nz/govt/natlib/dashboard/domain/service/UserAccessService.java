@@ -1,8 +1,8 @@
 package nz.govt.natlib.dashboard.domain.service;
 
-import com.exlibris.dps.sdk.pds.PdsUserInfo;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.core.RosettaWebService;
+import nz.govt.natlib.dashboard.common.metadata.PdsUserInfo;
 import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoWhiteList;
 import nz.govt.natlib.dashboard.ui.command.UserAccessRspCommand;

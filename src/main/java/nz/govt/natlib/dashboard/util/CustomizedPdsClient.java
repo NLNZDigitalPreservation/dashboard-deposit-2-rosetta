@@ -1,6 +1,6 @@
 package nz.govt.natlib.dashboard.util;
 
-import com.exlibris.dps.sdk.pds.PdsUserInfo;
+import nz.govt.natlib.dashboard.common.metadata.PdsUserInfo;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;

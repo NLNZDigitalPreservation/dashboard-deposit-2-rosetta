@@ -1,6 +1,6 @@
 package nz.govt.natlib.dashboard.common.core;
 
-import com.exlibris.dps.sdk.pds.PdsUserInfo;
+import nz.govt.natlib.dashboard.common.metadata.PdsUserInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.govt.natlib.dashboard.common.core.dto.*;

@@ -10,7 +10,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+//import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.lang.Exception;
 
@@ -40,14 +40,14 @@ public class MainBasicConfig {
         return bean;
     }
 
-    @Bean
-    public FreeMarkerConfigurer freeMarkerConfigurer() {
-        log.info("Start to initial FreeMarkerConfigure");
-        FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
-        freeMarkerConfigurer.setTemplateLoaderPath("/app");
-        log.info("End to initial FreeMarkerConfigure");
-        return freeMarkerConfigurer;
-    }
+//    @Bean
+//    public FreeMarkerConfigurer freeMarkerConfigurer() {
+//        log.info("Start to initial FreeMarkerConfigure");
+//        FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
+//        freeMarkerConfigurer.setTemplateLoaderPath("/app");
+//        log.info("End to initial FreeMarkerConfigure");
+//        return freeMarkerConfigurer;
+//    }
 
     @Bean
     public TomcatServletWebServerFactory tomcatFactory() {

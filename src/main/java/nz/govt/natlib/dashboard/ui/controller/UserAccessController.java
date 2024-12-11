@@ -1,6 +1,6 @@
 package nz.govt.natlib.dashboard.ui.controller;
 
-import com.exlibris.dps.sdk.pds.PdsUserInfo;
+import nz.govt.natlib.dashboard.common.metadata.PdsUserInfo;
 import nz.govt.natlib.dashboard.app.MainSecurityConfig;
 import nz.govt.natlib.dashboard.common.auth.Sessions;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;

@@ -31,6 +31,7 @@ const onReset = () => {
     searchConditions.selectedData = [];
     searchConditions.selectedStages = [];
     searchConditions.selectedStates = [];
+    searchConditions.isIncludeDeactiveJobs = true;
 };
 
 const onSearch = () => {
@@ -39,7 +40,8 @@ const onSearch = () => {
         dtEnd: Date.now().valueOf(),
         flowIds: [] as string[],
         stages: [] as string[],
-        states: [] as string[]
+        states: [] as string[],
+        isIncludeDeactiveJobs: isIncludeDeactiveJobs.value
     };
 
     if (searchConditions.fromDate) {
@@ -71,6 +73,7 @@ const isIndeteminate = computed(() => {
     return true;
 });
 const producersSelect = ref(false);
+const isIncludeDeactiveJobs = ref(true);
 
 const show = () => {
     visible.value = true;
@@ -120,6 +123,10 @@ defineExpose({ show });
 
                 <template #end>
                     <div class="flex justify-center flex-wrap gap-4 mt-4" style="justify-content: flex-end">
+                        <InputGroup class="mt-2 mb-2">
+                            <ToggleSwitch v-model="isIncludeDeactiveJobs" inputId="includeDeactiveJobs" />
+                            <label for="includeDeactiveJobs" class="ml-2"> Include deactive jobs </label>
+                        </InputGroup>
                         <Button type="button" label="Search" @click="onSearch()" autofocus></Button>
                         <Button type="button" label="Close" @click="visible = false" severity="secondary"></Button>
                     </div>
