@@ -14,10 +14,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-tomcat'
-//    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
-//    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation('org.springframework:spring-context') {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
@@ -44,7 +41,7 @@ test {
 }
 
 group = 'deposit-dashboard'
-version = '2.0.0-rc3'
+version = '2.0.0-rc4'
 description = 'Dashboard Tool'
 sourceCompatibility = '1.11'
 targetCompatibility = '1.11'
