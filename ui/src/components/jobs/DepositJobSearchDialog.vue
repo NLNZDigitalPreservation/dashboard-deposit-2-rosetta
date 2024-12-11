@@ -123,10 +123,10 @@ defineExpose({ show });
 
                 <template #end>
                     <div class="flex justify-center flex-wrap gap-4 mt-4" style="justify-content: flex-end">
-                        <InputGroup class="mt-2 mb-2">
+                        <!-- <InputGroup class="mt-2 mb-2">
                             <ToggleSwitch v-model="isIncludeDeactiveJobs" inputId="includeDeactiveJobs" />
                             <label for="includeDeactiveJobs" class="ml-2"> Include deactive jobs </label>
-                        </InputGroup>
+                        </InputGroup> -->
                         <Button type="button" label="Search" @click="onSearch()" autofocus></Button>
                         <Button type="button" label="Close" @click="visible = false" severity="secondary"></Button>
                     </div>

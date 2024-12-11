@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -62,7 +63,7 @@ public abstract class RepoAbstract {
             return null;
         }
         try {
-            return FileUtils.readFileToString(fullPath);
+            return FileUtils.readFileToString(fullPath, Charset.defaultCharset());
         } catch (IOException e) {
             log.error("Failed to read: {}", fullPath.getAbsolutePath(), e);
             return null;
@@ -75,7 +76,7 @@ public abstract class RepoAbstract {
 
     public boolean save(File fullPath, Object obj) {
         if (fullPath == null || obj == null) {
-            log.error("Invalid input parameter");
+            log.error("Save: invalid input parameter");
             return false;
         }
 
@@ -86,7 +87,7 @@ public abstract class RepoAbstract {
 
         String json = obj2Json(obj);
         try {
-            FileUtils.write(fullPath, json);
+            FileUtils.write(fullPath, json, Charset.defaultCharset());
             return true;
         } catch (IOException e) {
             log.error("Failed to save obj: {}", fullPath.getAbsolutePath(), e);
@@ -100,7 +101,7 @@ public abstract class RepoAbstract {
 
     public boolean delete(File fullPath) {
         if (fullPath == null || !fullPath.exists()) {
-            log.error("Invalid input parameter");
+            log.error("Delete: invalid input parameter");
             return false;
         }
         try {

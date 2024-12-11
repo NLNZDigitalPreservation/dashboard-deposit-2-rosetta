@@ -210,7 +210,12 @@ public class ScheduleProcessorImpl extends ScheduleProcessorBasic {
             return false;
         }
 
-        LocalDateTime finishedTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getFinishedTime());
+        LocalDateTime finishedTime;
+        if (job.getFinishedTime() == null) {
+            finishedTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getLatestTime());
+        } else {
+            finishedTime = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(job.getFinishedTime());
+        }
         LocalDateTime deadlineTime = finishedTime.plusDays(flowSetting.getMaxActiveDays());
         if (deadlineTime.isAfter(LocalDateTime.now())) {
             log.debug("Ignore pruning the inactive job: {} {}", job.getId(), finishedTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));

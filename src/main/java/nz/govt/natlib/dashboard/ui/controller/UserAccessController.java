@@ -19,9 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
-//import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,8 +29,6 @@ public class UserAccessController {
     private static final long EXPIRE_INTERNAL = 30 * 60 * 1000; //30 Minutes
     @Autowired
     private Sessions sessions;
-    @Autowired
-    private FreeMarkerConfigurer confFactory;
     @Autowired
     private MainSecurityConfig securityConfig;
     @Autowired

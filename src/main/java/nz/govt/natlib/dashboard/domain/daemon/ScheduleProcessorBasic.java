@@ -82,67 +82,74 @@ public abstract class ScheduleProcessorBasic {
         }
         Map<Long, List<EntityDepositJob>> allJobGroups = allJobs.stream().collect(Collectors.groupingBy(job -> job.getAppliedFlowSetting().getId()));
         for (Long flowSettingId : allJobGroups.keySet()) {
-            List<EntityDepositJob> jobs = allJobGroups.get(flowSettingId);
-            EntityFlowSetting flowSetting = repoFlowSetting.getById(flowSettingId);
-            if (flowSetting != null) {
-                if (!flowSetting.isEnabled()) {
-                    log.warn("Disabled Material Flow: {} {}", flowSetting.getId(), flowSetting.getMaterialFlowId());
-                    continue;
-                }
-
-                EntityDepositAccountSetting depositAccount = repoDepositAccount.getById(flowSetting.getDepositAccountId());
-                if (depositAccount == null) {
-                    log.error("The related deposit account does not exist: {}", flowSetting.getDepositAccountId());
-                    continue;
-                }
-
-                InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
-
-                long countRunning = jobs.stream().filter(job -> job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.RUNNING).count();
-                //Get the current max concurrency limitation of running jobs according to the schedule.
-                LocalDateTime now = LocalDateTime.now();
-                int nowDay = now.getDayOfWeek().ordinal();
-                int maxConcurrencyJobs = flowSetting.getWeeklyMaxConcurrency()[nowDay];
-                log.debug("Now: {}, day: {}, maxConcurrencyJobs: {}, countRunning: {}", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), nowDay, maxConcurrencyJobs, countRunning);
-
-                for (EntityDepositJob job : jobs) {
-                    if (job.getState() == EnumDepositJobState.PAUSED) {
-                        log.debug("Skip the Paused job: {}", job.getId());
+            try {
+                List<EntityDepositJob> jobs = allJobGroups.get(flowSettingId);
+                EntityFlowSetting flowSetting = repoFlowSetting.getById(flowSettingId);
+                if (flowSetting != null) {
+                    if (!flowSetting.isEnabled()) {
+                        log.warn("Disabled Material Flow: {} {}", flowSetting.getId(), flowSetting.getMaterialFlowId());
                         continue;
                     }
 
-                    boolean ret = handleInactivePruning(flowSetting, job);
-                    if (ret) {
+                    EntityDepositAccountSetting depositAccount = repoDepositAccount.getById(flowSetting.getDepositAccountId());
+                    if (depositAccount == null) {
+                        log.error("The related deposit account does not exist: {}", flowSetting.getDepositAccountId());
                         continue;
                     }
 
+                    InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
 
-                    if (!injectionPathScanClient.exists(job.getInjectionPath())) {
-                        log.info("The original directory does not exist: {} {}", job.getId(), job.getInjectionPath());
-                        continue;
-                    }
+                    long countRunning = jobs.stream().filter(job -> job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.RUNNING).count();
+                    //Get the current max concurrency limitation of running jobs according to the schedule.
+                    LocalDateTime now = LocalDateTime.now();
+                    int nowDay = now.getDayOfWeek().ordinal();
+                    int maxConcurrencyJobs = flowSetting.getWeeklyMaxConcurrency()[nowDay];
+                    log.debug("Now: {}, day: {}, maxConcurrencyJobs: {}, countRunning: {}", now.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), nowDay, maxConcurrencyJobs, countRunning);
 
-                    //Only launch the deposit task when Rosetta is idle
-                    if (countRunning < maxConcurrencyJobs) {
-                        if (handleDeposit(depositAccount, flowSetting, injectionPathScanClient, job)) {
-                            countRunning++; //To be sure Rosetta not over load.
+                    for (EntityDepositJob job : jobs) {
+                        try {
+                            if (job.getState() == EnumDepositJobState.PAUSED) {
+                                log.debug("Skip the Paused job: {}", job.getId());
+                                continue;
+                            }
+
+                            boolean ret = handleInactivePruning(flowSetting, job);
+                            if (ret) {
+                                continue;
+                            }
+
+                            if (!injectionPathScanClient.exists(job.getInjectionPath())) {
+                                log.info("The original directory does not exist: {} {}", job.getId(), job.getInjectionPath());
+                                continue;
+                            }
+
+                            //Only launch the deposit task when Rosetta is idle
+                            if (countRunning < maxConcurrencyJobs) {
+                                if (handleDeposit(depositAccount, flowSetting, injectionPathScanClient, job)) {
+                                    countRunning++; //To be sure Rosetta not over load.
+                                }
+                            }
+
+                            handlePollingStatus(depositAccount, job);
+
+                            handleFinalize(flowSetting, injectionPathScanClient, job);
+
+                            handleHistoryPruning(flowSetting, injectionPathScanClient, job);
+                        } catch (Exception ex) {
+                            log.error("Failed to process job: {}", job.getId(), ex);
                         }
                     }
+                    injectionPathScanClient.disconnect();
 
-                    handlePollingStatus(depositAccount, job);
-
-                    handleFinalize(flowSetting, injectionPathScanClient, job);
-
-                    handleHistoryPruning(flowSetting, injectionPathScanClient, job);
+                } else {
+                    for (EntityDepositJob job : jobs) {
+                        handleFlowSettingMissingJob(job);
+                    }
                 }
-                injectionPathScanClient.disconnect();
-
-            } else {
-                for (EntityDepositJob job : jobs) {
-                    handleFlowSettingMissingJob(job);
-                }
+                jobs.clear();
+            } catch (Exception ex) {
+                log.error("Failed to process flow: {}", flowSettingId, ex);
             }
-            jobs.clear();
         }
         allJobGroups.forEach((k, v) -> v.clear());
         allJobGroups.clear();
