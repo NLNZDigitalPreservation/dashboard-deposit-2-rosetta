@@ -2,7 +2,6 @@ package nz.govt.natlib.dashboard.domain.repo;
 
 import nz.govt.natlib.dashboard.common.metadata.EnumEntityKey;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
-import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +28,8 @@ public class RepoDepositJob extends RepoAbstract {
     public EntityDepositJob getByFlowIdAndInjectionTitle(Long flowId, String injectionTitle) {
         List<EntityDepositJob> allJobs = getAll();
         for (EntityDepositJob job : allJobs) {
-            if (job.getAppliedFlowSetting().getId().equals(flowId) && StringUtils.equals(job.getInjectionTitle(), injectionTitle)) {
+            if (job.getAppliedFlowSetting().getId().equals(flowId)
+                    && StringUtils.equals(job.getInjectionTitle(), injectionTitle)) {
                 return job;
             }
         }

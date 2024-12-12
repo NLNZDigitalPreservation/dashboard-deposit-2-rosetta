@@ -1,6 +1,5 @@
 package nz.govt.natlib.dashboard.common.injection;
 
-import java.io.File;
 import java.util.List;
 
 public class InjectionFileStat {
@@ -27,7 +26,6 @@ public class InjectionFileStat {
     public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
-
 
     public void stat(InjectionPathScan scanHandler, String absolutePath) {
         stat(scanHandler, new UnionPath(absolutePath));

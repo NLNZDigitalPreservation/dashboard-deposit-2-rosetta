@@ -5,11 +5,8 @@ import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDateTime;
 
 public class TestScheduleProcessorBasicImplJobHistoryPruning extends ScheduleProcessorTester {
@@ -23,20 +20,20 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
 
         initSubFolder();
 
-        //Initial injection
+        // Initial injection
         ScheduleProcessorBasic injectionProcessor = new ScheduleProcessorImpl();
         initProcessor(injectionProcessor);
         addReadyForIngestionFile();
         injectionProcessor.handleIngest();
     }
 
-//    @Ignore
-//    @Test
+    // @Ignore
+    // @Test
     public void testPruningNotExpired() throws Exception {
         EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;
 
-        //Pruning
+        // Pruning
         LocalDateTime ldt = LocalDateTime.now();
         job.setLatestTime(DashboardHelper.getLocalMilliSeconds(ldt));
         job.setStage(EnumDepositJobStage.FINISHED);
@@ -47,16 +44,15 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
 
         job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
 
-        //Do nothing because it isn't expired
+        // Do nothing because it isn't expired
         assert job != null;
     }
 
-//    @Test
-//    @Ignore
+    // @Test
+    // @Ignore
     public void testAgingExpired() throws Exception {
         EntityDepositJob job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);
         assert job != null;
-
 
         LocalDateTime oldTime = LocalDateTime.now().minusDays(2 * flowSetting.getMaxSaveDays());
         long oldMilliSeconds = DashboardHelper.getLocalMilliSeconds(oldTime);
@@ -65,10 +61,10 @@ public class TestScheduleProcessorBasicImplJobHistoryPruning extends SchedulePro
         job.setStage(EnumDepositJobStage.FINISHED);
         job.setState(EnumDepositJobState.SUCCEED);
 
-        //Added to history
+        // Added to history
         repoDepositJob.save(job);
 
-        //Pruning
+        // Pruning
         testInstance.handleHistoryPruning(flowSetting, injectionPathScanClient, job);
 
         job = repoDepositJob.getByFlowIdAndInjectionTitle(flowSetting.getId(), subFolderName);

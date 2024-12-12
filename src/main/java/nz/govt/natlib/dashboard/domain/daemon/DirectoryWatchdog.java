@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import static java.nio.file.StandardWatchEventKinds.*;
 
 public class DirectoryWatchdog {
@@ -28,7 +26,7 @@ public class DirectoryWatchdog {
         Runnable dog = new Runnable() {
             @Override
             public void run() {
-                for (; ; ) {
+                for (;;) {
                     try {
                         WatchKey key = watcher.take();
 
@@ -38,7 +36,7 @@ public class DirectoryWatchdog {
                                 continue;
                             }
 
-//                            WatchEvent<?> ev = (WatchEvent<?>)event;
+                            // WatchEvent<?> ev = (WatchEvent<?>)event;
                             Path path = (Path) event.context();
 
                             instance.preparedSubFolders.add(path);

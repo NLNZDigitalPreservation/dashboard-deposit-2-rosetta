@@ -1,8 +1,5 @@
 package nz.govt.natlib.dashboard.common.auth;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
 
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +21,8 @@ public class HttpAccessManagementFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse rsp = ((HttpServletResponse) response);
         String contextUri = req.getContextPath(), reqUri = req.getRequestURI();
@@ -32,7 +30,7 @@ public class HttpAccessManagementFilter implements Filter {
 
         log.debug("contextUri: {}, url: {}", contextUri, url);
 
-        //Only allowed the authentication for restful APIs
+        // Only allowed the authentication for restful APIs
         if (!url.startsWith(DashboardConstants.PATH_ROOT)) {
             chain.doFilter(request, response);
             return;
@@ -56,7 +54,6 @@ public class HttpAccessManagementFilter implements Filter {
             return;
         }
 
-
         chain.doFilter(request, response);
     }
 
@@ -68,7 +65,8 @@ public class HttpAccessManagementFilter implements Filter {
         if (url.contains("/restful/deposit-jobs/search")) {
             return true;
         }
-        return !method.equalsIgnoreCase("POST") && !method.equalsIgnoreCase("PUT") && !method.equalsIgnoreCase("DELETE");
+        return !method.equalsIgnoreCase("POST") && !method.equalsIgnoreCase("PUT")
+                && !method.equalsIgnoreCase("DELETE");
     }
 
     @Override

@@ -1,7 +1,6 @@
 package nz.govt.natlib.dashboard.domain.service;
 
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
-import nz.govt.natlib.dashboard.domain.daemon.TimerScheduledExecutors;
 import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoGlobalSetting;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
@@ -13,11 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.TimeZone;
 
 @Service
 public class GlobalSettingService {
@@ -32,30 +27,35 @@ public class GlobalSettingService {
         if (globalSetting == null) {
             globalSetting = new EntityGlobalSetting();
             globalSetting.setId(UNIQUE_GLOBAL_SETTING_ID);
-            globalSetting.setPausedStartTime(ldtNowDatetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
+            globalSetting
+                    .setPausedStartTime(ldtNowDatetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
             LocalDateTime ldtPausedEndTime = ldtNowDatetime.plusDays(1);
-            globalSetting.setPausedEndTime(ldtPausedEndTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
+            globalSetting
+                    .setPausedEndTime(ldtPausedEndTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
         } else {
             try {
                 LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             } catch (Exception e) {
                 log.warn("Failed to parse pausedStartTime: {}", globalSetting.getPausedStartTime(), e);
-                globalSetting.setPausedStartTime(ldtNowDatetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
+                globalSetting.setPausedStartTime(
+                        ldtNowDatetime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
             }
 
             LocalDateTime ldtPausedEndTime;
             try {
-                ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(),
+                        DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             } catch (Exception e) {
                 log.warn("Failed to parse pausedEndTime: {}", globalSetting.getPausedEndTime(), e);
                 ldtPausedEndTime = ldtNowDatetime.plusDays(1);
-                globalSetting.setPausedEndTime(ldtPausedEndTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
+                globalSetting.setPausedEndTime(
+                        ldtPausedEndTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
             }
 
             if (ldtPausedEndTime.isBefore(ldtNowDatetime)) {
                 globalSetting.setPaused(false);
-                //globalSetting.setPausedStartTime(strNowDatetime);
-                //globalSetting.setPausedEndTime(strNowDatetime);
+                // globalSetting.setPausedStartTime(strNowDatetime);
+                // globalSetting.setPausedEndTime(strNowDatetime);
             }
         }
         return globalSetting;
@@ -64,23 +64,33 @@ public class GlobalSettingService {
     public EntityGlobalSetting saveGlobalSetting(EntityGlobalSetting globalSetting) throws Exception {
         if (globalSetting.isPaused()) {
             if (StringUtils.isEmpty(globalSetting.getPausedStartTime())) {
-                throw new InvalidParameterException("The start time is empty: " + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+                throw new InvalidParameterException(
+                        "The start time is empty: " + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             }
             if (StringUtils.isEmpty(globalSetting.getPausedEndTime())) {
-                throw new InvalidParameterException("The end time is empty: " + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+                throw new InvalidParameterException(
+                        "The end time is empty: " + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             }
             LocalDateTime ldtNowDatetime = LocalDateTime.now();
-//            LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.RFC_1123_DATE_TIME	);
-//            LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.RFC_1123_DATE_TIME	);
-            LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            // LocalDateTime ldtPausedStartTime =
+            // LocalDateTime.parse(globalSetting.getPausedStartTime(),
+            // DateTimeFormatter.RFC_1123_DATE_TIME );
+            // LocalDateTime ldtPausedEndTime =
+            // LocalDateTime.parse(globalSetting.getPausedEndTime(),
+            // DateTimeFormatter.RFC_1123_DATE_TIME );
+            LocalDateTime ldtPausedStartTime = LocalDateTime.parse(globalSetting.getPausedStartTime(),
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            LocalDateTime ldtPausedEndTime = LocalDateTime.parse(globalSetting.getPausedEndTime(),
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
             if (ldtPausedEndTime.isBefore(ldtNowDatetime)) {
-                throw new InvalidParameterException("The end time must after now: " + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+                throw new InvalidParameterException(
+                        "The end time must after now: " + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             }
 
             if (ldtPausedEndTime.isBefore(ldtPausedStartTime)) {
-                throw new InvalidParameterException("The end time must after start time: " + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+                throw new InvalidParameterException(
+                        "The end time must after start time: " + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             }
         }
 

@@ -2,9 +2,6 @@ package nz.govt.natlib.dashboard.util;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 public class TestDashboardHelper {
     @Test
     public void testGetCurrentHour() {

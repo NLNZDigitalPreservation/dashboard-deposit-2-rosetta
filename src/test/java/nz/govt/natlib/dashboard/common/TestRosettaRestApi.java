@@ -5,7 +5,6 @@ import nz.govt.natlib.dashboard.common.core.dto.DtoMaterialFlowRsp;
 import nz.govt.natlib.dashboard.common.core.dto.DtoProducersRsp;
 import nz.govt.natlib.dashboard.common.metadata.SipStatusInfo;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -22,8 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.mockito.Mockito.mock;
 
 public class TestRosettaRestApi {
     private static final String PDSUrl = "https://slbpdstest.natlib.govt.nz/pds?";
@@ -43,12 +40,11 @@ public class TestRosettaRestApi {
         depositAccount.setDepositUserName(USERNAME);
         depositAccount.setDepositUserPassword(PASSWORD);
 
-//        CustomizedPdsClient pdsClient = CustomizedPdsClient.getInstance();
-//        pdsClient.init("http://localhost/", true);
+        // CustomizedPdsClient pdsClient = CustomizedPdsClient.getInstance();
+        // pdsClient.init("http://localhost/", true);
     }
 
-
-    //    @Test
+    // @Test
     public void testGetProducer() throws Exception {
         List<DtoProducersRsp.Producer> producers = restApi.getProducers(depositAccount);
         assert producers != null;
@@ -65,17 +61,16 @@ public class TestRosettaRestApi {
         assert producers.size() == set.size();
     }
 
-
-    //    @Disabled
-//    @Test
+    // @Disabled
+    // @Test
     public void testGetMaterialFlow() throws Exception {
         List<DtoProducersRsp.Producer> producers = restApi.getProducers(depositAccount);
         assert producers != null;
         assert !producers.isEmpty();
 
-
         for (DtoProducersRsp.Producer producer : producers) {
-            List<DtoMaterialFlowRsp.MaterialFlow> materialFlows = restApi.getMaterialFlows(depositAccount, producer.getId());
+            List<DtoMaterialFlowRsp.MaterialFlow> materialFlows = restApi.getMaterialFlows(depositAccount,
+                    producer.getId());
             if (materialFlows == null || materialFlows.isEmpty()) {
                 continue;
             }
@@ -88,16 +83,17 @@ public class TestRosettaRestApi {
         String sipId = "749344";
         try {
             SipStatusInfo sipStatusInfo = restApi.getSIPStatusInfo(depositAccount, sipId);
-//        assert sipStatusInfo != null;
-//        System.out.println(sipStatusInfo.getStatus());
+            // assert sipStatusInfo != null;
+            // System.out.println(sipStatusInfo.getStatus());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-
     private static String generateDPSSession(String pid, String pdsHandle) throws IOException, InterruptedException {
-        String deliveryUrl = String.format("https://slbpdstest.natlib.govt.nz/goto/logon/https://ndhadelivertest.natlib.govt.nz/delivery/DeliveryManagerServlet?dps_pid=%s&pds_handle=%s&calling_system=del&institute=", pid, pdsHandle);
+        String deliveryUrl = String.format(
+                "https://slbpdstest.natlib.govt.nz/goto/logon/https://ndhadelivertest.natlib.govt.nz/delivery/DeliveryManagerServlet?dps_pid=%s&pds_handle=%s&calling_system=del&institute=",
+                pid, pdsHandle);
 
         ConcurrentHashMap<String, List<String>> cookieHeaders = new ConcurrentHashMap<>();
         CookieHandler cookieHandler = new DeliveryCookieHandler(cookieHeaders);
@@ -108,7 +104,7 @@ public class TestRosettaRestApi {
 
         HttpRequest httpRequest = HttpRequest.newBuilder(URI.create(deliveryUrl))
                 .timeout(Duration.ofSeconds(30))
-//                .POST(HttpRequest.BodyPublishers.ofString(loginString))
+                // .POST(HttpRequest.BodyPublishers.ofString(loginString))
                 .GET()
                 .build();
 
