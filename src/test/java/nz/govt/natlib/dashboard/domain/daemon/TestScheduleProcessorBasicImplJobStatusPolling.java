@@ -1,5 +1,6 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
+import nz.govt.natlib.dashboard.common.BasicTester;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
@@ -21,17 +22,17 @@ public class TestScheduleProcessorBasicImplJobStatusPolling extends ScheduleProc
 
         initSubFolder();
 
-        //Initial processor
+        // Initial processor
         ScheduleProcessorBasic scheduleProcessor = new ScheduleProcessorImpl();
         initProcessor(scheduleProcessor);
         addReadyForIngestionFile();
         scheduleProcessor.handleIngest();
 
-        //Deposit job
+        // Deposit job
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
         EntityDepositJob job = jobs.get(0);
 
-        String depositResponse = this.readResourceFile("data/deposit-inprogress.json");
+        String depositResponse = BasicTester.readResourceFile("data/deposit-inprogress.json");
         when(restApi.fetch(any(), any(), any(), any())).thenReturn(depositResponse);
 
         scheduleProcessor.handleDeposit(depositAccount, flowSetting, injectionPathScanClient, job);
@@ -44,7 +45,7 @@ public class TestScheduleProcessorBasicImplJobStatusPolling extends ScheduleProc
         job.setState(EnumDepositJobState.RUNNING);
         repoDepositJob.save(job);
 
-        String depositResponse = this.readResourceFile("data/sipstatusinfo-ongoing.json");
+        String depositResponse = BasicTester.readResourceFile("data/sipstatusinfo-ongoing.json");
         when(restApi.fetch(any(), any(), any(), any())).thenReturn(depositResponse);
 
         testInstance.handlePollingStatus(depositAccount, job);
@@ -68,7 +69,7 @@ public class TestScheduleProcessorBasicImplJobStatusPolling extends ScheduleProc
         job.setState(EnumDepositJobState.RUNNING);
         repoDepositJob.save(job);
 
-        String depositResponse = this.readResourceFile("data/sipstatusinfo-succeed.json");
+        String depositResponse = BasicTester.readResourceFile("data/sipstatusinfo-succeed.json");
         when(restApi.fetch(any(), any(), any(), any())).thenReturn(depositResponse);
 
         testInstance.handlePollingStatus(depositAccount, job);
@@ -92,7 +93,7 @@ public class TestScheduleProcessorBasicImplJobStatusPolling extends ScheduleProc
         job.setState(EnumDepositJobState.RUNNING);
         repoDepositJob.save(job);
 
-        String depositResponse = this.readResourceFile("data/sipstatusinfo-failed.json");
+        String depositResponse = BasicTester.readResourceFile("data/sipstatusinfo-failed.json");
         when(restApi.fetch(any(), any(), any(), any())).thenReturn(depositResponse);
 
         testInstance.handlePollingStatus(depositAccount, job);

@@ -1,6 +1,6 @@
 package nz.govt.natlib.dashboard.domain.daemon;
 
-
+import nz.govt.natlib.dashboard.common.BasicTester;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobStage;
 import nz.govt.natlib.dashboard.common.metadata.EnumDepositJobState;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositJob;
@@ -34,7 +34,7 @@ public class TestScheduleProcessorBasicImplJobDepositing extends ScheduleProcess
 
     @Test
     public void testDepositingJobsInjectionSuccess() throws Exception {
-        String depositResponse = this.readResourceFile("data/deposit-inprogress.json");
+        String depositResponse = BasicTester.readResourceFile("data/deposit-inprogress.json");
         when(restApi.fetch(any(), any(), any(), any())).thenReturn(depositResponse);
 
         testInstance.handleIngest();
@@ -55,7 +55,7 @@ public class TestScheduleProcessorBasicImplJobDepositing extends ScheduleProcess
 
     @Test
     public void testDepositingJobsInjectionFailed() throws Exception {
-        String depositResponse = this.readResourceFile("data/deposit-declined.json");
+        String depositResponse = BasicTester.readResourceFile("data/deposit-declined.json");
         when(restApi.fetch(any(), any(), any(), any())).thenReturn(depositResponse);
 
         List<EntityDepositJob> jobs = repoDepositJob.getAll();
@@ -82,7 +82,6 @@ public class TestScheduleProcessorBasicImplJobDepositing extends ScheduleProcess
 
         assert DashboardHelper.isNull(job.getSipID());
     }
-
 
     @AfterEach
     public void clear() {

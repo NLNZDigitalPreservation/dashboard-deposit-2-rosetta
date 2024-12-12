@@ -41,7 +41,7 @@ public class TestDepositJobService extends BasicTester {
     public static void init() throws IOException {
         BasicTester.init();
 
-//        flowSetting.setId(repoFlowSetting.nextId());
+        // flowSetting.setId(repoFlowSetting.nextId());
         flowSetting.setDepositAccountId(Long.parseLong("0"));
         flowSetting.setEnabled(flowEnable);
         flowSetting.setMaterialFlowId(materialFlowId);
@@ -58,7 +58,7 @@ public class TestDepositJobService extends BasicTester {
         repoFlowSetting.save(flowSetting);
     }
 
-    //    @Test
+    // @Test
     @Disabled
     @Test
     public void testDeposit() {
@@ -82,7 +82,8 @@ public class TestDepositJobService extends BasicTester {
             String injectionPath = "20201023_GTG_parent_grouping__Get_Growing";
             ResultOfDeposit resultOfDeposit;
             try {
-                when(rosettaWebService.deposit(any(), any(), any(), any())).thenReturn(new ResultOfDeposit(true, "OK", "12345"));
+                when(rosettaWebService.deposit(any(), any(), any(), any()))
+                        .thenReturn(new ResultOfDeposit(true, "OK", "12345"));
                 resultOfDeposit = rosettaWebService.deposit(depositAccount, injectionPath, producerId, materialFlowId);
                 assert resultOfDeposit.isSuccess();
             } catch (Exception e) {
@@ -105,7 +106,8 @@ public class TestDepositJobService extends BasicTester {
                 log.info("Job [{}] is submitted to Rosetta successfully, SIPId=[{}], Status=[{}]",
                         injectionPath, resultOfDeposit.getSipID(), resultOfDeposit.getResultMessage());
             } else {
-                log.warn("Job [{}] is submitted to Rosetta failed, msg: [{}]", injectionPath, resultOfDeposit.getResultMessage());
+                log.warn("Job [{}] is submitted to Rosetta failed, msg: [{}]", injectionPath,
+                        resultOfDeposit.getResultMessage());
             }
         }
     }
@@ -118,25 +120,28 @@ public class TestDepositJobService extends BasicTester {
         sipStatusInfo.setStage("Finished");
         sipStatusInfo.setStatus("Finished");
         try {
-            String depositResponse = this.readResourceFile("data/sipstatusinfo-succeed.json");
-            when(restApi.fetch(any(),any(),any(),any())).thenReturn(depositResponse);
+            String depositResponse = BasicTester.readResourceFile("data/sipstatusinfo-succeed.json");
+            when(restApi.fetch(any(), any(), any(), any())).thenReturn(depositResponse);
             sipStatusInfo = rosettaWebService.getSIPStatusInfo(depositAccount, sipId);
         } catch (Exception e) {
             e.printStackTrace();
             assert false;
         }
 
-        log.info("Sip: {}, Status: {} {} {}", sipId, sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
+        log.info("Sip: {}, Status: {} {} {}", sipId, sipStatusInfo.getModule(), sipStatusInfo.getStage(),
+                sipStatusInfo.getStatus());
     }
 
     @Disabled
     @Test
     public void testManualSubmitDepositJob() {
         EntityFlowSetting flowSetting = repoFlowSetting.getAll().get(0);
-//        String srcDirectory = "C:\\temp\\MPRESS_deposit105";
-//        String srcDirectory="//wlgprdfile13/DFS_Shares/ndha/pre-deposit_prod/frank/PP_Example/MPRESS_deposit105";
+        // String srcDirectory = "C:\\temp\\MPRESS_deposit105";
+        // String
+        // srcDirectory="//wlgprdfile13/DFS_Shares/ndha/pre-deposit_prod/frank/PP_Example/MPRESS_deposit105";
         String srcDirectory = "/media/sf_frank/TEST_DATA/20201022_TVG_parent_grouping__TV_Guide";
-        RestResponseCommand rstVal = depositJobService.manuallySubmitDepositJob(flowSetting.getId(), srcDirectory, false);
+        RestResponseCommand rstVal = depositJobService.manuallySubmitDepositJob(flowSetting.getId(), srcDirectory,
+                false);
         assert rstVal.getRspCode() == RestResponseCommand.RSP_SUCCESS;
     }
 }
