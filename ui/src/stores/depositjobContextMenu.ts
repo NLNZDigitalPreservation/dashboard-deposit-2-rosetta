@@ -152,7 +152,7 @@ export const useContextMenu = defineStore('ContextMenu', () => {
         { label: 'Resume', icon: 'pi pi-fw pi-play-circle', command: () => editJob('resume') },
         { separator: true },
         { label: 'Terminate and Purge', icon: 'pi pi-fw pi-stop-circle', command: () => editJob('terminate') }
-    ]);
+    ] as any[]);
 
     return { selectedContextRow, contextMenuModel };
 });
