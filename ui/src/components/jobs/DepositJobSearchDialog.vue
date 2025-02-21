@@ -5,6 +5,7 @@ import { computed, ref } from 'vue';
 
 const visible = ref(false);
 const jobList = useJobStore();
+const flowStore = useMaterialFlowsStore();
 
 const stages = ref([
     { name: 'INGEST', code: 'INGEST' },
@@ -21,9 +22,6 @@ const states = ref([
     { name: 'FAILED', code: 'FAILED' },
     { name: 'CANCELED', code: 'CANCELED' }
 ]);
-
-const flowStore = useMaterialFlowsStore();
-flowStore.fetchAllData();
 
 const onReset = () => {
     searchConditions.fromDate = undefined;
@@ -76,6 +74,7 @@ const producersSelect = ref(false);
 const isIncludeDeactiveJobs = ref(true);
 
 const show = () => {
+    flowStore.fetchAllData();
     visible.value = true;
 };
 
