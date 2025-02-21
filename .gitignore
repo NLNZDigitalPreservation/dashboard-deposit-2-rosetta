@@ -4,6 +4,7 @@
 /logs/
 /apps/libs/
 /.idea/
+.idea/
 
 /ui/dist/
 /ui/node_modules/
