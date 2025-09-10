@@ -9,14 +9,16 @@ const closeDialog = () => {
     dialogRef.value.close();
 };
 
+const id=ref();
 const paused = ref();
 const pausedStartTime = ref();
 const pausedEndTime = ref();
-const delays = ref();
-const delayUnit = ref();
+const delays = ref(60);
+const delayUnit = ref('S');
 
 const globalStore = useSettingsGlobalStore();
 globalStore.queryRow().then((globalSetting: GlobalSetting) => {
+    id.value = globalSetting.id;
     paused.value = globalSetting.paused;
     pausedStartTime.value = dateTimeString2Object(globalSetting.pausedStartTime);
     pausedEndTime.value = dateTimeString2Object(globalSetting.pausedEndTime);

@@ -32,6 +32,8 @@ public class GlobalSettingService {
             LocalDateTime ldtPausedEndTime = ldtNowDatetime.plusDays(1);
             globalSetting
                     .setPausedEndTime(ldtPausedEndTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME).substring(0, 16));
+            globalSetting.setDelayUnit("S");
+            globalSetting.setDelays(60L);
         } else {
             try {
                 LocalDateTime.parse(globalSetting.getPausedStartTime(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
