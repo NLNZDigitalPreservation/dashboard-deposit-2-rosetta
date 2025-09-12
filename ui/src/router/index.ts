@@ -7,11 +7,20 @@ export const routes = {
             path: '/',
             children: [
                 {
-                    path: '',
+                    path: '/',
+                    name: 'index',
+                    component: () => import('@/views/MainView.vue')
+                },
+                {
+                    path: '/home.html',
                     name: 'home',
                     component: () => import('@/views/MainView.vue')
                 }
             ]
+        },
+        {
+            path: '/:pathMatch(.*)*',
+            redirect: '/'
         }
     ]
 };
