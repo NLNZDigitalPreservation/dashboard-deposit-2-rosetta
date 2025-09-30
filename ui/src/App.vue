@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useThemeStore } from '@/utils/themes';
-import { useBrowserLocation } from '@vueuse/core';
+import { useBrowserLocation, useTitle } from '@vueuse/core';
 import { ref } from 'vue';
 import LoginDialog from './components/LoginDialog.vue';
 import { useLoginStore } from './utils/rest.api';
 import MainView from './views/MainView.vue';
+
 const loginStore = useLoginStore();
 const themeStore = useThemeStore();
 
@@ -30,6 +31,9 @@ if (hostname && hostname.length > 6) {
     }
 }
 
+// bind a ref to the document title
+const title = useTitle('My Vue App');
+title.value = `Deposit Dashboard (${hostType})`;
 const envType = ref(hostType);
 themeStore.toggleTheme(darkMode, colorMode);
 </script>
