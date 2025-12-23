@@ -1,6 +1,6 @@
 package nz.govt.natlib.dashboard.domain.service;
 
-import nz.govt.natlib.dashboard.common.metadata.PdsUserInfo;
+import nz.govt.natlib.dashboard.common.metadata.UserInfo;
 import nz.govt.natlib.dashboard.common.auth.Sessions;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.metadata.EnumUserRole;
@@ -73,23 +73,23 @@ public class WhitelistSettingService {
         return repoWhiteList.getById(id);
     }
 
-    public boolean isInWhiteList(PdsUserInfo pdsUserInfo) {
-        EntityWhitelistSetting user = getUserFromWhiteList(pdsUserInfo);
+    public boolean isInWhiteList(UserInfo userInfo) {
+        EntityWhitelistSetting user = getUserFromWhiteList(userInfo);
         return !DashboardHelper.isNull(user);
     }
 
-    public EntityWhitelistSetting getUserFromWhiteList(PdsUserInfo pdsUserInfo) {
-        if (DashboardHelper.isNull(pdsUserInfo)) {
+    public EntityWhitelistSetting getUserFromWhiteList(UserInfo userInfo) {
+        if (DashboardHelper.isNull(userInfo)) {
             return null;
         }
-        return getUserFromWhiteList(pdsUserInfo.getUserName());
+        return getUserFromWhiteList(userInfo.getUserName());
     }
 
     public EntityWhitelistSetting getUserFromWhiteList(String userName) {
         return repoWhiteList.getByUserName(userName);
     }
 
-    public EntityWhitelistSetting initialWhiteListSetting(PdsUserInfo pdsUserInfo) {
+    public EntityWhitelistSetting initialWhiteListSetting(UserInfo pdsUserInfo) {
         EntityWhitelistSetting userInfo = getUserFromWhiteList(pdsUserInfo);
         if (!DashboardHelper.isNull(userInfo)) {
             throw new InvalidParameterException("The dashboard could not be duplicated initialed:" + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);

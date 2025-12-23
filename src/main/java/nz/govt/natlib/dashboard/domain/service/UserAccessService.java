@@ -2,7 +2,7 @@ package nz.govt.natlib.dashboard.domain.service;
 
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.core.RosettaWebService;
-import nz.govt.natlib.dashboard.common.metadata.PdsUserInfo;
+import nz.govt.natlib.dashboard.common.metadata.UserInfo;
 import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
 import nz.govt.natlib.dashboard.domain.repo.RepoWhiteList;
 import nz.govt.natlib.dashboard.ui.command.UserAccessRspCommand;
@@ -31,22 +31,16 @@ public class UserAccessService {
     public RestResponseCommand login(String username, String password) {
         RestResponseCommand restResponseCommand = new RestResponseCommand();
 
-        if (DashboardHelper.isNull(username) || DashboardHelper.isNull(password)) {
+        if (DashboardHelper.isEmpty(username) || DashboardHelper.isEmpty(password)) {
             restResponseCommand.setRspCode(RestResponseCommand.RSP_USER_CONFIDENTIAL_REQUIRED);
             return restResponseCommand;
         }
 
-        String pdsHandle;
-        PdsUserInfo pdsUserInfo;
+        UserInfo userInfo;
         try {
-            pdsHandle = rosettaWebService.login(userInstitution, username, password);
-            if (DashboardHelper.isNull(pdsHandle)) {
+            userInfo = rosettaWebService.login(userInstitution, username, password);
+            if (DashboardHelper.isNull(userInfo)) {
                 restResponseCommand.setRspCode(RestResponseCommand.RSP_USER_NAME_PASSWORD_ERROR);
-                return restResponseCommand;
-            }
-            pdsUserInfo = rosettaWebService.getPdsUserByPdsHandle(pdsHandle);
-            if (DashboardHelper.isNull(pdsUserInfo)) {
-                restResponseCommand.setRspCode(RestResponseCommand.RSP_USER_QUERY_ERROR);
                 return restResponseCommand;
             }
         } catch (Exception e) {
@@ -59,7 +53,7 @@ public class UserAccessService {
         EntityWhitelistSetting whitelistSetting = repoWhiteList.getByUserName(username);
         List<EntityWhitelistSetting> whiteListAll = repoWhiteList.getAll();
         if (whitelistSetting == null) {
-            if (whiteListAll.size() > 0) {
+            if (!whiteListAll.isEmpty()) {
                 restResponseCommand.setRspCode(RestResponseCommand.RSP_USER_OTHER_ERROR);
                 restResponseCommand.setRspMsg("Please contact the administrator to privilege the access.");
                 whiteListAll.clear();
@@ -70,23 +64,23 @@ public class UserAccessService {
         }
 
         UserAccessRspCommand userAccessRspCommand = new UserAccessRspCommand();
-        userAccessRspCommand.setPdsHandle(pdsHandle);
-        userAccessRspCommand.setUserInfo(pdsUserInfo);
+        userAccessRspCommand.setsessionId(userInfo.getSessionId());
+        userAccessRspCommand.setUserInfo(userInfo);
         userAccessRspCommand.setUsername(username);
 
         restResponseCommand.setRspBody(userAccessRspCommand);
         return restResponseCommand;
     }
 
-    public RestResponseCommand logout(String pdsHandle) {
+    public RestResponseCommand logout(String sessionId) {
         RestResponseCommand restResponseCommand = new RestResponseCommand();
-        if (DashboardHelper.isNull(pdsHandle)) {
+        if (DashboardHelper.isEmpty(sessionId)) {
             restResponseCommand.setRspCode(RestResponseCommand.RSP_USER_PDS_HANDLE_REQUIRED);
             return restResponseCommand;
         }
 
         try {
-            rosettaWebService.logout(pdsHandle);
+            rosettaWebService.logout(sessionId);
         } catch (Exception e) {
             restResponseCommand.setRspCode(RestResponseCommand.RSP_USER_OTHER_ERROR);
             restResponseCommand.setRspMsg(e.getMessage());

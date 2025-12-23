@@ -80,7 +80,7 @@ public class TestScheduleProcessorBasicImplJobDepositing extends ScheduleProcess
         assert job.getFileCount() == 2;
         assert job.getFileSize() == testFileLength_1 + testFileLength_2;
 
-        assert DashboardHelper.isNull(job.getSipID());
+        assert DashboardHelper.isEmpty(job.getSipID());
     }
 
     @AfterEach

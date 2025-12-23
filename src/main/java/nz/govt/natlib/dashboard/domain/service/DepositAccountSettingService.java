@@ -10,7 +10,6 @@ import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
 import nz.govt.natlib.dashboard.exceptions.BadRequestException;
 import nz.govt.natlib.dashboard.exceptions.SystemErrorException;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +37,14 @@ public class DepositAccountSettingService {
         DashboardHelper.assertNotNull("DepositUserInstitute", account.getDepositUserInstitute());
         DashboardHelper.assertNotNull("DepositUserName", account.getDepositUserName());
         DashboardHelper.assertNotNull("DepositUserPassword", account.getDepositUserPassword());
-//        rosettaWebService.login(account.getDepositUserInstitute(), account.getDepositUserName(), account.getDepositUserPassword());
 
-        String pdsHandle = rosettaWebService.login(account.getDepositUserInstitute(), account.getDepositUserName(), account.getDepositUserPassword());
-        if (StringUtils.isEmpty(pdsHandle)) {
-            String err_msg = "Invalid deposit username or password";
-            log.error(err_msg);
-            throw new BadRequestException(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE, err_msg);
-        }
+        //        With the LDAP authentication mechanism, will not authenticate the account in Rosetta
+        //        String sessionId = rosettaWebService.login(account.getDepositUserInstitute(), account.getDepositUserName(), account.getDepositUserPassword());
+        //        if (StringUtils.isEmpty(sessionId)) {
+        //            String err_msg = "Invalid deposit username or password";
+        //            log.error(err_msg);
+        //            throw new BadRequestException(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE, err_msg);
+        //        }
         repoDepositAccount.save(account);
     }
 
@@ -59,26 +58,27 @@ public class DepositAccountSettingService {
         repoDepositAccount.deleteById(id);
     }
 
-    public EntityDepositAccountSetting getDepositAccountDetail(Long id) throws Exception {
-        EntityDepositAccountSetting account = repoDepositAccount.getById(id);
-        String pdsHandle = null;
-
-        try {
-            pdsHandle = rosettaWebService.login(account.getDepositUserInstitute(), account.getDepositUserName(), account.getDepositUserPassword());
-            if (StringUtils.isEmpty(pdsHandle)) {
-                account.setAuditRst(Boolean.FALSE);
-                account.setAuditMsg("The credential message is not correct");
-            }
-        } catch (Exception e) {
-            account.setAuditRst(Boolean.FALSE);
-            account.setAuditMsg("The credential message is not correct:" + e.getMessage());
-        } finally {
-            if (!StringUtils.isEmpty(pdsHandle)) {
-                rosettaWebService.logout(pdsHandle);
-            }
-        }
-        return account;
-    }
+    //        With the LDAP authentication mechanism, will not authenticate the account in Rosetta
+    //    public EntityDepositAccountSetting getDepositAccountDetail(Long id) throws Exception {
+    //        EntityDepositAccountSetting account = repoDepositAccount.getById(id);
+    //        String sessionId = null;
+    //
+    //        try {
+    //            sessionId = rosettaWebService.login(account.getDepositUserInstitute(), account.getDepositUserName(), account.getDepositUserPassword());
+    //            if (StringUtils.isEmpty(sessionId)) {
+    //                account.setAuditRst(Boolean.FALSE);
+    //                account.setAuditMsg("The credential message is not correct");
+    //            }
+    //        } catch (Exception e) {
+    //            account.setAuditRst(Boolean.FALSE);
+    //            account.setAuditMsg("The credential message is not correct:" + e.getMessage());
+    //        } finally {
+    //            if (!StringUtils.isEmpty(sessionId)) {
+    //                rosettaWebService.logout(sessionId);
+    //            }
+    //        }
+    //        return account;
+    //    }
 
     public void refreshDepositAccountSetting(Long id) {
         RestResponseCommand retVal = new RestResponseCommand();

@@ -1,10 +1,12 @@
 package nz.govt.natlib.dashboard.app;
 
+import nz.govt.natlib.dashboard.common.auth.LdapAuthenticationClient;
 import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import org.apache.catalina.Context;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
@@ -27,14 +29,16 @@ public class MainBasicConfig {
     private String restApiDpsUrl;
     @Value("${Rosetta.RestApiSipUrl}")
     private String restApiSipUrl;
-    @Value("${TestEnabled}")
-    private boolean isTestMode;
+
+
+    @Autowired
+    private LdapAuthenticationClient authClient;
 
 
     @Bean(BeanDefinition.SCOPE_SINGLETON)
     public RosettaWebService rosettaRestApi() throws Exception {
         log.info("Start to initial Rosetta Web Service");
-        RosettaWebService bean = new RosettaWebService(pdsUrl, restApiDpsUrl, restApiSipUrl, isTestMode);
+        RosettaWebService bean = new RosettaWebService(authClient, restApiDpsUrl, restApiSipUrl);
 
         log.info("End to initial Rosetta Web Service");
         return bean;

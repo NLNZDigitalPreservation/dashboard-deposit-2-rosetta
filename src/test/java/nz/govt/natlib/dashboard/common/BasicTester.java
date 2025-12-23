@@ -6,7 +6,7 @@ import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
 import nz.govt.natlib.dashboard.domain.repo.*;
 import nz.govt.natlib.dashboard.domain.service.DepositJobService;
-import nz.govt.natlib.dashboard.util.CustomizedPdsClient;
+import nz.govt.natlib.dashboard.common.auth.LdapAuthenticationClient;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -44,10 +44,10 @@ public class BasicTester {
     protected static final int testFileLength_2 = 219;
 
     protected static final String sipId = "12345";
-    protected static final String pdsHandle = DashboardHelper.getUid();
+    protected static final String sessionId = DashboardHelper.getUid();
 
     protected static RosettaRestApi restApi;
-    protected static CustomizedPdsClient pdsClient;
+    protected static LdapAuthenticationClient authClient = mock(LdapAuthenticationClient.class);
     protected static RepoIdGenerator repoIdGenerator;
     protected static RepoFlowSetting repoFlowSetting;
     protected static RepoDepositJob repoDepositJob;
@@ -56,7 +56,7 @@ public class BasicTester {
     protected static RepoGlobalSetting repoGlobalSetting;
     protected static DepositJobService depositJobService;
 
-    protected static RosettaWebService rosettaWebService = new RosettaWebService("http://localhost", "http://localhost", "http://localhost", true);
+    protected static RosettaWebService rosettaWebService = new RosettaWebService(authClient, "http://localhost", "http://localhost");
 
     public static void init() throws IOException {
         depositAccount.setDepositUserInstitute(INSTITUTION);
@@ -64,10 +64,9 @@ public class BasicTester {
         depositAccount.setDepositUserPassword(PASSWORD);
 
         restApi = mock(RosettaRestApi.class);
-        pdsClient = mock(CustomizedPdsClient.class);
         rosettaWebService.setDpsRestAPI(restApi);
         rosettaWebService.setSipRestAPI(restApi);
-        rosettaWebService.setPdsClient(pdsClient);
+        rosettaWebService.setAuthClient(authClient);
 
         //Initial services
         repoIdGenerator = new RepoIdGenerator();

@@ -35,7 +35,7 @@ public class MetsHandler extends DefaultHandler {
         } else {
             this.keyId = null;
         }
-        if (qName.equalsIgnoreCase("section") && !DashboardHelper.isNull(id) && id.equalsIgnoreCase("generalFileCharacteristics")) {
+        if (qName.equalsIgnoreCase("section") && !DashboardHelper.isEmpty(id) && id.equalsIgnoreCase("generalFileCharacteristics")) {
 //            prop.newGeneralFileCharacters();
             generalFileCharacters = new MetsXmlProperties.GeneralFileCharacters();
             prop.getListFiles().add(generalFileCharacters);
@@ -51,7 +51,7 @@ public class MetsHandler extends DefaultHandler {
             case "section":
 
             case "key":
-                if (DashboardHelper.isNull(this.keyId) || DashboardHelper.isNull(this.elementValue)) {
+                if (DashboardHelper.isEmpty(this.keyId) || DashboardHelper.isEmpty(this.elementValue)) {
                     //Skip
                 } else if (this.keyId.equalsIgnoreCase("objectIdentifierType")) {
                     this.prop.setObjectIdentifierType(this.elementValue);

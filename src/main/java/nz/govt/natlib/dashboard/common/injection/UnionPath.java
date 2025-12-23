@@ -53,7 +53,7 @@ public class UnionPath {
     }
 
     public String getParent() {
-        if (DashboardHelper.isNull(path)) {
+        if (DashboardHelper.isEmpty(path)) {
             return path;
         }
 
@@ -72,7 +72,7 @@ public class UnionPath {
     }
 
     public String getName() {
-        if (DashboardHelper.isNull(path)) {
+        if (DashboardHelper.isEmpty(path)) {
             return path;
         }
 

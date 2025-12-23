@@ -159,7 +159,7 @@ public class InjectionPathScanFTP extends InjectionPathScan {
     public boolean exists(UnionPath f) {
         try {
             String size = ftpClient.getSize(f.getAbsolutePath());
-            return !DashboardHelper.isNull(size);
+            return !DashboardHelper.isEmpty(size);
         } catch (IOException e) {
             log.error("Failed to get size: {}", f.getAbsolutePath());
             return false;

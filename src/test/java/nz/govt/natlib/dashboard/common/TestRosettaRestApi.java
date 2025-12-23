@@ -1,5 +1,6 @@
 package nz.govt.natlib.dashboard.common;
 
+import nz.govt.natlib.dashboard.common.auth.LdapAuthenticationClient;
 import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.core.dto.DtoMaterialFlowRsp;
 import nz.govt.natlib.dashboard.common.core.dto.DtoProducersRsp;
@@ -22,11 +23,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.mockito.Mockito.mock;
+
 public class TestRosettaRestApi {
-    private static final String PDSUrl = "https://slbpdstest.natlib.govt.nz/pds?";
     private static final String RestApiDpsUrl = "https://wlguatdpsilb.natlib.govt.nz/rest/v0";
     private static final String RestApiSipUrl = "https://wlguatoprilb.natlib.govt.nz/rest/v0";
-    private static final RosettaWebService restApi = new RosettaWebService(PDSUrl, RestApiDpsUrl, RestApiSipUrl, true);
+    private static final LdapAuthenticationClient authClient = mock(LdapAuthenticationClient.class);
+    private static final RosettaWebService restApi = new RosettaWebService(authClient, RestApiDpsUrl, RestApiSipUrl);
 
     private static final String _PRODUCER_AGENT_ID = "NLNZ";
     private static final String INSTITUTION = "INS00";
@@ -90,15 +93,15 @@ public class TestRosettaRestApi {
         }
     }
 
-    private static String generateDPSSession(String pid, String pdsHandle) throws IOException, InterruptedException {
+    private static String generateDPSSession(String pid, String sessionId) throws IOException, InterruptedException {
         String deliveryUrl = String.format(
                 "https://slbpdstest.natlib.govt.nz/goto/logon/https://ndhadelivertest.natlib.govt.nz/delivery/DeliveryManagerServlet?dps_pid=%s&pds_handle=%s&calling_system=del&institute=",
-                pid, pdsHandle);
+                pid, sessionId);
 
         ConcurrentHashMap<String, List<String>> cookieHeaders = new ConcurrentHashMap<>();
         CookieHandler cookieHandler = new DeliveryCookieHandler(cookieHeaders);
         List<String> cookies = new ArrayList<>();
-        cookies.add("PDS_HANDLE=" + pdsHandle);
+        cookies.add("PDS_HANDLE=" + sessionId);
         cookies.add("PDSILB03=wlguatrosiapp02");
         cookieHeaders.put("Cookie", cookies);
 

@@ -5,7 +5,6 @@ import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.metadata.ResultOfDeposit;
 import nz.govt.natlib.dashboard.common.metadata.SipStatusInfo;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
-import nz.govt.natlib.dashboard.util.DashboardHelper;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -62,19 +60,6 @@ public class TestDepositJobService extends BasicTester {
     @Disabled
     @Test
     public void testDeposit() {
-        String institution = "INS00";
-        String username = "leefr";
-        String password = "******";
-
-        String pdsHandle = null;
-        try {
-            when(rosettaWebService.login(anyString(), anyString(), anyString())).thenReturn(DashboardHelper.getUid());
-            pdsHandle = rosettaWebService.login(institution, username, password);
-        } catch (Exception e) {
-            e.printStackTrace();
-            assert false;
-        }
-
         String producerId = "6355932079";
         String materialFlowId = "31072513794";
 

@@ -20,11 +20,11 @@ public class DepositAccountSettingController {
         return ResponseEntity.ok().body(ret);
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_DETAIL, method = {RequestMethod.POST, RequestMethod.GET})
-    public ResponseEntity<?> getProducerSettingDetail(@RequestParam("id") Long id) throws Exception {
-        EntityDepositAccountSetting ret = depositAccountSettingService.getDepositAccountDetail(id);
-        return ResponseEntity.ok().body(ret);
-    }
+//    @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_DETAIL, method = {RequestMethod.POST, RequestMethod.GET})
+//    public ResponseEntity<?> getProducerSettingDetail(@RequestParam("id") Long id) throws Exception {
+//        EntityDepositAccountSetting ret = depositAccountSettingService.getDepositAccountDetail(id);
+//        return ResponseEntity.ok().body(ret);
+//    }
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_SAVE, method = {RequestMethod.POST, RequestMethod.GET})
     public ResponseEntity<?> saveProducerSetting(@RequestBody EntityDepositAccountSetting reqCmd) {

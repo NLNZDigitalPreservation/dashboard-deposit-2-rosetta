@@ -1,13 +1,13 @@
 package nz.govt.natlib.dashboard.common.core;
 
-import nz.govt.natlib.dashboard.common.metadata.PdsUserInfo;
+import nz.govt.natlib.dashboard.common.metadata.UserInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.govt.natlib.dashboard.common.core.dto.*;
 import nz.govt.natlib.dashboard.common.metadata.ResultOfDeposit;
 import nz.govt.natlib.dashboard.common.metadata.SipStatusInfo;
 import nz.govt.natlib.dashboard.domain.entity.EntityDepositAccountSetting;
-import nz.govt.natlib.dashboard.util.CustomizedPdsClient;
+import nz.govt.natlib.dashboard.common.auth.LdapAuthenticationClient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -20,20 +20,19 @@ import java.util.List;
 
 public class RosettaWebService {
     private static final Logger log = LoggerFactory.getLogger(RosettaWebService.class);
-    private  RosettaRestApi dpsRestAPI;
-    private  RosettaRestApi sipRestAPI;
-    private CustomizedPdsClient pdsClient;
+    private RosettaRestApi dpsRestAPI;
+    private RosettaRestApi sipRestAPI;
+    private LdapAuthenticationClient authClient;
 
-    public RosettaWebService(String pdsUrl, String restApiDpsUrl, String restApiSipUrl, boolean isTestMode) {
+    public RosettaWebService(LdapAuthenticationClient authClient, String restApiDpsUrl, String restApiSipUrl) {
         this.dpsRestAPI = new RosettaRestApi(restApiDpsUrl);
         this.sipRestAPI = new RosettaRestApi(restApiSipUrl);
-        this.pdsClient = CustomizedPdsClient.getInstance();
-        this.pdsClient.init(pdsUrl, isTestMode);
+        this.authClient = authClient;
     }
 
-    public String login(String institution, String username, String password) throws Exception {
+    public UserInfo login(String institution, String username, String password) throws Exception {
         try {
-            return pdsClient.login(institution, username, password);
+            return authClient.login(institution, username, password);
         } catch (Exception e) {
             String err = String.format("Login failed: institution=%s, username=%s, password=********, %s", institution, username, e.getMessage());
             System.out.println(err);
@@ -41,24 +40,14 @@ public class RosettaWebService {
         }
     }
 
-    public String logout(String pdsHandle) throws Exception {
-        try {
-            return pdsClient.logout(pdsHandle);
-        } catch (Exception e) {
-            String err = String.format("Logout failed: pdsHandle=%s: %s", pdsHandle, e.getMessage());
-            System.out.println(err);
-            throw e;
-        }
-    }
+    /**
+     * Do nothing with LDAP
+     *
+     * @param sessionId
+     * @throws Exception
+     */
+    public void logout(String sessionId) throws Exception {
 
-    public PdsUserInfo getPdsUserByPdsHandle(String pdsHandle) throws Exception {
-        try {
-            return pdsClient.getPdsUserByPdsHandle(pdsHandle);
-        } catch (Exception e) {
-            String err = String.format("Get PdsUserByPdsHandle failed: pdsHandle=%s: %s", pdsHandle, e.getMessage());
-            System.out.println(err);
-            throw e;
-        }
     }
 
 
@@ -218,7 +207,7 @@ public class RosettaWebService {
         this.sipRestAPI = sipRestAPI;
     }
 
-    public void setPdsClient(CustomizedPdsClient pdsClient) {
-        this.pdsClient = pdsClient;
+    public void setAuthClient(LdapAuthenticationClient authClient) {
+        this.authClient = authClient;
     }
 }

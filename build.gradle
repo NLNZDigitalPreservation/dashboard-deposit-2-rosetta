@@ -41,10 +41,10 @@ test {
 }
 
 group = 'deposit-dashboard'
-version = '2.0.1'
+version = '2.1.0'
 description = 'Dashboard Tool'
-sourceCompatibility = '1.11'
-targetCompatibility = '1.11'
+sourceCompatibility = '1.17'
+targetCompatibility = '1.17'
 
 tasks.register('sourcesJar', Jar) {
     archiveClassifier.set('sources')
@@ -100,10 +100,10 @@ tasks.register('copyUI', Copy) {
     }
 }
 
-clean {
-    dependsOn tasks.cleanUI
-}
-
-processResources {
-    dependsOn tasks.copyUI
-}
+//clean {
+//    dependsOn tasks.cleanUI
+//}
+//
+//processResources {
+//    dependsOn tasks.copyUI
+//}

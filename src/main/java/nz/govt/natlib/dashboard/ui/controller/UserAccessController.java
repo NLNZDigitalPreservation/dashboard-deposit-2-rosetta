@@ -1,6 +1,6 @@
 package nz.govt.natlib.dashboard.ui.controller;
 
-import nz.govt.natlib.dashboard.common.metadata.PdsUserInfo;
+import nz.govt.natlib.dashboard.common.metadata.UserInfo;
 import nz.govt.natlib.dashboard.app.MainSecurityConfig;
 import nz.govt.natlib.dashboard.common.auth.Sessions;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
@@ -42,49 +42,41 @@ public class UserAccessController {
 
     @RequestMapping(path = DashboardConstants.PATH_USER_LOGIN_API, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<?> login(@RequestBody UserAccessReqCommand cmd, HttpServletRequest req, HttpServletResponse rsp) throws Exception {
-        String pdsHandle = null;
+        UserInfo userInfo;
         try {
-            pdsHandle = rosettaWebService.login("INS00", cmd.getUsername(), cmd.getPassword());
+            userInfo = rosettaWebService.login("INS00", cmd.getUsername(), cmd.getPassword());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage() + ":" + RestResponseCommand.RSP_NETWORK_EXCEPTION);
         }
 
-        PdsUserInfo pdsUserInfo;
-        try {
-            pdsUserInfo = rosettaWebService.getPdsUserByPdsHandle(pdsHandle);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage() + ":" + RestResponseCommand.RSP_NETWORK_EXCEPTION);
+        if (DashboardHelper.isNull(userInfo) || DashboardHelper.isEmpty(userInfo.getUserName())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to authenticate the credential " + RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
         }
 
         if (!isTestMode) {
-            if (!DashboardHelper.isNull(pdsUserInfo.getUserName())) {
-                //To initial the system: save the current user as the first admin user.
-                if (whitelistService.isEmptyWhiteList()) {
-                    EntityWhitelistSetting whitelist = new EntityWhitelistSetting();
-                    whitelist.setWhiteUserName(pdsUserInfo.getUserName());
-                    whitelist.setWhiteUserRole(EnumUserRole.admin.name());
-                    whitelistService.saveWhitelistSetting(whitelist);
-                } else if (!whitelistService.isInWhiteList(pdsUserInfo)) {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No privilege: not in the white list " + RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
-                }
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to authenticate the credential " + RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
+            //To initial the system: save the current user as the first admin user.
+            if (whitelistService.isEmptyWhiteList()) {
+                EntityWhitelistSetting whitelist = new EntityWhitelistSetting();
+                whitelist.setWhiteUserName(userInfo.getUserName());
+                whitelist.setWhiteUserRole(EnumUserRole.admin.name());
+                whitelistService.saveWhitelistSetting(whitelist);
+            } else if (!whitelistService.isInWhiteList(userInfo)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No privilege: not in the white list " + RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
             }
         }
 
-        pdsUserInfo.setPid(pdsHandle);
         EntityWhitelistSetting whitelistUser = whitelistService.getUserFromWhiteList(cmd.getUsername());
         if (whitelistUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No privilege: not in the white list " + RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
         }
 
         try {
-            sessions.addSession(pdsHandle, whitelistUser.getWhiteUserName(), whitelistUser.getWhiteUserRole(), EXPIRE_INTERNAL);
+            sessions.addSession(userInfo.getSessionId(), whitelistUser.getWhiteUserName(), whitelistUser.getWhiteUserRole(), EXPIRE_INTERNAL, userInfo.getDisplayName());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to authenticate: " + e.getMessage());
         }
 
-        return ResponseEntity.ok().body(pdsHandle);
+        return ResponseEntity.ok().body(userInfo.getSessionId());
     }
 
     @RequestMapping(path = DashboardConstants.PATH_USER_LOGOUT_API, method = {RequestMethod.POST, RequestMethod.GET})

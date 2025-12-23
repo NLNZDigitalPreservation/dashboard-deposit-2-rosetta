@@ -58,15 +58,16 @@ public class FlowSettingService {
             throw new InvalidParameterException("The Deposit Account does not exist, depositAccountId:" + flowSetting.getDepositAccountId());
         }
 
-        String pdsHandle;
-        try {
-            pdsHandle = rosettaWebService.login(depositAccount.getDepositUserInstitute(), depositAccount.getDepositUserName(), depositAccount.getDepositUserPassword());
-        } catch (Exception e) {
-            throw new WebServiceException(e);
-        }
-        if (DashboardHelper.isNull(pdsHandle)) {
-            throw new WebServiceException("Could not access platform with given institution, username and password.");
-        }
+        //        With the LDAP authentication mechanism, will not authenticate the account in Rosetta
+        //        String sessionId;
+        //        try {
+        //            sessionId = rosettaWebService.login(depositAccount.getDepositUserInstitute(), depositAccount.getDepositUserName(), depositAccount.getDepositUserPassword());
+        //        } catch (Exception e) {
+        //            throw new WebServiceException(e);
+        //        }
+        //        if (DashboardHelper.isEmpty(sessionId)) {
+        //            throw new WebServiceException("Could not access platform with given institution, username and password.");
+        //        }
 
         //Verify ProduceId and MaterialFlowId
         try {

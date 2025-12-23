@@ -1,14 +1,14 @@
 package nz.govt.natlib.dashboard.ui.command;
 
 
-import nz.govt.natlib.dashboard.common.metadata.PdsUserInfo;
+import nz.govt.natlib.dashboard.common.metadata.UserInfo;
 
 import java.util.List;
 
 public class UserAccessRspCommand {
     private String username;
-    private String pdsHandle;
-    private PdsUserInfo userInfo;
+    private String sessionId;
+    private UserInfo userInfo;
 
     private List<RawProducerCommand> producers;
 
@@ -20,19 +20,19 @@ public class UserAccessRspCommand {
         this.username = username;
     }
 
-    public String getPdsHandle() {
-        return pdsHandle;
+    public String getsessionId() {
+        return sessionId;
     }
 
-    public void setPdsHandle(String pdsHandle) {
-        this.pdsHandle = pdsHandle;
+    public void setsessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 
-    public PdsUserInfo getUserInfo() {
+    public UserInfo getUserInfo() {
         return userInfo;
     }
 
-    public void setUserInfo(PdsUserInfo userInfo) {
+    public void setUserInfo(UserInfo userInfo) {
         this.userInfo = userInfo;
     }
 

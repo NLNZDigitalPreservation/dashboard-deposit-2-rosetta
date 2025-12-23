@@ -9,8 +9,8 @@ import java.time.ZoneOffset;
 import java.util.UUID;
 
 public class DashboardHelper {
-    public static boolean isNull(String s) {
-        return s == null || s.trim().length() == 0;
+    public static boolean isEmpty(String s) {
+        return s == null || s.trim().isEmpty();
     }
 
     public static boolean isNull(Object o) {
@@ -18,7 +18,7 @@ public class DashboardHelper {
     }
 
     public static void assertNotNull(String sName, String sValue) throws NullParameterException {
-        if (sValue == null || sValue.trim().length() == 0) {
+        if (sValue == null || sValue.trim().isEmpty()) {
             throw new NullParameterException(sName + " can not be empty.");
         }
     }

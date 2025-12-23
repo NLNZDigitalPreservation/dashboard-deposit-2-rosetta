@@ -5,6 +5,7 @@ import nz.govt.natlib.dashboard.common.exception.InvalidParameterException;
 import nz.govt.natlib.dashboard.common.exception.NullParameterException;
 import nz.govt.natlib.dashboard.common.exception.WebServiceException;
 import nz.govt.natlib.dashboard.common.injection.InjectionUtils;
+import nz.govt.natlib.dashboard.common.metadata.UserInfo;
 import nz.govt.natlib.dashboard.domain.entity.EntityFlowSetting;
 import nz.govt.natlib.dashboard.domain.entity.EntityStorageLocation;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -33,7 +33,7 @@ public class TestFlowSettingService extends BasicTester {
 
         //Set mock data
         try {
-            when(pdsClient.login(anyString(), anyString(), anyString())).thenReturn(UUID.randomUUID().toString());
+            when(authClient.login(any(), anyString(), anyString())).thenReturn(new UserInfo());
             String producers = readResourceFile("data/producers.json");
             when(restApi.fetch(any(), any(), eq("/producers"), any())).thenReturn(producers);
             String producerDetail = readResourceFile("data/producer-detail.json");
@@ -129,7 +129,6 @@ public class TestFlowSettingService extends BasicTester {
 
         EntityFlowSetting rst;
         try {
-            when(pdsClient.login(anyString(), anyString(), anyString())).thenReturn(UUID.randomUUID().toString());
             rst = testInstance.saveFlowSetting(flowSetting);
             assert rst != null;
             assert !DashboardHelper.isNull(rst.getId());
@@ -147,7 +146,6 @@ public class TestFlowSettingService extends BasicTester {
 
         EntityFlowSetting rst = null;
         try {
-            when(pdsClient.login(anyString(), anyString(), anyString())).thenReturn(UUID.randomUUID().toString());
             rst = testInstance.saveFlowSetting(flowSetting);
             assert rst != null;
             assert !DashboardHelper.isNull(rst.getId());
