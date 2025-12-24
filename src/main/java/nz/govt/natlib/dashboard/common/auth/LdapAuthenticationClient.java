@@ -58,7 +58,7 @@ public class LdapAuthenticationClient {
         userInfo.setInstitution(institution);
         userInfo.setUserName(username);
 
-        if (isTestMode || DashboardHelper.isEmpty(this.ldapEnable) || this.ldapEnable.equalsIgnoreCase("true") || this.ldapEnable.equalsIgnoreCase("yes")) {
+        if (isTestMode || DashboardHelper.isEmpty(this.ldapEnable) || this.ldapEnable.equalsIgnoreCase("false") || this.ldapEnable.equalsIgnoreCase("no")) {
             userInfo.setSessionId("241200811372143992420081372111");
             userInfo.setDisplayName("Test User");
             return userInfo;
