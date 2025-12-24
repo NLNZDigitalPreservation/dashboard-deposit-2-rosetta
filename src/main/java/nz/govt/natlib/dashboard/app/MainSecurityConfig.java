@@ -3,6 +3,7 @@ package nz.govt.natlib.dashboard.app;
 
 import nz.govt.natlib.dashboard.common.auth.HttpAccessManagementFilter;
 import nz.govt.natlib.dashboard.common.auth.Sessions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,9 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 @Configuration
 @EnableWebSecurity
 public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    private Sessions sessions;
+
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
 //        http.csrf().disable()
@@ -33,16 +37,21 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().sameOrigin();
     }
 
-    @Bean
-    public Sessions sessions() {
-        Sessions bean = new Sessions();
-        return bean;
-    }
+//    @Bean
+//    public Sessions sessions() {
+//        Sessions bean = new Sessions();
+//        return bean;
+//    }
 
     @Bean
     public HttpAccessManagementFilter httpAccessManagementFilter() {
         HttpAccessManagementFilter bean = new HttpAccessManagementFilter();
-        bean.setSessions(sessions());
+        bean.setSessions(sessions);
         return bean;
     }
+
+//    @Bean
+//    public LdapAuthenticationClient authClient() {
+//        return new LdapAuthenticationClient();
+//    }
 }

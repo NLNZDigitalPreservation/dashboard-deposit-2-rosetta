@@ -56,49 +56,49 @@ tasks.register('testsJar', Jar) {
     from(sourceSets.test.output)
 }
 
-tasks.register('cleanUI', Delete) {
-    group = "BuildUI"
-    description = "Remove the dist folder and webapp folder"
-    delete './ui/dist', './src/main/resources/static/'
-    followSymlinks = true
-    doLast {
-        println 'UI cleaning done!'
-    }
-}
-
-tasks.register('installUI', Exec) {
-    group = "BuildUI"
-    description = "Install the dependencies for UI"
-    workingDir './ui'
-    commandLine 'npm', 'install'
-    doLast {
-        println 'UI installation done!'
-    }
-}
-
-tasks.register('buildUI', Exec) {
-    group = "BuildUI"
-    description = "Run npm install and build-only"
-    dependsOn tasks.installUI
-    workingDir './ui'
-    commandLine 'npm', 'run', 'build-only'
-    doLast {
-        println 'UI building done!'
-    }
-}
-
-
-tasks.register('copyUI', Copy) {
-    group = "BuildUI"
-    description = "Copy the files from dist folder to webapp folder"
-    dependsOn tasks.buildUI
-    from './ui/dist'
-    into './src/main/resources/static'
-    doLast {
-        println 'UI copying done!'
-        println 'All UI tasks done!'
-    }
-}
+//tasks.register('cleanUI', Delete) {
+//    group = "BuildUI"
+//    description = "Remove the dist folder and webapp folder"
+//    delete './ui/dist', './src/main/resources/static/'
+//    followSymlinks = true
+//    doLast {
+//        println 'UI cleaning done!'
+//    }
+//}
+//
+//tasks.register('installUI', Exec) {
+//    group = "BuildUI"
+//    description = "Install the dependencies for UI"
+//    workingDir './ui'
+//    commandLine 'npm', 'install'
+//    doLast {
+//        println 'UI installation done!'
+//    }
+//}
+//
+//tasks.register('buildUI', Exec) {
+//    group = "BuildUI"
+//    description = "Run npm install and build-only"
+//    dependsOn tasks.installUI
+//    workingDir './ui'
+//    commandLine 'npm', 'run', 'build-only'
+//    doLast {
+//        println 'UI building done!'
+//    }
+//}
+//
+//
+//tasks.register('copyUI', Copy) {
+//    group = "BuildUI"
+//    description = "Copy the files from dist folder to webapp folder"
+//    dependsOn tasks.buildUI
+//    from './ui/dist'
+//    into './src/main/resources/static'
+//    doLast {
+//        println 'UI copying done!'
+//        println 'All UI tasks done!'
+//    }
+//}
 
 //clean {
 //    dependsOn tasks.cleanUI

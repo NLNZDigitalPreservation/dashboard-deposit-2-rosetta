@@ -3,7 +3,7 @@ package nz.govt.natlib.dashboard.common.auth;
 import nz.govt.natlib.dashboard.common.metadata.UserInfo;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
@@ -15,7 +15,8 @@ import javax.naming.ldap.LdapContext;
 import javax.naming.directory.Attribute;
 import java.util.Hashtable;
 
-@Component
+
+@Service
 public class LdapAuthenticationClient {
     @Value("${TestEnabled}")
     private boolean isTestMode;
@@ -48,7 +49,7 @@ public class LdapAuthenticationClient {
     private String ldapContextSourceManagerPassword;
 
 
-    private LdapAuthenticationClient() {
+    public LdapAuthenticationClient() {
     }
 
 

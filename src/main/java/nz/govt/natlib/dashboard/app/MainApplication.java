@@ -11,7 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"nz.govt.natlib.dashboard.app", "nz.govt.natlib.dashboard.domain.daemon", "nz.govt.natlib.dashboard.domain", "nz.govt.natlib.dashboard.ui"})
+@ComponentScan(basePackages = {"nz.govt.natlib.dashboard.app", "nz.govt.natlib.dashboard.common.auth", "nz.govt.natlib.dashboard.domain.daemon", "nz.govt.natlib.dashboard.domain", "nz.govt.natlib.dashboard.ui"})
 public class MainApplication implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(MainApplication.class);
 

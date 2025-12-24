@@ -12,14 +12,12 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-//import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.lang.Exception;
 
 @Configuration
 public class MainBasicConfig {
     private final static Logger log = LoggerFactory.getLogger(MainBasicConfig.class);
-//    private final static String JE_LOG_FILE_MAX = Long.toString(512 * 1014 * 1014);
 
     @Value("${system.storage.path}")
     private String systemStoragePath;
@@ -44,14 +42,7 @@ public class MainBasicConfig {
         return bean;
     }
 
-//    @Bean
-//    public FreeMarkerConfigurer freeMarkerConfigurer() {
-//        log.info("Start to initial FreeMarkerConfigure");
-//        FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
-//        freeMarkerConfigurer.setTemplateLoaderPath("/app");
-//        log.info("End to initial FreeMarkerConfigure");
-//        return freeMarkerConfigurer;
-//    }
+
 
     @Bean
     public TomcatServletWebServerFactory tomcatFactory() {

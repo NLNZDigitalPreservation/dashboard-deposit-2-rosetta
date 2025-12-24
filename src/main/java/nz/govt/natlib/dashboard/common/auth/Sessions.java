@@ -1,13 +1,13 @@
 package nz.govt.natlib.dashboard.common.auth;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Basically a look-up table, containing a map of session IDs to session info structs
  */
-@Component
+@Service
 public class Sessions {
     private final ConcurrentHashMap<String, SessionInfo> sessionMap = new ConcurrentHashMap<>();
 
