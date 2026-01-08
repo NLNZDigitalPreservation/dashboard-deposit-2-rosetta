@@ -31,3 +31,6 @@ A primary use case for this solution is scanning the given root location of each
 ## Container
 ### Build
 podman build --secret id=host-certs,src=/etc/ssl/certs/ca-certificates.crt -t deposit-dashboard .
+
+### Run Spring Boot
+mvn spring-boot:run

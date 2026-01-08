@@ -35,6 +35,9 @@ case $CMD in
   run)
       ./gradlew clean bootRun
       ;;
+  *)
+      mvn clean package -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -DskipTests
+      ;;
 esac
 
 echo "End"
