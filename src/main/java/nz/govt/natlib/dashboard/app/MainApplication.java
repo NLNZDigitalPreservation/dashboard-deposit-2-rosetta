@@ -9,6 +9,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"nz.govt.natlib.dashboard.app", "nz.govt.natlib.dashboard.common.auth", "nz.govt.natlib.dashboard.domain.daemon", "nz.govt.natlib.dashboard.domain", "nz.govt.natlib.dashboard.ui"})
@@ -23,6 +25,8 @@ public class MainApplication implements CommandLineRunner {
 
     //    @Autowired
     private final ApplicationContext ctx;
+    @Autowired
+    private Environment env;
 
     public MainApplication(ApplicationContext ctx) {
         this.ctx = ctx;
@@ -47,6 +51,10 @@ public class MainApplication implements CommandLineRunner {
             System.out.println(ANSI_CYAN + beanName + ANSI_RESET);
 //            log.info(beanName);
         }
+
+        System.out.println(ANSI_CYAN + "----env variables----" + ANSI_RESET);
+        System.out.println("ldap.enable = " + env.getProperty("ldap.enable"));
+        System.out.println("ldap.url = " + env.getProperty("ldap.url"));
 
         System.out.println(ANSI_BLUE + "^_^_^_^_^_^_^_^_^_^ Dashboard Initialed ^_^_^_^_^_^_^_^_^_^_^" + ANSI_RESET);
 //          log.info("^_^_^_^_^_^_^_^_^_^ Dashboard Initialed ^_^_^_^_^_^_^_^_^_^_^");

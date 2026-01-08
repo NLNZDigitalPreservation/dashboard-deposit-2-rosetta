@@ -35,3 +35,6 @@ podman build -t deposit-dashboard .
 
 ### Run Spring Boot
 mvn spring-boot:run
+
+### Debug
+maven:3.9.9-eclipse-temurin-17

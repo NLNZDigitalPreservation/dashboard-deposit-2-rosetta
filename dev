@@ -36,7 +36,7 @@ CONTAINER_COMPOSE=$(select_container_compose)
 
 case $CMD in
     build)
-    eval "$CONTAINER_ENGINE build -f Dockerfile --tag ${docker_name} ."
+    eval "$CONTAINER_ENGINE build -f Dockerfile --no-cache --tag ${docker_name} ."
     ;;
 
     up)

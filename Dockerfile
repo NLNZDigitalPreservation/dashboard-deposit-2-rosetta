@@ -9,8 +9,9 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 # Set workdir
 WORKDIR /deployment/dashboard
 
-RUN git config --global http.sslVerify false && \
-    git clone --branch containerize2 --depth 1 https://github.com/NLNZDigitalPreservation/dashboard-deposit-2-rosetta.git /deployment/dashboard
+# RUN git config --global http.sslVerify false && \
+#     git clone --branch containerize2 --depth 1 https://github.com/NLNZDigitalPreservation/dashboard-deposit-2-rosetta.git /deployment/dashboard
+COPY . .
 
 RUN npm config set strict-ssl false && \
     bash build.sh && \

@@ -37,8 +37,8 @@ public class UserAccessController {
     private RosettaWebService rosettaWebService;
     @Autowired
     private WhitelistSettingService whitelistService;
-    @Value("${TestEnabled}")
-    private boolean isTestMode;
+    @Value("${ldap.enable}")
+    private String ldapEnable;
 
     @RequestMapping(path = DashboardConstants.PATH_USER_LOGIN_API, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<?> login(@RequestBody UserAccessReqCommand cmd, HttpServletRequest req, HttpServletResponse rsp) throws Exception {
@@ -53,7 +53,7 @@ public class UserAccessController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to authenticate the credential " + RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
         }
 
-        if (!isTestMode) {
+        if (!(DashboardHelper.isEmpty(ldapEnable) || ldapEnable.equalsIgnoreCase("false") || ldapEnable.equalsIgnoreCase("no"))) {
             //To initial the system: save the current user as the first admin user.
             if (whitelistService.isEmptyWhiteList()) {
                 EntityWhitelistSetting whitelist = new EntityWhitelistSetting();
