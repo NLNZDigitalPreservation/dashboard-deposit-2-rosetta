@@ -6,6 +6,8 @@ services:
     restart: always
     ports:
       - "1901:1901"
+    env_file:
+      - .env
     volumes:
       - /exlibris/dps/nlnz_tools/dashboard:/exlibris/dps/nlnz_tools/dashboard
       - /mnt/d/data:/mnt/d/data

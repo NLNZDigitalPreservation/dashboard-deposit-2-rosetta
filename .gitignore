@@ -25,3 +25,5 @@ gradle-app.setting
 src/main/resources/static/
 /**/application-dep.properties
 target/
+
+.env
