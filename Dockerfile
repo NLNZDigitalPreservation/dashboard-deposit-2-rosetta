@@ -6,24 +6,11 @@ RUN apt-get update && \
 
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
-# Add host certificates using BuildKit secret
-# RUN --mount=type=secret,id=host-certs,target=/usr/local/share/ca-certificates/host.crt \
-#     update-ca-certificates
-
-# RUN --mount=type=secret,id=host-certs,target=/tmp/host.crt \
-#     keytool -importcert -trustcacerts -alias host \
-#         -file /tmp/host.crt \
-#         -keystore ${JAVA_HOME}/lib/security/cacerts \
-#         -storepass changeit \
-#         -noprompt
-
 # Set workdir
-WORKDIR /deployment
+WORKDIR /deployment/dashboard
 
 RUN git config --global http.sslVerify false && \
-    git clone --branch containerize2 --depth 1 https://github.com/NLNZDigitalPreservation/dashboard-deposit-2-rosetta.git dashboard
-
-WORKDIR /deployment/dashboard
+    git clone --branch containerize2 --depth 1 https://github.com/NLNZDigitalPreservation/dashboard-deposit-2-rosetta.git /deployment/dashboard
 
 RUN npm config set strict-ssl false && \
     bash build.sh && \
@@ -32,9 +19,7 @@ RUN npm config set strict-ssl false && \
 
 EXPOSE 1901
 
-# FROM eclipse-temurin:17-jdk
-# FROM docker.io/eclipse-temurin:17-jdk-alpine
-# FROM docker.io/azul/zulu-openjdk-alpine:17-jre-headless
+
 FROM docker.io/eclipse-temurin:17-jre-alpine
 
 
