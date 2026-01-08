@@ -27,3 +27,7 @@ A primary use case for this solution is scanning the given root location of each
 2. Execute the shell script to start dashboard: ./startup.sh
 3. Execute the shell script to stop dashboard: ./shutdown.sh
 
+
+## Container
+### Build
+podman build --secret id=host-certs,src=/etc/ssl/certs/ca-certificates.crt -t deposit-dashboard .

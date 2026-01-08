@@ -7,7 +7,7 @@ echo "Current directory: ${PROJECT_DIR}"
 
 cd ${PROJECT_DIR}/ui
 rm -rf dist/
-echo "Clean the dist folder of UI"
+echo "Cleaned the dist folder of UI"
 npm install
 echo "Installed the dependencies of UI"
 npm audit fix
@@ -25,6 +25,8 @@ echo "Copied the dist files to the static folder"
 cd ${PROJECT_DIR}
 
 CMD=$1
+
+export GRADLE_OPTS="-Dorg.gradle.internal.http.socketTimeout=60000 -Dorg.gradle.internal.http.connectionTimeout=60000 -Djavax.net.ssl.trustStoreType=JKS -Djavax.net.ssl.trustStore=/dev/null -Djavax.net.ssl.trustStorePassword=changeit"
 
 case $CMD in
   build)
