@@ -1,0 +1,39 @@
+# DO NOT include azure-functions-fixity_worker in this file
+# The Python Worker is managed by Azure Functions platform
+# Manually managing azure-functions-fixity_worker may cause unexpected issues
+
+azure-functions
+azure-functions-durable
+azure-storage-blob~=12.25.1
+orjson~=3.10.18
+oracledb~=3.1.1
+xmltodict~=0.14.2
+requests~=2.32.3
+dacite~=1.9.2
+
+azure-core~=1.34.0
+python-dotenv~=1.1.0
+falcon~=4.0.2
+CherryPy~=18.10.0
+peewee~=3.18.1
+PyMySQL~=1.1.1
+mysql-connector-python~=9.3.0
+portalocker~=3.1.1
+
+dotenv~=0.9.9
+pytest~=8.3.5
+requests-mock~=1.12.1
+
+black~=25.1.0
+isort~=6.0.1
+psycopg[binary,pool]~=3.2.9
+
+
+python-dateutil~=2.9.0.post0
+psycopg-pool~=3.2.6
+lmdb~=1.7.5
+#azure-cli~=2.76.0
+ldap3~=2.9.1
+
+#For sql formatter
+sqlfluff~=3.5.0

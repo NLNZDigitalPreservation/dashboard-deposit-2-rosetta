@@ -1,0 +1,22 @@
+{
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": [
+    "--line-length",
+    "200"
+  ],
+  "sqlfluff.executablePath": "${workspaceFolder}/.venv/bin/sqlfluff",
+  "sqlfluff.linter.diagnosticSeverity": "error",
+  "sqlfluff.linter.diagnosticSeverityByRule": [
+    {
+      "rule": "L010",
+      "severity": "warning"
+    }
+  ],
+  "sqltools.connections": [],
+  "python.envFile": "${workspaceFolder}/.env"
+}
