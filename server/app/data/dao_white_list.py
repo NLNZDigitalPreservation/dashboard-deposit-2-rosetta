@@ -7,7 +7,7 @@ class RepoWhiteList(DAOAbstract):
         super().__init__(args, "white_list", Whitelist)
 
     def get_by_username(self, username):
-        for user in self.all_data():
-            if user.username == username:
-                return user
+        for item in self.all_data():
+            if item.username == username:
+                return item
         return None

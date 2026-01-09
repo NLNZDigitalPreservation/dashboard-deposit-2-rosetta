@@ -1,9 +1,4 @@
-from app.data.dao_deposit_account import RepoDepositAccount
-from app.data.dao_white_list import RepoWhiteList
-from app.data.dao_flow_setting import RepoFlowSetting
-from app.data.dao_deposit_job import RepoDepositJob
-from app.data.dao_deposit_job_history import RepoDepositJobHistory
-from app.data.dao_global_setting import RepoGlobalSetting
+from app.data import *
 
 
 class DataRepository:

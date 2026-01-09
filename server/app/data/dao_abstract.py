@@ -2,7 +2,6 @@ from dataclasses import is_dataclass, asdict
 import os
 import threading
 from common.db.lmdb_provider import LMDBWriter, LMDBReader
-from common.utils.dataclass_utils import dict_as_camel_dict
 
 
 class IdGenerator:
@@ -55,11 +54,9 @@ class DAOAbstract:
             return None
         return self.data_clazz(**data)
 
-    def get_as_camel_dict(self, data_id):
+    def get_dict(self, data_id):
         data = self.db_reader.get(data_id)
-        if data is None:
-            return None
-        return dict_as_camel_dict(data)
+        return data
 
     def all_keys(self):
         return self.db_reader.all_keys()
@@ -70,10 +67,10 @@ class DAOAbstract:
             datasets.append(self.data_clazz(**data))
         return datasets
 
-    def all_data_as_camel_dict(self):
+    def all_data_dict(self):
         datasets = []
         for data in self.db_reader.all_data():
-            datasets.append(dict_as_camel_dict(data))
+            datasets.append(data)
         return datasets
 
     def close(self):

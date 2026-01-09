@@ -4,15 +4,13 @@ from typing import List, Optional
 from enum import Enum
 
 
-# Helper Enums (Assuming these exist based on your Java imports)
+# Helper Enums
 class EnumDepositJobStage(Enum):
-    # Add actual stages here
     START = "START"
     END = "END"
 
 
 class EnumDepositJobState(Enum):
-    # Add actual states here
     RUNNING = "RUNNING"
     FINISHED = "FINISHED"
 
@@ -25,87 +23,81 @@ class EnumUserRole(Enum):
 @dataclass
 class EntityCommon:
     id: Optional[int] = None
-    audit_rst: bool = True
-    audit_msg: str = "OK"
+    auditRst: bool = True
+    auditMsg: str = "OK"
 
 
 @dataclass
 class GlobalSetting(EntityCommon):
     paused: bool = False
-    paused_start_time: Optional[str] = None
-    paused_end_time: Optional[str] = None
+    pausedStartTime: Optional[str] = None
+    pausedEndTime: Optional[str] = None
     delays: Optional[int] = None
-    delay_unit: str = "S"
+    delayUnit: str = "S"
 
     @property
-    def delay_time_unit_seconds(self) -> int:
-        """
-        Python doesn't have a built-in TimeUnit like Java.
-        This returns the multiplier for seconds.
-        """
+    def delayTimeUnitSeconds(self) -> int:
         mapping = {"S": 1, "M": 60, "H": 3600, "D": 86400}
-        return mapping.get(self.delay_unit.upper(), 1)
+        return mapping.get(self.delayUnit.upper(), 1)
 
 
 @dataclass
 class DepositAccount(EntityCommon):
-    deposit_user_institute: Optional[str] = None
-    deposit_user_name: Optional[str] = None
-    deposit_user_password: Optional[str] = None
-    # Assuming DtoProducersRsp.Producer is a dictionary or another class
-    producers: list = field(default_factory=list)
+    depositUserInstitute: Optional[str] = None
+    depositUserName: Optional[str] = None
+    depositUserPassword: Optional[str] = None
 
     def __str__(self):
-        return f"{self.deposit_user_name}-{self.deposit_user_institute}:*****"
+        return f"{self.depositUserName}-{self.depositUserInstitute}:*****"
 
 
 @dataclass
 class FlowSetting(EntityCommon):
     enabled: bool = False
-    deposit_account_id: Optional[int] = None
-    material_flow_id: Optional[str] = None
-    material_flow_name: Optional[str] = None
-    producer_id: Optional[str] = None
-    producer_name: Optional[str] = None
-    root_path: Optional[str] = None
-    stream_location: Optional[str] = None
-    injection_complete_file_name: Optional[str] = None
-    max_active_days: Optional[int] = None
-    max_save_days: Optional[int] = None
+    depositAccountId: Optional[int] = None
+    materialFlowId: Optional[str] = None
+    materialFlowName: Optional[str] = None
+    producerId: Optional[str] = None
+    producerName: Optional[str] = None
+    rootPath: Optional[str] = None
+    streamLocation: Optional[str] = None
+    injectionCompleteFileName: Optional[str] = None
+    maxActiveDays: Optional[int] = None
+    maxSaveDays: Optional[int] = None
     delays: Optional[int] = None
-    delay_unit: Optional[str] = None
-    weekly_max_concurrency: list[int] = field(default_factory=lambda: [0] * 7)
-    actual_content_delete_options: Optional[str] = None
-    backup_enabled: Optional[bool] = None
-    actual_content_backup_options: Optional[str] = None
-    backup_path: Optional[str] = None
-    backup_sub_folders: Optional[str] = None
+    delayUnit: Optional[str] = None
+    weeklyMaxConcurrency: list[int] = field(default_factory=lambda: [0] * 7)
+    actualContentDeleteOptions: Optional[str] = None
+    backupEnabled: Optional[bool] = None
+    actualContentBackupOptions: Optional[str] = None
+    backupPath: Optional[str] = None
+    backupSubFolders: Optional[str] = None
 
 
 @dataclass
 class DepositJob(EntityCommon):
-    initial_time: Optional[int] = None
-    latest_time: Optional[int] = None
-    deposit_start_time: Optional[int] = None
-    deposit_end_time: Optional[int] = None
-    finalized_time: Optional[int] = None
-    finished_time: Optional[int] = None
-    injection_path: Optional[str] = None
-    injection_title: Optional[str] = None
-    file_count: int = 0
-    file_size: int = 0
-    is_successful: bool = False
-    sip_id: Optional[str] = None
-    sip_module: Optional[str] = None
-    sip_stage: Optional[str] = None
-    sip_status: Optional[str] = None
+    initialTime: Optional[int] = None
+    latestTime: Optional[int] = None
+    depositStartTime: Optional[int] = None
+    depositEndTime: Optional[int] = None
+    finalizedTime: Optional[int] = None
+    finishedTime: Optional[int] = None
+    injectionPath: Optional[str] = None
+    injectionTitle: Optional[str] = None
+    fileCount: int = 0
+    fileSize: int = 0
+    isSuccessful: bool = False
+    sipId: Optional[str] = None
+    sipModule: Optional[str] = None
+    sipStage: Optional[str] = None
+    sipStatus: Optional[str] = None
     stage: Optional[EnumDepositJobStage] = None
     state: Optional[EnumDepositJobState] = None
-    deposit_set_id: Optional[str] = None
-    result_message: Optional[str] = None
-    applied_flow_setting: Optional[FlowSetting] = None
-    actual_content_deleted: bool = False
-    backup_completed: bool = False
+    depositSetId: Optional[str] = None
+    resultMessage: Optional[str] = None
+    appliedFlowSetting: Optional[FlowSetting] = None
+    actualContentDeleted: bool = False
+    backupCompleted: bool = False
 
 
 @dataclass
@@ -122,14 +114,14 @@ class EntityID:
 
 @dataclass
 class EntityStorageLocation:
-    scan_mode: Optional[str] = None
-    root_path: Optional[str] = None
-    ftp_server: Optional[str] = None
-    ftp_port: int = 21
-    ftp_username: Optional[str] = None
-    ftp_password: Optional[str] = None
-    ftp_proxy_enabled: bool = False
-    ftp_proxy_host: Optional[str] = None
-    ftp_proxy_port: int = 0
-    ftp_proxy_username: Optional[str] = None
-    ftp_proxy_password: Optional[str] = None
+    scanMode: Optional[str] = None
+    rootPath: Optional[str] = None
+    ftpServer: Optional[str] = None
+    ftpPort: int = 21
+    ftpUsername: Optional[str] = None
+    ftpPassword: Optional[str] = None
+    ftpProxyEnabled: bool = False
+    ftpProxyHost: Optional[str] = None
+    ftpProxyPort: int = 0
+    ftpProxyUsername: Optional[str] = None
+    ftpProxyPassword: Optional[str] = None
