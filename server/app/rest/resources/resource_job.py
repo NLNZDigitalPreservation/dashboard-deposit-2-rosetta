@@ -1,7 +1,7 @@
 import falcon
 import orjson
 
-from app.data.dao_job import JobDao
+from app.domain.dao_job import JobDao
 from common.db.db_access_fixity import FixityDatabaseHandler
 
 

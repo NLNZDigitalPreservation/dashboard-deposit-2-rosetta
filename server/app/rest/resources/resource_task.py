@@ -8,7 +8,7 @@ import falcon
 import orjson
 
 from app.auth.sessions import SessionManager
-from app.data.models import FixityTask
+from app.domain.models import FixityTask
 from app.task.task_manager import TaskManager
 
 

@@ -3,7 +3,7 @@ import argparse
 
 import falcon
 
-from app.data.models import db_manager
+from app.domain.models import db_manager
 from app.auth.ldap_client import LDAPAuthentication
 from app.auth.sessions import SessionManager
 from app.rest import server

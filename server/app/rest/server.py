@@ -6,7 +6,7 @@ import falcon
 
 from app.auth.ldap_client import LDAPAuthentication
 from app.auth.sessions import SessionManager
-from app.data.dao_job import JobDao
+from app.domain.dao_job import JobDao
 from app.rest import resources
 from app.rest.resources.resource_blob_storage import BlobStorageResource
 from app.task.task_manager import TaskManager

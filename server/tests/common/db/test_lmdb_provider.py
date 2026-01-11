@@ -3,7 +3,7 @@ import os
 import shutil
 import orjson
 import pytest
-from common.db.lmdb_provider import LMDBReader, LMDBWriter
+from app.domain.lmdb_provider import LMDBReader, LMDBWriter
 import threading
 import time
 import uuid

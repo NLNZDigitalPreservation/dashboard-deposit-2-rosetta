@@ -1,15 +1,33 @@
 import os
 from datetime import datetime
+import threading
 
 import falcon
-from app.data import *
+from app.domain import *
+
+GLOBAL_SINGLE_ID = 1
 
 
-class DataServicesSettings(DataServicesAbstract):
-    def __init__(self, args, repo: DataRepository):
-        super().__init__(args, repo)
+class ServicesSetting:
+    def __init__(self, args):
+        self.args = args
+        self.lock = threading.Lock()
 
-    def save_global_setting(self, global_setting: GlobalSetting) -> GlobalSetting:
+    def get_global_setting(self) -> GlobalSetting:
+        with self.lock:
+            instance = GlobalSetting.get_or_none(GlobalSetting.id == GLOBAL_SINGLE_ID)  # Ensure singleton with ID=1
+            if instance is None:
+                instance = GlobalSetting.create(id=GLOBAL_SINGLE_ID)
+                instance.save(force_insert=True)
+            return instance
+
+    def save_global_setting(self, data_json) -> GlobalSetting:
+        assert_not_empty("GlobalSetting", data_json)
+        global_setting = GlobalSetting(**data_json)
+
+        if global_setting.id is not None and global_setting.id != GLOBAL_SINGLE_ID:
+            raise falcon.HTTPBadRequest(title="Bad Request", description="Invalid GlobalSetting ID")
+
         if global_setting.paused:
             assert_not_empty("PausedStartTime", global_setting.pausedStartTime)
             assert_not_empty("PausedEndTime", global_setting.pausedEndTime)
@@ -19,22 +37,22 @@ class DataServicesSettings(DataServicesAbstract):
                 ldt_paused_start = datetime.fromisoformat(global_setting.pausedStartTime)
                 ldt_paused_end = datetime.fromisoformat(global_setting.pausedEndTime)
             except ValueError as e:
-                raise ValueError(f"Invalid date format: {str(e)}")
+                raise falcon.HTTPBadRequest(title="Bad Request", description=f"Invalid date format: {str(e)}")
 
             if ldt_paused_end < now:
-                raise ValueError(f"The end time must after now")
+                raise falcon.HTTPBadRequest(title="Bad Request", description=f"The end time must after now")
 
             if ldt_paused_end < ldt_paused_start:
-                raise ValueError(f"The end time must after start time")
+                raise falcon.HTTPBadRequest(title="Bad Request", description=f"The end time must after start time")
 
         # Validation for Delays and DelayUnit (Equivalent to DashboardHelper.assertNotNull)
         assert_not_empty("Delays", global_setting.delays)
         assert_not_empty("DelayUnit", global_setting.delayUnit)
 
-        # Ensure we are always updating the same singleton record
-        global_setting = self.repo_global_settings.save(global_setting)
-
-        return global_setting
+        with self.lock:
+            global_setting.id = GLOBAL_SINGLE_ID  # Ensure singleton ID
+            global_setting.save()
+            return global_setting
 
     def save_deposit_account(self, data_json, is_insert: bool) -> DepositAccount:
         assert_not_empty("DepositAccount", data_json)
@@ -47,7 +65,7 @@ class DataServicesSettings(DataServicesAbstract):
         assert_not_empty("DepositUserName", deposit_account.depositUserName)
         assert_not_empty("DepositUserPassword", deposit_account.depositUserPassword)
 
-        existing_account = self.repo_deposit_account.get_by_institute_name(deposit_account.depositUserInstitute)
+        existing_account = DepositAccount.get_or_none(DepositAccount.depositUserInstitute == deposit_account.depositUserInstitute)
         if is_insert and existing_account is not None:
             raise falcon.HTTPBadRequest(
                 title="Bad Request",
@@ -58,24 +76,22 @@ class DataServicesSettings(DataServicesAbstract):
                 title="Bad Request",
                 description=f"The account for institute {deposit_account.depositUserInstitute} already exists",
             )
-
-        self.repo_deposit_account.save(data_json)
-        self.repo_deposit_account.save(deposit_account)
+        deposit_account.save(force_insert=is_insert)
         return deposit_account
 
-    def delete_deposit_account(self, data_json):
-        assert_not_empty("DepositAccount", data_json)
-        deposit_account = DepositAccount(**data_json)
-        assert_not_empty("ID", deposit_account.id)
+    def delete_deposit_account(self, deposit_account_id: int) -> DepositAccount:
+        deposit_account = DepositAccount.get_or_none(DepositAccount.id == deposit_account_id)
+        if deposit_account is None:
+            raise falcon.HTTPNotFound(title="Not Found", description=f"Not able to find deposit account: {deposit_account_id}")
 
-        existing_flow_settings = self.repo_flow_setting.get_by_account_id(deposit_account.id)
-        if existing_flow_settings:
+        existing_flow_settings = FlowSetting.select().where(FlowSetting.depositAccountId == deposit_account.id)
+        if existing_flow_settings.count() > 0:
             raise falcon.HTTPBadRequest(
                 title="Bad Request",
                 description=f"The deposit account id={deposit_account.id} is still used by flow settings, please remove them first",
             )
-
-        self.repo_deposit_account.delete(deposit_account.id)
+        DepositAccount.delete().where(DepositAccount.id == deposit_account.id).execute()
+        return deposit_account
 
     def save_flow_setting(self, data_json, is_insert: bool) -> FlowSetting:
         assert_not_empty("FlowSetting", data_json)
@@ -97,7 +113,7 @@ class DataServicesSettings(DataServicesAbstract):
         if not os.path.isdir(str(flow_setting.rootPath)):
             raise falcon.HTTPBadRequest(title="Bad Request", description="Invalid RootPath: the Root Path does not exist or is not a directory.")
 
-        deposit_account = self.repo_deposit_account.get_by_id(flow_setting.depositAccountId)
+        deposit_account = DepositAccount.get_or_none(DepositAccount.id == flow_setting.depositAccountId)
         if deposit_account is None:
             raise falcon.HTTPBadRequest(title="Bad Request", description=f"The Deposit Account does not exist, depositAccountId: {flow_setting.depositAccountId}")
 
@@ -114,7 +130,7 @@ class DataServicesSettings(DataServicesAbstract):
 
         # Uniqueness/Duplication Logic
         # Note: For performance, it is better to use specific repo filter methods if available
-        flow_settings: List[FlowSetting] = self.repo_flow_setting.all_data()
+        flow_settings = FlowSetting.select()
         for existing_flow in flow_settings:
             # Skip checking against itself if it's an update
             if not is_insert and existing_flow.id == flow_setting.id:
@@ -132,22 +148,22 @@ class DataServicesSettings(DataServicesAbstract):
             assert_not_empty("Backup Sub Folders", flow_setting.backupSubFolders)
 
         # Save and Return
-        flow_setting = self.repo_flow_setting.save(flow_setting)
+        flow_setting.save(force_insert=is_insert)
         return flow_setting
 
-    def delete_flow_setting(self, flow_id: int) -> FlowSetting:
+    def delete_flow_setting(self, flow_setting_id: int) -> FlowSetting:
         # 1. Verify existence
-        flow_setting = self.repo_flow_setting.get_by_id(flow_id)
+        flow_setting = FlowSetting.get_or_none(FlowSetting.id == flow_setting_id)
         if flow_setting is None:
-            raise falcon.HTTPNotFound(title="Not Found", description=f"Not able to find material flow: {flow_id}")
+            raise falcon.HTTPNotFound(title="Not Found", description=f"Not able to find material flow: {flow_setting_id}")
 
         # 2. Check for dependencies (Referential Integrity)
         # Checking if any deposit jobs are linked to this flow
-        jobs = self.deposit_job.get_by_flow_id(flow_id)
+        jobs = self.deposit_job.get_by_flow_id(flow_setting.id)
         if jobs:  # In Python, an empty list evaluates to False
             raise falcon.HTTPConflict(title="Conflict", description="The flow is referenced by deposit jobs and cannot be deleted.")
 
         # 3. Perform deletion
-        self.repo_flow_setting.delete_by_id(flow_id)
+        self.repo_flow_setting.delete_by_id(flow_setting.id)
 
         return flow_setting

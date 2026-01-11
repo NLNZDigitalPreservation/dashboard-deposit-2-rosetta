@@ -4,9 +4,9 @@ import falcon
 import orjson
 
 from app.auth.sessions import RoleType, SessionManager
-from app.data import RepoWhiteList
-from app.data.models import WhiteList
-from app.data.services_settings import DataServices
+from app.domain import RepoWhiteList
+from app.domain.models import WhiteList
+from app.domain.services_setting import DataServices
 from common.utils import helper
 from common.utils.dataclass_utils import dataclass_as_dict
 

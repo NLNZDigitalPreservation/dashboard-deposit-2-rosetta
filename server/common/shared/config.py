@@ -121,13 +121,13 @@ class Parser(ArgumentParser):
 
         # Rosetta access
         self.add_env_argument(
-            "--rosetta-rest-api-dps-url",
+            "--rosetta-dps-url",
             type=str,
             default="https://wlguatdpsilb.natlib.govt.nz/rest/v0",
             help="Rosetta REST API DPS URL",
         )
         self.add_env_argument(
-            "--rosetta-rest-api-sip-url",
+            "--rosetta-sip-url",
             type=str,
             default="https://wlguatoprilb.natlib.govt.nz/rest/v0",
             help="Rosetta REST API SIP URL",
