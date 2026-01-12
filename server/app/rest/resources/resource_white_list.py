@@ -3,93 +3,54 @@ from typing import Optional
 import falcon
 import orjson
 
-from app.auth.sessions import RoleType, SessionManager
-from app.domain import RepoWhiteList
-from app.domain.models import WhiteList
-from app.domain.services_setting import DataServices
-from common.utils import helper
-from common.utils.dataclass_utils import dataclass_as_dict
+from app.domain.models import Whitelist
+from app.domain.services_setting import ServicesSetting
 
 
 class WhiteListResource:
-    def __init__(
-        self,
-        session_manager: SessionManager,
-        repo: DataServices,
-    ):
-        self.session_manager = session_manager
-        self.repo_white_list: RepoWhiteList = repo.repo_white_list
+    def __init__(self, service):
+        self.service: ServicesSetting = service
 
-    def on_get(self, req: falcon.Request, rsp: falcon.Response, oid: Optional[int] = None):
+    def on_get(
+        self, req: falcon.Request, rsp: falcon.Response, oid: Optional[int] = None
+    ):
         if oid is None:
             rsp.status = falcon.HTTP_OK
-            rsp.media = self.repo_white_list.all_data_dict()
+            rsp.media = Whitelist.select().dicts()
         else:
-            row = self.repo_white_list.get_dict(oid)
+            row = Whitelist.select().where(Whitelist.id == oid).dicts().first()
             if row is None:
-                raise falcon.HTTPNotFound(description=f"No user found in the white list with id={oid}")
+                raise falcon.HTTPNotFound(
+                    description=f"No user found in the white list with id={oid}"
+                )
             rsp.status = falcon.HTTP_OK
             rsp.media = row
 
-    def assert_privilege(self, req: falcon.Request, rsp: falcon.Response, user: WhiteList):
-        token = req.get_header("Authorization")
-        role = self.session_manager.get_role(token)
-        if role not in [RoleType.BOOTSTRAP, RoleType.ADMIN]:
-            raise falcon.HTTPForbidden(
-                title="NoPrivilege",
-                description="You have no privilege to edit the white list",
-            )
-
-        if user.username == "bootstrap":
-            raise falcon.HTTPForbidden(title="Forbidden", description="The bootstrap user can not be changed")
-        cur_login_name = self.session_manager.get_username(token)
-        if cur_login_name == user.username:
-            raise falcon.HTTPForbidden(title="Forbidden", description="You can not edit your self")
-
     def on_post(self, req: falcon.Request, rsp: falcon.Response):
+        token = req.get_header("Authorization")
         data = req.stream.read(req.content_length).decode()
         data_json = orjson.loads(data)
 
-        helper.assert_empty("id", data_json)
-        helper.assert_not_empty("username", data_json)
-        helper.assert_not_empty("role", data_json)
-
-        user = WhiteList(**data_json)
-        existing_user = self.repo_white_list.get_by_username(user.username)
-        if existing_user is not None:
-            raise falcon.HTTPBadRequest(title="Bad Request", description=f"The user {user.username} does exist")
-
-        self.assert_privilege(req, rsp, user=user)
-        user = self.repo_white_list.save(user)
+        user = self.service.save_white_list(
+            token=token, data_json=data_json, is_insert=True
+        )
 
         rsp.status = falcon.HTTP_OK
-        rsp.media = dataclass_as_dict(user)
+        rsp.media = Whitelist.select().where(Whitelist.id == user.id).dicts().first()
 
     def on_put(self, req: falcon.Request, rsp: falcon.Response):
+        token = req.get_header("Authorization")
         data = req.stream.read(req.content_length).decode()
         data_json = orjson.loads(data)
 
-        helper.assert_not_empty("id", data_json)
-        helper.assert_not_empty("username", data_json)
-        helper.assert_not_empty("role", data_json)
-
-        user = WhiteList(**data_json)
-
-        self.assert_privilege(req, rsp, user=user)
-        user = self.repo_white_list.save(user)
-        rsp.status = falcon.HTTP_OK
-        rsp.media = dataclass_as_dict(user)
-
-    def on_delete(self, req: falcon.Request, rsp: falcon.Response):
-        data = req.stream.read(req.content_length).decode()
-        data_json = orjson.loads(data)
-
-        helper.assert_not_empty("id", data_json)
-
-        user = WhiteList(**data_json)
-
-        self.assert_privilege(req, rsp, user=user)
-        self.repo_white_list.delete(user.id)
+        user = self.service.save_white_list(
+            token=token, data_json=data_json, is_insert=True
+        )
 
         rsp.status = falcon.HTTP_OK
-        rsp.media = dataclass_as_dict(user)
+        rsp.media = Whitelist.select().where(Whitelist.id == user.id).dicts().first()
+
+    def on_delete(self, req: falcon.Request, rsp: falcon.Response, oid: int):
+        token = req.get_header("Authorization")
+        self.service.delete_white_list(token=token, user_id=oid)
+        rsp.status = falcon.HTTP_OK

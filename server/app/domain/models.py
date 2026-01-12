@@ -20,8 +20,8 @@ class BaseModel(Model):
 # --- Models ---
 class GlobalSetting(BaseModel):
     paused = BooleanField(default=False)
-    pausedStartTime = CharField(null=True)
-    pausedEndTime = CharField(null=True)
+    pausedStartTime = BigIntegerField(null=True)
+    pausedEndTime = BigIntegerField(null=True)
     delays = IntegerField(null=True)
     delayUnit = CharField(default="S")
 

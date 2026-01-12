@@ -2,7 +2,6 @@ import falcon
 import orjson
 
 from app.auth.sessions import SessionManager
-from app.domain import RepoGlobalSetting
 from app.domain.services_setting import DataServices
 from common.utils import helper
 from common.utils.dataclass_utils import dataclass_as_dict

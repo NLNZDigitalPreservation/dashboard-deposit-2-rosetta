@@ -6,17 +6,19 @@ import falcon
 
 from app.auth.ldap_client import LDAPAuthentication
 from app.auth.sessions import SessionManager
-from app.domain.dao_job import JobDao
 from app.rest import resources
 from app.rest.resources.resource_blob_storage import BlobStorageResource
-from app.task.task_manager import TaskManager
-from common.db.db_access_fixity import FixityDatabaseHandler
-from common.utils.blob_storage import BlobStorageAccess
 
 _server_running = False
 
 
-def start_rest_server(app: falcon.App, app_auth: falcon.App, app_mock: falcon.App, port: int, thread_pool_size: int = 20):
+def start_rest_server(
+    app: falcon.App,
+    app_auth: falcon.App,
+    app_mock: falcon.App,
+    port: int,
+    thread_pool_size: int = 20,
+):
     global _server_running
     if _server_running:
         raise RuntimeError("Only one rest server may be running at once")
@@ -29,7 +31,13 @@ def start_rest_server(app: falcon.App, app_auth: falcon.App, app_mock: falcon.Ap
     current_dir = Path(os.path.dirname(os.path.abspath(__file__)))
     web_dir = current_dir.parent.parent.parent.joinpath("frontend").joinpath("dist")
 
-    conf = {"/": {"tools.staticdir.on": True, "tools.staticdir.dir": str(web_dir), "tools.staticdir.index": "index.html"}}  # folder "dist"
+    conf = {
+        "/": {
+            "tools.staticdir.on": True,
+            "tools.staticdir.dir": str(web_dir),
+            "tools.staticdir.index": "index.html",
+        }
+    }  # folder "dist"
 
     def error_page_404(status, message, traceback, version):
         index_file = os.path.join(web_dir, "index.html")
@@ -62,7 +70,9 @@ def add_auth_resources(
     auth_client: LDAPAuthentication,
     session_manager: SessionManager,
 ):
-    res_user_auth = resources.UserAuthResource(session_manager=session_manager, auth_client=auth_client)
+    res_user_auth = resources.UserAuthResource(
+        session_manager=session_manager, auth_client=auth_client
+    )
     app.add_route("/login", res_user_auth)
     app.add_route("/logout/{token}", res_user_auth)
 
@@ -76,8 +86,12 @@ def add_resources(
 ):
 
     res_global_settings = resources.GlobalSettingsResource(db_fixity=db_fixity)
-    res_white_list = resources.WhiteListResource(session_manager=session_manager, db_fixity=db_fixity)
-    res_task = resources.TaskResource(session_manager=session_manager, task_manager=task_manager)
+    res_white_list = resources.WhiteListResource(
+        session_manager=session_manager, db_fixity=db_fixity
+    )
+    res_task = resources.TaskResource(
+        session_manager=session_manager, task_manager=task_manager
+    )
 
     res_job = resources.JobResource(db_fixity=db_fixity)
     res_fixity_metadata = resources.FixityMetadataResource(args=args)

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from dotenv import load_dotenv
+from app.auth.sessions import SessionManager
 from common.shared import config, exiting
 from common.utils import log_utils
 
@@ -88,3 +89,9 @@ def deposit_account(env_args):
         depositUserPassword=env_args.test_deposit_password,
     )
     yield data
+
+
+@pytest.fixture(scope="session")
+def session_manager(env_args, db_handler):
+    sm = SessionManager()
+    yield sm

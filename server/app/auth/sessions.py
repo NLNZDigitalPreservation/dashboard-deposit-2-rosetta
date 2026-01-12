@@ -26,7 +26,7 @@ class SessionInfo:
 
 
 class SessionManager:
-    def __init__(self, expire_interval):
+    def __init__(self, expire_interval=60):
         self.expire_interval = expire_interval
         self.session_map: Dict[str:SessionInfo] = {}
 
