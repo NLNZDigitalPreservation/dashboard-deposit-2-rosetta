@@ -1,0 +1,15 @@
+{
+  "profile_material_flow": [
+    {
+      "active": true,
+      "id": "853329458",
+      "name": "New Books"
+    },
+    {
+      "active": true,
+      "id": "12345",
+      "name": "Old Books"
+    }
+  ],
+  "total_record_count": 1
+}

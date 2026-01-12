@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from common.shared import config, exiting
 from common.utils import log_utils
 
-from app.domain.models import init_db, close_db
+from app.domain.models import DepositAccount, init_db, close_db
 
 env_path = Path.cwd() / ".env"
 load_dotenv()
@@ -40,6 +40,24 @@ def env_args():
         help="Test deposit account password",
     )
 
+    parser.add_env_argument(
+        "--test-producer-id",
+        default="12345",
+        help="Test deposit producer",
+    )
+
+    parser.add_env_argument(
+        "--test-material-flow-id",
+        default="6789",
+        help="Test deposit material flow",
+    )
+
+    parser.add_env_argument(
+        "--test-sip-id",
+        default="762608",
+        help="Test deposited sip",
+    )
+
     args = parser.parse_known_args()[0]
 
     yield args
@@ -60,3 +78,13 @@ def data_resources():
     data_resources_dir = os.path.join(test_dir, "data_resources")
 
     yield data_resources_dir
+
+
+@pytest.fixture(scope="session")
+def deposit_account(env_args):
+    data = DepositAccount(
+        depositUserInstitute=env_args.test_institution,
+        depositUserName=env_args.test_deposit_account,
+        depositUserPassword=env_args.test_deposit_password,
+    )
+    yield data

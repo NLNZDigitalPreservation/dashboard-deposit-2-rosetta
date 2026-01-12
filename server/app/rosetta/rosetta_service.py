@@ -1,3 +1,4 @@
+import logging
 from typing import List, Optional, Any
 from app.rosetta.rosetta_apis import RosettaRestApi
 from common.metadata import SipStatusInfo
@@ -21,12 +22,11 @@ class RosettaWebService:
         producers = []
         offset = 0
         while True:
-            ret = self.rest_dps_api.fetch(
+            rsp = self.rest_dps_api.fetch(
                 deposit_account, "GET", f"/producers?limit=100&offset={offset}", None
             )
-            rsp = self._json_to_dict(ret)
 
-            self.log.debug(f"Got producers, offset={offset}")
+            logging.debug(f"Got producers, offset={offset}")
 
             if rsp and rsp.get("total_record_count", 0) > 0 and rsp.get("producer"):
                 producers.extend(rsp.get("producer"))
@@ -34,22 +34,21 @@ class RosettaWebService:
             else:
                 break
 
-        self.log.debug(f"{len(producers)} producers with account: {deposit_account}")
+        logging.debug(f"{len(producers)} producers with account: {deposit_account}")
         return producers
 
     def get_producer_profile_id(
         self, deposit_account, producer_id: str
     ) -> Optional[str]:
-        ret = self.rest_dps_api.fetch(
+        rsp = self.rest_dps_api.fetch(
             deposit_account, "GET", f"/producers/{producer_id}", None
         )
-        rsp = self._json_to_dict(ret)
 
         # Accessing profile -> id from the response JSON
         if rsp and rsp.get("profile"):
             return rsp["profile"].get("id")
         else:
-            self.log.error(
+            logging.error(
                 f"Can not find the producer profile with the producer id: {producer_id}"
             )
             return None
@@ -62,8 +61,8 @@ class RosettaWebService:
         self,
         deposit_account,
         producer_id: str,
-        limit: int,
-        offset: int,
+        limit: int = 10,
+        offset: int = 0,
         name: str = None,
     ) -> Optional[str]:
         profile_id = self.get_producer_profile_id(deposit_account, producer_id)
@@ -122,12 +121,14 @@ class RosettaWebService:
     ):
         try:
             if not self.is_valid_producer(deposit_account, deposit_user_producer_id):
-                self.log.warn(f"Invalid producer: {deposit_user_producer_id}")
+                logging.error(f"Invalid producer: {deposit_user_producer_id}")
+                return False, None, None
 
             if not self.is_valid_material_flow(
                 deposit_account, deposit_user_producer_id, material_flow_id
             ):
-                self.log.warn(f"Invalid material flow: {material_flow_id}")
+                logging.error(f"Invalid material flow: {material_flow_id}")
+                return False, None, None
 
             # Constructing the request body as a dictionary (replaces DtoDepositReq)
             req_body = {
@@ -156,10 +157,10 @@ class RosettaWebService:
             return result, sip_id, sip_reason
 
         except Exception as e:
-            self.log.error(
+            logging.error(
                 f"Deposit failed: {deposit_account} {injection_root_directory} {deposit_user_producer_id} {material_flow_id}"
             )
-            raise e
+            return False, None, None
 
     def get_sip_status_info(self, deposit_account, sip_id: str):
         ret = self.rest_sip_spi.fetch(deposit_account, "GET", f"/sips/{sip_id}", None)

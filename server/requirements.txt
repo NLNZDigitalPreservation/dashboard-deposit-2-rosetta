@@ -10,3 +10,4 @@ ldap3~=2.9.1
 dotenv~=0.9.9
 tinydb~=4.8.2
 peewee~=3.18.3
+responses~=0.25.8
