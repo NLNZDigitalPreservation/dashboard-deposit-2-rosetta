@@ -135,7 +135,7 @@ class ServicesSetting:
         assert_not_empty("DepositUserPassword", deposit_account.depositUserPassword)
 
         existing_account = DepositAccount.get_or_none(
-            DepositAccount.depositUserInstitute == deposit_account.depositUserInstitute
+            DepositAccount.depositUserName == deposit_account.depositUserName
         )
         if is_insert and existing_account is not None:
             raise falcon.HTTPBadRequest(

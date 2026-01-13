@@ -32,7 +32,9 @@ class UserAuthResource:
 
         token = f"{uuid.uuid4()}"
 
-        self.session_manager.add_session(token=token, username=username, role=RoleType.ADMIN)
+        self.session_manager.add_session(
+            token=token, username=username, role=RoleType.ADMIN
+        )
 
         rsp.status = falcon.HTTP_OK
         rsp.media = token
