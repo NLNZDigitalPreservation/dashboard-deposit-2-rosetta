@@ -15,8 +15,9 @@ class WhiteListResource:
         self, req: falcon.Request, rsp: falcon.Response, oid: Optional[int] = None
     ):
         if oid is None:
+            rows = list(Whitelist.select().dicts())
             rsp.status = falcon.HTTP_OK
-            rsp.media = Whitelist.select().dicts()
+            rsp.media = rows
         else:
             row = Whitelist.select().where(Whitelist.id == oid).dicts().first()
             if row is None:
@@ -44,7 +45,7 @@ class WhiteListResource:
         data_json = orjson.loads(data)
 
         user = self.service.save_white_list(
-            token=token, data_json=data_json, is_insert=True
+            token=token, data_json=data_json, is_insert=False
         )
 
         rsp.status = falcon.HTTP_OK

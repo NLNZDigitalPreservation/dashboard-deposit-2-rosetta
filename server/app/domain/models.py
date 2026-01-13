@@ -8,7 +8,6 @@ db = SqliteDatabase(None)
 
 
 class BaseModel(Model):
-    id = BigAutoField(primary_key=True)
     auditRst = BooleanField(default=True)
     auditMsg = CharField(default="OK", null=True)
 
@@ -19,6 +18,7 @@ class BaseModel(Model):
 
 # --- Models ---
 class GlobalSetting(BaseModel):
+    id = IntegerField(primary_key=True)
     paused = BooleanField(default=False)
     pausedStartTime = BigIntegerField(null=True)
     pausedEndTime = BigIntegerField(null=True)
@@ -32,6 +32,7 @@ class GlobalSetting(BaseModel):
 
 
 class DepositAccount(BaseModel):
+    id = BigAutoField(primary_key=True)
     depositUserInstitute = CharField(null=True)
     depositUserName = CharField(null=True)
     depositUserPassword = CharField(null=True)
@@ -41,6 +42,7 @@ class DepositAccount(BaseModel):
 
 
 class FlowSetting(BaseModel):
+    id = BigAutoField(primary_key=True)
     enabled = BooleanField(default=True)
     # Using 'depositAccountId' as the name to match your dataclass exactly
     depositAccountId = BigIntegerField(null=True)
@@ -64,6 +66,7 @@ class FlowSetting(BaseModel):
 
 
 class DepositJob(BaseModel):
+    id = BigAutoField(primary_key=True)
     initialTime = BigIntegerField(null=True)
     latestTime = BigIntegerField(null=True)
     depositStartTime = BigIntegerField(null=True)
@@ -90,16 +93,13 @@ class DepositJob(BaseModel):
 
 
 class Whitelist(BaseModel):
+    id = BigAutoField(primary_key=True)
     username = CharField(null=True)
     role = CharField(null=True)
 
 
-class EntityID(BaseModel):
-    key = CharField(primary_key=True)
-    number = IntegerField(null=True)
-
-
 class EntityStorageLocation(BaseModel):
+    id = BigAutoField(primary_key=True)
     scanMode = CharField(null=True)
     rootPath = CharField(null=True)
     ftpServer = CharField(null=True)
@@ -124,7 +124,6 @@ def init_db(persistent_storage):
             FlowSetting,
             DepositJob,
             Whitelist,
-            EntityID,
             EntityStorageLocation,
         ]
     )

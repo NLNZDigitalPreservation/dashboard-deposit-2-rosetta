@@ -21,8 +21,7 @@ class ServicesSetting:
                 GlobalSetting.id == GLOBAL_SINGLE_ID
             )  # Ensure singleton with ID=1
             if instance is None:
-                instance = GlobalSetting.create(id=GLOBAL_SINGLE_ID)
-                instance.save(force_insert=True)
+                instance = GlobalSetting.create(id=GLOBAL_SINGLE_ID, delays=60)
             return instance
 
     def save_global_setting(self, data_json) -> GlobalSetting:
