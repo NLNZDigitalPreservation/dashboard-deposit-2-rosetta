@@ -8,8 +8,9 @@ from app.rosetta.rosetta_service import RosettaWebService
 
 
 @dataclass
-class RawProducerRequestCommand:
+class RawMaterialFlowRequestCommand:
     depositAccountId: int
+    producerId: str
     offset: int
     limit: int
     name: str
@@ -23,19 +24,19 @@ class RawProducersResource:
         data = req.stream.read(req.content_length).decode()
         data_json = orjson.loads(data)
 
-        cmd = RawProducerRequestCommand(**data_json)
+        cmd = RawMaterialFlowRequestCommand(**data_json)
 
         deposit_account = DepositAccount.get_or_none(
             DepositAccount.id == cmd.depositAccountId
         )
-
         if deposit_account is None:
             raise falcon.HTTPBadRequest(
                 description=f"There is no Deposit Account related to the id {cmd.depositAccountId}"
             )
 
-        rows = self.rosetta.get_producers_raw(
+        rows = self.rosetta.get_material_flows_raw(
             deposit_account=deposit_account,
+            producer_id=cmd.producerId,
             limit=cmd.limit,
             offset=cmd.limit,
             name=cmd.name,
