@@ -4,27 +4,17 @@
          system variables. See https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-logging.html
          for details on how to configure Spring Boot application.properties to map to system properties that
          logback can use. -->
-
-    <appender name="GeneralLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/exlibris/dps/nlnz_tools/dashboard/logs/dashboard.log</file>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <!-- Note that brackets are special characters in the pattern and must be escaped -->
-            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS Z} %-5p [%t] %C{2} \(%F:%L\) - %m%n</Pattern>
-        </encoder>
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- Daily rollover, and new file created when size exceeds 20MB -->
-            <fileNamePattern>/exlibris/dps/nlnz_tools/dashboard/logs/dashboard-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <!-- Max size of a single log file -->
-            <maxFileSize>100MB</maxFileSize>
-            <!-- Keep log files for up to 60 days -->
-            <maxHistory>60</maxHistory>
-            <!-- Total size cap for all log files -->
-            <totalSizeCap>6GB</totalSizeCap>
-        </rollingPolicy>
+    
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <!-- Note that log4j.xml had a ConversionPattern of value="%d %-5p [%t] %C{2} (%F:%L) - %m%n" -->
+            <Pattern>
+                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
+            </Pattern>
+        </layout>
     </appender>
-
     <root level="INFO">
-        <appender-ref ref="GeneralLog"/>
+        <!-- <appender-ref ref="GeneralLog"/> -->
+        <appender-ref ref="Console"/>
     </root>
 </configuration>

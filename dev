@@ -52,7 +52,7 @@ case $CMD in
     ;;
 
     exec)
-    eval "$CONTAINER_ENGINE exec -it ${docker_name} bash"
+    eval "$CONTAINER_ENGINE exec -it ${docker_name} ash"
     ;;
     push)
     docker push 

@@ -9,7 +9,7 @@ services:
     # env_file:
     #   - .env
     environment:
-      - PERSIST_PATH=${PERSIST_PATH:/exlibris/dps/nlnz_tools/dashboard}
+      - PERSIST_PATH=${PERSIST_PATH:-/exlibris/dps/nlnz_tools/dashboard}
     volumes:
       - /exlibris/dps/nlnz_tools/dashboard:/exlibris/dps/nlnz_tools/dashboard
       - /mnt/d/data:/mnt/d/data
