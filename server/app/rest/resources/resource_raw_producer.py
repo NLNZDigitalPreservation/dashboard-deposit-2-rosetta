@@ -15,7 +15,7 @@ class RawProducerRequestCommand:
     name: str
 
 
-class RawProducersResource:
+class RawProducerResource:
     def __init__(self, rosetta):
         self.rosetta: RosettaWebService = rosetta
 
@@ -37,7 +37,7 @@ class RawProducersResource:
         rows = self.rosetta.get_producers_raw(
             deposit_account=deposit_account,
             limit=cmd.limit,
-            offset=cmd.limit,
+            offset=cmd.offset,
             name=cmd.name,
         )
 

@@ -16,7 +16,7 @@ class RawMaterialFlowRequestCommand:
     name: str
 
 
-class RawProducersResource:
+class RawMaterialFlowResource:
     def __init__(self, rosetta):
         self.rosetta: RosettaWebService = rosetta
 
@@ -38,7 +38,7 @@ class RawProducersResource:
             deposit_account=deposit_account,
             producer_id=cmd.producerId,
             limit=cmd.limit,
-            offset=cmd.limit,
+            offset=cmd.offset,
             name=cmd.name,
         )
 
