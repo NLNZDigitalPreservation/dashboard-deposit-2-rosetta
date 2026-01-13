@@ -6,8 +6,10 @@ services:
     restart: always
     ports:
       - "1901:1901"
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
+    environment:
+      - PERSIST_PATH=${PERSIST_PATH:/exlibris/dps/nlnz_tools/dashboard}
     volumes:
       - /exlibris/dps/nlnz_tools/dashboard:/exlibris/dps/nlnz_tools/dashboard
       - /mnt/d/data:/mnt/d/data
