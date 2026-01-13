@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- Note that values enclosed by ${...} are NOT substituted in by Spring Boot. Instead, they refer to
-         system variables. See https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-logging.html
-         for details on how to configure Spring Boot application.properties to map to system properties that
-         logback can use. -->
-    
-    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <!-- Note that log4j.xml had a ConversionPattern of value="%d %-5p [%t] %C{2} (%F:%L) - %m%n" -->
-            <Pattern>
-                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
-            </Pattern>
-        </layout>
+    <!-- Define the Console Appender -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
     </appender>
+
+    <!-- Use the Appender -->
     <root level="INFO">
-        <!-- <appender-ref ref="GeneralLog"/> -->
-        <appender-ref ref="Console"/>
+        <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
