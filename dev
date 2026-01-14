@@ -4,8 +4,9 @@ version=2.1.0
 
 CMD=$1
 INSTALL_PATH=`pwd`
+image_name=deposit-dashboard
 docker_name=dashboard
-docker_network=dashboard_network_x
+docker_network=deposit_dashboard_network_x
 
 select_container_engine() {
     if command -v podman &> /dev/null; then
@@ -36,7 +37,7 @@ CONTAINER_COMPOSE=$(select_container_compose)
 
 case $CMD in
     build)
-    eval "$CONTAINER_ENGINE build -f Dockerfile --tag ${docker_name} ."
+    eval "$CONTAINER_ENGINE build --no-cache -f Dockerfile --tag ${image_name} ."
     ;;
 
     up)
@@ -52,7 +53,7 @@ case $CMD in
     ;;
 
     exec)
-    eval "$CONTAINER_ENGINE exec -it ${docker_name} ash"
+    eval "$CONTAINER_ENGINE exec -it ${docker_name} bash"
     ;;
     push)
     docker push 

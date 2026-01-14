@@ -1,6 +1,7 @@
 services:
   dashboard:
     image: localhost/deposit-dashboard
+#    image: docker.io/maven:3.9.9-eclipse-temurin-17
     command: sleep infinity
     container_name: dashboard
     hostname: dashboard
