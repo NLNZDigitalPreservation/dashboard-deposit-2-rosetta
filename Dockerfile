@@ -10,14 +10,11 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 WORKDIR /deployment/dashboard
 
 RUN git config --global http.sslVerify false && \
-    git clone --branch containerize2 --depth 1 https://github.com/NLNZDigitalPreservation/dashboard-deposit-2-rosetta.git /deployment/dashboard
+    git clone --branch main --depth 1 https://github.com/NLNZDigitalPreservation/dashboard-deposit-2-rosetta.git /deployment/dashboard
 
 RUN npm config set strict-ssl false && \
     bash build.sh && \
     mvn clean package -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -DskipTests
-
-
-EXPOSE 1901
 
 
 FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu
@@ -30,7 +27,7 @@ COPY --from=build /deployment/dashboard/target/deposit-dashboard-*.war ./dashboa
 
 # Optional: if using Tomcat or running with java -jar
 # You can adjust ENTRYPOINT accordingly
-ENTRYPOINT ["java", "-jar", "/deployment/dashboard.war", "--spring.config.location=file:${PERSIST_PATH}/conf/application-ldap.properties"]
+ENTRYPOINT ["java", "-jar", "/deployment/dashboard.war"]
 
 
 

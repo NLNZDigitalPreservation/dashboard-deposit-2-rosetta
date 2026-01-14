@@ -1,18 +1,15 @@
 services:
   dashboard:
     image: localhost/deposit-dashboard
-#    image: docker.io/maven:3.9.9-eclipse-temurin-17
-#    command: sleep infinity
+    command: --spring.config.location=file:${PERSIST_PATH}/conf/application-ldap.properties
     container_name: dashboard
     hostname: dashboard
     restart: always
     ports:
       - "1901:1901"
-    # env_file:
-    #   - .env
     environment:
       - PERSIST_PATH=${PERSIST_PATH:-/exlibris/dps/nlnz_tools/dashboard}
     volumes:
       - /exlibris/dps/nlnz_tools/dashboard:/exlibris/dps/nlnz_tools/dashboard
-      - /mnt/d/data:/mnt/d/data
-      - ./:/source-code
+
+
