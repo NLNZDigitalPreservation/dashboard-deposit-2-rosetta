@@ -35,7 +35,7 @@ public class RosettaWebService {
             return authClient.login(institution, username, password);
         } catch (Exception e) {
             String err = String.format("Login failed: institution=%s, username=%s, password=********, %s", institution, username, e.getMessage());
-            System.out.println(err);
+            log.error("Login failed: institution={}, username={}, password=********", institution, username, e);
             throw e;
         }
     }

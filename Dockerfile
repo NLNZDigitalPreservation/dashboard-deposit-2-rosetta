@@ -31,7 +31,7 @@ COPY --from=build /deployment/dashboard/target/deposit-dashboard-*.war ./dashboa
 
 # Optional: if using Tomcat or running with java -jar
 # You can adjust ENTRYPOINT accordingly
-ENTRYPOINT ["java", "-jar", "/deployment/dashboard.war", "--spring.config.location=file:${PERSIST_PATH}/conf/application-ldap.properties"]
+#ENTRYPOINT ["java", "-jar", "/deployment/dashboard.war", "--spring.config.location=file:${PERSIST_PATH}/conf/application-ldap.properties"]
 
 
 

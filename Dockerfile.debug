@@ -1,0 +1,12 @@
+FROM docker.io/maven:3.9.9-eclipse-temurin-17
+
+# Create deployment folder in final image
+WORKDIR /deployment
+
+# Copy the WAR from the build stage
+COPY ./target/deposit-dashboard-2.1.0.war ./dashboard.war
+
+ENTRYPOINT ["java", "-jar", "/deployment/dashboard.war", "--spring.config.location=file:${PERSIST_PATH}/conf/application-ldap.properties"]
+
+
+
