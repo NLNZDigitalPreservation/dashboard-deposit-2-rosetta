@@ -45,7 +45,7 @@ public class MainApplication implements CommandLineRunner {
         Arrays.sort(beanNames);
         for (String beanName : beanNames) {
 //            System.out.println(ANSI_CYAN + beanName + ANSI_RESET);
-            log.info(beanName);
+            log.info("bean: {}", beanName);
         }
 
 //        System.out.println(ANSI_BLUE + "^_^_^_^_^_^_^_^_^_^ Dashboard Initialed ^_^_^_^_^_^_^_^_^_^_^" + ANSI_RESET);

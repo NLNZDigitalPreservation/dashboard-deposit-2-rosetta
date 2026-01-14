@@ -1,6 +1,7 @@
 services:
   dashboard:
     image: localhost/deposit-dashboard
+    command: sleep infinity
     container_name: dashboard
     hostname: dashboard
     restart: always
@@ -13,3 +14,4 @@ services:
     volumes:
       - /exlibris/dps/nlnz_tools/dashboard:/exlibris/dps/nlnz_tools/dashboard
       - /mnt/d/data:/mnt/d/data
+      - ./:/source-code

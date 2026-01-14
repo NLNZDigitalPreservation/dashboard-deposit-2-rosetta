@@ -2,7 +2,7 @@
 FROM node:20-slim AS build
 
 RUN apt-get update && \
-    apt-get install -y ca-certificates git openjdk-17-jdk maven
+    apt-get install -y git openjdk-17-jdk maven
 
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
@@ -31,7 +31,7 @@ COPY --from=build /deployment/dashboard/target/deposit-dashboard-*.war ./dashboa
 
 # Optional: if using Tomcat or running with java -jar
 # You can adjust ENTRYPOINT accordingly
-ENTRYPOINT ["java", "-jar", "/deployment/dashboard.war", "--spring.config.location=file:${PERSIST_PATH}/conf/application-ldap.properties"]
+#ENTRYPOINT ["java", "-jar", "/deployment/dashboard.war", "--spring.config.location=file:${PERSIST_PATH}/conf/application-ldap.properties"]
 
 
 
