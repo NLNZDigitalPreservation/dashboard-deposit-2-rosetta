@@ -20,8 +20,7 @@ RUN npm config set strict-ssl false && \
 EXPOSE 1901
 
 
-FROM docker.io/eclipse-temurin:17-jre-alpine
-
+FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu
 
 # Create deployment folder in final image
 WORKDIR /deployment
@@ -31,7 +30,7 @@ COPY --from=build /deployment/dashboard/target/deposit-dashboard-*.war ./dashboa
 
 # Optional: if using Tomcat or running with java -jar
 # You can adjust ENTRYPOINT accordingly
-#ENTRYPOINT ["java", "-jar", "/deployment/dashboard.war", "--spring.config.location=file:${PERSIST_PATH}/conf/application-ldap.properties"]
+ENTRYPOINT ["java", "-jar", "/deployment/dashboard.war", "--spring.config.location=file:${PERSIST_PATH}/conf/application-ldap.properties"]
 
 
 
