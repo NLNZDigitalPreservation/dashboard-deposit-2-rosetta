@@ -17,7 +17,7 @@ import java.util.Hashtable;
 
 
 @Service
-public class LdapAuthenticationClient {  
+public class LdapAuthenticationClient {
     @Value("${ldap.enable}")
     private String ldapEnable;
 
@@ -56,7 +56,8 @@ public class LdapAuthenticationClient {
         userInfo.setUserName(username);
 
         if (DashboardHelper.isEmpty(this.ldapEnable) || this.ldapEnable.equalsIgnoreCase("false") || this.ldapEnable.equalsIgnoreCase("no")) {
-            userInfo.setSessionId("241200811372143992420081372111");
+//            userInfo.setSessionId("241200811372143992420081372111");
+            userInfo.setSessionId(DashboardHelper.getUid());
             userInfo.setDisplayName("Test User");
             return userInfo;
         }
