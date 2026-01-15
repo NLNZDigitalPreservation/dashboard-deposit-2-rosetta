@@ -1,0 +1,14 @@
+.idea
+.git
+.gitignore
+.env
+docker-compose.yml
+dev
+build.sh
+target
+ui/node_modules
+ui/dist
+apps/
+src/main/resources/static
+src/test
+
