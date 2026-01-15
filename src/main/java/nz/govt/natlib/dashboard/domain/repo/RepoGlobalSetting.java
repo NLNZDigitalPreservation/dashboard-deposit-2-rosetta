@@ -5,7 +5,7 @@ import nz.govt.natlib.dashboard.domain.entity.EntityGlobalSetting;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

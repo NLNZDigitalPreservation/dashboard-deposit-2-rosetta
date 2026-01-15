@@ -1,11 +1,11 @@
 package nz.govt.natlib.dashboard.domain.repo;
 
+import jakarta.annotation.PostConstruct;
 import nz.govt.natlib.dashboard.common.metadata.EnumEntityKey;
 import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

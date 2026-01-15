@@ -27,3 +27,4 @@ src/main/resources/static/
 target/
 
 .env
+/**/*.crt
