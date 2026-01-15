@@ -15,6 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -31,6 +32,7 @@ import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 @Service
+@Lazy
 public class DepositJobService implements InterfaceFlowSetting, InterfaceMappingDTO {
     //    private static final String INJECTION_DONE_FILE_NAME = "ready-for-ingestion-FOLDER-COMPLETED";
     private static final Logger log = LoggerFactory.getLogger(DepositJobService.class);

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export app_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+export app_version=$(grep "^version" build.gradle | head -1 | awk -F"'" '{print $2}')
 echo "deposit-dashboard version: ${app_version}"
 
 CMD=$1

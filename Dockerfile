@@ -11,8 +11,8 @@ RUN npm config set strict-ssl false && \
     npm run build-only
 
 
-# Stage 2: Build the maven project
-FROM docker.io/maven:3.9.9-eclipse-temurin-17 AS build-server
+# Stage 2: Build the web server project
+FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu AS build-server
 WORKDIR /build
 COPY ./ ./
 
@@ -20,8 +20,12 @@ WORKDIR /build/src/main/resources
 RUN rm -rf static
 
 COPY --from=build-ui /build/ui/dist ./static
+
 WORKDIR /build
-RUN mvn clean package -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -DskipTests
+RUN keytool -importcert -alias ZscalerRootCA -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -file ZscalerRoot.crt -noprompt && \
+    ./gradlew clean build -x test && \
+    mv ./build/libs/dashboard-*.war ./
+
 
 # Stage 3: Build the final project
 FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu
@@ -30,7 +34,7 @@ FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu
 WORKDIR /deployment
 
 # Copy the WAR from the build stage
-COPY --from=build-server /build/target/deposit-dashboard-*.war ./dashboard.war
+COPY --from=build-server /build/dashboard-*.war ./dashboard.war
 
 # Optional: if using Tomcat or running with java -jar
 # You can adjust ENTRYPOINT accordingly

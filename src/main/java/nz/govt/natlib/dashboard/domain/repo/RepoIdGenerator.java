@@ -4,12 +4,14 @@ package nz.govt.natlib.dashboard.domain.repo;
 import nz.govt.natlib.dashboard.common.metadata.EnumEntityKey;
 import nz.govt.natlib.dashboard.domain.entity.EntityID;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 import java.io.File;
 
 @Component("RepoIdGenerator")
+@Lazy
 public class RepoIdGenerator extends RepoAbstract {
     private static final String SUB_FOLDER = "id-generator";
 
