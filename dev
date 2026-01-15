@@ -1,6 +1,7 @@
 #!/bin/bash
 
-version=3.0.0
+export app_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+echo "deposit-dashboard version: ${app_version}"
 
 CMD=$1
 INSTALL_PATH=`pwd`
@@ -37,7 +38,7 @@ CONTAINER_COMPOSE=$(select_container_compose)
 
 case $CMD in
     build)
-    eval "$CONTAINER_ENGINE build --no-cache -f Dockerfile --tag ${image_name} ."
+    eval "$CONTAINER_ENGINE build --no-cache -f Dockerfile --tag ${image_name}:${app_version} ."
     ;;
 
     up)
@@ -70,6 +71,8 @@ case $CMD in
     echo "    stop the docker container"
     echo "dev logs"
     echo "    print the logs of the docker container"
+    echo "dev exec"
+    echo "    enter the container for debuging"
     echo "dev push"
     echo "    push the current image to docker hub"
 esac

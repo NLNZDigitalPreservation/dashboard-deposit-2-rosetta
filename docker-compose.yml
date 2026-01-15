@@ -1,7 +1,7 @@
 services:
   dashboard:
-    image: localhost/deposit-dashboard
-    command: --spring.config.location=file:${PERSIST_PATH}/conf/application-ldap.properties
+    image: localhost/deposit-dashboard:${app_version}
+    command: --spring.config.additional-location=file:${PERSIST_PATH}/conf/
     container_name: dashboard
     hostname: dashboard
     restart: always
