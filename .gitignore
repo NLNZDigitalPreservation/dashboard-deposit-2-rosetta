@@ -27,4 +27,5 @@ src/main/resources/static/
 target/
 
 .env
+/trust-ca/
 /**/*.crt
