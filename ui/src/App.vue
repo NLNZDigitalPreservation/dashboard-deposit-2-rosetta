@@ -1,41 +1,44 @@
 <script setup lang="ts">
+import { type UseFetchApis, useFetch, useLoginStore } from '@/utils/rest.api';
 import { useThemeStore } from '@/utils/themes';
-import { useBrowserLocation, useTitle } from '@vueuse/core';
-import { ref } from 'vue';
+import { useTitle } from '@vueuse/core';
+import { onMounted, ref } from 'vue';
 import LoginDialog from './components/LoginDialog.vue';
-import { useLoginStore } from './utils/rest.api';
+
 import MainView from './views/MainView.vue';
+
+const rest: UseFetchApis = useFetch();
 
 const loginStore = useLoginStore();
 const themeStore = useThemeStore();
+const title = useTitle('Dashboard');
+const envType = ref('DEV');
 
-let location = useBrowserLocation();
-let hostname: string = location.value.hostname;
-let darkMode = false;
-let colorMode = 'indigo';
-let hostType = 'DEV';
+onMounted(async () => {
+    const sysInfo = await rest.get('/restful/system-info');
+    let darkMode = false;
+    let colorMode = 'indigo';
+    let hostType = 'DEV';
+    if (!sysInfo.systemDeployment) {
+        hostType = 'DEV';
+    } else {
+        hostType = sysInfo.systemDeployment.toUpperCase();
+    }
 
-// hostname = 'wlguatrosiapp01.natlib.govt.nz';
-
-if (hostname && hostname.length > 6) {
-    hostname = hostname.toUpperCase();
-    hostType = hostname.substring(3, 3 + 3);
+    darkMode = true;
     if (hostType === 'PRD') {
-        darkMode = true;
         colorMode = 'lime';
     } else if (hostType === 'UAT') {
-        darkMode = true;
         colorMode = 'rose';
     } else {
         hostType = 'DEV';
+        colorMode = 'blue';
     }
-}
 
-// bind a ref to the document title
-const title = useTitle('My Vue App');
-title.value = `Deposit Dashboard (${hostType})`;
-const envType = ref(hostType);
-themeStore.toggleTheme(darkMode, colorMode);
+    envType.value = hostType; // bind a ref to the document title
+    title.value = `Dashboard (${hostType})`;
+    themeStore.toggleTheme(darkMode, colorMode);
+});
 </script>
 
 <template>

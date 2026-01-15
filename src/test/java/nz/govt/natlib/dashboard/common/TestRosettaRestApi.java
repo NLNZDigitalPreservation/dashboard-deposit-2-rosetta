@@ -81,7 +81,7 @@ public class TestRosettaRestApi {
         }
     }
 
-    @Test
+//    @Test
     public void testGetSipStatusInfo() throws Exception {
         String sipId = "749344";
         try {

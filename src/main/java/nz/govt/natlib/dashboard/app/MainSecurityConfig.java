@@ -20,16 +20,6 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
-//        http.csrf().disable()
-//                .authorizeRequests()
-//                .antMatchers("/").anonymous()
-//                .antMatchers("/index.html").anonymous()
-//                .antMatchers(RequestPathConstants.PATH_ROOT_RESTFUL + "/**").anonymous()
-//                .anyRequest().permitAll()
-//                .and()
-//                .logout()
-//                .invalidateHttpSession(true)
-//                .logoutSuccessUrl(RequestPathConstants.PATH_USER_LOGOUT);
         http.csrf().disable()
                 .authorizeRequests()
                 .anyRequest().permitAll();
@@ -37,21 +27,10 @@ public class MainSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().sameOrigin();
     }
 
-//    @Bean
-//    public Sessions sessions() {
-//        Sessions bean = new Sessions();
-//        return bean;
-//    }
-
     @Bean
     public HttpAccessManagementFilter httpAccessManagementFilter() {
         HttpAccessManagementFilter bean = new HttpAccessManagementFilter();
         bean.setSessions(sessions);
         return bean;
     }
-
-//    @Bean
-//    public LdapAuthenticationClient authClient() {
-//        return new LdapAuthenticationClient();
-//    }
 }

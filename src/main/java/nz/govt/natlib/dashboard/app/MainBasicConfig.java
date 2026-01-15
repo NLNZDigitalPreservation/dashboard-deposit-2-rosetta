@@ -21,13 +21,10 @@ public class MainBasicConfig {
 
     @Value("${system.storage.path}")
     private String systemStoragePath;
-    @Value("${Rosetta.PDSUrl}")
-    private String pdsUrl;
     @Value("${Rosetta.RestApiDpsUrl}")
     private String restApiDpsUrl;
     @Value("${Rosetta.RestApiSipUrl}")
     private String restApiSipUrl;
-
 
     @Autowired
     private LdapAuthenticationClient authClient;
@@ -41,7 +38,6 @@ public class MainBasicConfig {
         log.info("End to initial Rosetta Web Service");
         return bean;
     }
-
 
 
     @Bean

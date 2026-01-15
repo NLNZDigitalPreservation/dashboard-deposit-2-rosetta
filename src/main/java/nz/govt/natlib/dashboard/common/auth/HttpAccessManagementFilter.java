@@ -31,7 +31,7 @@ public class HttpAccessManagementFilter implements Filter {
         log.debug("contextUri: {}, url: {}", contextUri, url);
 
         // Only allowed the authentication for restful APIs
-        if (!url.startsWith(DashboardConstants.PATH_ROOT)) {
+        if (!url.startsWith(DashboardConstants.PATH_ROOT) || url.equalsIgnoreCase(DashboardConstants.SYSTEM_INFO)) {
             chain.doFilter(request, response);
             return;
         }
