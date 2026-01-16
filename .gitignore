@@ -27,5 +27,6 @@ src/main/resources/static/
 target/
 
 .env
-/security/
+/certs.tar.gz
 /**/*.crt
+/certs

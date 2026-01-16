@@ -22,10 +22,14 @@ RUN rm -rf static
 COPY --from=build-ui /build/ui/dist ./static
 
 WORKDIR /build
-RUN keytool -importcert -alias ZscalerRootCA -cacerts -storepass changeit -file security/ZscalerRoot.crt -noprompt && \
+
+RUN rm -rf certs && \
+    mkdir certs && \
+    tar -xvf certs.tar.gz -C ./ && \
+    keytool -importcert -alias ZscalerRootCA -cacerts -storepass changeit -file certs/ZscalerRoot.crt -noprompt && \
     ./gradlew clean build -x test && \
     mv ./build/libs/dashboard-*.war ./ && \
-    rm -rf security
+    rm -rf certs certs.tar.gz
 
 
 # Stage 3: Build the final project
@@ -34,16 +38,19 @@ FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu
 # Create deployment folder in final image
 WORKDIR /deployment
 
-COPY ./security/*.crt ./
+COPY ./certs.tar.gz ./certs.tar.gz
 
-RUN keytool -importcert -alias rootCA -cacerts -storepass changeit -file NZGovtCA004.crt -noprompt && \
-    keytool -importcert -alias intermediateCA -cacerts -storepass changeit -file NZGovtCA205.crt -noprompt && \
-    keytool -importcert -alias natlibECC -cacerts -storepass changeit -file NZGovtCA342.crt -noprompt && \
-    keytool -importcert -alias rootRSA -cacerts -storepass changeit -file NZGovtCA003.crt -noprompt && \
-    keytool -importcert -alias intermediateRSA -cacerts -storepass changeit -file NZGovtCA204.crt -noprompt && \
-    keytool -importcert -alias natlibRSA -cacerts -storepass changeit -file NZGovtCA338.crt -noprompt && \
-    keytool -importcert -alias ZscalerRootCA -cacerts -storepass changeit -file ZscalerRoot.crt -noprompt && \
-    rm *.crt
+RUN rm -rf certs && \
+    mkdir certs && \
+    tar -xvf certs.tar.gz -C ./ && \
+    keytool -importcert -alias rootCA -cacerts -storepass changeit -file certs/NZGovtCA004.crt -noprompt && \
+    keytool -importcert -alias intermediateCA -cacerts -storepass changeit -file certs/NZGovtCA205.crt -noprompt && \
+    keytool -importcert -alias natlibECC -cacerts -storepass changeit -file certs/NZGovtCA342.crt -noprompt && \
+    keytool -importcert -alias rootRSA -cacerts -storepass changeit -file certs/NZGovtCA003.crt -noprompt && \
+    keytool -importcert -alias intermediateRSA -cacerts -storepass changeit -file certs/NZGovtCA204.crt -noprompt && \
+    keytool -importcert -alias natlibRSA -cacerts -storepass changeit -file certs/NZGovtCA338.crt -noprompt && \
+    keytool -importcert -alias ZscalerRootCA -cacerts -storepass changeit -file certs/ZscalerRoot.crt -noprompt && \
+    rm -rf certs certs.tar.gz
 
 # Copy the WAR from the build stage
 COPY --from=build-server /build/dashboard-*.war ./dashboard.war
