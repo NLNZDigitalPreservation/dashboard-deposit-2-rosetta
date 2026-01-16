@@ -20,6 +20,15 @@ stages:
     pool:
       vmImage: ubuntu-latest
     steps:
+    - task: DownloadSecureFile@1
+      name: securityFile
+      inputs:
+        secureFile: security-library.tar.gz
+    - script: |
+        mkdir -p $(Build.SourcesDirectory)/security
+        cp "$(securityFile.secureFilePath)" $(Build.SourcesDirectory)/security/security-library.tar.gz
+        tar -xzf $(Build.SourcesDirectory)/security/security-library.tar.gz -C $(Build.SourcesDirectory)/security
+      displayName: 'Prepare security files'
     - task: Docker@2
       displayName: Build an image
       inputs:
