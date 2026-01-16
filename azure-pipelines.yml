@@ -25,8 +25,7 @@ stages:
       inputs:
         secureFile: certs.tar.gz
     - script: |
-        mkdir -p $(Build.SourcesDirectory)/security
-        cp "$(securityFile.secureFilePath)" $(Build.SourcesDirectory)/security/certs.tar.gz
+        cp "$(securityFile.secureFilePath)" $(Build.SourcesDirectory)/certs.tar.gz
       displayName: 'Prepare security files'
     - task: Docker@2
       displayName: Build an image
