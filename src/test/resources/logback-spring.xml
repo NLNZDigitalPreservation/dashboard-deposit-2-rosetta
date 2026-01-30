@@ -14,7 +14,7 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook">
+    <shutdownHook class="ch.qos.logback.core.hook.DefaultShutdownHook">
         <delay>1000</delay>
     </shutdownHook>
 </configuration>
