@@ -13,7 +13,6 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.lang.Exception;
 
 @Configuration
 public class MainBasicConfig {
@@ -46,7 +45,6 @@ public class MainBasicConfig {
     }
 
     static class CustomTomcatServletWebServerFactory extends TomcatServletWebServerFactory {
-        @Override
         protected void postProcessContext(Context context) {
             ((StandardJarScanner) context.getJarScanner()).setScanManifest(false);
         }
