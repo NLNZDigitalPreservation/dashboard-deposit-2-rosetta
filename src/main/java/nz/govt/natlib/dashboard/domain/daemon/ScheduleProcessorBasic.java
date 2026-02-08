@@ -61,7 +61,7 @@ public abstract class ScheduleProcessorBasic {
     public void scan() {
         log.debug("On timer heartbeat: scan.");
         if (this.isGlobalPaused()) {
-            log.info("Skip the paused timeslot.");
+            log.warn("Skip the paused timeslot.");
             return;
         }
 
@@ -72,7 +72,7 @@ public abstract class ScheduleProcessorBasic {
     public void pipeline() throws Exception {
         log.debug("On timer heartbeat: pipeline.");
         if (this.isGlobalPaused()) {
-            log.info("Skip the paused timeslot in pipeline.");
+            log.warn("Skip the paused timeslot in pipeline.");
             return;
         }
 
@@ -87,7 +87,7 @@ public abstract class ScheduleProcessorBasic {
                 EntityFlowSetting flowSetting = repoFlowSetting.getById(flowSettingId);
                 if (flowSetting != null) {
                     if (!flowSetting.isEnabled()) {
-                        log.warn("Disabled Material Flow: {} {}", flowSetting.getId(), flowSetting.getMaterialFlowId());
+                        log.info("Disabled Material Flow: {} {}", flowSetting.getId(), flowSetting.getMaterialFlowId());
                         continue;
                     }
 
