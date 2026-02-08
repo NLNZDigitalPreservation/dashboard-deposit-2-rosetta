@@ -49,7 +49,15 @@ public class MainApplication implements CommandLineRunner {
         for (var propertySource : env.getPropertySources()) {
             if (propertySource instanceof EnumerablePropertySource eps) {
                 for (String name : eps.getPropertyNames()) {
-                    listProps.add(name + "=" + eps.getProperty(name));
+                    Object obj = eps.getProperty(name);
+                    String value = "";
+                    if (obj != null) {
+                        value = obj.toString();
+                    }
+                    if (name.toLowerCase().contains("password") || name.toLowerCase().contains("passwd")) {
+                        value = "******";
+                    }
+                    listProps.add(name + "=" + value);
                 }
             }
         }
