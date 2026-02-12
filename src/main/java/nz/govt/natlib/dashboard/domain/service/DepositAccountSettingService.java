@@ -10,6 +10,7 @@ import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
 import nz.govt.natlib.dashboard.exceptions.BadRequestException;
 import nz.govt.natlib.dashboard.exceptions.SystemErrorException;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
+import nz.govt.natlib.dashboard.common.exception.InvalidParameterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +39,20 @@ public class DepositAccountSettingService {
         DashboardHelper.assertNotNull("DepositUserName", account.getDepositUserName());
         DashboardHelper.assertNotNull("DepositUserPassword", account.getDepositUserPassword());
 
-        //        With the LDAP authentication mechanism, will not authenticate the account in Rosetta
-        //        String sessionId = rosettaWebService.login(account.getDepositUserInstitute(), account.getDepositUserName(), account.getDepositUserPassword());
-        //        if (StringUtils.isEmpty(sessionId)) {
-        //            String err_msg = "Invalid deposit username or password";
-        //            log.error(err_msg);
-        //            throw new BadRequestException(RestResponseCommand.RSP_AUTH_NO_PRIVILEGE, err_msg);
-        //        }
+        //The previous password is invisible to ui
+        if (account.getDepositUserPassword().equals("******")) {
+            if (account.getId() == null) {
+                throw new InvalidParameterException("Invalid password for the account");
+            } else {
+                EntityDepositAccountSetting existingAccount = repoDepositAccount.getById(account.getId());
+                if (existingAccount == null) {
+                    throw new InvalidParameterException("The account has been deleted, can not be updated");
+                } else {
+                    account.setDepositUserPassword(existingAccount.getDepositUserPassword());
+                }
+            }
+        }
+
         repoDepositAccount.save(account);
     }
 
@@ -58,27 +66,11 @@ public class DepositAccountSettingService {
         repoDepositAccount.deleteById(id);
     }
 
-    //        With the LDAP authentication mechanism, will not authenticate the account in Rosetta
-    //    public EntityDepositAccountSetting getDepositAccountDetail(Long id) throws Exception {
-    //        EntityDepositAccountSetting account = repoDepositAccount.getById(id);
-    //        String sessionId = null;
-    //
-    //        try {
-    //            sessionId = rosettaWebService.login(account.getDepositUserInstitute(), account.getDepositUserName(), account.getDepositUserPassword());
-    //            if (StringUtils.isEmpty(sessionId)) {
-    //                account.setAuditRst(Boolean.FALSE);
-    //                account.setAuditMsg("The credential message is not correct");
-    //            }
-    //        } catch (Exception e) {
-    //            account.setAuditRst(Boolean.FALSE);
-    //            account.setAuditMsg("The credential message is not correct:" + e.getMessage());
-    //        } finally {
-    //            if (!StringUtils.isEmpty(sessionId)) {
-    //                rosettaWebService.logout(sessionId);
-    //            }
-    //        }
-    //        return account;
-    //    }
+
+    public EntityDepositAccountSetting getDepositAccountDetail(Long id) throws Exception {
+        EntityDepositAccountSetting account = repoDepositAccount.getById(id);
+        return account;
+    }
 
     public void refreshDepositAccountSetting(Long id) {
         RestResponseCommand retVal = new RestResponseCommand();

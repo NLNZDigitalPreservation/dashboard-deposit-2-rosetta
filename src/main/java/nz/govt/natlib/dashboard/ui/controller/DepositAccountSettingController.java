@@ -17,14 +17,18 @@ public class DepositAccountSettingController {
     @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_ALL_GET, method = {RequestMethod.POST, RequestMethod.GET})
     public ResponseEntity<?> getAllProducerSettings() {
         List<EntityDepositAccountSetting> ret = depositAccountSettingService.getAllDepositAccountSettings();
+        for (EntityDepositAccountSetting account : ret) {
+            account.setDepositUserPassword("******");
+        }
         return ResponseEntity.ok().body(ret);
     }
 
-//    @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_DETAIL, method = {RequestMethod.POST, RequestMethod.GET})
-//    public ResponseEntity<?> getProducerSettingDetail(@RequestParam("id") Long id) throws Exception {
-//        EntityDepositAccountSetting ret = depositAccountSettingService.getDepositAccountDetail(id);
-//        return ResponseEntity.ok().body(ret);
-//    }
+    @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_DETAIL, method = {RequestMethod.POST, RequestMethod.GET})
+    public ResponseEntity<?> getProducerSettingDetail(@RequestParam("id") Long id) throws Exception {
+        EntityDepositAccountSetting ret = depositAccountSettingService.getDepositAccountDetail(id);
+        ret.setDepositUserPassword("******");
+        return ResponseEntity.ok().body(ret);
+    }
 
     @RequestMapping(path = DashboardConstants.PATH_SETTING_DEPOSIT_ACCOUNT_SAVE, method = {RequestMethod.POST, RequestMethod.GET})
     public ResponseEntity<?> saveProducerSetting(@RequestBody EntityDepositAccountSetting reqCmd) {
