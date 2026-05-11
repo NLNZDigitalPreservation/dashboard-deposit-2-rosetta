@@ -1,7 +1,6 @@
 package nz.govt.natlib.dashboard.domain.service;
 
 import nz.govt.natlib.dashboard.common.metadata.UserInfo;
-import nz.govt.natlib.dashboard.common.auth.Sessions;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.metadata.EnumUserRole;
 import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
@@ -21,9 +20,6 @@ public class WhitelistSettingService {
     @Autowired
     private RepoWhiteList repoWhiteList;
 
-    @Autowired
-    private Sessions sessions;
-
     public boolean isEmptyWhiteList() {
         List<EntityWhitelistSetting> data = repoWhiteList.getAll();
         return data.isEmpty();
@@ -34,40 +30,42 @@ public class WhitelistSettingService {
         return data;
     }
 
-    public void saveWhitelistSetting(EntityWhitelistSetting whitelist, String token) throws Exception {
-        if (whitelist.getId() != null) {
-            String currentUsername = sessions.getUsername(token);
+    public void saveWhitelistSetting(EntityWhitelistSetting whitelist, String currentUsername) throws Exception {
+        if (whitelist.getId() != null && !DashboardHelper.isEmpty(currentUsername)) {
             EntityWhitelistSetting toBeModifiedUser = repoWhiteList.getById(whitelist.getId());
             if (toBeModifiedUser != null && toBeModifiedUser.getWhiteUserName().equalsIgnoreCase(currentUsername)) {
-                throw new InvalidParameterException("You could not change yourself: " + RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
+                throw new InvalidParameterException(
+                        "You could not change yourself: " + RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
             }
         }
         saveWhitelistSetting(whitelist);
     }
 
     public void saveWhitelistSetting(EntityWhitelistSetting whitelist) throws Exception {
-        //Validate the producer
+        // Validate the producer
         DashboardHelper.assertNotNull("Whitelist", whitelist);
         DashboardHelper.assertNotNull("WhitelistUsername", whitelist.getWhiteUserName());
         DashboardHelper.assertNotNull("WhitelistRole", whitelist.getWhiteUserRole());
 
         EntityWhitelistSetting existingUser = repoWhiteList.getByUserName(whitelist.getWhiteUserName());
         if (existingUser != null && !existingUser.getId().equals(whitelist.getId())) {
-            throw new InvalidParameterException("The user exists in the white list: " + RestResponseCommand.RSP_PROCESS_SET_DUPLICATED);
+            throw new InvalidParameterException(
+                    "The user exists in the white list: " + RestResponseCommand.RSP_PROCESS_SET_DUPLICATED);
         }
 
         repoWhiteList.save(whitelist);
     }
 
-    public void deleteWhitelistSetting(Long id, String token) throws Exception {
-        String currentUsername = sessions.getUsername(token);
+    public void deleteWhitelistSetting(Long id, String currentUsername) throws Exception {
         EntityWhitelistSetting toBeDeletedUser = repoWhiteList.getById(id);
-        if (toBeDeletedUser != null && toBeDeletedUser.getWhiteUserName().equalsIgnoreCase(currentUsername)) {
-            throw new InvalidParameterException("You could not delete yourself: " + RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
+        if (toBeDeletedUser != null
+                && !DashboardHelper.isEmpty(currentUsername)
+                && toBeDeletedUser.getWhiteUserName().equalsIgnoreCase(currentUsername)) {
+            throw new InvalidParameterException(
+                    "You could not delete yourself: " + RestResponseCommand.RSP_WHITELIST_CHANGE_ERROR);
         }
         repoWhiteList.deleteById(id);
     }
-
 
     public EntityWhitelistSetting getWhitelistDetail(Long id) {
         return repoWhiteList.getById(id);
@@ -92,7 +90,8 @@ public class WhitelistSettingService {
     public EntityWhitelistSetting initialWhiteListSetting(UserInfo pdsUserInfo) {
         EntityWhitelistSetting userInfo = getUserFromWhiteList(pdsUserInfo);
         if (!DashboardHelper.isNull(userInfo)) {
-            throw new InvalidParameterException("The dashboard could not be duplicated initialed:" + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
+            throw new InvalidParameterException("The dashboard could not be duplicated initialed:"
+                    + RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
         }
 
         userInfo = new EntityWhitelistSetting();
