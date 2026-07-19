@@ -1,5 +1,6 @@
 package nz.govt.natlib.dashboard.common.auth;
 
+import nz.govt.natlib.dashboard.util.DashboardHelper;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +36,9 @@ public class Sessions {
      * Get the session if it's still valid and, if so, update the timestamp of last access
      */
     public SessionInfo getSession(String id) throws InvalidSessionException {
+        if (DashboardHelper.isEmpty(id)) {
+            throw new InvalidSessionException("Session ID is empty");
+        }
         if (!sessionMap.containsKey(id) || sessionMap.get(id).expired()) {
             sessionMap.remove(id);
             throw new InvalidSessionException(id);
