@@ -1,12 +1,90 @@
-<script setup lang="ts">
-import { useLoginStore } from '@/utils/rest.api';
+<script setup lang="js">
+import { useDrawerService } from '@/utils/drawer.service';
+import { useUserProfileStore } from '@/utils/users';
+import { ref } from 'vue';
 
-const loginStore = useLoginStore();
+document.body.contentEditable = 'false';
+document.documentElement.contentEditable = 'false';
 
-// const checked = ref(false);
+const drawerRef = useDrawerService();
 
-const login = () => {
-    loginStore.authenticate();
+const userProfile = useUserProfileStore();
+
+const emit = defineEmits(['cancel', 'save']);
+
+const username = ref();
+const password = ref();
+const userInfo = ref();
+const feedback = ref({
+    ok: true,
+    title: '',
+    detail: ''
+});
+
+const msgKey = ref(0);
+const login = async () => {
+    if (!username.value) {
+        feedback.value.ok = false;
+        feedback.value.title = 'Error';
+        feedback.value.detail = 'The username can Not be empty!';
+        return;
+    }
+    if (!password.value) {
+        feedback.value.ok = false;
+        feedback.value.title = 'Error';
+        feedback.value.detail = 'The password can Not be empty!';
+        return;
+    }
+
+    feedback.value = await _login();
+    msgKey.value += 1;
+    if (feedback.value.ok) {
+        emit('save', { userInfo: userInfo.value });
+        drawerRef.close();
+    }
+};
+
+const _login = async () => {
+    const credentials = {
+        username: username.value,
+        password: password.value
+    };
+
+    const rsp = await fetch('/fixity/rest/auth/login', {
+        method: 'POST',
+        redirect: 'error',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: JSON.stringify(credentials)
+    });
+
+    const _feedback = {
+        ok: true,
+        title: '',
+        detail: ''
+    };
+
+    if (!rsp.ok) {
+        const status = rsp.status;
+        let statusText = rsp.statusText;
+        if (!statusText || statusText.length === 0) {
+            if (status === 401) {
+                statusText = 'Unknown username or password, please try again.';
+            } else {
+                statusText = 'Unknown error.';
+            }
+        }
+        _feedback.ok = false;
+        _feedback.title = 'Error: ' + status;
+        _feedback.detail = statusText;
+    } else {
+        userInfo.value = await rsp.json();
+        userProfile.update(userInfo.value);
+        await userProfile.syncAzureAccount();
+    }
+
+    return _feedback;
 };
 </script>
 

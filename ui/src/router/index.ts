@@ -1,3 +1,6 @@
+import { useAuthStore } from '@/utils/auth';
+import { useSystemInfoStore } from '@/utils/system.info.store';
+import { useUserProfileStore } from '@/utils/users';
 import { createRouter, createWebHistory } from 'vue-router';
 
 export const routes = {
@@ -26,5 +29,19 @@ export const routes = {
 };
 
 const router = createRouter(routes);
+
+router.beforeEach(async (to) => {
+    const systemInfoStore = useSystemInfoStore();
+    const userProfileStore = useUserProfileStore();
+    const authStore = useAuthStore();
+
+    await systemInfoStore.load();
+    await userProfileStore.load();
+
+    const isAuthenticated = await authStore.isAuthenticated();
+    if (!isAuthenticated) {
+        await authStore.requireLogin();
+    }
+});
 
 export default router;

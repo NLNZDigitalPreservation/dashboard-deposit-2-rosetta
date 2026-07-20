@@ -82,4 +82,21 @@ interface JobQueryCondition {
     states: string[];
 }
 
-export type { DepositAccount, DepositJob, GlobalSetting, JobQueryCondition, MaterialFlow, WhiteListUser };
+interface SystemInfo {
+    appDeployment: string;
+    version: string;
+    authMode: string;
+    entraTenantId: string;
+    entraClientId: string;
+    entraRedirectUrl: string;
+}
+
+interface UserProfile {
+    token: string;
+    username: string;
+    presentationName: string;
+    email: string;
+    role: string;
+}
+
+export type { DepositAccount, DepositJob, GlobalSetting, JobQueryCondition, MaterialFlow, SystemInfo, UserProfile, WhiteListUser };

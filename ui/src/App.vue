@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import { type UseFetchApis, useFetch, useLoginStore } from '@/utils/rest.api';
+import { useSystemInfoStore } from '@/utils/system.info.store';
 import { useThemeStore } from '@/utils/themes';
+import { useUserProfileStore } from '@/utils/users';
 import { useTitle } from '@vueuse/core';
 import { onMounted, ref } from 'vue';
-import LoginDialog from './components/LoginDialog.vue';
-
 import MainView from './views/MainView.vue';
 
-const rest: UseFetchApis = useFetch();
+const systemInfoStore = useSystemInfoStore();
+const userProfileStore = useUserProfileStore();
 
-const loginStore = useLoginStore();
 const themeStore = useThemeStore();
 const title = useTitle('Dashboard');
 const envType = ref('DEV');
 
 onMounted(async () => {
-    const sysInfo = await rest.get('/restful/system-info');
+    const sysInfo = systemInfoStore.data;
+
     let darkMode = false;
     let colorMode = 'indigo';
     let hostType = 'DEV';
-    if (!sysInfo.systemDeployment) {
+    if (!sysInfo.appDeployment) {
         hostType = 'DEV';
     } else {
-        hostType = sysInfo.systemDeployment.toUpperCase();
+        hostType = sysInfo.appDeployment.toUpperCase();
     }
 
     darkMode = true;
@@ -42,11 +42,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <LoginDialog v-if="loginStore.visibleLoginWindow" id="login-dialog" />
-
-    <div v-show="!loginStore.visibleLoginWindow">
-        <Suspense> <MainView :env-type="envType" /> </Suspense>
-    </div>
+    <Suspense> <MainView :env-type="envType" /> </Suspense>
     <Suspense>
         <DynamicDialog />
     </Suspense>

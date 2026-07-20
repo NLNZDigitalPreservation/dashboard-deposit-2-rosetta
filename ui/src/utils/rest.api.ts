@@ -1,223 +1,106 @@
-import { useUserProfileStore } from '@/stores/users';
-import { defineStore } from 'pinia';
-import { useToast } from 'primevue/usetoast';
-import { computed, reactive, ref } from 'vue';
+import { useAuthStore } from '@/utils/auth';
+import { extractError } from '@/utils/rest.http';
+import { useUserProfileStore } from '@/utils/users';
+import axios from 'axios';
 
-const RootContextPath = '/deposit-dashboard';
-const ToastLife = 6 * 1000;
-const RetryDelay = 3 * 1000;
+const baseUrl = import.meta.env.BASE_URL;
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
+// Move these outside the hook or use a ref if you want
+// to share the queue across multiple hook calls
+let isRefreshing = false;
+let failedQueue = [] as Array<{ resolve: (token: string) => void; reject: () => void }>;
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-export const useLoginStore = defineStore('LoginStore', () => {
-    const feedback = reactive({
-        ok: true,
-        title: '',
-        detail: ''
+const processQueue = (token: any = null) => {
+    failedQueue.forEach((prom) => {
+        if (token) {
+            prom.resolve(token);
+        } else {
+            prom.reject();
+        }
     });
-    const username = ref('');
-    const password = ref('');
-    const userProfile = useUserProfileStore();
-    const isAuthenticating = ref(false);
-    const isInitialed = ref(false);
-    const startLogin = () => {
-        if (!isAuthenticating.value) {
-            isAuthenticating.value = true;
-        }
-    };
-
-    const logout = () => {
-        username.value = '';
-        password.value = '';
-        userProfile.clear();
-        startLogin();
-    };
-
-    const authenticate = async () => {
-        feedback.ok = true;
-        feedback.title = '';
-        feedback.detail = '';
-
-        const credentials = JSON.stringify({
-            username: username.value,
-            password: password.value
-        });
-        const rsp = await fetch(RootContextPath + '/auth/login.json', {
-            method: 'POST',
-            redirect: 'error',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: credentials
-        }).catch((err: any) => {
-            feedback.ok = false;
-            feedback.title = 'Error';
-            feedback.detail = err.message;
-        });
-
-        //Exception has happened
-        if (!rsp) {
-            console.log(feedback);
-            return;
-        }
-
-        if (!rsp.ok) {
-            let status = rsp.status;
-            let statusText = rsp.statusText;
-            if (!statusText || statusText.length === 0) {
-                if (status === 401) {
-                    statusText = 'Unknown username or password, please try again.';
-                } else {
-                    statusText = 'Unknown error.';
-                }
-            }
-            feedback.ok = false;
-            feedback.title = 'Error: ' + status;
-            feedback.detail = statusText;
-            return;
-        }
-
-        const token = await rsp.text();
-        userProfile.setToken(username, token);
-
-        isAuthenticating.value = false;
-        isInitialed.value = true;
-    };
-
-    const visibleLoginWindow = computed(() => {
-        if (!isInitialed.value) {
-            return true;
-        }
-        return isAuthenticating.value;
-    });
-
-    return { startLogin, authenticate, logout, visibleLoginWindow, isAuthenticating, isInitialed, feedback, username, password };
-});
-
-export interface UseFetchApis {
-    // methods
-    get: (path: string) => any;
-    post: (path: string, payload: any) => any;
-    put: (path: string, payload: any) => any;
-    delete: (path: string, payload: any) => any;
-    patch: (path: string, payload: any) => any;
-    head: (path: string) => any;
-    options: (path: string, payload: any) => any;
-}
+    failedQueue = [];
+};
 
 // by convention, composable function names start with "use"
 export function useFetch() {
-    // state encapsulated and managed by the composable
-    // const dialog = useDialog();
-    const toast = useToast();
+    const userStore = useUserProfileStore();
+    const authStore = useAuthStore();
 
-    const shell: UseFetchApis = {
-        // method
-        get: setMethod('GET'),
-        put: setMethod('PUT'),
-        post: setMethod('POST'),
-        delete: setMethod('DELETE'),
-        patch: setMethod('PATCH'),
-        head: setMethod('HEAD'),
-        options: setMethod('OPTIONS')
-    };
+    const api = axios.create({
+        baseURL: baseUrl,
+        timeout: 60000
+    });
 
-    function setMethod(methodValue: HttpMethod) {
-        return async (path: string, payload: any = null) => {
-            const loginStore = useLoginStore();
-            const userProfile = useUserProfileStore();
+    api.interceptors.request.use((config) => {
+        const userInfo = userStore.userInfo;
+        if (userInfo?.token) {
+            config.headers = config.headers ?? {};
+            config.headers.Authorization = userInfo.token;
+        }
+        return config;
+    });
 
-            let ret = null;
+    api.interceptors.response.use(
+        (res) => res.data,
+        async (error) => {
+            const originalRequest = error.config || {};
 
-            const isFinished = ref(false);
-
-            //Retry until it's finished. If the login session is expired, it can be run 2 rounds
-            while (!isFinished.value) {
-                // Waiting until the authentication is finished
-                while (loginStore.isAuthenticating) {
-                    await sleep(1000);
+            if (error.response && error.response.status === 401 && !originalRequest._retry) {
+                if (isRefreshing) {
+                    // 1. If a login is already in progress, add this request to the queue
+                    return new Promise((resolve, reject) => {
+                        failedQueue.push({ resolve, reject });
+                    })
+                        .then((token) => {
+                            originalRequest.headers.Authorization = token;
+                            return api(originalRequest);
+                        })
+                        .catch((err) => {
+                            return Promise.reject(err);
+                        });
                 }
 
-                const reqOptions: RequestInit = {
-                    method: methodValue,
-                    credentials: 'same-origin',
-                    redirect: 'error',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: userProfile.token
-                    }
+                // 2. Mark this request as retrying and lock the refresh process
+                originalRequest._retry = true;
+                isRefreshing = true;
+
+                try {
+                    // 3. Trigger the login dialog
+                    await authStore.requireLogin();
+
+                    // 4. Reload store to get the new token
+                    const userInfo = userStore.userInfo;
+                    const newToken = userInfo?.token;
+
+                    // 5. Release the waiting requests
+                    processQueue(newToken);
+
+                    // 6. Retry the original request that triggered the 401
+                    originalRequest.headers.Authorization = newToken;
+                    return api(originalRequest);
+                } catch (e) {
+                    processQueue(null); // Reject the queue
+                    return Promise.reject(e);
+                } finally {
+                    isRefreshing = false;
+                }
+            } else {
+                let err = {
+                    title: 'Error',
+                    description: 'Unknown error'
                 };
-                if (payload !== null && payload !== undefined) {
-                    reqOptions.body = JSON.stringify(payload);
+
+                if (error.response) {
+                    err = extractError(error.response);
                 }
 
-                const rsp = await fetch(RootContextPath + path, reqOptions).catch((err: any) => {
-                    toast.removeAllGroups();
-                    toast.add({ severity: 'warn', summary: 'Warning! ', detail: err.message, life: ToastLife });
-                });
+                console.error(err.description, err.description, err.title);
 
-                //Exception has happened
-                if (!rsp) {
-                    // await sleep(RetryDelay);
-                    // continue;
-                    break;
-                }
-
-                //Need authentication, forward to login page
-                if (rsp.status === 401) {
-                    loginStore.startLogin();
-                    continue;
-                }
-
-                //Upstream error
-                if (rsp.status >= 500 && rsp.status <= 599) {
-                    toast.removeAllGroups();
-                    toast.add({ severity: 'warn', summary: 'Warning!', detail: '[' + rsp.status + '] System Error! Will retry in ' + RetryDelay / 1000 + ' seconds.', life: ToastLife });
-                    await sleep(RetryDelay);
-                    continue;
-                }
-
-                // const headerNames = rsp.headers.keys();
-                // while (true) {
-                //     const headerName = headerNames.next();
-                //     if (headerName.done) {
-                //         break;
-                //     }
-                //     console.log(headerName.value);
-                // }
-
-                if (rsp.ok) {
-                    const contentType = rsp.headers.get('content-type') || '';
-                    const contentLength = parseInt(rsp.headers.get('content-length') || '-1');
-
-                    if (contentType.length === 0 && contentLength <= 0) {
-                        ret = null;
-                    } else if (contentType.startsWith('application/json')) {
-                        ret = await rsp.json();
-                    } else if (contentType.startsWith('application') || contentType.startsWith('image') || contentType.startsWith('video') || contentType.startsWith('audio')) {
-                        ret = await rsp.blob();
-                    } else {
-                        ret = await rsp.text();
-                    }
-                } else {
-                    let error = '';
-                    let e = await rsp.text();
-                    if (!e) {
-                        e = 'Unknown error';
-                    }
-                    error = '[' + path + '] ' + e + ' StatusCode: ' + rsp.status;
-                    toast.removeAllGroups();
-                    toast.add({ severity: 'error', summary: 'Error!', detail: error, life: ToastLife });
-                    ret = undefined;
-                }
-                isFinished.value = true;
+                // return Promise.reject(undefined);
+                return { data: undefined };
             }
-            return ret;
-        };
-    }
+        }
+    );
 
-    // expose managed state as return value
-    return shell;
+    return api;
 }

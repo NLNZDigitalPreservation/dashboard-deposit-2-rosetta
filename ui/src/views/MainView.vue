@@ -8,8 +8,8 @@ import WhiteListDrawer from '@/components/settings/WhiteListDrawer.vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useJobStore } from '@/stores/depositjob';
 import { useTopbarActions } from '@/stores/depositjobTopbarActions';
-import { useUserProfileStore } from '@/stores/users';
-import { useLoginStore } from '@/utils/rest.api';
+import { useAuthStore } from '@/utils/auth';
+import { useUserProfileStore } from '@/utils/users';
 import Menu from 'primevue/menu';
 import { useDialog } from 'primevue/usedialog';
 import { computed, ref } from 'vue';
@@ -27,7 +27,7 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 const keywords = ref();
 
 const jobList = useJobStore();
-const loginStore = useLoginStore();
+const loginStore = useAuthStore();
 const topbarMenuActive = ref(false);
 const topbarMenuClasses = computed(() => {
     return {

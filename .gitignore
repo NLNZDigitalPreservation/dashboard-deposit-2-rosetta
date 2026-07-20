@@ -5,6 +5,7 @@
 /apps/libs/
 /.idea/
 .idea/
+/bin/
 
 /ui/dist/
 /ui/node_modules/

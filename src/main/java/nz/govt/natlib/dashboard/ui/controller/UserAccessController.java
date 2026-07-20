@@ -130,8 +130,8 @@ public class UserAccessController {
                 presentationName = DashboardHelper.isEmpty(cmd.getEmail()) ? cmd.getUsername() : cmd.getEmail();
             }
             String sessionId = UUID.randomUUID().toString();
-            sessions.addSession(sessionId, cmd.getUsername(), "admin", EXPIRE_INTERNAL, presentationName);
-            sessionInfo = sessions.getSession(TEST_SESSION_ID);
+            sessions.addSession(sessionId, cmd.getUsername(), "admin", Long.MAX_VALUE, presentationName);
+            sessionInfo = sessions.getSession(sessionId);
         }
 
         if (sessionInfo == null) {
@@ -141,7 +141,7 @@ public class UserAccessController {
         return ResponseEntity.ok().body(sessionInfo);
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_USER_LOGOUT_API, method = {RequestMethod.POST, RequestMethod.GET})
+    @RequestMapping(path = DashboardConstants.PATH_USER_LOGOUT_API, method = {RequestMethod.POST, RequestMethod.GET, RequestMethod.DELETE})
     public ResponseEntity<?> logout(@RequestBody UserAccessReqCommand cmd, HttpServletRequest req, HttpServletResponse rsp) throws Exception {
         sessions.removeSession(cmd.getToken());
 

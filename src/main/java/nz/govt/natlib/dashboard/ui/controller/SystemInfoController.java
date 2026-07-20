@@ -23,6 +23,17 @@ public class SystemInfoController {
     @Value("${app.version:1.0.0}")
     private String version;
 
+    @Value("${AuthMode}")
+    private String authMode;
+
+    @Value("${entra.tenantId}")
+    private String entraTenantId;
+
+    @Value("${entra.clientId}")
+    private String entraClientId;
+
+    @Value("${entra.redirectUrl}")
+    private String entraRedirectUrl;
 
     @RequestMapping(path = DashboardConstants.SYSTEM_INFO, method = {RequestMethod.GET})
     public ResponseEntity<?> get() {
@@ -32,6 +43,10 @@ public class SystemInfoController {
 
             sysInfo.put("version", version);
             sysInfo.put("systemDeployment", appDeployment);
+            sysInfo.put("authMode", authMode.toLowerCase());
+            sysInfo.put("entraTenantId", entraTenantId);
+            sysInfo.put("entraClientId", entraClientId);
+            sysInfo.put("entraRedirectUrl", entraRedirectUrl);
 
             return ResponseEntity.ok().body(sysInfo);
         } catch (Exception e) {
