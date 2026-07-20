@@ -42,11 +42,15 @@ onMounted(async () => {
 </script>
 
 <template>
-    <Suspense> <MainView :env-type="envType" /> </Suspense>
+    <Suspense>
+        <MainView :env-type="envType" />
+    </Suspense>
     <Suspense>
         <DynamicDialog />
     </Suspense>
-    <ConfirmDialog></ConfirmDialog>
+    <Suspense>
+        <ConfirmDialog />
+    </Suspense>
 </template>
 
 <style>

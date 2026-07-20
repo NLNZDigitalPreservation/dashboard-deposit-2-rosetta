@@ -12,11 +12,11 @@ export const useUserProfileStore = defineStore('userProfile', () => {
 
     const load = async () => {
         const systemInfoStore = await useSystemInfoStore();
-        const authMode = systemInfoStore.data.value.authMode || 'test';
+        const authMode = systemInfoStore.data.authMode || 'test';
         if (authMode === 'entra') {
-            const tenantId = systemInfoStore.data.value.entraTenantId;
-            const clientId = systemInfoStore.data.value.entraClientId;
-            const redirectUrl = systemInfoStore.data.value.entraRedirectUrl;
+            const tenantId = systemInfoStore.data.entraTenantId;
+            const clientId = systemInfoStore.data.entraClientId;
+            const redirectUrl = systemInfoStore.data.entraRedirectUrl;
 
             const azureInfo = await getAzureAccountInfo(tenantId, clientId, redirectUrl);
             userInfo.value.token = '';
@@ -43,7 +43,7 @@ export const useUserProfileStore = defineStore('userProfile', () => {
         userInfo.value.token = sessionInfo.sessionId;
 
         const systemInfoStore = await useSystemInfoStore();
-        const authMode = systemInfoStore.data.value.authMode || 'test';
+        const authMode = systemInfoStore.data.authMode || 'test';
         if (authMode !== 'entra') {
             userInfo.value.username = sessionInfo.username;
             userInfo.value.presentationName = sessionInfo.displayName;
