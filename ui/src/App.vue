@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { useSystemInfoStore } from '@/utils/system.info.store';
 import { useThemeStore } from '@/utils/themes';
-import { useUserProfileStore } from '@/utils/users';
 import { useTitle } from '@vueuse/core';
 import { onMounted, ref } from 'vue';
-import MainView from './views/MainView.vue';
 
 const systemInfoStore = useSystemInfoStore();
-const userProfileStore = useUserProfileStore();
 
 const themeStore = useThemeStore();
 const title = useTitle('Dashboard');
@@ -43,19 +40,58 @@ onMounted(async () => {
 
 <template>
     <Suspense>
-        <MainView :env-type="envType" />
+        <router-view />
     </Suspense>
-    <Suspense>
-        <DynamicDialog />
-    </Suspense>
-    <Suspense>
-        <ConfirmDialog />
-    </Suspense>
-</template>
+    <DynamicDialog />
+    <ConfirmDialog />
 
-<style>
-#login-dialog {
-    position: fixed;
-    z-index: 9999;
-}
-</style>
+    <Toast group="toast-info" position="bottom-left">
+        <template #message="slotProps">
+            <div class="flex flex-col items-start flex-auto">
+                <div class="flex items-center gap-2">
+                    <i class="pi pi-info-circle" />
+                    <span class="font-bold">{{ slotProps.message.summary }}</span>
+                </div>
+                <div class="p-2">{{ slotProps.message.detail }}</div>
+            </div>
+        </template>
+    </Toast>
+    <Toast group="toast-error" position="bottom-left">
+        <template #message="slotProps">
+            <div class="flex flex-col items-start flex-auto">
+                <div class="flex items-center gap-2">
+                    <i class="pi pi-exclamation-triangle" />
+                    <span class="font-bold">{{ slotProps.message.summary }}</span>
+                </div>
+                <div class="font-medium text-lg my-4">{{ slotProps.message.detail }}</div>
+            </div>
+        </template>
+    </Toast>
+    <ConfirmDialog group="dlg-error">
+        <template #container="{ message, acceptCallback, rejectCallback }">
+            <Panel>
+                <template #header>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold">{{ message.header }}</span>
+                    </div>
+                </template>
+                <template #footer>
+                    <div class="flex flex-col items-center justify-center w-full">
+                        <Divider />
+                        <Button label="OK" @click="acceptCallback" class="w-32" severity="secondary"></Button>
+                    </div>
+                </template>
+                <template #icons>
+                    <Button icon="pi pi-times" severity="secondary" rounded text @click="rejectCallback" />
+                </template>
+                <div class="flex items-center gap-2">
+                    <!-- <IconWarning style="width: 30px; height: 30px" /> -->
+                    <i class="pi pi-exclamation-triangle" style="color: var(--p-toast-error-color); font-size: 3rem"></i>
+                    <div style="min-width: 30rem; max-width: 50rem">
+                        <p class="m-0">{{ message.message }}</p>
+                    </div>
+                </div>
+            </Panel>
+        </template>
+    </ConfirmDialog>
+</template>

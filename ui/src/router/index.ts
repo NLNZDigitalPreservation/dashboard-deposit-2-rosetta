@@ -11,6 +11,11 @@ export const routes = {
             children: [
                 {
                     path: '/',
+                    name: 'root',
+                    component: () => import('@/views/MainView.vue')
+                },
+                {
+                    path: '/index.html',
                     name: 'index',
                     component: () => import('@/views/MainView.vue')
                 },
@@ -18,6 +23,11 @@ export const routes = {
                     path: '/home.html',
                     name: 'home',
                     component: () => import('@/views/MainView.vue')
+                },
+                {
+                    path: '/login.html',
+                    name: 'login',
+                    component: () => import('@/views/LoginView.vue')
                 }
             ]
         },
@@ -32,15 +42,19 @@ const router = createRouter(routes);
 
 router.beforeEach(async (to) => {
     const systemInfoStore = useSystemInfoStore();
-    const userProfileStore = useUserProfileStore();
-    const authStore = useAuthStore();
-
     await systemInfoStore.load();
+
+    const userProfileStore = useUserProfileStore();
     await userProfileStore.load();
 
+    if (to.path === '/login.html') {
+        return;
+    }
+
+    const authStore = useAuthStore();
     const isAuthenticated = await authStore.isAuthenticated();
     if (!isAuthenticated) {
-        await authStore.requireLogin();
+        await authStore.logout();
     }
 });
 

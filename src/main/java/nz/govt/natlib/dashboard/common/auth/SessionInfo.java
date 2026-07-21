@@ -11,6 +11,9 @@ public class SessionInfo {
     String sessionId;
     String displayName;
 
+    public SessionInfo() {
+    }
+
     public SessionInfo(String username, String role, long expireInterval, String sessionId, String displayName) {
         this.modified = new Date();
         this.username = username;
@@ -28,7 +31,51 @@ public class SessionInfo {
         modified = new Date();
     }
 
+    public Date getModified() {
+        return modified;
+    }
+
+    public void setModified(Date modified) {
+        this.modified = modified;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public long getExpireInterval() {
+        return expireInterval;
+    }
+
+    public void setExpireInterval(long expireInterval) {
+        this.expireInterval = expireInterval;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
     public String getDisplayName() {
         return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 }

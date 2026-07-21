@@ -6,12 +6,12 @@ import { computed, ref } from 'vue';
 
 const KEY_USER_PROFILE = 'dashboard-user-profile';
 export const useUserProfileStore = defineStore('userProfile', () => {
+    const systemInfoStore = useSystemInfoStore();
     const userInfo = ref<UserProfile>({} as UserProfile);
 
     const currUserName = computed(() => userInfo.value.presentationName || userInfo.value.email || userInfo.value.username);
 
     const load = async () => {
-        const systemInfoStore = await useSystemInfoStore();
         const authMode = systemInfoStore.data.authMode || 'test';
         if (authMode === 'entra') {
             const tenantId = systemInfoStore.data.entraTenantId;
@@ -42,7 +42,6 @@ export const useUserProfileStore = defineStore('userProfile', () => {
     const update = async (sessionInfo: any) => {
         userInfo.value.token = sessionInfo.sessionId;
 
-        const systemInfoStore = await useSystemInfoStore();
         const authMode = systemInfoStore.data.authMode || 'test';
         if (authMode !== 'entra') {
             userInfo.value.username = sessionInfo.username;
