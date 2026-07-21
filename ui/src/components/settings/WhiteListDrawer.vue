@@ -50,10 +50,9 @@ const onDelete = (selectedData: any) => {
 onMounted(() => {});
 
 const visible = ref(false);
-const toggle = () => {
-    whiteListStore.queryAllRows().then((data: any) => {
-        visible.value = true;
-    });
+const toggle = async () => {
+    visible.value = true;
+    await whiteListStore.queryAllRows();
 };
 defineExpose({ toggle });
 </script>

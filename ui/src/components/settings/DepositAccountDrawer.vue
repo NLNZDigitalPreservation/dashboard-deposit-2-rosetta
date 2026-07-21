@@ -48,10 +48,9 @@ const onDelete = (selectedData: any) => {
 onMounted(() => {});
 
 const visible = ref(false);
-const toggle = () => {
-    depositAccountStore.queryAllRows().then((data: any) => {
-        visible.value = true;
-    });
+const toggle = async () => {
+    visible.value = true;
+    await depositAccountStore.queryAllRows();
 };
 defineExpose({ toggle });
 </script>

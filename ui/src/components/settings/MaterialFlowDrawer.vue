@@ -64,10 +64,9 @@ const onDelete = (selectedData: MaterialFlow) => {
 onMounted(() => {});
 
 const visible = ref(false);
-const toggle = () => {
-    materialFlowStore.queryAllRows().then((data: any) => {
-        visible.value = true;
-    });
+const toggle = async () => {
+    visible.value = true;
+    await materialFlowStore.queryAllRows();
 };
 defineExpose({ toggle });
 </script>

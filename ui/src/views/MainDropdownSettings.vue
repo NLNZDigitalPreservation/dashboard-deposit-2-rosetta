@@ -17,23 +17,23 @@ const settingsMenuItems = ref([
     {
         label: 'Deposit Account Settings',
         icon: 'pi pi-users',
-        command: () => {
+        command: async () => {
             // router.push('/setting/deposit-account');
-            drawerDepositAccount.value.toggle();
+            await drawerDepositAccount.value.toggle();
         }
     },
     {
         label: 'Material Flow Settings',
         icon: 'pi pi-objects-column',
-        command: () => {
-            drawerMaterialFlow.value.toggle();
+        command: async () => {
+            await drawerMaterialFlow.value.toggle();
         }
     },
     {
         label: 'User White List',
         icon: 'pi pi-list-check',
-        command: () => {
-            drawerWhiteList.value.toggle();
+        command: async () => {
+            await drawerWhiteList.value.toggle();
         }
     },
     {
