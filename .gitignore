@@ -31,3 +31,5 @@ target/
 /certs.tar.gz
 /**/*.crt
 /certs
+
+/bin/
