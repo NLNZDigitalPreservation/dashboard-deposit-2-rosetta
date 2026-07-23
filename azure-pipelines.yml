@@ -1,18 +1,13 @@
 # Docker
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+# Build and Push Spring Boot Docker Image
 
 trigger:
   - main
-
-# Build Number format:
-name: 3.0.$(Date:yyyyMMdd).$(Rev:r)
 
 resources:
   - repo: self
 
 variables:
-  tag: $(Build.BuildNumber)
   imageName: deposit-dashboard
 
 stages:
@@ -21,59 +16,54 @@ stages:
 
     jobs:
       - job: Build
-
-        # Change this to your self-hosted pool if applicable
+        displayName: Build and Push
         pool:
           vmImage: ubuntu-latest
-          # name: MySelfHostedPool
 
         steps:
           - checkout: self
 
-          - task: DownloadSecureFile@1
-            name: securityFile
+          # Ensure Gradle wrapper is executable
+          - script: chmod +x gradlew
+            displayName: Make Gradle Wrapper Executable
+
+          # Read project version from Gradle
+          - bash: |
+              VERSION=$(./gradlew properties -q | awk -F': ' '/^version:/ {print $2}')
+              echo "Project Version: $VERSION"
+              echo "##vso[task.setvariable variable=IMAGE_TAG]$VERSION"
+            displayName: Get Project Version
+
+          # Build the Spring Boot WAR
+          - task: Gradle@3
+            displayName: Build WAR
             inputs:
-              secureFile: certs.tar.gz
+              gradleWrapperFile: gradlew
+              tasks: bootWar
+              publishJUnitResults: false
+              javaHomeOption: JDKVersion
+              jdkVersionOption: "17"
 
+          # Login to Azure Container Registry
+          - task: Docker@2
+            displayName: Login to ACR
+            inputs:
+              command: login
+              containerRegistry: "<YOUR-ACR-SERVICE-CONNECTION>"
+
+          # Build and Push Docker Image
+          - task: Docker@2
+            displayName: Build and Push Docker Image
+            inputs:
+              command: buildAndPush
+              containerRegistry: "<YOUR-ACR-SERVICE-CONNECTION>"
+              repository: $(imageName)
+              Dockerfile: "**/Dockerfile"
+              tags: |
+                $(IMAGE_TAG)
+                latest
+
+          # Display the image tag in the pipeline log
           - script: |
-              cp "$(securityFile.secureFilePath)" "$(Build.SourcesDirectory)/certs.tar.gz"
-            displayName: Prepare security files
-
-          - script: |
-              echo "Build Number: $(Build.BuildNumber)"
-              echo "Image Tag: $(tag)"
-            displayName: Show Build Information
-
-          - script: |
-              echo "$(REGISTRY_PASSWORD)" | docker login \
-                $(REGISTRY_SERVER) \
-                --username "$(REGISTRY_USERNAME)" \
-                --password-stdin
-            displayName: Login to Registry
-
-          - script: |
-              docker build \
-                -t $(imageName):$(tag) \
-                -f "$(Build.SourcesDirectory)/Dockerfile" \
-                "$(Build.SourcesDirectory)"
-            displayName: Build Image
-
-          - script: |
-              docker tag \
-                $(imageName):$(tag) \
-                $(REGISTRY_SERVER)/$(imageName):$(tag)
-
-              docker tag \
-                $(imageName):$(tag) \
-                $(REGISTRY_SERVER)/$(imageName):latest
-            displayName: Tag Image
-
-          - script: |
-              docker push $(REGISTRY_SERVER)/$(imageName):$(tag)
-              docker push $(REGISTRY_SERVER)/$(imageName):latest
-            displayName: Push Image
-
-          - script: |
-              docker logout $(REGISTRY_SERVER)
-            displayName: Logout
-            condition: always()
+              echo "Docker image tag: $(IMAGE_TAG)"
+            displayName: Show Image Tag
