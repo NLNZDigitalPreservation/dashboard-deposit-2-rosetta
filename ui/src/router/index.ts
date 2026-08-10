@@ -28,6 +28,11 @@ export const routes = {
                     path: '/login.html',
                     name: 'login',
                     component: () => import('@/views/LoginView.vue')
+                },
+                {
+                    path: '/redirect.html',
+                    name: 'redirect',
+                    component: () => import('@/views/RedirectView.vue')
                 }
             ]
         },
@@ -47,7 +52,7 @@ router.beforeEach(async (to) => {
     const userProfileStore = useUserProfileStore();
     await userProfileStore.load();
 
-    if (to.path === '/login.html') {
+    if (to.path === '/login.html' || to.path === '/redirect.html') {
         return;
     }
 

@@ -19,7 +19,7 @@ export const useUserProfileStore = defineStore('userProfile', () => {
             const redirectUrl = systemInfoStore.data.entraRedirectUrl;
 
             const azureInfo = await getAzureAccountInfo(tenantId, clientId, redirectUrl);
-            userInfo.value.token = '';
+            userInfo.value.token = azureInfo?.azureAccountId || '';
             userInfo.value.username = azureInfo?.username || '';
             userInfo.value.presentationName = azureInfo?.presentation_name || '';
             userInfo.value.email = azureInfo?.email || '';
