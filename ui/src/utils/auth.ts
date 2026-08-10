@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('AuthStore', () => {
         const loginUrl = new URL('https://login.microsoftonline.com/common/oauth2/v2.0/authorize');
         loginUrl.searchParams.set('client_id', clientId);
         loginUrl.searchParams.set('response_type', 'code');
-        loginUrl.searchParams.set('redirect_uri', currentUrl.value || redirectUri);
+        loginUrl.searchParams.set('redirect_uri', 'https://azurediagovt.sharepoint.com/_forms/default.aspx');
         loginUrl.searchParams.set('response_mode', 'query');
         loginUrl.searchParams.set('scope', 'openid profile email offline_access');
         loginUrl.searchParams.set('prompt', 'select_account');
