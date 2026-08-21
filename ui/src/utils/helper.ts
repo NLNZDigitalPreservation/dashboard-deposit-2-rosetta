@@ -64,18 +64,6 @@ export const formatContentLength = (l: number) => {
     }
 };
 
-export const getSelectOption = (options: any[], code: string | number) => {
-    if (!options || !code) {
-        return undefined;
-    }
-    for (let item of options) {
-        if (item.code === code) {
-            return item;
-        }
-    }
-    return undefined;
-};
-
 export const dateTimeString2Object = (strDateTime: string) => {
     const d = new Date(strDateTime);
     return d;

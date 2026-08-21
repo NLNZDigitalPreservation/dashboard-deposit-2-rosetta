@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useSettingsWhiteListStore } from '@/stores/settings';
 import { type WhiteListUser } from '@/types/deposit';
-import { getSelectOption } from '@/utils/helper';
 import { inject, ref } from 'vue';
 import FlatInputGroup from '../FlatInputGroup.vue';
 
@@ -15,12 +14,10 @@ const userRoleOptions = ref([
     { name: 'Admin', code: 'admin' },
     { name: 'Normal', code: 'normal' }
 ]);
-const selectedUserRole = ref({ name: 'Normal', code: 'normal' });
 
 const whiteListStore = useSettingsWhiteListStore();
 
 const selectedRow = ref(Object.assign({}, params) as WhiteListUser);
-selectedUserRole.value = getSelectOption(userRoleOptions.value, selectedRow.value.whiteUserRole);
 
 const onSave = async () => {
     const ret = await whiteListStore.saveRow(selectedRow.value);
@@ -46,7 +43,7 @@ const onSave = async () => {
             </FlatInputGroup>
             <FlatInputGroup class="mt-2 mb-2">
                 <InputGroupAddon>User Role</InputGroupAddon>
-                <Select v-model="selectedUserRole" :options="userRoleOptions" optionLabel="name" placeholder="Select a role" />
+                <Select v-model="selectedRow.whiteUserRole" :options="userRoleOptions" optionLabel="name" optionValue="code" placeholder="Select a role" />
             </FlatInputGroup>
         </Fieldset>
 
