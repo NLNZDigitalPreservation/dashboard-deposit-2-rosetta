@@ -1,6 +1,4 @@
-import { useAuthStore } from '@/utils/auth';
-import { useSystemInfoStore } from '@/utils/system.info.store';
-import { useUserProfileStore } from '@/utils/users';
+import { PublicClientApplication } from '@azure/msal-browser';
 import { createRouter, createWebHistory } from 'vue-router';
 
 export const routes = {
@@ -45,21 +43,50 @@ export const routes = {
 
 const router = createRouter(routes);
 
+const msalConfig = {
+    auth: {
+        clientId: '',
+        authority: 'https://login.microsoftonline.com/',
+        redirectUri: 'https://dps.uat.natlib.govt.nz/depdash/redirect.html'
+    },
+    cache: {
+        cacheLocation: 'sessionStorage'
+    }
+};
+const msalInstance = new PublicClientApplication(msalConfig);
+await msalInstance.initialize();
+
 router.beforeEach(async (to) => {
-    const systemInfoStore = useSystemInfoStore();
-    await systemInfoStore.load();
+    // const systemInfoStore = useSystemInfoStore();
+    // await systemInfoStore.load();
 
-    const userProfileStore = useUserProfileStore();
-    await userProfileStore.load();
+    // const userProfileStore = useUserProfileStore();
+    // await userProfileStore.load();
 
-    if (to.path === '/login.html' || to.path === '/redirect.html') {
+    const publicRoutes = ['/login.html', '/redirect.html'];
+    if (publicRoutes.includes(to.path)) {
         return;
     }
 
-    const authStore = useAuthStore();
-    const isAuthenticated = await authStore.isAuthenticated();
-    if (!isAuthenticated) {
-        await authStore.logout();
+    // const authStore = useAuthStore();
+    // const isAuthenticated = await authStore.isAuthenticated();
+    // if (!isAuthenticated) {
+    //     await authStore.logout();
+    // }
+    // await authStore.requireLogin();
+
+    try {
+        // Check if user is already authenticated
+        const accounts = msalInstance.getAllAccounts();
+        if (accounts.length > 0) {
+            return; // User is logged in, proceed
+        }
+
+        await msalInstance.loginRedirect({
+            scopes: ['openid', 'profile', 'email']
+        });
+    } catch (error) {
+        console.error('Login failed:', error);
     }
 });
 
