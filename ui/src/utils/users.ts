@@ -1,37 +1,22 @@
 import type { UserProfile } from '@/types/deposit';
-import { getAzureAccountInfo } from '@/utils/msal';
-import { useSystemInfoStore } from '@/utils/system.info.store';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
 const KEY_USER_PROFILE = 'dashboard-user-profile';
+
 export const useUserProfileStore = defineStore('userProfile', () => {
-    const systemInfoStore = useSystemInfoStore();
     const userInfo = ref<UserProfile>({} as UserProfile);
 
+    const token = computed(() => userInfo.value.token);
     const currUserName = computed(() => userInfo.value.presentationName || userInfo.value.email || userInfo.value.username);
 
     const load = async () => {
-        const authMode = systemInfoStore.data.authMode || 'test';
-        if (authMode === 'entra') {
-            const tenantId = systemInfoStore.data.entraTenantId;
-            const clientId = systemInfoStore.data.entraClientId;
-            const redirectUrl = systemInfoStore.data.entraRedirectUrl;
-
-            const azureInfo = await getAzureAccountInfo(tenantId, clientId, redirectUrl);
-            userInfo.value.token = azureInfo?.azureAccountId || '';
-            userInfo.value.username = azureInfo?.username || '';
-            userInfo.value.presentationName = azureInfo?.presentation_name || '';
-            userInfo.value.email = azureInfo?.email || '';
-            userInfo.value.role = '';
-        } else {
-            const cachedContent = localStorage.getItem(KEY_USER_PROFILE);
-            if (!cachedContent) {
-                return;
-            }
-            const p = JSON.parse(cachedContent);
-            userInfo.value = p;
+        const cachedContent = localStorage.getItem(KEY_USER_PROFILE);
+        if (!cachedContent) {
+            return;
         }
+        const p = JSON.parse(cachedContent);
+        userInfo.value = p;
     };
 
     const clear = () => {
@@ -39,17 +24,11 @@ export const useUserProfileStore = defineStore('userProfile', () => {
         localStorage.removeItem(KEY_USER_PROFILE);
     };
 
-    const update = async (sessionInfo: any) => {
-        userInfo.value.token = sessionInfo.sessionId;
-
-        const authMode = systemInfoStore.data.authMode || 'test';
-        if (authMode !== 'entra') {
-            userInfo.value.username = sessionInfo.username;
-            userInfo.value.presentationName = sessionInfo.displayName;
-        }
-
+    const update = async (userProfile: UserProfile) => {
+        userProfile.password = '';
+        userInfo.value = userProfile;
         localStorage.setItem(KEY_USER_PROFILE, JSON.stringify(userInfo.value));
     };
 
-    return { userInfo, currUserName, load, clear, update };
+    return { userInfo, token, currUserName, load, clear, update };
 });

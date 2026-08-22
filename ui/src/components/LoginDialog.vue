@@ -1,19 +1,28 @@
 <script setup lang="ts">
 import { useDrawerService } from '@/utils/drawer.service';
-import { useUserProfileStore } from '@/utils/users';
+import { useLdapStore } from '@/utils/ldap';
+import { useSystemInfoStore } from '@/utils/system.info.store';
 import { ref } from 'vue';
 
 document.body.contentEditable = 'false';
 document.documentElement.contentEditable = 'false';
 
 const drawerRef = useDrawerService();
-
-const userProfile = useUserProfileStore();
+const systemInfoStore = useSystemInfoStore();
+const ldapStore = useLdapStore();
 
 const emit = defineEmits(['cancel', 'save']);
 
 const username = ref();
 const password = ref();
+
+const systemInfo = systemInfoStore.data;
+const authMode = systemInfo.authMode;
+if (authMode === 'test') {
+    username.value = 'testuser';
+    password.value = 'password';
+}
+
 const userInfo = ref();
 const feedback = ref({
     ok: true,
@@ -45,42 +54,18 @@ const login = async () => {
 };
 
 const _login = async () => {
-    const credentials = {
-        username: username.value,
-        password: password.value
-    };
-
-    const rsp = await fetch('/fixity/rest/auth/login', {
-        method: 'POST',
-        redirect: 'error',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: JSON.stringify(credentials)
-    });
-
     const _feedback = {
         ok: true,
         title: '',
         detail: ''
     };
 
-    if (!rsp.ok) {
-        const status = rsp.status;
-        let statusText = rsp.statusText;
-        if (!statusText || statusText.length === 0) {
-            if (status === 401) {
-                statusText = 'Unknown username or password, please try again.';
-            } else {
-                statusText = 'Unknown error.';
-            }
-        }
+    try {
+        await ldapStore.login(username.value, password.value);
+    } catch (error) {
         _feedback.ok = false;
-        _feedback.title = 'Error: ' + status;
-        _feedback.detail = statusText;
-    } else {
-        userInfo.value = await rsp.json();
-        userProfile.update(userInfo.value);
+        _feedback.title = 'Error';
+        _feedback.detail = (error as Error).message;
     }
 
     return _feedback;
@@ -105,9 +90,9 @@ const _login = async () => {
 
                         <div>
                             <label for="username" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Username</label>
-                            <InputText v-model="username" id="username" name="username" type="text" placeholder="User name" class="w-full md:w-[30rem] mb-8" autocomplete="username" />
+                            <InputText v-model="username" id="username" name="username" type="text" placeholder="User name" class="w-full md:w-[30rem] mb-8" autocomplete="username" :disabled="authMode === 'test'" />
                             <label for="password1" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
-                            <Password v-model="password" id="password1" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false" :inputProps="{ autocomplete: 'current-password' }" />
+                            <Password v-model="password" id="password1" placeholder="Password" :toggleMask="true" class="mb-4" fluid :feedback="false" :inputProps="{ autocomplete: 'current-password' }" :disabled="authMode === 'test'" />
                             <Button type="submit" label="Sign In" class="mt-8 w-full" />
                         </div>
                     </div>

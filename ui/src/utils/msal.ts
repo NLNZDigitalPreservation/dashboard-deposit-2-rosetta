@@ -1,95 +1,110 @@
-import { type AccountInfo, PublicClientApplication } from '@azure/msal-browser';
+import type { UserProfile } from '@/types/deposit';
+import { PublicClientApplication } from '@azure/msal-browser';
+import axios from 'axios';
+import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
+import { getRootUrl } from './helper';
+import { useUserProfileStore } from './users';
 
-const instances = new Map<string, PublicClientApplication>();
+const baseUrl = import.meta.env.BASE_URL;
 
-function buildKey(tenantId: string, clientId: string, redirectUrl: string): string {
-    return `${tenantId}|${clientId}|${redirectUrl}`;
-}
+export const useMsalStore = defineStore('MsalStore', () => {
+    const userProfileStore = useUserProfileStore();
 
-function buildMsalConfig(tenantId: string, clientId: string, redirectUrl: string) {
-    return {
-        auth: {
-            clientId,
-            authority: `https://login.microsoftonline.com/${tenantId}`,
-            redirectUri: redirectUrl || window.location.origin
-        },
-        cache: {
-            cacheLocation: 'localStorage' as const
+    const _isInitialized = ref(false);
+    const _msalInstance = ref({} as PublicClientApplication);
+
+    const initialize = async () => {
+        if (_isInitialized.value) {
+            return;
         }
+
+        const res = await fetch(`${baseUrl}/restful/system-info`);
+        if (!res.ok) {
+            throw new Error(`Failed to fetch system info: ${res.status} ${res.statusText}`);
+        }
+
+        const systemInfo = await res.json();
+        const rootUrl = getRootUrl();
+        const msalConfig = {
+            auth: {
+                clientId: systemInfo.entraClientId,
+                authority: `https://login.microsoftonline.com/${systemInfo.entraTenantId}`,
+                redirectUri: `${rootUrl}/redirect.html`
+            },
+            cache: {
+                cacheLocation: 'sessionStorage'
+            }
+        };
+        _msalInstance.value = new PublicClientApplication(msalConfig);
+        await _msalInstance.value.initialize();
+        _isInitialized.value = true;
     };
-}
 
-export async function getMsalInstance(tenantId: string, clientId: string, redirectUrl: string): Promise<PublicClientApplication | null> {
-    if (!clientId?.trim()) {
-        return null;
-    }
+    const msalInstance = computed(() => _msalInstance.value);
 
-    const key = buildKey(tenantId, clientId, redirectUrl);
-
-    let app = instances.get(key);
-
-    if (app) {
-        return app;
-    }
-
-    app = new PublicClientApplication(buildMsalConfig(tenantId, clientId, redirectUrl));
-
-    await app.initialize();
-    await app.handleRedirectPromise();
-
-    let account = app.getActiveAccount();
-
-    if (!account) {
-        const accounts = app.getAllAccounts();
-        if (accounts.length > 0) {
-            account = accounts[0];
-            app.setActiveAccount(account);
+    const userProfile = async () => {
+        await initialize();
+        const account = _msalInstance.value.getActiveAccount();
+        if (!account) {
+            throw new Error('No active account found');
         }
-    }
 
-    instances.set(key, app);
+        const tokenResponse = await _msalInstance.value.acquireTokenSilent({
+            account: account,
+            scopes: ['User.Read']
+        });
 
-    return app;
-}
+        const profileResponse = await fetch('https://graph.microsoft.com/v1.0/me', {
+            headers: {
+                Authorization: `Bearer ${tokenResponse.accessToken}`
+            }
+        });
 
-export async function getActiveAccount(tenantId: string, clientId: string, redirectUrl: string): Promise<AccountInfo | null> {
-    const app = await getMsalInstance(tenantId, clientId, redirectUrl);
+        const profile = await profileResponse.json();
 
-    if (!app) {
-        return null;
-    }
-
-    let account = app.getActiveAccount();
-
-    if (!account) {
-        const accounts = app.getAllAccounts();
-
-        if (accounts.length > 0) {
-            account = accounts[0];
-            app.setActiveAccount(account);
-        }
-    }
-
-    return account;
-}
-
-export async function getAzureAccountInfo(tenantId: string, clientId: string, redirectUrl: string) {
-    const account = await getActiveAccount(tenantId, clientId, redirectUrl);
-
-    if (!account) {
-        return null;
-    }
-
-    const claims: any = account.idTokenClaims || {};
-    const username = account.username || claims.preferred_username || '';
-
-    return {
-        azureAccountId: account.homeAccountId,
-        azureLocalAccountId: account.localAccountId,
-        azureTenantId: account.tenantId || claims.tid || '',
-        azureUsername: username,
-        presentation_name: account.name || claims.name || '',
-        email: claims.email || username,
-        username
+        const user = {} as UserProfile;
+        user.username = profile.userPrincipalName;
+        user.presentationName = profile.displayName;
+        user.email = profile.mail || profile.userPrincipalName;
+        user.token = tokenResponse.accessToken;
+        return user;
     };
-}
+
+    const requireLogin = async () => {
+        await initialize();
+        await _msalInstance.value.loginPopup({
+            scopes: ['openid', 'profile', 'email']
+        });
+        await _login();
+    };
+
+    const _login = async () => {
+        const user = await userProfile();
+        if (!user) {
+            await requireLogin();
+            return;
+        }
+        const response = await axios.post(`${baseUrl}/auth/login`, user);
+        if (response.status !== 200) {
+            await requireLogin();
+            return;
+        }
+
+        const userData = response.data as UserProfile;
+        userProfileStore.update(userData);
+    };
+
+    const logout = async () => {
+        await axios.delete(`${baseUrl}/auth/logout`, {
+            headers: {
+                Authorization: userProfileStore.token,
+                'Content-Type': 'application/json'
+            }
+        });
+        await _msalInstance.value.logoutPopup();
+        await _login();
+    };
+
+    return { initialize, msalInstance, userProfile, requireLogin, logout };
+});

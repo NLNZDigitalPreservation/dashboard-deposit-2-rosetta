@@ -94,6 +94,7 @@ interface SystemInfo {
 interface UserProfile {
     token: string;
     username: string;
+    password: string;
     presentationName: string;
     email: string;
     role: string;

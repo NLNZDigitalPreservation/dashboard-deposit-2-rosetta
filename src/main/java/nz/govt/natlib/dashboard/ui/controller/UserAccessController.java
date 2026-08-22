@@ -65,6 +65,21 @@ public class UserAccessController {
         return this.authMode.equalsIgnoreCase("entra");
     }
 
+    @RequestMapping(path = DashboardConstants.PATH_USER_IS_LOGIN_API, method = { RequestMethod.GET })
+    public ResponseEntity<?> isLogin(HttpServletRequest req, HttpServletResponse rsp) throws Exception {
+        String token = req.getHeader("Authorization");
+        if (DashboardHelper.isEmpty(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("No privilege: not in the white list " + RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
+        }
+        SessionInfo sessionInfo = sessions.getSession(token);
+        if (sessionInfo == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("No privilege: not in the white list " + RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
+        }
+        return ResponseEntity.ok().body(sessionInfo);
+    }
+
     @RequestMapping(path = DashboardConstants.PATH_USER_LOGIN_API, method = { RequestMethod.GET, RequestMethod.POST })
     public ResponseEntity<?> login(@RequestBody UserAccessReqCommand cmd, HttpServletRequest req,
             HttpServletResponse rsp) throws Exception {
@@ -154,11 +169,11 @@ public class UserAccessController {
         return ResponseEntity.ok().body(sessionInfo);
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_USER_LOGOUT_API, method = { RequestMethod.POST, RequestMethod.GET,
-            RequestMethod.DELETE })
-    public ResponseEntity<?> logout(@RequestBody UserAccessReqCommand cmd, HttpServletRequest req,
+    @RequestMapping(path = DashboardConstants.PATH_USER_LOGOUT_API, method = { RequestMethod.DELETE })
+    public ResponseEntity<?> logout(HttpServletRequest req,
             HttpServletResponse rsp) throws Exception {
-        sessions.removeSession(cmd.getToken());
+        String token = req.getHeader("Authorization");
+        sessions.removeSession(token);
 
         return ResponseEntity.ok().body(true);
     }

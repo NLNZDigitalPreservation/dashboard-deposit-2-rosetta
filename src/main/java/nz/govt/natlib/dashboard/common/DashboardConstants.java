@@ -55,11 +55,12 @@ public class DashboardConstants {
     public static final String PATH_SYSTEM_EVENT_ALL = PATH_SYSTEM_EVENT + "/all/get";
     public static final String PATH_SYSTEM_EVENT_ACTION = PATH_SYSTEM_EVENT + "/selected/action";
 
-
-    //Will bypass the authentication filter
+    // Will bypass the authentication filter
     public static final String PATH_ROOT_AUTH = "/auth";
-    public static final String PATH_USER_LOGIN_API = PATH_ROOT_AUTH + "/login.json";
-    public static final String PATH_USER_LOGOUT_API = PATH_ROOT_AUTH + "/logout.json";
+    public static final String PATH_USER_LOGIN_API = PATH_ROOT_AUTH + "/login";
+    public static final String PATH_USER_LOGOUT_API = PATH_ROOT_AUTH + "/logout";
+    public static final String PATH_USER_IS_LOGIN_API = PATH_ROOT_AUTH + "/is-login";
+
     public static final String PATH_USER_LOGIN_HTML = "/login.html";
     public static final String PATH_USER_INDEX_HTML = "/index.html";
 
