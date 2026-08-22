@@ -4,7 +4,6 @@ import { useDrawerService } from '@/utils/drawer.service';
 import { useSystemInfoStore } from '@/utils/system.info.store';
 import { useThemeStore } from '@/utils/themes';
 import { useTitle } from '@vueuse/core';
-import type Drawer from 'primevue/drawer';
 import { onMounted, ref } from 'vue';
 
 const drawerService = useDrawerService();
@@ -46,9 +45,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <!-- <Suspense>
-        <router-view />
-    </Suspense> -->
+    <component :key="drawerService.state.component" :is="drawerService.state.component" v-if="drawerService.state.visible" v-bind="drawerService.state.props" @save="drawerService.close" @cancel="drawerService.close" />
 
     <Suspense>
         <router-view v-slot="{ Component }">
@@ -61,9 +58,6 @@ onMounted(async () => {
     <DynamicDialog />
 
     <ConfirmDialog />
-
-    <Drawer />
-    <component :key="drawerService.state.component" :is="drawerService.state.component" v-if="drawerService.state.visible" v-bind="drawerService.state.props" @save="drawerService.close" @cancel="drawerService.close" />
 
     <Toast group="toast-info" position="bottom-left">
         <template #message="slotProps">

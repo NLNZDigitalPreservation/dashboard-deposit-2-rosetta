@@ -2,12 +2,9 @@
 import DepositJobListDataTable from '@/components/jobs/DepositJobListDataTable.vue';
 import DepositJobSearchDialog from '@/components/jobs/DepositJobSearchDialog.vue';
 import { useTopbarActions } from '@/stores/depositjobTopbarActions';
-import { useDrawerService } from '@/utils/drawer.service';
 import { useSystemInfoStore } from '@/utils/system.info.store';
 import MainDropdownSettings from '@/views/MainDropdownSettings.vue';
 import { computed, ref } from 'vue';
-
-const drawerService = useDrawerService();
 
 const systemInfoStore = useSystemInfoStore();
 const envType = computed(() => {
@@ -25,8 +22,6 @@ const topbarActions = useTopbarActions();
 </script>
 
 <template>
-    <component :key="drawerService.state.component" :is="drawerService.state.component" v-if="drawerService.state.visible" v-bind="drawerService.state.props" @save="drawerService.close" @cancel="drawerService.close" />
-
     <Toast position="bottom-left"></Toast>
     <!-- <div class="layout-topbar" style="position: relative; background: linear-gradient(to right, #212529, #32cd32, #212529)"> -->
     <div class="layout-topbar" style="position: relative">
