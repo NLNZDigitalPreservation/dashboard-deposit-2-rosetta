@@ -31,7 +31,7 @@ export const useLdapStore = defineStore('LdapStore', () => {
             throw new Error(`Login failed: ${response.status} ${response.statusText}`);
         }
 
-        const userData = response.data as UserProfile;
+        const userData = response.data as any;
         userProfileStore.update(userData);
     };
 
@@ -42,7 +42,8 @@ export const useLdapStore = defineStore('LdapStore', () => {
                 'Content-Type': 'application/json'
             }
         });
-        await requireLogin();
+        // window.location.reload(); // Reload the page to reset the state after logout
+        await requireLogin(); // Prompt for login again after logout
     };
 
     return { requireLogin, login, logout };

@@ -91,7 +91,7 @@ export const useMsalStore = defineStore('MsalStore', () => {
             return;
         }
 
-        const userData = response.data as UserProfile;
+        const userData = response.data as any;
         userProfileStore.update(userData);
     };
 

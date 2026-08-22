@@ -5,9 +5,9 @@ import { computed, ref } from 'vue';
 const KEY_USER_PROFILE = 'dashboard-user-profile';
 
 export const useUserProfileStore = defineStore('userProfile', () => {
-    const userInfo = ref<UserProfile>({} as UserProfile);
+    const userInfo = ref<any>({} as any);
 
-    const token = computed(() => userInfo.value.token);
+    const token = computed(() => userInfo.value.sessionId);
     const currUserName = computed(() => userInfo.value.presentationName || userInfo.value.email || userInfo.value.username);
 
     const load = async () => {
@@ -24,7 +24,7 @@ export const useUserProfileStore = defineStore('userProfile', () => {
         localStorage.removeItem(KEY_USER_PROFILE);
     };
 
-    const update = async (userProfile: UserProfile) => {
+    const update = async (userProfile: any) => {
         userProfile.password = '';
         userInfo.value = userProfile;
         localStorage.setItem(KEY_USER_PROFILE, JSON.stringify(userInfo.value));

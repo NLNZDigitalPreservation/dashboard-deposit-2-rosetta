@@ -2,14 +2,12 @@ package nz.govt.natlib.dashboard.ui.controller;
 
 import nz.govt.natlib.dashboard.common.auth.SessionInfo;
 import nz.govt.natlib.dashboard.common.metadata.UserInfo;
-import nz.govt.natlib.dashboard.app.MainSecurityConfig;
 import nz.govt.natlib.dashboard.common.auth.Sessions;
 import nz.govt.natlib.dashboard.common.core.RestResponseCommand;
 import nz.govt.natlib.dashboard.common.DashboardConstants;
 import nz.govt.natlib.dashboard.common.core.RosettaWebService;
 import nz.govt.natlib.dashboard.common.metadata.EnumUserRole;
 import nz.govt.natlib.dashboard.domain.entity.EntityWhitelistSetting;
-import nz.govt.natlib.dashboard.domain.repo.RepoFlowSetting;
 import nz.govt.natlib.dashboard.domain.service.WhitelistSettingService;
 import nz.govt.natlib.dashboard.ui.command.UserAccessReqCommand;
 import nz.govt.natlib.dashboard.util.DashboardHelper;
@@ -33,10 +31,7 @@ public class UserAccessController {
     private static final long EXPIRE_INTERNAL = 30 * 60 * 1000; // 30 Minutes
     @Autowired
     private Sessions sessions;
-    @Autowired
-    private MainSecurityConfig securityConfig;
-    @Autowired
-    private RepoFlowSetting repoFlowSetting;
+
     @Autowired
     private RosettaWebService rosettaWebService;
     @Autowired
@@ -72,12 +67,17 @@ public class UserAccessController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("No privilege: not in the white list " + RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
         }
-        SessionInfo sessionInfo = sessions.getSession(token);
-        if (sessionInfo == null) {
+        try {
+            SessionInfo sessionInfo = sessions.getSession(token);
+            if (sessionInfo == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("No privilege: not in the white list " + RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
+            }
+            return ResponseEntity.ok().body(sessionInfo);
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("No privilege: not in the white list " + RestResponseCommand.RSP_AUTH_NO_PRIVILEGE);
         }
-        return ResponseEntity.ok().body(sessionInfo);
     }
 
     @RequestMapping(path = DashboardConstants.PATH_USER_LOGIN_API, method = { RequestMethod.GET, RequestMethod.POST })
@@ -88,7 +88,7 @@ public class UserAccessController {
             try {
                 sessions.getSession(TEST_SESSION_ID);
             } catch (Exception e) {
-                sessions.addSession(TEST_SESSION_ID, "test", "admin", EXPIRE_INTERNAL, "Test");
+                sessions.addSession(TEST_SESSION_ID, cmd.getUsername(), "admin", EXPIRE_INTERNAL, "TestUser");
             }
             SessionInfo info = sessions.getSession(TEST_SESSION_ID);
             return ResponseEntity.ok().body(info);

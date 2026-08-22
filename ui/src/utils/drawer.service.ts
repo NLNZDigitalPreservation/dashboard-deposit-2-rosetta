@@ -24,7 +24,11 @@ export const useDrawerService = () => {
 
     const close = (data: any) => {
         state.visible = false;
-        if (state.resolve) state.resolve(data);
+        if (state.resolve) {
+            state.resolve(data);
+            state.resolve = null;
+            state.reject = null;
+        }
         // Reset state after transition
         setTimeout(() => {
             state.component = null;

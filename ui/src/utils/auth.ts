@@ -14,17 +14,28 @@ export const useAuthStore = defineStore('AuthStore', () => {
     const userProfileStore = useUserProfileStore();
 
     const tryLogin = async () => {
-        const rsp = await axios.get(`${baseUrl}/auth/is-login`, {
-            headers: {
-                Authorization: userProfileStore.token,
-                'Content-Type': 'application/json'
-            }
-        });
+        try {
+            userProfileStore.load();
+            const rsp = await axios.get(`${baseUrl}/auth/is-login`, {
+                headers: {
+                    Authorization: userProfileStore.token,
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        if (rsp.status === 200) {
-            return true;
+            if (rsp.status === 200) {
+                return true;
+            }
+        } catch (error) {
+            console.error('Error checking login status:', error);
         }
 
+        await requireLogin();
+
+        return true;
+    };
+
+    const requireLogin = async () => {
         if (!systemInfoStore.loaded) {
             await systemInfoStore.load();
         }
@@ -37,7 +48,6 @@ export const useAuthStore = defineStore('AuthStore', () => {
         } else {
             await ldapStore.requireLogin();
         }
-        return true;
     };
 
     const logout = async () => {
@@ -55,5 +65,5 @@ export const useAuthStore = defineStore('AuthStore', () => {
         }
     };
 
-    return { tryLogin, logout };
+    return { tryLogin, requireLogin, logout };
 });

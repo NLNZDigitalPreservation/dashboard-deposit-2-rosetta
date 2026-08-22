@@ -23,7 +23,7 @@ const processQueue = (token: any = null) => {
 
 // by convention, composable function names start with "use"
 export function useFetch() {
-    const userStore = useUserProfileStore();
+    const userProfileStore = useUserProfileStore();
     const authStore = useAuthStore();
 
     const api = axios.create({
@@ -32,10 +32,9 @@ export function useFetch() {
     });
 
     api.interceptors.request.use((config) => {
-        const userInfo = userStore.userInfo;
-        if (userInfo?.token) {
+        if (userProfileStore.token) {
             config.headers = config.headers ?? {};
-            config.headers.Authorization = userInfo.token;
+            config.headers.Authorization = userProfileStore.token;
         }
         return config;
     });
@@ -69,8 +68,7 @@ export function useFetch() {
                     await authStore.requireLogin();
 
                     // 4. Reload store to get the new token
-                    const userInfo = userStore.userInfo;
-                    const newToken = userInfo?.token;
+                    const newToken = userProfileStore.token;
 
                     // 5. Release the waiting requests
                     processQueue(newToken);

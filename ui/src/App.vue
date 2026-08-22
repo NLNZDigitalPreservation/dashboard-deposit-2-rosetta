@@ -1,10 +1,15 @@
 <script setup lang="ts">
+// import { useAuthStore } from '@/utils/auth';
+import { useDrawerService } from '@/utils/drawer.service';
 import { useSystemInfoStore } from '@/utils/system.info.store';
 import { useThemeStore } from '@/utils/themes';
 import { useTitle } from '@vueuse/core';
+import type Drawer from 'primevue/drawer';
 import { onMounted, ref } from 'vue';
 
+const drawerService = useDrawerService();
 const systemInfoStore = useSystemInfoStore();
+// const authStore = useAuthStore();
 
 const themeStore = useThemeStore();
 const title = useTitle('Dashboard');
@@ -35,15 +40,30 @@ onMounted(async () => {
     envType.value = hostType; // bind a ref to the document title
     title.value = `Dashboard (${hostType})`;
     themeStore.toggleTheme(darkMode, colorMode);
+
+    // await authStore.tryLogin();
 });
 </script>
 
 <template>
-    <Suspense>
+    <!-- <Suspense>
         <router-view />
+    </Suspense> -->
+
+    <Suspense>
+        <router-view v-slot="{ Component }">
+            <KeepAlive>
+                <component :is="Component" />
+            </KeepAlive>
+        </router-view>
     </Suspense>
+
     <DynamicDialog />
+
     <ConfirmDialog />
+
+    <Drawer />
+    <component :key="drawerService.state.component" :is="drawerService.state.component" v-if="drawerService.state.visible" v-bind="drawerService.state.props" @save="drawerService.close" @cancel="drawerService.close" />
 
     <Toast group="toast-info" position="bottom-left">
         <template #message="slotProps">

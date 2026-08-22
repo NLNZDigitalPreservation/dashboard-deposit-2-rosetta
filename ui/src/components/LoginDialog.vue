@@ -49,7 +49,7 @@ const login = async () => {
     msgKey.value += 1;
     if (feedback.value.ok) {
         emit('save', { userInfo: userInfo.value });
-        drawerRef.close();
+        drawerRef.close({});
     }
 };
 
