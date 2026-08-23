@@ -13,7 +13,7 @@ export const useAuthStore = defineStore('AuthStore', () => {
     const ldapStore = useLdapStore();
     const userProfileStore = useUserProfileStore();
 
-    const tryLogin = async () => {
+    const isLogin = async () => {
         try {
             userProfileStore.load();
             const rsp = await axios.get(`${baseUrl}/auth/is-login`, {
@@ -23,19 +23,33 @@ export const useAuthStore = defineStore('AuthStore', () => {
                 }
             });
 
-            if (rsp.status === 200) {
-                return true;
+            if (rsp.status !== 200) {
+                return false;
+            }
+
+            if (!systemInfoStore.loaded) {
+                await systemInfoStore.load();
+            }
+
+            const systemInfo = systemInfoStore.data;
+            const authMode = systemInfo.authMode;
+
+            if (authMode === 'entra') {
+                const user = await msalStore.userProfile();
+                if (!user) {
+                    return false;
+                }
             }
         } catch (error) {
-            console.error('Error checking login status:', error);
+            // Do nothing
+            // console.error('Error checking login status:', error);
+            return false;
         }
-
-        await requireLogin();
 
         return true;
     };
 
-    const requireLogin = async () => {
+    const requireLogin = async (redirectMode = false) => {
         if (!systemInfoStore.loaded) {
             await systemInfoStore.load();
         }
@@ -44,7 +58,7 @@ export const useAuthStore = defineStore('AuthStore', () => {
         const authMode = systemInfo.authMode;
 
         if (authMode === 'entra') {
-            await msalStore.requireLogin();
+            await msalStore.requireLogin(redirectMode);
         } else {
             await ldapStore.requireLogin();
         }
@@ -65,5 +79,5 @@ export const useAuthStore = defineStore('AuthStore', () => {
         }
     };
 
-    return { tryLogin, requireLogin, logout };
+    return { isLogin, requireLogin, logout };
 });

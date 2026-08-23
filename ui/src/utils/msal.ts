@@ -16,6 +16,15 @@ export const useMsalStore = defineStore('MsalStore', () => {
 
     const initialize = async () => {
         if (_isInitialized.value) {
+            try {
+                const result = await _msalInstance.value.handleRedirectPromise();
+                if (result?.account) {
+                    _msalInstance.value.setActiveAccount(result.account);
+                }
+                return;
+            } catch (error) {
+                console.error('Failed to handle redirect promise:', error);
+            }
             return;
         }
 
@@ -43,7 +52,7 @@ export const useMsalStore = defineStore('MsalStore', () => {
 
     const msalInstance = computed(() => _msalInstance.value);
 
-    const userProfile = async () => {
+    const _userProfile = async () => {
         await initialize();
         const account = _msalInstance.value.getActiveAccount();
         if (!account) {
@@ -71,15 +80,44 @@ export const useMsalStore = defineStore('MsalStore', () => {
         return user;
     };
 
-    const requireLogin = async () => {
-        await initialize();
-        await _msalInstance.value.loginPopup({
-            scopes: ['openid', 'profile', 'email']
-        });
-        await _login();
+    const userProfile = async () => {
+        try {
+            return await _userProfile();
+        } catch (error) {
+            console.error('Failed to get user profile:', error);
+            return undefined;
+        }
     };
 
-    const _login = async () => {
+    const _requireLogin = async (redirectMode = false) => {
+        await initialize();
+        try {
+            if (redirectMode) {
+                await _msalInstance.value.loginRedirect({
+                    scopes: ['openid', 'profile', 'email']
+                });
+            } else {
+                await _msalInstance.value.loginPopup({
+                    scopes: ['openid', 'profile', 'email']
+                });
+                await login();
+            }
+        } catch (error) {
+            console.error('Login failed:', error);
+            return;
+        }
+    };
+
+    const requireLogin = async (redirectMode = false) => {
+        const user = await userProfile();
+        if (user) {
+            await login();
+        } else {
+            await _requireLogin(redirectMode);
+        }
+    };
+
+    const login = async () => {
         const user = await userProfile();
         if (!user) {
             await requireLogin();
@@ -102,9 +140,8 @@ export const useMsalStore = defineStore('MsalStore', () => {
                 'Content-Type': 'application/json'
             }
         });
-        await _msalInstance.value.logoutPopup();
-        await _login();
+        await _requireLogin(true); // Prompt for login again after logout
     };
 
-    return { initialize, msalInstance, userProfile, requireLogin, logout };
+    return { initialize, msalInstance, userProfile, requireLogin, login, logout };
 });

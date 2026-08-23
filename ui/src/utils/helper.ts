@@ -47,7 +47,7 @@ export const getRouteURLByName = (routeName: string, params: any = undefined) =>
 export const getRootUrl = () => {
     const { origin, pathname } = window.location;
     const appPath = import.meta.env.BASE_URL;
-    return `${origin}/${appPath}`;
+    return `${origin}${appPath}`;
 };
 
 export const camelCaseToTitleCase = (s: string) => {

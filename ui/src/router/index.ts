@@ -50,7 +50,10 @@ router.beforeEach(async (to) => {
     }
 
     const authStore = useAuthStore();
-    await authStore.tryLogin();
+    const isLogin = await authStore.isLogin();
+    if (!isLogin) {
+        await authStore.requireLogin(true);
+    }
 });
 
 export default router;
