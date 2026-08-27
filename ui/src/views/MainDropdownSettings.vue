@@ -4,14 +4,17 @@ import GlobalSetting from '@/components/settings/GlobalSetting.vue';
 import MaterialFlowDrawer from '@/components/settings/MaterialFlowDrawer.vue';
 import WhiteListDrawer from '@/components/settings/WhiteListDrawer.vue';
 import { useAuthStore } from '@/utils/auth';
+import { useUserProfileStore } from '@/utils/users';
 import { useDialog } from 'primevue/usedialog';
 import { ref } from 'vue';
+
 const dialog = useDialog();
 
 const drawerDepositAccount = ref();
 const drawerMaterialFlow = ref();
 const drawerWhiteList = ref();
 const loginStore = useAuthStore();
+const userProfileStore = useUserProfileStore();
 
 const settingsMenuItems = ref([
     {
@@ -59,7 +62,7 @@ const settingsMenuItems = ref([
         separator: true
     },
     {
-        label: 'Sign out',
+        label: 'Sign out (' + userProfileStore.presentationName + ')',
         icon: 'pi pi-power-off',
         command: () => {
             loginStore.logout();

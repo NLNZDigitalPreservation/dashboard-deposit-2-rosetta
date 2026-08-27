@@ -24,7 +24,7 @@ export default defineConfig({
     server: {
         open: false,
         port: 5174,
-        allowedHosts: ['dps.uat.natlib.govt.nz', 'localhost']
+        allowedHosts: ['nzndevanlpod01.dia.govt.nz', 'dps.uat.natlib.govt.nz', 'localhost']
         // https: false,
         // hotOnly: false,
     }

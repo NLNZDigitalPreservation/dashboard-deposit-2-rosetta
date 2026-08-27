@@ -60,7 +60,7 @@ public class UserAccessController {
         return this.authMode.equalsIgnoreCase("entra");
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_USER_IS_LOGIN_API, method = { RequestMethod.GET })
+    @RequestMapping(path = DashboardConstants.PATH_USER_LOGIN, method = { RequestMethod.GET })
     public ResponseEntity<?> isLogin(HttpServletRequest req, HttpServletResponse rsp) throws Exception {
         String token = req.getHeader("Authorization");
         if (DashboardHelper.isEmpty(token)) {
@@ -80,7 +80,7 @@ public class UserAccessController {
         }
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_USER_LOGIN_API, method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(path = DashboardConstants.PATH_USER_LOGIN, method = { RequestMethod.POST })
     public ResponseEntity<?> login(@RequestBody UserAccessReqCommand cmd, HttpServletRequest req,
             HttpServletResponse rsp) throws Exception {
         // Return the TEST SESSION ID
@@ -169,7 +169,7 @@ public class UserAccessController {
         return ResponseEntity.ok().body(sessionInfo);
     }
 
-    @RequestMapping(path = DashboardConstants.PATH_USER_LOGOUT_API, method = { RequestMethod.DELETE })
+    @RequestMapping(path = DashboardConstants.PATH_USER_LOGIN, method = { RequestMethod.DELETE })
     public ResponseEntity<?> logout(HttpServletRequest req,
             HttpServletResponse rsp) throws Exception {
         String token = req.getHeader("Authorization");

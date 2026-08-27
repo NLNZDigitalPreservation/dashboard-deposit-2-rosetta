@@ -25,13 +25,14 @@ public class HttpAccessManagementFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse rsp = ((HttpServletResponse) response);
-        String contextUri = req.getContextPath(), reqUri = req.getRequestURI();
+        String contextUri = req.getContextPath();
         String url = req.getRequestURI().substring(contextUri.length());
 
         log.debug("contextUri: {}, url: {}", contextUri, url);
 
         // Only allowed the authentication for restful APIs
-        if (!url.startsWith(DashboardConstants.PATH_ROOT) || url.equalsIgnoreCase(DashboardConstants.SYSTEM_INFO)) {
+        if (!url.startsWith(DashboardConstants.PATH_ROOT) || url.startsWith(DashboardConstants.PATH_ROOT_AUTH)
+                || url.equalsIgnoreCase(DashboardConstants.SYSTEM_INFO)) {
             chain.doFilter(request, response);
             return;
         }

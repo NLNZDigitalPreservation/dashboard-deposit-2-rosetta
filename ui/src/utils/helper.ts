@@ -2,6 +2,8 @@ import { routes } from '@/router';
 import { defineStore } from 'pinia';
 import { useToast } from 'primevue/usetoast';
 
+export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export const formatDate = (timestamp: number) => {
     const value = new Date(timestamp);
     return value.toLocaleDateString(undefined, {
