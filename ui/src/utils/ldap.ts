@@ -26,7 +26,7 @@ export const useLdapStore = defineStore('LdapStore', () => {
         user.username = username;
         user.password = password;
 
-        const response = await axios.post(`${baseUrl}/auth/login`, user);
+        const response = await axios.post(`${baseUrl}/restful/auth/login`, user);
         if (response.status !== 200) {
             throw new Error(`Login failed: ${response.status} ${response.statusText}`);
         }
@@ -36,7 +36,7 @@ export const useLdapStore = defineStore('LdapStore', () => {
     };
 
     const logout = async () => {
-        await axios.delete(`${baseUrl}/auth/logout`, {
+        await axios.delete(`${baseUrl}/restful/auth/login`, {
             headers: {
                 Authorization: userProfileStore.token,
                 'Content-Type': 'application/json'

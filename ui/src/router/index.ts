@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/utils/auth';
+import { useMsalStore } from '@/utils/msal';
 import { createRouter, createWebHistory } from 'vue-router';
 
 export const routes = {
@@ -26,17 +27,8 @@ export const routes = {
                     path: '/login.html',
                     name: 'login',
                     component: () => import('@/views/LoginView.vue')
-                },
-                {
-                    path: '/redirect.html',
-                    name: 'redirect',
-                    component: () => import('@/views/RedirectView.vue')
                 }
             ]
-        },
-        {
-            path: '/:pathMatch(.*)*',
-            redirect: '/'
         }
     ]
 };
@@ -44,15 +36,20 @@ export const routes = {
 const router = createRouter(routes);
 
 router.beforeEach(async (to) => {
-    const publicRoutes = ['/login.html', '/redirect.html'];
+    const publicRoutes = ['/login.html'];
     if (publicRoutes.includes(to.path)) {
-        return;
+        return; // Allow navigation to public routes
     }
-
-    const authStore = useAuthStore();
-    const isLogin = await authStore.isLogin();
-    if (!isLogin) {
-        await authStore.requireLogin(true);
+    if (to.path === '/redirect.html') {
+        const msalStore = useMsalStore();
+        await msalStore.login();
+        return '/'; // Redirect to home after login
+    } else {
+        const authStore = useAuthStore();
+        const isLogin = await authStore.isLogin();
+        if (!isLogin) {
+            await authStore.requireLogin(true);
+        }
     }
 });
 

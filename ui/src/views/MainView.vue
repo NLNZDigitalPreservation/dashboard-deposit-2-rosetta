@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import DepositJobListDataTable from '@/components/jobs/DepositJobListDataTable.vue';
 import DepositJobSearchDialog from '@/components/jobs/DepositJobSearchDialog.vue';
+// import UserProfileCard from '@/components/user_profile/UserProfileCard.vue';
 import { useTopbarActions } from '@/stores/depositjobTopbarActions';
 import { useSystemInfoStore } from '@/utils/system.info.store';
 import MainDropdownSettings from '@/views/MainDropdownSettings.vue';
@@ -45,6 +46,7 @@ const topbarActions = useTopbarActions();
                 <InputText v-model="keywords" type="text" placeholder="Filter" />
             </IconField>
             <MainDropdownSettings />
+            <!-- <UserProfileCard /> -->
         </div>
     </div>
     <div style="width: 100vw; height: calc(100vh - 60px)">

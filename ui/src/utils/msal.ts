@@ -3,16 +3,22 @@ import { PublicClientApplication } from '@azure/msal-browser';
 import axios from 'axios';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { getRootUrl } from './helper';
+import { getRootUrl, sleep } from './helper';
+import { useSystemInfoStore } from './system.info.store';
 import { useUserProfileStore } from './users';
 
 const baseUrl = import.meta.env.BASE_URL;
+const loginOptions = {
+    scopes: ['openid', 'profile', 'email', 'User.Read'],
+    prompt: 'select_account'
+};
 
 export const useMsalStore = defineStore('MsalStore', () => {
+    const systemInfoStore = useSystemInfoStore();
     const userProfileStore = useUserProfileStore();
 
     const _isInitialized = ref(false);
-    const _msalInstance = ref({} as PublicClientApplication);
+    const _msalInstance = ref({} as any);
 
     const initialize = async () => {
         if (_isInitialized.value) {
@@ -28,55 +34,107 @@ export const useMsalStore = defineStore('MsalStore', () => {
             return;
         }
 
-        const res = await fetch(`${baseUrl}/restful/system-info`);
-        if (!res.ok) {
-            throw new Error(`Failed to fetch system info: ${res.status} ${res.statusText}`);
+        if (!systemInfoStore.loaded) {
+            await systemInfoStore.load();
         }
+        const systemInfo = systemInfoStore.data;
 
-        const systemInfo = await res.json();
         const rootUrl = getRootUrl();
         const msalConfig = {
             auth: {
                 clientId: systemInfo.entraClientId,
                 authority: `https://login.microsoftonline.com/${systemInfo.entraTenantId}`,
-                redirectUri: `${rootUrl}/redirect.html`
+                redirectUri: `${rootUrl}/redirect.html`,
+                navigateToLoginRequestUrl: false
             },
             cache: {
-                cacheLocation: 'sessionStorage'
+                cacheLocation: 'localStorage',
+                storeAuthStateInCookie: true
             }
         };
-        _msalInstance.value = new PublicClientApplication(msalConfig);
+        try {
+            _msalInstance.value = new PublicClientApplication(msalConfig);
+        } catch (error) {
+            console.error('Failed to create MSAL instance:', error);
+            throw error;
+        }
         await _msalInstance.value.initialize();
         _isInitialized.value = true;
     };
 
     const msalInstance = computed(() => _msalInstance.value);
 
+    const getAvatar = async () => {
+        await initialize();
+
+        const account = _msalInstance.value.getActiveAccount();
+
+        if (!account) {
+            return null;
+        }
+
+        try {
+            const tokenResponse = await _msalInstance.value.acquireTokenSilent({
+                account,
+                scopes: ['User.Read']
+            });
+
+            const avatarResponse = await fetch('https://graph.microsoft.com/v1.0/me/photo/$value', {
+                headers: {
+                    Authorization: `Bearer ${tokenResponse.accessToken}`
+                }
+            });
+            if (!avatarResponse.ok) {
+                console.error('Failed to fetch avatar:', avatarResponse.status, avatarResponse.statusText);
+                return null;
+            }
+
+            const blob = await avatarResponse.blob();
+            return URL.createObjectURL(blob);
+        } catch (error) {
+            console.error('Failed to get avatar:', error);
+            return null;
+        }
+    };
+
+    const handleRedirectPromise = async () => {
+        await initialize();
+        try {
+            await sleep(2000); // Wait for 1 second to ensure MSAL is initialized
+
+            const result = await _msalInstance.value.handleRedirectPromise();
+            if (result?.account) {
+                _msalInstance.value.setActiveAccount(result.account);
+            }
+        } catch (error) {
+            console.error('Failed to handle redirect promise:', error);
+        }
+    };
+
     const _userProfile = async () => {
         await initialize();
-        const account = _msalInstance.value.getActiveAccount();
+
+        let account = _msalInstance.value.getActiveAccount();
+        if (!account) {
+            // throw new Error('No active account found');
+            const accounts = _msalInstance.value.getAllAccounts();
+            if (accounts.length > 0) {
+                account = accounts[0];
+                _msalInstance.value.setActiveAccount(account);
+            }
+        }
         if (!account) {
             throw new Error('No active account found');
         }
 
-        const tokenResponse = await _msalInstance.value.acquireTokenSilent({
-            account: account,
-            scopes: ['User.Read']
-        });
-
-        const profileResponse = await fetch('https://graph.microsoft.com/v1.0/me', {
-            headers: {
-                Authorization: `Bearer ${tokenResponse.accessToken}`
-            }
-        });
-
-        const profile = await profileResponse.json();
-
         const user = {} as UserProfile;
-        user.username = profile.userPrincipalName;
-        user.presentationName = profile.displayName;
-        user.email = profile.mail || profile.userPrincipalName;
-        user.token = tokenResponse.accessToken;
+
+        user.email = account.username;
+        user.username = account.username;
+        // user.token = account.idToken;
+        user.presentationName = account.name;
+        // user.role = 'admin';
+
         return user;
     };
 
@@ -90,18 +148,10 @@ export const useMsalStore = defineStore('MsalStore', () => {
     };
 
     const _requireLogin = async (redirectMode = false) => {
-        await initialize();
         try {
-            if (redirectMode) {
-                await _msalInstance.value.loginRedirect({
-                    scopes: ['openid', 'profile', 'email']
-                });
-            } else {
-                await _msalInstance.value.loginPopup({
-                    scopes: ['openid', 'profile', 'email']
-                });
-                await login();
-            }
+            await initialize();
+            await _msalInstance.value.loginRedirect(loginOptions);
+            console.log('Login successful');
         } catch (error) {
             console.error('Login failed:', error);
             return;
@@ -120,28 +170,27 @@ export const useMsalStore = defineStore('MsalStore', () => {
     const login = async () => {
         const user = await userProfile();
         if (!user) {
-            await requireLogin();
             return;
         }
-        const response = await axios.post(`${baseUrl}/auth/login`, user);
+        const response = await axios.post(`${baseUrl}/restful/auth/login`, user);
         if (response.status !== 200) {
-            await requireLogin();
             return;
         }
 
-        const userData = response.data as any;
+        const userData = response.data;
         userProfileStore.update(userData);
     };
 
     const logout = async () => {
-        await axios.delete(`${baseUrl}/auth/logout`, {
+        await axios.delete(`${baseUrl}/restful/auth/login`, {
             headers: {
                 Authorization: userProfileStore.token,
                 'Content-Type': 'application/json'
             }
         });
-        await _requireLogin(true); // Prompt for login again after logout
+        _msalInstance.value.setActiveAccount(null);
+        await _requireLogin(true); // Prompt the user to log in again after logout
     };
 
-    return { initialize, msalInstance, userProfile, requireLogin, login, logout };
+    return { initialize, handleRedirectPromise, msalInstance, getAvatar, userProfile, requireLogin, login, logout };
 });

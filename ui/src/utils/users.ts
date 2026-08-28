@@ -8,7 +8,8 @@ export const useUserProfileStore = defineStore('userProfile', () => {
     const userInfo = ref<any>({} as any);
 
     const token = computed(() => userInfo.value.sessionId);
-    const currUserName = computed(() => userInfo.value.presentationName || userInfo.value.email || userInfo.value.username);
+    const presentationName = computed(() => userInfo.value.displayName || userInfo.value.email || userInfo.value.username);
+    const currUserName = computed(() => userInfo.value.displayName || userInfo.value.email || userInfo.value.username);
 
     const load = async () => {
         const cachedContent = localStorage.getItem(KEY_USER_PROFILE);
@@ -30,5 +31,5 @@ export const useUserProfileStore = defineStore('userProfile', () => {
         localStorage.setItem(KEY_USER_PROFILE, JSON.stringify(userInfo.value));
     };
 
-    return { userInfo, token, currUserName, load, clear, update };
+    return { userInfo, token, presentationName, currUserName, load, clear, update };
 });
