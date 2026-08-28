@@ -59,6 +59,8 @@ public class DashboardConstants {
     public static final String PATH_ROOT_AUTH = PATH_ROOT + "/auth";
     public static final String PATH_USER_LOGIN = PATH_ROOT_AUTH + "/login";
 
+    public static final String PATH_HEALTH_CHECK = "/health";
+
     public static final String PATH_USER_LOGIN_HTML = "/login.html";
     public static final String PATH_USER_INDEX_HTML = "/index.html";
 

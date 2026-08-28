@@ -32,6 +32,7 @@ public class HttpAccessManagementFilter implements Filter {
 
         // Only allowed the authentication for restful APIs
         if (!url.startsWith(DashboardConstants.PATH_ROOT) || url.startsWith(DashboardConstants.PATH_ROOT_AUTH)
+                || url.equalsIgnoreCase(DashboardConstants.PATH_HEALTH_CHECK)
                 || url.equalsIgnoreCase(DashboardConstants.SYSTEM_INFO)) {
             chain.doFilter(request, response);
             return;
