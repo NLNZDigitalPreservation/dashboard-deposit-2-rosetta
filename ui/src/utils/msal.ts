@@ -45,7 +45,7 @@ export const useMsalStore = defineStore('MsalStore', () => {
                 clientId: systemInfo.entraClientId,
                 authority: `https://login.microsoftonline.com/${systemInfo.entraTenantId}`,
                 redirectUri: `${rootUrl}/redirect.html`,
-                navigateToLoginRequestUrl: false
+                navigateToLoginRequestUrl: true
             },
             cache: {
                 cacheLocation: 'localStorage',

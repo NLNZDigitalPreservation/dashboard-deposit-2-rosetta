@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Basically a look-up table, containing a map of session IDs to session info structs
+ * Basically a look-up table, containing a map of session IDs to session info
+ * structs
  */
 @Service
 public class Sessions {
@@ -22,18 +23,21 @@ public class Sessions {
         }
         for (String key : sessionMap.keySet()) {
             if (sessionMap.get(key).expired()) {
-                removeSession(id);
+                removeSession(key);
             }
         }
         sessionMap.put(id, new SessionInfo(username, role, expireInterval, id, readableUserName));
     }
 
     public void removeSession(String id) {
-        sessionMap.remove(id);
+        if (id != null) {
+            sessionMap.remove(id);
+        }
     }
 
     /**
-     * Get the session if it's still valid and, if so, update the timestamp of last access
+     * Get the session if it's still valid and, if so, update the timestamp of last
+     * access
      */
     public SessionInfo getSession(String id) throws InvalidSessionException {
         if (DashboardHelper.isEmpty(id)) {
@@ -48,16 +52,17 @@ public class Sessions {
     }
 
     /**
-     * Get the username for this session if it's still valid and, if so, update the timestamp of last access
+     * Get the username for this session if it's still valid and, if so, update the
+     * timestamp of last access
      */
     public String getUsername(String id) throws InvalidSessionException {
         SessionInfo sessionInfo = this.getSession(id);
         return sessionInfo.username;
     }
 
-
     /**
-     * Get the role for this session if it's still valid and, if so, update the timestamp of last access
+     * Get the role for this session if it's still valid and, if so, update the
+     * timestamp of last access
      */
     public String getRole(String id) throws InvalidSessionException {
         if (!sessionMap.containsKey(id) || sessionMap.get(id).expired()) {
