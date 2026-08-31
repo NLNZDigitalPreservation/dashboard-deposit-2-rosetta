@@ -192,6 +192,23 @@ export const useMsalStore = defineStore('MsalStore', () => {
         return true;
     };
 
+    const _requireLogout = async () => {
+        try {
+            await initialize();
+            const rootPath = getRootUrl();
+            await _msalInstance.value.logoutRedirect({
+                postLogoutRedirectUri: rootPath
+            });
+        } catch (error) {
+            console.error('Logout failed:', error);
+            const err = error as any;
+            if (err && err.errorCode && err.errorCode === 'interaction_in_progress') {
+                await handleRedirectPromise();
+            }
+            return;
+        }
+    };
+
     const logout = async () => {
         await axios.delete(`${baseUrl}/restful/auth/login`, {
             headers: {
@@ -200,7 +217,7 @@ export const useMsalStore = defineStore('MsalStore', () => {
             }
         });
         await _msalInstance.value.setActiveAccount(null);
-        await _requireLogin(true); // Prompt the user to log in again after logout
+        await _requireLogout(); // Prompt the user to log in again after logout
     };
 
     return { initialize, handleRedirectPromise, msalInstance, getAvatar, userProfile, requireLogin, login, logout };
