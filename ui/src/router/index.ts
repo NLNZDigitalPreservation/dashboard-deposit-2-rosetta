@@ -52,6 +52,8 @@ router.beforeEach(async (to) => {
     if (to.path === '/redirect.html') {
         const msalStore = useMsalStore();
         await msalStore.login();
+        // Handle redirect promise to set the active account after login
+        await msalStore.handleRedirectPromise();
     } else {
         const authStore = useAuthStore();
         const isLogin = await authStore.isLogin();

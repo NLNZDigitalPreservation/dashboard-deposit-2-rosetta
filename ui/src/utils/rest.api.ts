@@ -32,6 +32,7 @@ export function useFetch() {
     });
 
     api.interceptors.request.use((config) => {
+        userProfileStore.load();
         if (userProfileStore.token) {
             config.headers = config.headers ?? {};
             config.headers.Authorization = userProfileStore.token;

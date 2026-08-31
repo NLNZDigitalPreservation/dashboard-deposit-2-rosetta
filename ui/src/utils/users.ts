@@ -1,4 +1,3 @@
-import type { UserProfile } from '@/types/deposit';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
@@ -14,6 +13,7 @@ export const useUserProfileStore = defineStore('userProfile', () => {
     const load = async () => {
         const cachedContent = localStorage.getItem(KEY_USER_PROFILE);
         if (!cachedContent) {
+            userInfo.value = {} as any;
             return;
         }
         const p = JSON.parse(cachedContent);
@@ -21,7 +21,7 @@ export const useUserProfileStore = defineStore('userProfile', () => {
     };
 
     const clear = () => {
-        userInfo.value = {} as UserProfile;
+        userInfo.value = {} as any;
         localStorage.removeItem(KEY_USER_PROFILE);
     };
 

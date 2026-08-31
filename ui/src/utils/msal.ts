@@ -50,7 +50,7 @@ export const useMsalStore = defineStore('MsalStore', () => {
                 navigateToLoginRequestUrl: true
             },
             cache: {
-                cacheLocation: 'localStorage',
+                cacheLocation: 'sessionStorage', // This configures where your cache will be stored
                 storeAuthStateInCookie: true
             }
         };
@@ -185,9 +185,6 @@ export const useMsalStore = defineStore('MsalStore', () => {
 
         const userData = response.data;
         userProfileStore.update(userData);
-
-        // Handle redirect promise to set the active account after login
-        await handleRedirectPromise();
 
         return true;
     };
