@@ -34,6 +34,10 @@ export const routes = {
                     component: () => import('@/views/LoginView.vue')
                 }
             ]
+        },
+        {
+            path: '/:pathMatch(.*)*',
+            redirect: '/'
         }
     ]
 };

@@ -3,7 +3,7 @@ import { PublicClientApplication } from '@azure/msal-browser';
 import axios from 'axios';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { getRootUrl, sleep } from './helper';
+import { getRootUrl } from './helper';
 import { useSystemInfoStore } from './system.info.store';
 import { useUserProfileStore } from './users';
 
@@ -21,6 +21,17 @@ export const useMsalStore = defineStore('MsalStore', () => {
     const _msalInstance = ref({} as any);
 
     const initialize = async () => {
+        try {
+            if (_msalInstance.value && _msalInstance.value.handleRedirectPromise) {
+                const result = await _msalInstance.value.handleRedirectPromise();
+                if (result?.account) {
+                    _msalInstance.value.setActiveAccount(result.account);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to handle redirect promise:', error);
+        }
+
         if (_isInitialized.value) {
             return;
         }
@@ -39,8 +50,8 @@ export const useMsalStore = defineStore('MsalStore', () => {
                 navigateToLoginRequestUrl: true
             },
             cache: {
-                cacheLocation: 'sessionStorage',
-                storeAuthStateInCookie: false
+                cacheLocation: 'localStorage',
+                storeAuthStateInCookie: true
             }
         };
         try {
@@ -91,11 +102,11 @@ export const useMsalStore = defineStore('MsalStore', () => {
     const handleRedirectPromise = async () => {
         await initialize();
         try {
-            await sleep(2000); // Wait for 1 second to ensure MSAL is initialized
-
-            const result = await _msalInstance.value.handleRedirectPromise();
-            if (result?.account) {
-                _msalInstance.value.setActiveAccount(result.account);
+            if (_msalInstance.value && _msalInstance.value.handleRedirectPromise) {
+                const result = await _msalInstance.value.handleRedirectPromise();
+                if (result?.account) {
+                    _msalInstance.value.setActiveAccount(result.account);
+                }
             }
         } catch (error) {
             console.error('Failed to handle redirect promise:', error);
@@ -145,6 +156,10 @@ export const useMsalStore = defineStore('MsalStore', () => {
             console.log('Login successful');
         } catch (error) {
             console.error('Login failed:', error);
+            const err = error as any;
+            if (err && err.errorCode && err.errorCode === 'interaction_in_progress') {
+                await handleRedirectPromise();
+            }
             return;
         }
     };
@@ -172,16 +187,8 @@ export const useMsalStore = defineStore('MsalStore', () => {
         userProfileStore.update(userData);
 
         // Handle redirect promise to set the active account after login
-        if (_msalInstance.value.handleRedirectPromise) {
-            try {
-                const result = await _msalInstance.value.handleRedirectPromise();
-                if (result?.account) {
-                    _msalInstance.value.setActiveAccount(result.account);
-                }
-            } catch (error) {
-                console.error('Failed to handle redirect promise:', error);
-            }
-        }
+        await handleRedirectPromise();
+
         return true;
     };
 
