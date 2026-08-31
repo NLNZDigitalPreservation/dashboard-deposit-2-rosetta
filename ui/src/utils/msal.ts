@@ -22,15 +22,6 @@ export const useMsalStore = defineStore('MsalStore', () => {
 
     const initialize = async () => {
         if (_isInitialized.value) {
-            try {
-                const result = await _msalInstance.value.handleRedirectPromise();
-                if (result?.account) {
-                    _msalInstance.value.setActiveAccount(result.account);
-                }
-                return;
-            } catch (error) {
-                console.error('Failed to handle redirect promise:', error);
-            }
             return;
         }
 
@@ -48,8 +39,8 @@ export const useMsalStore = defineStore('MsalStore', () => {
                 navigateToLoginRequestUrl: true
             },
             cache: {
-                cacheLocation: 'localStorage',
-                storeAuthStateInCookie: true
+                cacheLocation: 'sessionStorage',
+                storeAuthStateInCookie: false
             }
         };
         try {
@@ -179,6 +170,19 @@ export const useMsalStore = defineStore('MsalStore', () => {
 
         const userData = response.data;
         userProfileStore.update(userData);
+
+        // Handle redirect promise to set the active account after login
+        if (_msalInstance.value.handleRedirectPromise) {
+            try {
+                const result = await _msalInstance.value.handleRedirectPromise();
+                if (result?.account) {
+                    _msalInstance.value.setActiveAccount(result.account);
+                }
+                return;
+            } catch (error) {
+                console.error('Failed to handle redirect promise:', error);
+            }
+        }
     };
 
     const logout = async () => {
@@ -188,7 +192,7 @@ export const useMsalStore = defineStore('MsalStore', () => {
                 'Content-Type': 'application/json'
             }
         });
-        _msalInstance.value.setActiveAccount(null);
+        await _msalInstance.value.setActiveAccount(null);
         await _requireLogin(true); // Prompt the user to log in again after logout
     };
 

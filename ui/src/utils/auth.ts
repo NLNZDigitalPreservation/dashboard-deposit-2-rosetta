@@ -27,16 +27,19 @@ export const useAuthStore = defineStore('AuthStore', () => {
                 const user = await msalStore.userProfile();
                 if (!user) {
                     return false;
+                } else {
+                    await msalStore.login();
+                    return true;
                 }
+            } else {
+                const rsp = await axios.get(`${baseUrl}/restful/auth/login`, {
+                    headers: {
+                        Authorization: userProfileStore.token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                return rsp.status === 200;
             }
-
-            const rsp = await axios.get(`${baseUrl}/restful/auth/login`, {
-                headers: {
-                    Authorization: userProfileStore.token,
-                    'Content-Type': 'application/json'
-                }
-            });
-            return rsp.status === 200;
         } catch (error) {
             // Do nothing
             // console.error('Error checking login status:', error);
