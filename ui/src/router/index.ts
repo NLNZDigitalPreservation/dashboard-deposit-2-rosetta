@@ -24,6 +24,11 @@ export const routes = {
                     component: () => import('@/views/MainView.vue')
                 },
                 {
+                    path: '/redirect.html',
+                    name: 'redirect',
+                    component: () => import('@/views/MainView.vue')
+                },
+                {
                     path: '/login.html',
                     name: 'login',
                     component: () => import('@/views/LoginView.vue')
@@ -38,12 +43,11 @@ const router = createRouter(routes);
 router.beforeEach(async (to) => {
     const publicRoutes = ['/login.html'];
     if (publicRoutes.includes(to.path)) {
-        return; // Allow navigation to public routes
+        return true; // Allow navigation to public routes
     }
     if (to.path === '/redirect.html') {
         const msalStore = useMsalStore();
         await msalStore.login();
-        return '/'; // Redirect to home after login
     } else {
         const authStore = useAuthStore();
         const isLogin = await authStore.isLogin();
