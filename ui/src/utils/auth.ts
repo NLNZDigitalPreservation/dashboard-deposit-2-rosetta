@@ -28,8 +28,8 @@ export const useAuthStore = defineStore('AuthStore', () => {
                 if (!user) {
                     return false;
                 } else {
-                    await msalStore.login();
-                    return true;
+                    const ret = await msalStore.login();
+                    return ret;
                 }
             } else {
                 const rsp = await axios.get(`${baseUrl}/restful/auth/login`, {

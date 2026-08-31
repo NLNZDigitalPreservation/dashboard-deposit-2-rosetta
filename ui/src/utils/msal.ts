@@ -161,11 +161,11 @@ export const useMsalStore = defineStore('MsalStore', () => {
     const login = async () => {
         const user = await userProfile();
         if (!user) {
-            return;
+            return false;
         }
         const response = await axios.post(`${baseUrl}/restful/auth/login`, user);
         if (response.status !== 200) {
-            return;
+            return false;
         }
 
         const userData = response.data;
@@ -178,11 +178,11 @@ export const useMsalStore = defineStore('MsalStore', () => {
                 if (result?.account) {
                     _msalInstance.value.setActiveAccount(result.account);
                 }
-                return;
             } catch (error) {
                 console.error('Failed to handle redirect promise:', error);
             }
         }
+        return true;
     };
 
     const logout = async () => {
