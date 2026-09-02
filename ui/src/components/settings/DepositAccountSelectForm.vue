@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { useSettingsDepositAccountStore } from '@/stores/settings';
 import { type UseFetchApis, useFetch } from '@/utils/rest.api';
-import { computed, defineEmits, ref } from 'vue';
+import { computed, defineEmits, onMounted, ref } from 'vue';
 
 const emit = defineEmits(['onSelected']);
 
 const rest: UseFetchApis = useFetch();
 const depositAccountStore = useSettingsDepositAccountStore();
-const allAccounts = ref(await depositAccountStore.queryAllRows());
+const allAccounts = ref([]);
 
 const rows = ref(10);
 const first = ref(0);
-const totalRecords = ref(allAccounts.value.length);
+const totalRecords = ref(0);
 
 const onRowSelect = (event: any) => {
     emit('onSelected', event.data);
@@ -28,6 +28,11 @@ const curPageRows = computed(() => {
 const onPage = (event: any) => {
     first.value = event.first;
 };
+
+onMounted(async () => {
+    allAccounts.value = await depositAccountStore.queryAllRows();
+    totalRecords.value = allAccounts.value.length;
+});
 </script>
 
 <template>

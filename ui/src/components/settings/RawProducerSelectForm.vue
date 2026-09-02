@@ -31,13 +31,11 @@ const _search = () => {
         name: filterName.value
     };
 
-    rest.post('/restful/raw/producers', searchCondition).then((rsp: any) => {
-        if (!rsp) {
-            console.error('Can not get raw producers: ' + rsp);
+    rest.post('/restful/raw/producers', searchCondition).then((datasets: any) => {
+        if (!datasets) {
+            console.error('Can not get raw producers: ' + datasets);
             return;
         }
-
-        const datasets = JSON.parse(rsp);
 
         if (datasets && datasets.total_record_count) {
             totalRecords.value = datasets.total_record_count;
