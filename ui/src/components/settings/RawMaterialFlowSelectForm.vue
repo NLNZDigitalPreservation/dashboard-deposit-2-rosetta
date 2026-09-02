@@ -73,29 +73,18 @@ _search();
 </script>
 
 <template>
-    <Toolbar style="border: 0; padding-top: 0; padding-bottom: 0; margin: 0">
-        <template #start>
-            <InputGroup>
-                <InputText v-model="filterName" placeholder="MaterialFlow name" />
-                <Button icon="pi pi-search" @click="onSearch" />
-            </InputGroup>
+    <DataTable :value="curPageRows" dataKey="id" selectionMode="single" @row-select="onRowSelect" tableStyle="width:100%;" sortField="id" :sortOrder="1" :rows="rows" scrollable scrollHeight="25rem">
+        <template #header>
+            <div class="flex items-center justify-between w-full">
+                <InputGroup style="width: 16rem">
+                    <InputText v-model="filterName" placeholder="MaterialFlow name" />
+                    <Button icon="pi pi-search" @click="onSearch" />
+                </InputGroup>
+                <span>Records: {{ totalRecords }}</span>
+                <Paginator v-model:first="first" :rows="rows" :totalRecords="totalRecords" :pageLinkSize="3" @page="onPage"></Paginator>
+            </div>
         </template>
-        <template #center>
-            <span>Records: {{ totalRecords }}</span>
-        </template>
-        <template #end> <Paginator v-model:first="first" :rows="rows" :totalRecords="totalRecords" :pageLinkSize="3" @page="onPage"></Paginator> </template>
-    </Toolbar>
-
-    <div class="mt-2">
-        <DataTable :value="curPageRows" dataKey="id" selectionMode="single" @row-select="onRowSelect" tableStyle="width:100%;" sortField="id" :sortOrder="1" :rows="rows" scrollable scrollHeight="25rem">
-            <Column field="id" header="ID"></Column>
-            <Column field="name" header="MaterialFlow Name"></Column>
-            <!-- <Column field="active" header="Active">
-                <template #body="{ data }">
-                    <span v-if="data.active" class="pi pi-check"></span>
-                    <span v-else class="pi pi-times"></span>
-                </template>
-            </Column> -->
-        </DataTable>
-    </div>
+        <Column field="id" header="ID"></Column>
+        <Column field="name" header="MaterialFlow Name"></Column>
+    </DataTable>
 </template>
