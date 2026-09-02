@@ -1,4 +1,4 @@
-import { type UseFetchApis, useFetch } from '@/utils/rest.api';
+import { useFetch } from '@/utils/rest.api';
 import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
 import { saveAs } from 'file-saver';
 import { defineStore } from 'pinia';
@@ -126,7 +126,7 @@ export const useJobStore = defineStore('JobStore', () => {
     const listJobsFiltered = ref();
     const selectedJobs = ref([]);
     const subFolder = ref();
-    const rest: UseFetchApis = useFetch();
+    const rest = useFetch();
 
     const fetchAllData = () => {
         rest.get('/restful/deposit-jobs/jobs/active/list')

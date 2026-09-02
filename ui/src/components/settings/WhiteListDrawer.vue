@@ -2,7 +2,7 @@
 import { useSettingsWhiteListStore } from '@/stores/settings';
 import { type WhiteListUser } from '@/types/deposit';
 import { useDialog } from 'primevue/usedialog';
-import { defineExpose, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import WhiteListEditDialog from './WhiteListEditDialog.vue';
 
 const dialog = useDialog();

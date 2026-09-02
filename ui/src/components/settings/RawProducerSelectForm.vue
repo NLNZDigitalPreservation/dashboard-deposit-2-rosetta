@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { type UseFetchApis, useFetch } from '@/utils/rest.api';
-import { defineEmits, ref } from 'vue';
+import { useFetch } from '@/utils/rest.api';
+import { ref } from 'vue';
 
 const emit = defineEmits(['onSelected']);
 const props = defineProps<{
     account?: number;
 }>();
-const rest: UseFetchApis = useFetch();
+const rest = useFetch();
 const rows = ref(10);
 const first = ref(0);
 const page = ref(0);

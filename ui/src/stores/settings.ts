@@ -1,5 +1,5 @@
 import { useToastStore } from '@/utils/helper';
-import { useFetch, type UseFetchApis } from '@/utils/rest.api';
+import { useFetch } from '@/utils/rest.api';
 import { defineStore } from 'pinia';
 import { useConfirm } from 'primevue/useconfirm';
 import { reactive, ref } from 'vue';
@@ -20,7 +20,7 @@ export const depositAccount = reactive({
 export const useSettingsDepositAccountStore = defineStore('SettingsDepositAccountStore', () => {
     const toast = useToastStore();
     const confirm = useConfirm();
-    const rest: UseFetchApis = useFetch();
+    const rest = useFetch();
 
     const dataList = ref();
     const data = ref();
@@ -95,7 +95,7 @@ export const useSettingsDepositAccountStore = defineStore('SettingsDepositAccoun
 export const useSettingsMaterialFlowStore = defineStore('SettingsMaterialFlowStore', () => {
     const toast = useToastStore();
     const confirm = useConfirm();
-    const rest: UseFetchApis = useFetch();
+    const rest = useFetch();
 
     const dataList = ref();
     const data = ref();
@@ -172,7 +172,7 @@ export const useSettingsWhiteListStore = defineStore('SettingsWhiteListStore', (
     const toast = useToastStore();
     const confirm = useConfirm();
 
-    const rest: UseFetchApis = useFetch();
+    const rest = useFetch();
 
     const dataList = ref();
     const data = ref();
@@ -238,7 +238,7 @@ export const useSettingsWhiteListStore = defineStore('SettingsWhiteListStore', (
 
 export const useSettingsGlobalStore = defineStore('SettingsGlobalStore', () => {
     const toast = useToastStore();
-    const rest: UseFetchApis = useFetch();
+    const rest = useFetch();
 
     const data = ref();
     const selectedRow = ref();

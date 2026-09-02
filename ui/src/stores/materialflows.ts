@@ -1,5 +1,5 @@
 import type { MaterialFlow } from '@/types/deposit';
-import { type UseFetchApis, useFetch } from '@/utils/rest.api';
+import { useFetch } from '@/utils/rest.api';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
@@ -7,7 +7,7 @@ export const useMaterialFlowsStore = defineStore('MaterialFlows', () => {
     const data = ref([] as MaterialFlow[]);
     const filteredData = ref();
     const selectedData = ref([]);
-    const rest: UseFetchApis = useFetch();
+    const rest = useFetch();
 
     const fetchAllData = () => {
         rest.get('/restful/setting/flow/all/get')

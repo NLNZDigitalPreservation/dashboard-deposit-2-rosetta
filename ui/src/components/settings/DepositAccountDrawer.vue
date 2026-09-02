@@ -2,7 +2,7 @@
 import { useSettingsDepositAccountStore } from '@/stores/settings';
 import { type DepositAccount } from '@/types/deposit';
 import { useDialog } from 'primevue/usedialog';
-import { defineExpose, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import DepositAccountEditDialog from './DepositAccountEditDialog.vue';
 
 const dialog = useDialog();

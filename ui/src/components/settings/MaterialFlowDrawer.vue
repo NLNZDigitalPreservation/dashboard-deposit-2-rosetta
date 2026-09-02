@@ -2,7 +2,7 @@
 import { useSettingsMaterialFlowStore } from '@/stores/settings';
 import type { MaterialFlow } from '@/types/deposit';
 import { useDialog } from 'primevue/usedialog';
-import { defineExpose, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import MaterialFlowEditDialog from './MaterialFlowEditDialog.vue';
 
 const dialog = useDialog();

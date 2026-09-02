@@ -1,7 +1,7 @@
 import DepositJobAvailableActionsDialog from '@/components/jobs/DepositJobAvailableActionsDialog.vue';
 import DepositJobDetailDialog from '@/components/jobs/DepositJobDetailDialog.vue';
 import { useJobStore } from '@/stores/depositjob';
-import { type UseFetchApis, useFetch } from '@/utils/rest.api';
+import { useFetch } from '@/utils/rest.api';
 import { defineStore } from 'pinia';
 import { useDialog } from 'primevue/usedialog';
 import { useToast } from 'primevue/usetoast';
@@ -11,7 +11,7 @@ export const useContextMenu = defineStore('ContextMenu', () => {
     const toast = useToast();
     const dialog = useDialog();
     const jobList = useJobStore();
-    const rest: UseFetchApis = useFetch();
+    const rest = useFetch();
     const selectedContextRow = ref();
 
     const isRowDataValidForAction = (action: string, rowData: any) => {

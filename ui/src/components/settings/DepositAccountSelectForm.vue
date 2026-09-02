@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useSettingsDepositAccountStore } from '@/stores/settings';
-import { type UseFetchApis, useFetch } from '@/utils/rest.api';
-import { computed, defineEmits, onMounted, ref } from 'vue';
+import { useFetch } from '@/utils/rest.api';
+import { computed, onMounted, ref } from 'vue';
 
 const emit = defineEmits(['onSelected']);
 
-const rest: UseFetchApis = useFetch();
+const rest = useFetch();
 const depositAccountStore = useSettingsDepositAccountStore();
 const allAccounts = ref([]);
 
