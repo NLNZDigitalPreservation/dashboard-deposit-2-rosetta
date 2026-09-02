@@ -2,6 +2,7 @@ import { useAuthStore } from '@/utils/auth';
 import { extractError } from '@/utils/rest.http';
 import { useUserProfileStore } from '@/utils/users';
 import axios from 'axios';
+import { useAlertStore } from './alert.store';
 
 const baseUrl = import.meta.env.BASE_URL;
 
@@ -23,6 +24,7 @@ const processQueue = (token: any = null) => {
 
 // by convention, composable function names start with "use"
 export function useFetch() {
+    const alertStore = useAlertStore();
     const userProfileStore = useUserProfileStore();
     const authStore = useAuthStore();
 
@@ -93,10 +95,10 @@ export function useFetch() {
                     err = extractError(error.response);
                 }
 
-                console.error(err.description, err.description, err.title);
+                alertStore.error(err.description, err.title);
 
                 // return Promise.reject(undefined);
-                return { data: undefined };
+                return undefined;
             }
         }
     );
