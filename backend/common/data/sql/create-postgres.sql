@@ -1,0 +1,10 @@
+CREATE DATABASE depdash WITH ENCODING = 'UTF8';
+
+\c depdash
+
+
+CREATE ROLE depdash LOGIN PASSWORD 'depdash'
+NOINHERIT
+VALID UNTIL 'infinity';
+
+GRANT USAGE ON SCHEMA public TO depdash;

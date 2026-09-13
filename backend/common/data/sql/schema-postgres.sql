@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS global_setting (
     delay_unit VARCHAR(8) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS deposit_account_setting (
+CREATE TABLE IF NOT EXISTS deposit_account (
     id BIGINT PRIMARY KEY,
     audit_rst BOOLEAN NOT NULL DEFAULT TRUE,
     audit_msg TEXT NOT NULL DEFAULT 'OK',

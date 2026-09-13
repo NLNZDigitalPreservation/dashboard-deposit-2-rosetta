@@ -19,8 +19,6 @@ from peewee import (
 )
 from playhouse.pool import PooledPsycopg3Database
 
-from worker.metadata import FinalResultCode
-
 # Do NOT import Psycopg3JSONField from peewee or postgres_ext
 
 
@@ -103,14 +101,14 @@ class GlobalSetting(BaseModel):
         table_name = "global_setting"
 
 
-class DepositAccountSetting(BaseModel):
+class DepositAccount(BaseModel):
     deposit_user_institute = CharField(max_length=64, null=False)
     deposit_user_name = CharField(max_length=255, null=False)
     deposit_user_password = TextField(null=False)
     producers = Psycopg3JSONField(default=list, null=False)
 
     class Meta:
-        table_name = "deposit_account_setting"
+        table_name = "deposit_account"
 
 
 class StorageLocation(BaseModel):
