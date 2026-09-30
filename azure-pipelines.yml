@@ -22,10 +22,12 @@ stages:
       - job: Build
 
         # Change this to your self-hosted pool if applicable
+        # pool:
+        #   name: self-hosted-linux
+        #   demands:
+        #     - Agent.Name -equals vm-mgt-ado-01
         pool:
-          name: self-hosted-linux
-          demands:
-            - Agent.Name -equals vm-mgt-ado-01
+          vmImage: ubuntu-latest
 
         steps:
           - checkout: self
