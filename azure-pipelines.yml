@@ -12,11 +12,11 @@ resources:
 
 variables:
   imageName: deposit-dashboard
+  containerRegistryServiceConnection: ANL-DP-Development_to_acrdiaanlnzndev_WIF
 
 stages:
   - stage: Build
     displayName: Build and Push Image
-    containerRegistryServiceConnection: ANL-DP-Development_to_acrdiaanlnzndev_WIF
 
     jobs:
       - job: Build
