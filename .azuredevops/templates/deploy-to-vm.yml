@@ -1,0 +1,101 @@
+parameters:
+  - name: azureSubscription
+    type: string
+
+  - name: resourceGroup
+    type: string
+
+  - name: vmName
+    type: string
+
+  - name: tarName
+    type: string
+
+  - name: sourceDir
+    type: string
+
+  - name: remoteDir
+    type: string
+
+  - name: remoteOwner
+    type: string
+    default: dpsutl:dpsutl
+
+  - name: identityClientId
+    type: string
+
+  - name: envName
+    type: string
+    default: dev
+
+steps:
+  - script: |
+      SOURCE_DIR='${{ parameters.sourceDir }}'
+      echo "DASHBOARD_VERSION=$(Build.SourceBranchName)" >> "${SOURCE_DIR}/.env"
+      echo "ENV_NAME=${{ parameters.envName }}" >> "${SOURCE_DIR}/.env"
+      echo "Deploying to ${{ parameters.envName }} VM: ${{ parameters.vmName }}"
+    displayName: "Initialize .env file for ${{ parameters.envName }} VM"
+
+  - task: AzureCLI@2
+    displayName: "Transfer archive to ${{ parameters.envName }} VM"
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -euo pipefail
+
+        TAR_NAME='${{ parameters.tarName }}'
+        SOURCE_DIR='${{ parameters.sourceDir }}'
+        REMOTE_DIR='${{ parameters.remoteDir }}'
+        REMOTE_OWNER='${{ parameters.remoteOwner }}'
+        LOCAL_TAR="$(Agent.TempDirectory)/${TAR_NAME}.tar.gz"
+
+        echo "Preparing $TAR_NAME from $SOURCE_DIR"
+
+        if [[ ! -d "$SOURCE_DIR" ]]; then
+          echo "Source directory not found: $SOURCE_DIR" >&2
+          exit 1
+        fi
+
+        tar -czf "$LOCAL_TAR" -C "$SOURCE_DIR" .
+        echo "Archive size: $(du -h "$LOCAL_TAR" | cut -f1)"
+
+        CONTENT=$(base64 -w 0 "$LOCAL_TAR")
+
+        REMOTE_SCRIPT="rm -rf '$REMOTE_DIR' && mkdir -p '$REMOTE_DIR' && \
+          echo '$CONTENT' | base64 -d > '$REMOTE_DIR/$TAR_NAME.tar.gz' && \
+          tar -xzf '$REMOTE_DIR/$TAR_NAME.tar.gz' -C '$REMOTE_DIR' && \
+          rm -f '$REMOTE_DIR/$TAR_NAME.tar.gz'  && \
+          sudo chown -R '$REMOTE_OWNER' '$REMOTE_DIR'"
+
+        echo "Transferring $TAR_NAME to ${{ parameters.vmName }}:$REMOTE_DIR"
+
+        az vm run-command invoke \
+          --resource-group '${{ parameters.resourceGroup }}' \
+          --name '${{ parameters.vmName }}' \
+          --command-id RunShellScript \
+          --scripts "$REMOTE_SCRIPT"
+
+        echo "Transfer complete for $TAR_NAME"
+
+  - task: AzureCLI@2
+    displayName: "Install to ${{ parameters.envName }} VM"
+    inputs:
+      azureSubscription: ${{ parameters.azureSubscription }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -euo pipefail
+
+        REMOTE_DIR='${{ parameters.remoteDir }}'
+
+        BASH_SCRIPT="sudo -iu dpsutl bash $REMOTE_DIR/deploy.sh ${{ parameters.envName }} false false ${{parameters.identityClientId}}"
+
+        RUN_OUTPUT=$(az vm run-command invoke \
+          --command-id RunShellScript \
+          --name '${{ parameters.vmName }}' \
+          --resource-group '${{ parameters.resourceGroup }}' \
+          --scripts "$BASH_SCRIPT")
+
+        printf '%s\n' "$RUN_OUTPUT"

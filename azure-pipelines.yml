@@ -2,7 +2,12 @@
 # Build and Push Spring Boot Docker Image
 
 trigger:
-  - main
+  branches:
+    include:
+      - main
+  tags:
+    include:
+      - "*"
 
 # Build Number format:
 name: 3.0.$(Date:yyyyMMdd).$(Rev:r)
@@ -42,14 +47,14 @@ stages:
             displayName: Prepare security files
 
           - script: |
-              VERSION=$(bash gradlew properties -q | grep "^version:" | awk '{print $2}')
-              echo "Project Version: $VERSION"
-              echo "##vso[task.setvariable variable=tag]$VERSION"
-            displayName: Get Project Version
+              VERSION="$(Build.SourceBranchName)"
+              echo "Git Tag: $VERSION"
+              echo "##vso[task.setvariable variable=VERSION]$VERSION"
+            displayName: Get Git Tag
 
           - script: |
               echo "Build Number: $(Build.BuildNumber)"
-              echo "Image Tag: $(tag)"
+              echo "Image Tag: $(VERSION)"
             displayName: Show Build Information
 
           - task: Docker@2
@@ -61,5 +66,83 @@ stages:
               dockerfile: $(Build.SourcesDirectory)/Dockerfile
               buildContext: $(Build.SourcesDirectory)
               tags: |
-                $(tag)
+                $(VERSION)
                 latest
+
+  - stage: DeployDev
+    displayName: Deploy to DEV Environment
+    dependsOn: Build
+    condition: succeeded()
+
+    jobs:
+      - job: InstallToVM
+        pool:
+          name: self-hosted-linux
+          demands:
+            - Agent.Name -equals vm-mgt-ado-01
+
+        steps:
+          - checkout: self
+
+          - template: .azuredevops/templates/deploy-to-vm.yml
+            parameters:
+              azureSubscription: ANL-DP-Development_pipeline_agent_dev
+              resourceGroup: rg-dia-anl-nzn-pod-dev
+              vmName: nzndevanlpod01
+              tarName: deployment
+              sourceDir: $(Build.SourcesDirectory)/deployment
+              remoteDir: /home/dpsutl/temp/dashboard/deployment
+              identityClientId: fbac5d00-7afb-49da-81f0-ea566eeb48d5
+              envName: dev
+
+  - stage: DeployUat
+    displayName: Deploy to UAT Environment
+    dependsOn: Build
+    condition: succeeded()
+
+    jobs:
+      - job: InstallToVM
+        pool:
+          name: self-hosted-linux
+          demands:
+            - Agent.Name -equals vm-mgt-ado-01
+
+        steps:
+          - checkout: self
+
+          - template: .azuredevops/templates/deploy-to-vm.yml
+            parameters:
+              azureSubscription: ANL-DP-Development_pipeline_agent_uat
+              resourceGroup: rg-dia-anl-nzn-pod-uat
+              vmName: nznuatanlpod01
+              tarName: deployment
+              sourceDir: $(Build.SourcesDirectory)/deployment
+              remoteDir: /home/dpsutl/temp/dashboard/deployment
+              identityClientId: 8c5debda-fa7e-48eb-9a1d-947c696d3795
+              envName: uat
+
+  - stage: DeployPrd
+    displayName: Deploy to PRD Environment
+    dependsOn: Build
+    condition: succeeded()
+
+    jobs:
+      - job: InstallToVM
+        pool:
+          name: self-hosted-linux
+          demands:
+            - Agent.Name -equals vm-mgt-ado-01
+
+        steps:
+          - checkout: self
+
+          - template: .azuredevops/templates/deploy-to-vm.yml
+            parameters:
+              azureSubscription: ANL-DP-Development_pipeline_agent_prd
+              resourceGroup: rg-dia-anl-nzn-pod-prd
+              vmName: nznprdanlpod01
+              tarName: deployment
+              sourceDir: $(Build.SourcesDirectory)/deployment
+              remoteDir: /home/dpsutl/temp/dashboard/deployment
+              identityClientId: 97a851f3-8b80-4a66-8b6c-22304dedaac8
+              envName: prd

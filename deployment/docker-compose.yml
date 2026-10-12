@@ -1,0 +1,19 @@
+networks:
+  viridian-network:
+    external: true
+services:
+  dashboard:
+    image: acrdiaanlnzndev.azurecr.io/deposit-dashboard:${DASHBOARD_VERSION:-latest}
+    command: --spring.config.additional-location=file:/usr/local/dashboard/
+    container_name: dashboard
+    hostname: dashboard
+    restart: always
+    ports:
+      - "1901:1901"
+    networks:
+      - viridian-network
+    environment:
+      - PERSIST_PATH=${PERSIST_PATH:-/data/persistent/dashboard}
+    volumes:
+      - ${SOURCE_INSTALL_PATH}:/usr/local/dashboard
+      - /mnt/ndha-pre-deposit/:/ndha/pre-deposit
