@@ -33,6 +33,8 @@ steps:
       SOURCE_DIR='${{ parameters.sourceDir }}'
       echo "DASHBOARD_VERSION=$(Build.SourceBranchName)" >> "${SOURCE_DIR}/.env"
       echo "ENV_NAME=${{ parameters.envName }}" >> "${SOURCE_DIR}/.env"
+      echo "SOURCE_INSTALL_PATH=/data/viridian/conf/dashboard" >> "${SOURCE_DIR}/.env"
+      echo "SOURCE_PERSISTENT_PATH=/data/viridian/persistent/dashboard" >> "${SOURCE_DIR}/.env"
       echo "Deploying to ${{ parameters.envName }} VM: ${{ parameters.vmName }}"
     displayName: "Initialize .env file for ${{ parameters.envName }} VM"
 
