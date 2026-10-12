@@ -67,7 +67,7 @@ steps:
           echo '$CONTENT' | base64 -d > '$REMOTE_DIR/$TAR_NAME.tar.gz' && \
           tar -xzf '$REMOTE_DIR/$TAR_NAME.tar.gz' -C '$REMOTE_DIR' && \
           rm -f '$REMOTE_DIR/$TAR_NAME.tar.gz'  && \
-          sudo chown -R '$REMOTE_OWNER' '$REMOTE_DIR'"
+          sudo chown -R '$REMOTE_OWNER' '$REMOTE_DIR/..'"
 
         echo "Transferring $TAR_NAME to ${{ parameters.vmName }}:$REMOTE_DIR"
 
