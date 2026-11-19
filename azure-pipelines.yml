@@ -1,6 +1,3 @@
-# Docker
-# Build and Push Spring Boot Docker Image
-
 trigger:
   branches:
     include:
@@ -97,52 +94,60 @@ stages:
 
   - stage: DeployUat
     displayName: Deploy to UAT Environment
-    dependsOn: Build
+    dependsOn: DeployDev
     condition: succeeded()
 
     jobs:
-      - job: InstallToVM
+      - deployment: InstallToVM
+        displayName: Install to UAT VM
+        environment: DPS-APP-APPROVE
         pool:
           name: self-hosted-linux
           demands:
             - Agent.Name -equals vm-mgt-ado-01
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
 
-        steps:
-          - checkout: self
-
-          - template: .azuredevops/templates/deploy-to-vm.yml
-            parameters:
-              azureSubscription: ANL-DP-Development_pipeline_agent_uat
-              resourceGroup: rg-dia-anl-nzn-pod-uat
-              vmName: nznuatanlpod01
-              tarName: deployment
-              sourceDir: $(Build.SourcesDirectory)/deployment
-              remoteDir: /home/dpsutl/temp/dashboard/deployment
-              identityClientId: 8c5debda-fa7e-48eb-9a1d-947c696d3795
-              envName: uat
+                - template: .azuredevops/templates/deploy-to-vm.yml
+                  parameters:
+                    azureSubscription: ANL-DP-Development_pipeline_agent_uat
+                    resourceGroup: rg-dia-anl-nzn-pod-uat
+                    vmName: nznuatanlpod01
+                    tarName: deployment
+                    sourceDir: $(Build.SourcesDirectory)/deployment
+                    remoteDir: /home/dpsutl/temp/dashboard/deployment
+                    identityClientId: 8c5debda-fa7e-48eb-9a1d-947c696d3795
+                    envName: uat
 
   - stage: DeployPrd
     displayName: Deploy to PRD Environment
-    dependsOn: Build
+    dependsOn: DeployDev
     condition: succeeded()
 
     jobs:
-      - job: InstallToVM
+      - deployment: InstallToVM
+        displayName: Install to PRD VM
+        environment: DPS-APP-APPROVE
         pool:
           name: self-hosted-linux
           demands:
             - Agent.Name -equals vm-mgt-ado-01
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
 
-        steps:
-          - checkout: self
-
-          - template: .azuredevops/templates/deploy-to-vm.yml
-            parameters:
-              azureSubscription: ANL-DP-Development_pipeline_agent_prd
-              resourceGroup: rg-dia-anl-nzn-pod-prd
-              vmName: nznprdanlpod01
-              tarName: deployment
-              sourceDir: $(Build.SourcesDirectory)/deployment
-              remoteDir: /home/dpsutl/temp/dashboard/deployment
-              identityClientId: 97a851f3-8b80-4a66-8b6c-22304dedaac8
-              envName: prd
+                - template: .azuredevops/templates/deploy-to-vm.yml
+                  parameters:
+                    azureSubscription: ANL-DP-Development_pipeline_agent_prd
+                    resourceGroup: rg-dia-anl-nzn-pod-prd
+                    vmName: nznprdanlpod01
+                    tarName: deployment
+                    sourceDir: $(Build.SourcesDirectory)/deployment
+                    remoteDir: /home/dpsutl/temp/dashboard/deployment
+                    identityClientId: 97a851f3-8b80-4a66-8b6c-22304dedaac8
+                    envName: prd
