@@ -34,7 +34,8 @@ import java.util.stream.Collectors;
 @Service
 @Lazy
 public class DepositJobService implements InterfaceFlowSetting, InterfaceMappingDTO {
-    //    private static final String INJECTION_DONE_FILE_NAME = "ready-for-ingestion-FOLDER-COMPLETED";
+    // private static final String INJECTION_DONE_FILE_NAME =
+    // "ready-for-ingestion-FOLDER-COMPLETED";
     private static final Logger log = LoggerFactory.getLogger(DepositJobService.class);
     private static final Map<Long, Semaphore> DB_JOB_TOKENS = new HashMap<>();
     @Autowired
@@ -112,10 +113,12 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         if (StringUtils.equalsIgnoreCase(job.getSipModule(), sipStatusInfo.getModule()) &&
                 StringUtils.equalsIgnoreCase(job.getSipStage(), sipStatusInfo.getStage()) &&
                 StringUtils.equalsIgnoreCase(job.getSipStatus(), sipStatusInfo.getStatus())) {
-            log.debug("The status info is not updated: jobId={},  sipStatusInfo: ({} {} {})", job.getId(), sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
+            log.debug("The status info is not updated: jobId={},  sipStatusInfo: ({} {} {})", job.getId(),
+                    sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
             return job;
         } else {
-            log.info("Updated status: {}, {} {} {}==> {} {} {}", job.getId(), job.getSipModule(), job.getStage(), job.getState(), sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
+            log.info("Updated status: {}, {} {} {}==> {} {} {}", job.getId(), job.getSipModule(), job.getStage(),
+                    job.getState(), sipStatusInfo.getModule(), sipStatusInfo.getStage(), sipStatusInfo.getStatus());
         }
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
@@ -130,7 +133,8 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         return job;
     }
 
-    public EntityDepositJob jobUpdateStatus(EntityDepositJob job, EnumDepositJobStage stage, EnumDepositJobState state) {
+    public EntityDepositJob jobUpdateStatus(EntityDepositJob job, EnumDepositJobStage stage,
+            EnumDepositJobState state) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
         job.setLatestTime(nowDatetime);
         if (stage != null) {
@@ -168,19 +172,22 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
 
     public EntityDepositJob pause(EntityDepositJob job) {
         if (!isPauseAble(job)) {
-            log.warn("{} at stage [{}] and state [{}] could not be paused", job.getInjectionTitle(), job.getStage(), job.getState());
+            log.warn("{} at stage [{}] and state [{}] could not be paused", job.getInjectionTitle(), job.getStage(),
+                    job.getState());
             return job;
         }
         return jobUpdateStatus(job, EnumDepositJobState.PAUSED);
     }
 
     private boolean isPauseAble(EntityDepositJob job) {
-        return (job.getStage() != EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.RUNNING) || (job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.INITIALED);
+        return (job.getStage() != EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.RUNNING)
+                || (job.getStage() == EnumDepositJobStage.DEPOSIT && job.getState() == EnumDepositJobState.INITIALED);
     }
 
     public EntityDepositJob resume(EntityDepositJob job) {
         if (job.getState() != EnumDepositJobState.PAUSED) {
-            log.warn("{} at stage [{}] and state [{}] could not be resumed", job.getInjectionTitle(), job.getStage(), job.getState());
+            log.warn("{} at stage [{}] and state [{}] could not be resumed", job.getInjectionTitle(), job.getStage(),
+                    job.getState());
             return job;
         }
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
@@ -198,20 +205,24 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     }
 
     public EntityDepositJob terminate(EntityDepositJob job) {
-        if ((job.getStage() == EnumDepositJobStage.FINISHED && job.getState() == EnumDepositJobState.SUCCEED) || job.getState() == EnumDepositJobState.FAILED || job.getState() == EnumDepositJobState.CANCELED) {
-            //Delete the existing subfolder
-            InjectionPathScan injectionPathScanClient = InjectionUtils.createPathScanClient(job.getAppliedFlowSetting().getRootPath());
+        if ((job.getStage() == EnumDepositJobStage.FINISHED && job.getState() == EnumDepositJobState.SUCCEED)
+                || job.getState() == EnumDepositJobState.FAILED || job.getState() == EnumDepositJobState.CANCELED) {
+            // Delete the existing subfolder
+            InjectionPathScan injectionPathScanClient = InjectionUtils
+                    .createPathScanClient(job.getAppliedFlowSetting().getRootPath());
             InjectionUtils.deleteFiles(injectionPathScanClient, new File(job.getInjectionPath()));
             repoJob.delete(job);
         } else {
-            log.error("{} at stage [{}] and state [{}] could not be terminated", job.getInjectionTitle(), job.getStage(), job.getState());
+            log.error("{} at stage [{}] and state [{}] could not be terminated", job.getInjectionTitle(),
+                    job.getStage(), job.getState());
         }
         return job;
     }
 
     public EntityDepositJob cancel(EntityDepositJob job) {
         if (job.getState() == EnumDepositJobState.RUNNING) {
-            log.warn("{} at stage [{}] and state [{}] could not be canceled", job.getInjectionTitle(), job.getStage(), job.getState());
+            log.warn("{} at stage [{}] and state [{}] could not be canceled", job.getInjectionTitle(), job.getStage(),
+                    job.getState());
             return job;
         }
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
@@ -239,14 +250,14 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         repoJob.save(job);
     }
 
-//    public EntityDepositJob jobFinalizeStart(EntityDepositJob job) {
-//        long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
-//        job.setLatestTime(nowDatetime);
-//        job.setStage(EnumDepositJobStage.FINALIZE);
-//        job.setState(EnumDepositJobState.RUNNING);
-//        repoJob.save(job);
-//        return job;
-//    }
+    // public EntityDepositJob jobFinalizeStart(EntityDepositJob job) {
+    // long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
+    // job.setLatestTime(nowDatetime);
+    // job.setStage(EnumDepositJobStage.FINALIZE);
+    // job.setState(EnumDepositJobState.RUNNING);
+    // repoJob.save(job);
+    // return job;
+    // }
 
     public EntityDepositJob jobFinalizeEnd(EntityDepositJob job, EnumDepositJobState state) {
         long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
@@ -267,15 +278,15 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
     }
 
     public void jobCompletedBackup(EntityDepositJob job) {
-//        long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
-//        job.setFinalizedTime(nowDatetime);
+        // long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
+        // job.setFinalizedTime(nowDatetime);
         job.setBackupCompleted(true);
         repoJob.save(job);
     }
 
     public void jobDeletedActualContent(EntityDepositJob job) {
-//        long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
-//        job.setFinalizedTime(nowDatetime);
+        // long nowDatetime = DashboardHelper.getLocalCurrentMilliSeconds();
+        // job.setFinalizedTime(nowDatetime);
         job.setActualContentDeleted(true);
         repoJob.save(job);
     }
@@ -285,7 +296,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         String stage = sipStatusInfo.getStage();
         String status = sipStatusInfo.getStatus();
 
-        //Take the "DECLINED" status at any stages as failed
+        // Take the "DECLINED" status at any stages as failed
         if (status != null && status.equalsIgnoreCase("DECLINED")) {
             return EnumDepositJobState.FAILED;
         }
@@ -318,7 +329,8 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         }
         progressFiles.clear();
 
-        InputStream inputStream = injectionPathScanClient.readFile(injectionPath + File.separator + "content", "mets.xml");
+        InputStream inputStream = injectionPathScanClient.readFile(injectionPath + File.separator + "content",
+                "mets.xml");
         if (inputStream == null) {
             return false;
         }
@@ -332,8 +344,8 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             return false;
         }
 
-
-        List<UnionFile> streamFiles = injectionPathScanClient.listFile(injectionPath + File.separator + "content" + File.separator + "streams");
+        List<UnionFile> streamFiles = injectionPathScanClient
+                .listFile(injectionPath + File.separator + "content" + File.separator + "streams");
         if (streamFiles == null || streamFiles.size() == 0) {
             return false;
         }
@@ -358,32 +370,36 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         return true;
     }
 
-//    public boolean isDepositDone(InjectionPathScan injectionPathScanClient, String injectionPath) {
-//        List<UnionFile> progressFiles = injectionPathScanClient.listFile(injectionPath);
-//        for (UnionFile f : progressFiles) {
-//            if (f.getName().equalsIgnoreCase("done")) {
-//                return true;
-//            }
-//        }
-//
-//        InputStream inputStream = injectionPathScanClient.readFile(injectionPath + File.separator + "content", "mets.xml");
-//        if (inputStream == null) {
-//            return false;
-//        }
-//        MetsXmlProperties prop = MetsHandler.parse(inputStream);
-//        if (prop == null) {
-//            return false;
-//        }
-//
-//        int num = rosettaWebService.getNumberOfRecords(prop);
-//        return num == 1;
-//    }
+    // public boolean isDepositDone(InjectionPathScan injectionPathScanClient,
+    // String injectionPath) {
+    // List<UnionFile> progressFiles =
+    // injectionPathScanClient.listFile(injectionPath);
+    // for (UnionFile f : progressFiles) {
+    // if (f.getName().equalsIgnoreCase("done")) {
+    // return true;
+    // }
+    // }
+    //
+    // InputStream inputStream = injectionPathScanClient.readFile(injectionPath +
+    // File.separator + "content", "mets.xml");
+    // if (inputStream == null) {
+    // return false;
+    // }
+    // MetsXmlProperties prop = MetsHandler.parse(inputStream);
+    // if (prop == null) {
+    // return false;
+    // }
+    //
+    // int num = rosettaWebService.getNumberOfRecords(prop);
+    // return num == 1;
+    // }
 
-    public RestResponseCommand manuallySubmitDepositJob(Long flowId, String sourceNfsDirectory, boolean isForceReplaceExistingJob) {
+    public RestResponseCommand manuallySubmitDepositJob(Long flowId, String sourceNfsDirectory,
+            boolean isForceReplaceExistingJob) {
         RestResponseCommand retVal = new RestResponseCommand();
 
         EntityFlowSetting flowSetting = repoFlowSetting.getById(flowId);
-        //Checking is input sourceNfsDirectory duplicated
+        // Checking is input sourceNfsDirectory duplicated
         if (flowSetting == null || !flowSetting.isEnabled()) {
             String msg = String.format("%s flow setting does not exist or is disabled", flowId);
             log.warn(msg);
@@ -401,8 +417,9 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             return retVal;
         }
 
-        //Checking is sourceNfsDirectory valid and is ready
-        InjectionPathScan targetInjectionPathScanClient = InjectionUtils.createPathScanClient(flowSetting.getRootPath());
+        // Checking is sourceNfsDirectory valid and is ready
+        InjectionPathScan targetInjectionPathScanClient = InjectionUtils
+                .createPathScanClient(flowSetting.getRootPath());
 
         //
         EntityDepositJob job = repoJob.getByFlowIdAndInjectionTitle(flowId, fSubFolder.getName());
@@ -411,14 +428,15 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
 
         boolean isExisting = targetInjectionPathScanClient.exists(targetSubFolder.getAbsolutePath()) || job != null;
         if (isExisting && !isForceReplaceExistingJob) {
-            String msg = String.format("%s folder does exist in: %s, and can not be replaced", fSubFolder.getName(), flowSetting.getRootPath());
+            String msg = String.format("%s folder does exist in: %s, and can not be replaced", fSubFolder.getName(),
+                    flowSetting.getRootPath());
             log.error(msg);
             retVal.setRspCode(RestResponseCommand.RSP_INVALID_INPUT_PARAMETERS);
             retVal.setRspMsg(msg);
             return retVal;
         }
 
-        //If existing and allow replaced
+        // If existing and allow replaced
         if (isExisting) {
             InjectionUtils.deleteFiles(targetInjectionPathScanClient, targetSubFolder);
             if (job != null) {
@@ -426,11 +444,11 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             }
         }
 
-        //The upload job in the flow root location
+        // The upload job in the flow root location
         if (!fSubFolder.getParent().equalsIgnoreCase(flowSetting.getRootPath())) {
-            //Copying the input sourceNfsDirectory to root location of the Flow
+            // Copying the input sourceNfsDirectory to root location of the Flow
             cascadeCopyFiles(fSubFolder.getParentFile(), targetInjectionPathScanClient, fSubFolder, flowSetting);
-//            FileUtils.copyDirectory(sourceDirectory, destinationDirectory);
+            // FileUtils.copyDirectory(sourceDirectory, destinationDirectory);
         }
 
         UnionPath completeInjectFile = new UnionPath(targetSubFolder, flowSetting.getInjectionCompleteFileName());
@@ -450,7 +468,8 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         return retVal;
     }
 
-    private void cascadeCopyFiles(File sourceRootDir, InjectionPathScan targetInjectionPathScanClient, File curFile, EntityFlowSetting flowSetting) {
+    private void cascadeCopyFiles(File sourceRootDir, InjectionPathScan targetInjectionPathScanClient, File curFile,
+            EntityFlowSetting flowSetting) {
         log.debug("Copying: {}", curFile.getAbsolutePath());
 
         int lenSourceRootDir = sourceRootDir.getAbsolutePath().length();
@@ -458,10 +477,12 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
 
         if (curFile.isFile()) {
             if (!curFile.getName().equalsIgnoreCase(flowSetting.getInjectionCompleteFileName())) {
-                targetInjectionPathScanClient.copy(UnionPath.of(curFile), new UnionPath(targetInjectionPathScanClient.getRootPath(), curFileName));
+                targetInjectionPathScanClient.copy(UnionPath.of(curFile),
+                        new UnionPath(targetInjectionPathScanClient.getRootPath(), curFileName));
             }
         } else {
-            targetInjectionPathScanClient.mkdirs(new UnionPath(targetInjectionPathScanClient.getRootPath(), curFileName));
+            targetInjectionPathScanClient
+                    .mkdirs(new UnionPath(targetInjectionPathScanClient.getRootPath(), curFileName));
 
             File[] files = curFile.listFiles();
             if (files == null) {
@@ -473,7 +494,7 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         }
     }
 
-    //Query deposit jobs by input condition
+    // Query deposit jobs by input condition
     public List<EntityDepositJob> searchDepositJobs(DepositJobSearchCommand cmd) {
         LocalDateTime ldtStart = DashboardHelper.getLocalDateTimeFromEpochMilliSecond(cmd.getDtStart());
         ldtStart = ldtStart.withHour(0).withMinute(0).withSecond(0);
@@ -484,7 +505,6 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
 
         long lStart = DashboardHelper.getLocalMilliSeconds(ldtStart);
         long lEnd = DashboardHelper.getLocalMilliSeconds(ldtEnd);
-
 
         List<EntityDepositJob> listJobs = repoJob.getByLatestTime(lStart, lEnd);
 
@@ -513,7 +533,45 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
         return false;
     }
 
-    //    Export selected jobs to excel document
+    public List<Map<String, Object>> fetchExportData(List<Long> reqJobIDs) throws IOException {
+        List<Map<String, Object>> exportData = new ArrayList<>();
+        for (Long jobId : reqJobIDs) {
+            EntityDepositJob job = repoJob.getById(jobId);
+            if (job == null) {
+                continue;
+            }
+            Map<String, Object> jobData = new HashMap<>();
+            jobData.put("ID", job.getId());
+
+            EntityFlowSetting flowSetting = job.getAppliedFlowSetting();
+            jobData.put("Producer", flowSetting != null ? flowSetting.getProducerName() : "Unknown Producer");
+            jobData.put("MaterialFlow",
+                    flowSetting != null ? flowSetting.getMaterialFlowName() : "Unknown Material Flow");
+            jobData.put("JobTitle", job.getInjectionTitle());
+            jobData.put("SubFolder", job.getInjectionPath());
+            jobData.put("Stage", job.getStage().name());
+            jobData.put("State", job.getState().name());
+            jobData.put("JobInitialTime",
+                    DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getInitialTime()));
+            jobData.put("JobLatestUpdateTime",
+                    DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getLatestTime()));
+            jobData.put("NumOfFiles", job.getFileCount());
+            jobData.put("SizeOfFiles", job.getFileSize());
+            jobData.put("DepositStartTime",
+                    DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getDepositStartTime()));
+            jobData.put("DepositEndTime",
+                    DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getDepositEndTime()));
+            jobData.put("SipId", job.getSipID());
+            jobData.put("SipModule", job.getSipModule());
+            jobData.put("SipStage", job.getSipStage());
+            jobData.put("SipStatus", job.getSipStatus());
+            jobData.put("SipResult", job.getResultMessage());
+            exportData.add(jobData);
+        }
+        return exportData;
+    }
+
+    // Export selected jobs to excel document
     public void exportData(List<Long> reqJobIDs, HttpServletRequest req, HttpServletResponse rsp) throws IOException {
         Resource resource = new ClassPathResource("deposit-jobs-template.xlsx");
         Workbook workbook = new XSSFWorkbook(resource.getInputStream());
@@ -559,10 +617,12 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             cState.setCellValue(job.getState().name());
 
             Cell cInitialTime = rowExcel.createCell(colNum++, CellType.STRING);
-            cInitialTime.setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getInitialTime()));
+            cInitialTime
+                    .setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getInitialTime()));
 
             Cell cLatestUpdateTime = rowExcel.createCell(colNum++, CellType.STRING);
-            cLatestUpdateTime.setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getLatestTime()));
+            cLatestUpdateTime
+                    .setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getLatestTime()));
 
             Cell cNumOfFiles = rowExcel.createCell(colNum++, CellType.NUMERIC);
             cNumOfFiles.setCellValue(job.getFileCount());
@@ -571,10 +631,12 @@ public class DepositJobService implements InterfaceFlowSetting, InterfaceMapping
             cSizeOfFiles.setCellValue(job.getFileSize());
 
             Cell cDepositStartTime = rowExcel.createCell(colNum++, CellType.STRING);
-            cDepositStartTime.setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getDepositStartTime()));
+            cDepositStartTime.setCellValue(
+                    DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getDepositStartTime()));
 
             Cell cDepositEndTime = rowExcel.createCell(colNum++, CellType.STRING);
-            cDepositEndTime.setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getDepositEndTime()));
+            cDepositEndTime
+                    .setCellValue(DashboardHelper.epochMilliSecondToFrontendReadableLocalTime(job.getDepositEndTime()));
 
             Cell cSipId = rowExcel.createCell(colNum++, CellType.NUMERIC);
             cSipId.setCellValue(job.getSipID());

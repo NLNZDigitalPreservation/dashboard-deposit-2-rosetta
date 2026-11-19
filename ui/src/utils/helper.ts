@@ -1,6 +1,7 @@
 import { routes } from '@/router';
 import { defineStore } from 'pinia';
 import { useToast } from 'primevue/usetoast';
+import * as XLSX from 'xlsx';
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -110,3 +111,66 @@ export const useToastStore = defineStore('ToastStore', () => {
     };
     return { success, error, warn, info };
 });
+
+export const isNull = (obj: any) => {
+    if (obj === undefined || obj === null) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
+export const isEmpty = (obj: any) => {
+    if (obj === undefined || obj === null) {
+        return true;
+    }
+    if (obj.length == 0) {
+        return true;
+    }
+    return false;
+};
+
+export const saveExcel = (data: any[], sheetName: string, customizedHeaders: any = undefined) => {
+    const safeData = Array.isArray(data) ? data : [];
+    const normalizedCustomHeaders = Array.isArray(customizedHeaders) ? customizedHeaders.map((header) => String(header)) : [];
+    const headerSet = new Set<string>(normalizedCustomHeaders);
+    if (isNull(customizedHeaders)) {
+        for (const row of safeData) {
+            if (!row || typeof row !== 'object') {
+                continue;
+            }
+            for (const key of Object.keys(row)) {
+                headerSet.add(key);
+            }
+        }
+    }
+
+    const headers = Array.from(headerSet);
+    const worksheet = XLSX.utils.json_to_sheet(safeData, {
+        header: headers,
+        skipHeader: false
+    });
+
+    // Auto-size columns using the longest header/value length per column.
+    if (headers.length > 0) {
+        worksheet['!cols'] = headers.map((header) => {
+            let maxLength = String(header).length;
+
+            for (const row of safeData) {
+                const value = row?.[String(header)];
+                const text = isNull(value) ? '' : String(value);
+                if (text.length > maxLength) {
+                    maxLength = text.length;
+                }
+            }
+
+            return { wch: Math.min(Math.max(maxLength + 2, 10), 80) };
+        });
+    }
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+    const timeString = dataTimeObject2String(new Date());
+    XLSX.writeFile(workbook, `${sheetName}-${timeString}.xlsx`);
+};

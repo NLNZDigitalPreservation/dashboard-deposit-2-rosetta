@@ -24,8 +24,16 @@ export default defineConfig({
     server: {
         open: false,
         port: 5174,
-        allowedHosts: ['nzndevanlpod01.dia.govt.nz', 'dps.uat.natlib.govt.nz', 'dps.natlib.govt.nz', 'localhost']
+        allowedHosts: ['nzndevanlpod01.dia.govt.nz', 'dps.uat.natlib.govt.nz', 'dps.natlib.govt.nz', 'localhost'],
         // https: false,
-        // hotOnly: false,
+        // hotOnly: false,x
+        proxy: {
+            '/depdash/restful': {
+                target: 'http://localhost:1901',
+                changeOrigin: true,
+                secure: false
+            }
+        },
+        strictPort: true
     }
 });

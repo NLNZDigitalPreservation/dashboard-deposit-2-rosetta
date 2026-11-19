@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+        "type": "java",
+        "name": "Debug Dashboard (MainApplication)",
+        "request": "launch",
+        "mainClass": "nz.govt.natlib.dashboard.app.MainApplication",
+        "preLaunchTask": "gradle: classes",
+        "cwd": "${workspaceFolder}",
+        "console": "integratedTerminal"
+    },
+    {
+        "type": "java",
+        "name": "Run Dashboard (MainApplication)",
+        "request": "launch",
+        "mainClass": "nz.govt.natlib.dashboard.app.MainApplication",
+        "preLaunchTask": "gradle: classes",
+        "cwd": "${workspaceFolder}",
+        "console": "integratedTerminal",
+        "noDebug": true
+    }
+]
+}

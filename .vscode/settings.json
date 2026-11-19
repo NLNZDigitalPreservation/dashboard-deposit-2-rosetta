@@ -1,3 +1,18 @@
 {
-  "java.compile.nullAnalysis.mode": "disabled"
+  "java.compile.nullAnalysis.mode": "disabled",
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.project.importOnFirstTimeStartup": "automatic",
+  "java.import.gradle.enabled": true,
+  "java.import.gradle.wrapper.enabled": true,
+  "java.import.gradle.java.home": "/usr/lib/jvm/java-17-openjdk-amd64",
+  "java.jdt.ls.java.home": "/usr/lib/jvm/java-17-openjdk-amd64",
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-17",
+      "path": "/usr/lib/jvm/java-17-openjdk-amd64",
+      "default": true
+    }
+  ],
+  "gradle.java.home": "/usr/lib/jvm/java-17-openjdk-amd64",
+  "java.debug.settings.onBuildFailureProceed": true
 }

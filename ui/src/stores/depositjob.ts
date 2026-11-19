@@ -1,6 +1,6 @@
+import { saveExcel } from '@/utils/helper';
 import { useFetch } from '@/utils/rest.api';
 import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
-import { saveAs } from 'file-saver';
 import { defineStore } from 'pinia';
 import { reactive, ref } from 'vue';
 
@@ -168,15 +168,46 @@ export const useJobStore = defineStore('JobStore', () => {
     };
 
     const exportSelectedJobs = () => {
+        const EXCEL_DATA_COLUMNS = [
+            'ID',
+            'Producer',
+            'MaterialFlow',
+            'JobTitle',
+            'SubFolder',
+            'Stage',
+            'State',
+            'JobInitialTime',
+            'JobLatestUpdateTime',
+            'NumOfFiles',
+            'SizeOfFiles',
+            'DepositStartTime',
+            'DepositEndTime',
+            'SipId',
+            'SipModule',
+            'SipStage',
+            'SipStatus',
+            'SipResult'
+        ];
+
         const req: any[] = [];
         selectedJobs.value.forEach((job: any) => {
             req.push(job.id);
         });
-        rest.post('/restful/deposit-jobs/export-data', req)
+        // rest.post('/restful/deposit-jobs/export-data', req)
+        //     .then((blob: any) => {
+        //         if (blob) {
+        //             console.log('Succeed to export the selected jobs');
+        //             saveAs(blob, 'deposit_jobs.xlsx');
+        //         }
+        //     })
+        //     .catch((err: any) => {
+        //         console.log(err.message);
+        //     });
+        rest.post('/restful/deposit-jobs/fetch-export-data', req)
             .then((blob: any) => {
                 if (blob) {
+                    saveExcel(blob, 'deposit_jobs.xlsx', EXCEL_DATA_COLUMNS);
                     console.log('Succeed to export the selected jobs');
-                    saveAs(blob, 'deposit_jobs.xlsx');
                 }
             })
             .catch((err: any) => {
