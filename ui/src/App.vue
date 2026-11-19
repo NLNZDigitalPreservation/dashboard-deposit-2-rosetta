@@ -15,15 +15,17 @@ const title = useTitle('Dashboard');
 const envType = ref('DEV');
 
 onMounted(async () => {
+    await systemInfoStore.load();
+
     const sysInfo = systemInfoStore.data;
 
     let darkMode = false;
     let colorMode = 'indigo';
     let hostType = 'DEV';
-    if (!sysInfo.appDeployment) {
+    if (!sysInfo.systemDeployment) {
         hostType = 'DEV';
     } else {
-        hostType = sysInfo.appDeployment.toUpperCase();
+        hostType = sysInfo.systemDeployment.toUpperCase();
     }
 
     darkMode = true;

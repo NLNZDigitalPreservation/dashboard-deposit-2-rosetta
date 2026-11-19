@@ -83,7 +83,7 @@ interface JobQueryCondition {
 }
 
 interface SystemInfo {
-    appDeployment: string;
+    systemDeployment: string;
     version: string;
     authMode: string;
     entraTenantId: string;

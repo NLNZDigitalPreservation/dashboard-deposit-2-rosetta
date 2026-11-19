@@ -10,10 +10,10 @@ import { computed, ref } from 'vue';
 const systemInfoStore = useSystemInfoStore();
 const envType = computed(() => {
     const sysInfo = systemInfoStore.data;
-    if (!sysInfo.appDeployment) {
+    if (!sysInfo.systemDeployment) {
         return 'DEV';
     } else {
-        return sysInfo.appDeployment.toUpperCase();
+        return sysInfo.systemDeployment.toUpperCase();
     }
 });
 
