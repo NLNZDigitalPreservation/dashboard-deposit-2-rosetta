@@ -6,8 +6,8 @@ WORKDIR /build/ui
 
 RUN npm config set strict-ssl false && \
     rm -rf dist && \
+    rm -rf node_modules && \
     npm install && \
-    npm audit fix --force && \
     npm run build-only
 
 
